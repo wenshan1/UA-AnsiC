@@ -23,58 +23,6 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-#ifndef OPCUA_EXCLUDE_TestStack
-/*============================================================================
- * Synchronously calls the TestStack service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TestStack(
-    OpcUa_Channel              hChannel,
-    const OpcUa_RequestHeader* pRequestHeader,
-    OpcUa_UInt32               nTestId,
-    OpcUa_Int32                nIteration,
-    const OpcUa_Variant*       pInput,
-    OpcUa_ResponseHeader*      pResponseHeader,
-    OpcUa_Variant*             pOutput);
-
-/*============================================================================
- * Asynchronously calls the TestStack service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTestStack(
-    OpcUa_Channel                     hChannel,
-    const OpcUa_RequestHeader*        pRequestHeader,
-    OpcUa_UInt32                      nTestId,
-    OpcUa_Int32                       nIteration,
-    const OpcUa_Variant*              pInput,
-    OpcUa_Channel_PfnRequestComplete* pCallback,
-    OpcUa_Void*                       pCallbackData);
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-/*============================================================================
- * Synchronously calls the TestStackEx service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TestStackEx(
-    OpcUa_Channel                  hChannel,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nTestId,
-    OpcUa_Int32                    nIteration,
-    const OpcUa_CompositeTestType* pInput,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_CompositeTestType*       pOutput);
-
-/*============================================================================
- * Asynchronously calls the TestStackEx service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTestStackEx(
-    OpcUa_Channel                     hChannel,
-    const OpcUa_RequestHeader*        pRequestHeader,
-    OpcUa_UInt32                      nTestId,
-    OpcUa_Int32                       nIteration,
-    const OpcUa_CompositeTestType*    pInput,
-    OpcUa_Channel_PfnRequestComplete* pCallback,
-    OpcUa_Void*                       pCallbackData);
-#endif
-
 #ifndef OPCUA_EXCLUDE_FindServers
 /*============================================================================
  * Synchronously calls the FindServers service.
@@ -111,16 +59,16 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginFindServers(
  * Synchronously calls the FindServersOnNetwork service.
  *===========================================================================*/
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServersOnNetwork(
-    OpcUa_Channel                  hChannel,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nStartingRecordId,
-    OpcUa_UInt32                   nMaxRecordsToReturn,
-    OpcUa_Int32                    nNoOfServerCapabilityFilter,
-    const OpcUa_String*            pServerCapabilityFilter,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_DateTime*                pLastCounterResetTime,
-    OpcUa_Int32*                   pNoOfServers,
-    OpcUa_ServerOnNetwork**        pServers);
+    OpcUa_Channel              hChannel,
+    const OpcUa_RequestHeader* pRequestHeader,
+    OpcUa_UInt32               nStartingRecordId,
+    OpcUa_UInt32               nMaxRecordsToReturn,
+    OpcUa_Int32                nNoOfServerCapabilityFilter,
+    const OpcUa_String*        pServerCapabilityFilter,
+    OpcUa_ResponseHeader*      pResponseHeader,
+    OpcUa_DateTime*            pLastCounterResetTime,
+    OpcUa_Int32*               pNoOfServers,
+    OpcUa_ServerOnNetwork**    pServers);
 
 /*============================================================================
  * Asynchronously calls the FindServersOnNetwork service.

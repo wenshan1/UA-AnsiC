@@ -178,7 +178,6 @@
     <ClInclude Include="platforms\win32\opcua_p_types.h" />
     <ClInclude Include="platforms\win32\opcua_p_utilities.h" />
     <ClInclude Include="platforms\win32\opcua_p_win32_pki.h" />
-    <ClInclude Include="platforms\win32\opcua_p_wincrypt.h" />
     <ClInclude Include="platforms\win32\opcua_platformdefs.h" />
     <ClInclude Include="securechannel\opcua_securechannel_types.h" />
     <ClInclude Include="securechannel\opcua_secureconnection.h" />
@@ -503,12 +502,6 @@
       </PrecompiledHeader>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeaderOutputFile>
-    </ClCompile>
-    <ClCompile Include="platforms\win32\opcua_p_wincrypt_random.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="securechannel\opcua_secureconnection.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

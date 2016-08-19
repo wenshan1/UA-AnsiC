@@ -26,16 +26,6 @@ struct _OpcUa_Decoder;
 struct _OpcUa_EncodeableType;
 struct _OpcUa_EnumeratedType;
 
-/*============================================================================
- * We initialize any enumerated type to zero
- *===========================================================================*/
-
-#define OpcUa_EnumeratedType_Initialize(xValue, xType) \
-    do { *(xValue) = (OpcUa_##xType)0; } while(0)
-
-#define OpcUa_EnumeratedType_Clear(xValue, xType) \
-    do { *(xValue) = (OpcUa_##xType)0; } while(0)
-
 #ifndef OPCUA_EXCLUDE_IdType
 /*============================================================================
  * The IdType enumeration.
@@ -46,12 +36,15 @@ typedef enum _OpcUa_IdType
     OpcUa_IdType_String  = 1,
     OpcUa_IdType_Guid    = 2,
     OpcUa_IdType_Opaque  = 3
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_IdType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_IdType;
 
-#define OpcUa_IdType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, IdType)
+#define OpcUa_IdType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_IdType_Numeric)
 
-#define OpcUa_IdType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, IdType)
+#define OpcUa_IdType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_IdType_Numeric)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_IdType_EnumeratedType;
 #endif
@@ -71,12 +64,15 @@ typedef enum _OpcUa_NodeClass
     OpcUa_NodeClass_ReferenceType = 32,
     OpcUa_NodeClass_DataType      = 64,
     OpcUa_NodeClass_View          = 128
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_NodeClass_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_NodeClass;
 
-#define OpcUa_NodeClass_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, NodeClass)
+#define OpcUa_NodeClass_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_NodeClass_Unspecified)
 
-#define OpcUa_NodeClass_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, NodeClass)
+#define OpcUa_NodeClass_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_NodeClass_Unspecified)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_NodeClass_EnumeratedType;
 #endif
@@ -135,6 +131,68 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Node_Encode(OpcUa_Node* pValue, struct _OpcU
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Node_Decode(OpcUa_Node* pValue, struct _OpcUa_Decoder* pDecoder);
 
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_Node_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_InstanceNode
+/*============================================================================
+ * The InstanceNode structure.
+ *===========================================================================*/
+typedef struct _OpcUa_InstanceNode
+{
+    OpcUa_NodeId         NodeId;
+    OpcUa_NodeClass      NodeClass;
+    OpcUa_QualifiedName  BrowseName;
+    OpcUa_LocalizedText  DisplayName;
+    OpcUa_LocalizedText  Description;
+    OpcUa_UInt32         WriteMask;
+    OpcUa_UInt32         UserWriteMask;
+    OpcUa_Int32          NoOfReferences;
+    OpcUa_ReferenceNode* References;
+}
+OpcUa_InstanceNode;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_InstanceNode_Initialize(OpcUa_InstanceNode* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_InstanceNode_Clear(OpcUa_InstanceNode* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_InstanceNode_GetSize(OpcUa_InstanceNode* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_InstanceNode_Encode(OpcUa_InstanceNode* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_InstanceNode_Decode(OpcUa_InstanceNode* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_InstanceNode_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_TypeNode
+/*============================================================================
+ * The TypeNode structure.
+ *===========================================================================*/
+typedef struct _OpcUa_TypeNode
+{
+    OpcUa_NodeId         NodeId;
+    OpcUa_NodeClass      NodeClass;
+    OpcUa_QualifiedName  BrowseName;
+    OpcUa_LocalizedText  DisplayName;
+    OpcUa_LocalizedText  Description;
+    OpcUa_UInt32         WriteMask;
+    OpcUa_UInt32         UserWriteMask;
+    OpcUa_Int32          NoOfReferences;
+    OpcUa_ReferenceNode* References;
+}
+OpcUa_TypeNode;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_TypeNode_Initialize(OpcUa_TypeNode* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_TypeNode_Clear(OpcUa_TypeNode* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TypeNode_GetSize(OpcUa_TypeNode* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TypeNode_Encode(OpcUa_TypeNode* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TypeNode_Decode(OpcUa_TypeNode* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TypeNode_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_ObjectNode
@@ -438,30 +496,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Argument_Decode(OpcUa_Argument* pValue, stru
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_Argument_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_TimeZoneDataType
-/*============================================================================
- * The TimeZoneDataType structure.
- *===========================================================================*/
-typedef struct _OpcUa_TimeZoneDataType
-{
-    OpcUa_Int16   Offset;
-    OpcUa_Boolean DaylightSavingInOffset;
-}
-OpcUa_TimeZoneDataType;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TimeZoneDataType_Initialize(OpcUa_TimeZoneDataType* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TimeZoneDataType_Clear(OpcUa_TimeZoneDataType* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_GetSize(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_Encode(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_Decode(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TimeZoneDataType_EncodeableType;
-#endif
-
 #ifndef OPCUA_EXCLUDE_EnumValueType
 /*============================================================================
  * The EnumValueType structure.
@@ -487,95 +521,52 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_EnumValueType_Decode(OpcUa_EnumValueType* pV
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EnumValueType_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_StatusResult
+#ifndef OPCUA_EXCLUDE_OptionSet
 /*============================================================================
- * The StatusResult structure.
+ * The OptionSet structure.
  *===========================================================================*/
-typedef struct _OpcUa_StatusResult
+typedef struct _OpcUa_OptionSet
 {
-    OpcUa_StatusCode     StatusCode;
-    OpcUa_DiagnosticInfo DiagnosticInfo;
+    OpcUa_ByteString Value;
+    OpcUa_ByteString ValidBits;
 }
-OpcUa_StatusResult;
+OpcUa_OptionSet;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_StatusResult_Initialize(OpcUa_StatusResult* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_OptionSet_Initialize(OpcUa_OptionSet* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_StatusResult_Clear(OpcUa_StatusResult* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_OptionSet_Clear(OpcUa_OptionSet* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OptionSet_GetSize(OpcUa_OptionSet* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_Encode(OpcUa_StatusResult* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OptionSet_Encode(OpcUa_OptionSet* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_Decode(OpcUa_StatusResult* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OptionSet_Decode(OpcUa_OptionSet* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_StatusResult_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_OptionSet_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_MessageSecurityMode
+#ifndef OPCUA_EXCLUDE_TimeZoneDataType
 /*============================================================================
- * The MessageSecurityMode enumeration.
+ * The TimeZoneDataType structure.
  *===========================================================================*/
-typedef enum _OpcUa_MessageSecurityMode
+typedef struct _OpcUa_TimeZoneDataType
 {
-    OpcUa_MessageSecurityMode_Invalid        = 0,
-    OpcUa_MessageSecurityMode_None           = 1,
-    OpcUa_MessageSecurityMode_Sign           = 2,
-    OpcUa_MessageSecurityMode_SignAndEncrypt = 3
+    OpcUa_Int16   Offset;
+    OpcUa_Boolean DaylightSavingInOffset;
 }
-OpcUa_MessageSecurityMode;
+OpcUa_TimeZoneDataType;
 
-#define OpcUa_MessageSecurityMode_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, MessageSecurityMode)
+OPCUA_EXPORT OpcUa_Void OpcUa_TimeZoneDataType_Initialize(OpcUa_TimeZoneDataType* pValue);
 
-#define OpcUa_MessageSecurityMode_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, MessageSecurityMode)
+OPCUA_EXPORT OpcUa_Void OpcUa_TimeZoneDataType_Clear(OpcUa_TimeZoneDataType* pValue);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_MessageSecurityMode_EnumeratedType;
-#endif
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_GetSize(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-#ifndef OPCUA_EXCLUDE_UserTokenType
-/*============================================================================
- * The UserTokenType enumeration.
- *===========================================================================*/
-typedef enum _OpcUa_UserTokenType
-{
-    OpcUa_UserTokenType_Anonymous   = 0,
-    OpcUa_UserTokenType_UserName    = 1,
-    OpcUa_UserTokenType_Certificate = 2,
-    OpcUa_UserTokenType_IssuedToken = 3
-}
-OpcUa_UserTokenType;
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_Encode(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Encoder* pEncoder);
 
-#define OpcUa_UserTokenType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, UserTokenType)
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TimeZoneDataType_Decode(OpcUa_TimeZoneDataType* pValue, struct _OpcUa_Decoder* pDecoder);
 
-#define OpcUa_UserTokenType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, UserTokenType)
-
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_UserTokenType_EnumeratedType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_UserTokenPolicy
-/*============================================================================
- * The UserTokenPolicy structure.
- *===========================================================================*/
-typedef struct _OpcUa_UserTokenPolicy
-{
-    OpcUa_String        PolicyId;
-    OpcUa_UserTokenType TokenType;
-    OpcUa_String        IssuedTokenType;
-    OpcUa_String        IssuerEndpointUrl;
-    OpcUa_String        SecurityPolicyUri;
-}
-OpcUa_UserTokenPolicy;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_UserTokenPolicy_Initialize(OpcUa_UserTokenPolicy* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_UserTokenPolicy_Clear(OpcUa_UserTokenPolicy* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_GetSize(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_Encode(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_Decode(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_UserTokenPolicy_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TimeZoneDataType_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_ApplicationType
@@ -588,12 +579,15 @@ typedef enum _OpcUa_ApplicationType
     OpcUa_ApplicationType_Client          = 1,
     OpcUa_ApplicationType_ClientAndServer = 2,
     OpcUa_ApplicationType_DiscoveryServer = 3
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_ApplicationType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_ApplicationType;
 
-#define OpcUa_ApplicationType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, ApplicationType)
+#define OpcUa_ApplicationType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_ApplicationType_Server)
 
-#define OpcUa_ApplicationType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, ApplicationType)
+#define OpcUa_ApplicationType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_ApplicationType_Server)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ApplicationType_EnumeratedType;
 #endif
@@ -628,17 +622,153 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ApplicationDescription_Decode(OpcUa_Applicat
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ApplicationDescription_EncodeableType;
 #endif
 
+#ifndef OPCUA_EXCLUDE_RequestHeader
+/*============================================================================
+ * The RequestHeader structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RequestHeader
+{
+    OpcUa_NodeId          AuthenticationToken;
+    OpcUa_DateTime        Timestamp;
+    OpcUa_UInt32          RequestHandle;
+    OpcUa_UInt32          ReturnDiagnostics;
+    OpcUa_String          AuditEntryId;
+    OpcUa_UInt32          TimeoutHint;
+    OpcUa_ExtensionObject AdditionalHeader;
+}
+OpcUa_RequestHeader;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RequestHeader_Initialize(OpcUa_RequestHeader* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RequestHeader_Clear(OpcUa_RequestHeader* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_GetSize(OpcUa_RequestHeader* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_Encode(OpcUa_RequestHeader* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_Decode(OpcUa_RequestHeader* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RequestHeader_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_ResponseHeader
+/*============================================================================
+ * The ResponseHeader structure.
+ *===========================================================================*/
+typedef struct _OpcUa_ResponseHeader
+{
+    OpcUa_DateTime        Timestamp;
+    OpcUa_UInt32          RequestHandle;
+    OpcUa_StatusCode      ServiceResult;
+    OpcUa_DiagnosticInfo  ServiceDiagnostics;
+    OpcUa_Int32           NoOfStringTable;
+    OpcUa_String*         StringTable;
+    OpcUa_ExtensionObject AdditionalHeader;
+}
+OpcUa_ResponseHeader;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ResponseHeader_Initialize(OpcUa_ResponseHeader* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ResponseHeader_Clear(OpcUa_ResponseHeader* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_GetSize(OpcUa_ResponseHeader* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_Encode(OpcUa_ResponseHeader* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_Decode(OpcUa_ResponseHeader* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ResponseHeader_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_ServiceFault
+/*============================================================================
+ * The ServiceFault structure.
+ *===========================================================================*/
+typedef struct _OpcUa_ServiceFault
+{
+    OpcUa_ResponseHeader ResponseHeader;
+}
+OpcUa_ServiceFault;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ServiceFault_Initialize(OpcUa_ServiceFault* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ServiceFault_Clear(OpcUa_ServiceFault* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_GetSize(OpcUa_ServiceFault* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_Encode(OpcUa_ServiceFault* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_Decode(OpcUa_ServiceFault* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ServiceFault_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServers
+#ifndef OPCUA_EXCLUDE_FindServersRequest
+/*============================================================================
+ * The FindServersRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_FindServersRequest
+{
+    OpcUa_RequestHeader RequestHeader;
+    OpcUa_String        EndpointUrl;
+    OpcUa_Int32         NoOfLocaleIds;
+    OpcUa_String*       LocaleIds;
+    OpcUa_Int32         NoOfServerUris;
+    OpcUa_String*       ServerUris;
+}
+OpcUa_FindServersRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersRequest_Initialize(OpcUa_FindServersRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersRequest_Clear(OpcUa_FindServersRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_GetSize(OpcUa_FindServersRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_Encode(OpcUa_FindServersRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_Decode(OpcUa_FindServersRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServersResponse
+/*============================================================================
+ * The FindServersResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_FindServersResponse
+{
+    OpcUa_ResponseHeader          ResponseHeader;
+    OpcUa_Int32                   NoOfServers;
+    OpcUa_ApplicationDescription* Servers;
+}
+OpcUa_FindServersResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersResponse_Initialize(OpcUa_FindServersResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersResponse_Clear(OpcUa_FindServersResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_GetSize(OpcUa_FindServersResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_Encode(OpcUa_FindServersResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_Decode(OpcUa_FindServersResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersResponse_EncodeableType;
+#endif
+#endif
+
 #ifndef OPCUA_EXCLUDE_ServerOnNetwork
 /*============================================================================
  * The ServerOnNetwork structure.
  *===========================================================================*/
 typedef struct _OpcUa_ServerOnNetwork
 {
-    OpcUa_UInt32          RecordId;
-    OpcUa_String          ServerName;
-    OpcUa_String          DiscoveryUrl;
-    OpcUa_Int32           NoOfServerCapabilities;
-    OpcUa_String*         ServerCapabilities;
+    OpcUa_UInt32  RecordId;
+    OpcUa_String  ServerName;
+    OpcUa_String  DiscoveryUrl;
+    OpcUa_Int32   NoOfServerCapabilities;
+    OpcUa_String* ServerCapabilities;
 }
 OpcUa_ServerOnNetwork;
 
@@ -655,29 +785,132 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServerOnNetwork_Decode(OpcUa_ServerOnNetwork
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ServerOnNetwork_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_MdnsDiscoveryConfiguration
+#ifndef OPCUA_EXCLUDE_FindServersOnNetwork
+#ifndef OPCUA_EXCLUDE_FindServersOnNetworkRequest
 /*============================================================================
- * The MdnsDiscoveryConfiguration structure.
+ * The FindServersOnNetworkRequest structure.
  *===========================================================================*/
-typedef struct _OpcUa_MdnsDiscoveryConfiguration
+typedef struct _OpcUa_FindServersOnNetworkRequest
 {
-    OpcUa_String          MdnsServerName;
-    OpcUa_Int32           NoOfMdnsServerCapabilities;
-    OpcUa_String*         MdnsServerCapabilities;
+    OpcUa_RequestHeader RequestHeader;
+    OpcUa_UInt32        StartingRecordId;
+    OpcUa_UInt32        MaxRecordsToReturn;
+    OpcUa_Int32         NoOfServerCapabilityFilter;
+    OpcUa_String*       ServerCapabilityFilter;
 }
-OpcUa_MdnsDiscoveryConfiguration;
+OpcUa_FindServersOnNetworkRequest;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Initialize(OpcUa_MdnsDiscoveryConfiguration* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkRequest_Initialize(OpcUa_FindServersOnNetworkRequest* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Clear(OpcUa_MdnsDiscoveryConfiguration* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkRequest_Clear(OpcUa_FindServersOnNetworkRequest* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_GetSize(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_GetSize(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Encode(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Encode(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Decode(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Decode(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_MdnsDiscoveryConfiguration_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServersOnNetworkResponse
+/*============================================================================
+ * The FindServersOnNetworkResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_FindServersOnNetworkResponse
+{
+    OpcUa_ResponseHeader   ResponseHeader;
+    OpcUa_DateTime         LastCounterResetTime;
+    OpcUa_Int32            NoOfServers;
+    OpcUa_ServerOnNetwork* Servers;
+}
+OpcUa_FindServersOnNetworkResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkResponse_Initialize(OpcUa_FindServersOnNetworkResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkResponse_Clear(OpcUa_FindServersOnNetworkResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_GetSize(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Encode(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Decode(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkResponse_EncodeableType;
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_MessageSecurityMode
+/*============================================================================
+ * The MessageSecurityMode enumeration.
+ *===========================================================================*/
+typedef enum _OpcUa_MessageSecurityMode
+{
+    OpcUa_MessageSecurityMode_Invalid        = 0,
+    OpcUa_MessageSecurityMode_None           = 1,
+    OpcUa_MessageSecurityMode_Sign           = 2,
+    OpcUa_MessageSecurityMode_SignAndEncrypt = 3
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_MessageSecurityMode_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
+}
+OpcUa_MessageSecurityMode;
+
+#define OpcUa_MessageSecurityMode_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_MessageSecurityMode_Invalid)
+
+#define OpcUa_MessageSecurityMode_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_MessageSecurityMode_Invalid)
+
+OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_MessageSecurityMode_EnumeratedType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_UserTokenType
+/*============================================================================
+ * The UserTokenType enumeration.
+ *===========================================================================*/
+typedef enum _OpcUa_UserTokenType
+{
+    OpcUa_UserTokenType_Anonymous   = 0,
+    OpcUa_UserTokenType_UserName    = 1,
+    OpcUa_UserTokenType_Certificate = 2,
+    OpcUa_UserTokenType_IssuedToken = 3
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_UserTokenType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
+}
+OpcUa_UserTokenType;
+
+#define OpcUa_UserTokenType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_UserTokenType_Anonymous)
+
+#define OpcUa_UserTokenType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_UserTokenType_Anonymous)
+
+OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_UserTokenType_EnumeratedType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_UserTokenPolicy
+/*============================================================================
+ * The UserTokenPolicy structure.
+ *===========================================================================*/
+typedef struct _OpcUa_UserTokenPolicy
+{
+    OpcUa_String        PolicyId;
+    OpcUa_UserTokenType TokenType;
+    OpcUa_String        IssuedTokenType;
+    OpcUa_String        IssuerEndpointUrl;
+    OpcUa_String        SecurityPolicyUri;
+}
+OpcUa_UserTokenPolicy;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_UserTokenPolicy_Initialize(OpcUa_UserTokenPolicy* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_UserTokenPolicy_Clear(OpcUa_UserTokenPolicy* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_GetSize(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_Encode(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_UserTokenPolicy_Decode(OpcUa_UserTokenPolicy* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_UserTokenPolicy_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_EndpointDescription
@@ -711,6 +944,222 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointDescription_Decode(OpcUa_EndpointDes
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EndpointDescription_EncodeableType;
 #endif
 
+#ifndef OPCUA_EXCLUDE_GetEndpoints
+#ifndef OPCUA_EXCLUDE_GetEndpointsRequest
+/*============================================================================
+ * The GetEndpointsRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_GetEndpointsRequest
+{
+    OpcUa_RequestHeader RequestHeader;
+    OpcUa_String        EndpointUrl;
+    OpcUa_Int32         NoOfLocaleIds;
+    OpcUa_String*       LocaleIds;
+    OpcUa_Int32         NoOfProfileUris;
+    OpcUa_String*       ProfileUris;
+}
+OpcUa_GetEndpointsRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsRequest_Initialize(OpcUa_GetEndpointsRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsRequest_Clear(OpcUa_GetEndpointsRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_GetSize(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_Encode(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_Decode(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_GetEndpointsRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_GetEndpointsResponse
+/*============================================================================
+ * The GetEndpointsResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_GetEndpointsResponse
+{
+    OpcUa_ResponseHeader       ResponseHeader;
+    OpcUa_Int32                NoOfEndpoints;
+    OpcUa_EndpointDescription* Endpoints;
+}
+OpcUa_GetEndpointsResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsResponse_Initialize(OpcUa_GetEndpointsResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsResponse_Clear(OpcUa_GetEndpointsResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_GetSize(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_Encode(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_Decode(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_GetEndpointsResponse_EncodeableType;
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisteredServer
+/*============================================================================
+ * The RegisteredServer structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RegisteredServer
+{
+    OpcUa_String          ServerUri;
+    OpcUa_String          ProductUri;
+    OpcUa_Int32           NoOfServerNames;
+    OpcUa_LocalizedText*  ServerNames;
+    OpcUa_ApplicationType ServerType;
+    OpcUa_String          GatewayServerUri;
+    OpcUa_Int32           NoOfDiscoveryUrls;
+    OpcUa_String*         DiscoveryUrls;
+    OpcUa_String          SemaphoreFilePath;
+    OpcUa_Boolean         IsOnline;
+}
+OpcUa_RegisteredServer;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisteredServer_Initialize(OpcUa_RegisteredServer* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisteredServer_Clear(OpcUa_RegisteredServer* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_GetSize(OpcUa_RegisteredServer* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_Encode(OpcUa_RegisteredServer* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_Decode(OpcUa_RegisteredServer* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisteredServer_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer
+#ifndef OPCUA_EXCLUDE_RegisterServerRequest
+/*============================================================================
+ * The RegisterServerRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RegisterServerRequest
+{
+    OpcUa_RequestHeader    RequestHeader;
+    OpcUa_RegisteredServer Server;
+}
+OpcUa_RegisterServerRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerRequest_Initialize(OpcUa_RegisterServerRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerRequest_Clear(OpcUa_RegisterServerRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_GetSize(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_Encode(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_Decode(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServerRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServerResponse
+/*============================================================================
+ * The RegisterServerResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RegisterServerResponse
+{
+    OpcUa_ResponseHeader ResponseHeader;
+}
+OpcUa_RegisterServerResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerResponse_Initialize(OpcUa_RegisterServerResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerResponse_Clear(OpcUa_RegisterServerResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_GetSize(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_Encode(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_Decode(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServerResponse_EncodeableType;
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_MdnsDiscoveryConfiguration
+/*============================================================================
+ * The MdnsDiscoveryConfiguration structure.
+ *===========================================================================*/
+typedef struct _OpcUa_MdnsDiscoveryConfiguration
+{
+    OpcUa_String  MdnsServerName;
+    OpcUa_Int32   NoOfServerCapabilities;
+    OpcUa_String* ServerCapabilities;
+}
+OpcUa_MdnsDiscoveryConfiguration;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Initialize(OpcUa_MdnsDiscoveryConfiguration* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Clear(OpcUa_MdnsDiscoveryConfiguration* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_GetSize(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Encode(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Decode(OpcUa_MdnsDiscoveryConfiguration* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_MdnsDiscoveryConfiguration_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer2
+#ifndef OPCUA_EXCLUDE_RegisterServer2Request
+/*============================================================================
+ * The RegisterServer2Request structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RegisterServer2Request
+{
+    OpcUa_RequestHeader    RequestHeader;
+    OpcUa_RegisteredServer Server;
+    OpcUa_Int32            NoOfDiscoveryConfiguration;
+    OpcUa_ExtensionObject* DiscoveryConfiguration;
+}
+OpcUa_RegisterServer2Request;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Request_Initialize(OpcUa_RegisterServer2Request* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Request_Clear(OpcUa_RegisterServer2Request* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_GetSize(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_Encode(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_Decode(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServer2Request_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer2Response
+/*============================================================================
+ * The RegisterServer2Response structure.
+ *===========================================================================*/
+typedef struct _OpcUa_RegisterServer2Response
+{
+    OpcUa_ResponseHeader  ResponseHeader;
+    OpcUa_Int32           NoOfConfigurationResults;
+    OpcUa_StatusCode*     ConfigurationResults;
+    OpcUa_Int32           NoOfDiagnosticInfos;
+    OpcUa_DiagnosticInfo* DiagnosticInfos;
+}
+OpcUa_RegisterServer2Response;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Response_Initialize(OpcUa_RegisterServer2Response* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Response_Clear(OpcUa_RegisterServer2Response* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_GetSize(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_Encode(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_Decode(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServer2Response_EncodeableType;
+#endif
+#endif
+
 #ifndef OPCUA_EXCLUDE_SecurityTokenRequestType
 /*============================================================================
  * The SecurityTokenRequestType enumeration.
@@ -719,14 +1168,262 @@ typedef enum _OpcUa_SecurityTokenRequestType
 {
     OpcUa_SecurityTokenRequestType_Issue = 0,
     OpcUa_SecurityTokenRequestType_Renew = 1
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_SecurityTokenRequestType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_SecurityTokenRequestType;
 
-#define OpcUa_SecurityTokenRequestType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, SecurityTokenRequestType)
+#define OpcUa_SecurityTokenRequestType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_SecurityTokenRequestType_Issue)
 
-#define OpcUa_SecurityTokenRequestType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, SecurityTokenRequestType)
+#define OpcUa_SecurityTokenRequestType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_SecurityTokenRequestType_Issue)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_SecurityTokenRequestType_EnumeratedType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_ChannelSecurityToken
+/*============================================================================
+ * The ChannelSecurityToken structure.
+ *===========================================================================*/
+typedef struct _OpcUa_ChannelSecurityToken
+{
+    OpcUa_UInt32   ChannelId;
+    OpcUa_UInt32   TokenId;
+    OpcUa_DateTime CreatedAt;
+    OpcUa_UInt32   RevisedLifetime;
+}
+OpcUa_ChannelSecurityToken;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ChannelSecurityToken_Initialize(OpcUa_ChannelSecurityToken* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_ChannelSecurityToken_Clear(OpcUa_ChannelSecurityToken* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_GetSize(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_Encode(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_Decode(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ChannelSecurityToken_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_OpenSecureChannel
+#ifndef OPCUA_EXCLUDE_OpenSecureChannelRequest
+/*============================================================================
+ * The OpenSecureChannelRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_OpenSecureChannelRequest
+{
+    OpcUa_RequestHeader            RequestHeader;
+    OpcUa_UInt32                   ClientProtocolVersion;
+    OpcUa_SecurityTokenRequestType RequestType;
+    OpcUa_MessageSecurityMode      SecurityMode;
+    OpcUa_ByteString               ClientNonce;
+    OpcUa_UInt32                   RequestedLifetime;
+}
+OpcUa_OpenSecureChannelRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelRequest_Initialize(OpcUa_OpenSecureChannelRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelRequest_Clear(OpcUa_OpenSecureChannelRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_GetSize(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Encode(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Decode(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_OpenSecureChannelResponse
+/*============================================================================
+ * The OpenSecureChannelResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_OpenSecureChannelResponse
+{
+    OpcUa_ResponseHeader       ResponseHeader;
+    OpcUa_UInt32               ServerProtocolVersion;
+    OpcUa_ChannelSecurityToken SecurityToken;
+    OpcUa_ByteString           ServerNonce;
+}
+OpcUa_OpenSecureChannelResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelResponse_Initialize(OpcUa_OpenSecureChannelResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelResponse_Clear(OpcUa_OpenSecureChannelResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_GetSize(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Encode(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Decode(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelResponse_EncodeableType;
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_CloseSecureChannel
+#ifndef OPCUA_EXCLUDE_CloseSecureChannelRequest
+/*============================================================================
+ * The CloseSecureChannelRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_CloseSecureChannelRequest
+{
+    OpcUa_RequestHeader RequestHeader;
+}
+OpcUa_CloseSecureChannelRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelRequest_Initialize(OpcUa_CloseSecureChannelRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelRequest_Clear(OpcUa_CloseSecureChannelRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_GetSize(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Encode(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Decode(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_CloseSecureChannelResponse
+/*============================================================================
+ * The CloseSecureChannelResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_CloseSecureChannelResponse
+{
+    OpcUa_ResponseHeader ResponseHeader;
+}
+OpcUa_CloseSecureChannelResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelResponse_Initialize(OpcUa_CloseSecureChannelResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelResponse_Clear(OpcUa_CloseSecureChannelResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_GetSize(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Encode(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Decode(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelResponse_EncodeableType;
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
+/*============================================================================
+ * The SignedSoftwareCertificate structure.
+ *===========================================================================*/
+typedef struct _OpcUa_SignedSoftwareCertificate
+{
+    OpcUa_ByteString CertificateData;
+    OpcUa_ByteString Signature;
+}
+OpcUa_SignedSoftwareCertificate;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_SignedSoftwareCertificate_Initialize(OpcUa_SignedSoftwareCertificate* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_SignedSoftwareCertificate_Clear(OpcUa_SignedSoftwareCertificate* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Encode(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Decode(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SignedSoftwareCertificate_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_SignatureData
+/*============================================================================
+ * The SignatureData structure.
+ *===========================================================================*/
+typedef struct _OpcUa_SignatureData
+{
+    OpcUa_String     Algorithm;
+    OpcUa_ByteString Signature;
+}
+OpcUa_SignatureData;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_SignatureData_Initialize(OpcUa_SignatureData* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_SignatureData_Clear(OpcUa_SignatureData* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_GetSize(OpcUa_SignatureData* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_Encode(OpcUa_SignatureData* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_Decode(OpcUa_SignatureData* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SignatureData_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_CreateSession
+#ifndef OPCUA_EXCLUDE_CreateSessionRequest
+/*============================================================================
+ * The CreateSessionRequest structure.
+ *===========================================================================*/
+typedef struct _OpcUa_CreateSessionRequest
+{
+    OpcUa_RequestHeader          RequestHeader;
+    OpcUa_ApplicationDescription ClientDescription;
+    OpcUa_String                 ServerUri;
+    OpcUa_String                 EndpointUrl;
+    OpcUa_String                 SessionName;
+    OpcUa_ByteString             ClientNonce;
+    OpcUa_ByteString             ClientCertificate;
+    OpcUa_Double                 RequestedSessionTimeout;
+    OpcUa_UInt32                 MaxResponseMessageSize;
+}
+OpcUa_CreateSessionRequest;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionRequest_Initialize(OpcUa_CreateSessionRequest* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionRequest_Clear(OpcUa_CreateSessionRequest* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_GetSize(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_Encode(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_Decode(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CreateSessionRequest_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_CreateSessionResponse
+/*============================================================================
+ * The CreateSessionResponse structure.
+ *===========================================================================*/
+typedef struct _OpcUa_CreateSessionResponse
+{
+    OpcUa_ResponseHeader             ResponseHeader;
+    OpcUa_NodeId                     SessionId;
+    OpcUa_NodeId                     AuthenticationToken;
+    OpcUa_Double                     RevisedSessionTimeout;
+    OpcUa_ByteString                 ServerNonce;
+    OpcUa_ByteString                 ServerCertificate;
+    OpcUa_Int32                      NoOfServerEndpoints;
+    OpcUa_EndpointDescription*       ServerEndpoints;
+    OpcUa_Int32                      NoOfServerSoftwareCertificates;
+    OpcUa_SignedSoftwareCertificate* ServerSoftwareCertificates;
+    OpcUa_SignatureData              ServerSignature;
+    OpcUa_UInt32                     MaxRequestMessageSize;
+}
+OpcUa_CreateSessionResponse;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionResponse_Initialize(OpcUa_CreateSessionResponse* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionResponse_Clear(OpcUa_CreateSessionResponse* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_GetSize(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_Encode(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_Decode(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CreateSessionResponse_EncodeableType;
+#endif
 #endif
 
 #ifndef OPCUA_EXCLUDE_UserIdentityToken
@@ -850,208 +1547,163 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_IssuedIdentityToken_Decode(OpcUa_IssuedIdent
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_IssuedIdentityToken_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_EndpointConfiguration
+#ifndef OPCUA_EXCLUDE_ActivateSession
+#ifndef OPCUA_EXCLUDE_ActivateSessionRequest
 /*============================================================================
- * The EndpointConfiguration structure.
+ * The ActivateSessionRequest structure.
  *===========================================================================*/
-typedef struct _OpcUa_EndpointConfiguration
+typedef struct _OpcUa_ActivateSessionRequest
 {
-    OpcUa_Int32   OperationTimeout;
-    OpcUa_Boolean UseBinaryEncoding;
-    OpcUa_Int32   MaxStringLength;
-    OpcUa_Int32   MaxByteStringLength;
-    OpcUa_Int32   MaxArrayLength;
-    OpcUa_Int32   MaxMessageSize;
-    OpcUa_Int32   MaxBufferSize;
-    OpcUa_Int32   ChannelLifetime;
-    OpcUa_Int32   SecurityTokenLifetime;
+    OpcUa_RequestHeader              RequestHeader;
+    OpcUa_SignatureData              ClientSignature;
+    OpcUa_Int32                      NoOfClientSoftwareCertificates;
+    OpcUa_SignedSoftwareCertificate* ClientSoftwareCertificates;
+    OpcUa_Int32                      NoOfLocaleIds;
+    OpcUa_String*                    LocaleIds;
+    OpcUa_ExtensionObject            UserIdentityToken;
+    OpcUa_SignatureData              UserTokenSignature;
 }
-OpcUa_EndpointConfiguration;
+OpcUa_ActivateSessionRequest;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_EndpointConfiguration_Initialize(OpcUa_EndpointConfiguration* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionRequest_Initialize(OpcUa_ActivateSessionRequest* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_EndpointConfiguration_Clear(OpcUa_EndpointConfiguration* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionRequest_Clear(OpcUa_ActivateSessionRequest* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_GetSize(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_Encode(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_Encode(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_Decode(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_Decode(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EndpointConfiguration_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ActivateSessionRequest_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_ComplianceLevel
+#ifndef OPCUA_EXCLUDE_ActivateSessionResponse
 /*============================================================================
- * The ComplianceLevel enumeration.
+ * The ActivateSessionResponse structure.
  *===========================================================================*/
-typedef enum _OpcUa_ComplianceLevel
+typedef struct _OpcUa_ActivateSessionResponse
 {
-    OpcUa_ComplianceLevel_Untested   = 0,
-    OpcUa_ComplianceLevel_Partial    = 1,
-    OpcUa_ComplianceLevel_SelfTested = 2,
-    OpcUa_ComplianceLevel_Certified  = 3
+    OpcUa_ResponseHeader  ResponseHeader;
+    OpcUa_ByteString      ServerNonce;
+    OpcUa_Int32           NoOfResults;
+    OpcUa_StatusCode*     Results;
+    OpcUa_Int32           NoOfDiagnosticInfos;
+    OpcUa_DiagnosticInfo* DiagnosticInfos;
 }
-OpcUa_ComplianceLevel;
+OpcUa_ActivateSessionResponse;
 
-#define OpcUa_ComplianceLevel_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, ComplianceLevel)
+OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionResponse_Initialize(OpcUa_ActivateSessionResponse* pValue);
 
-#define OpcUa_ComplianceLevel_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, ComplianceLevel)
+OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionResponse_Clear(OpcUa_ActivateSessionResponse* pValue);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ComplianceLevel_EnumeratedType;
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_GetSize(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_Encode(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_Decode(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ActivateSessionResponse_EncodeableType;
+#endif
 #endif
 
-#ifndef OPCUA_EXCLUDE_SupportedProfile
+#ifndef OPCUA_EXCLUDE_CloseSession
+#ifndef OPCUA_EXCLUDE_CloseSessionRequest
 /*============================================================================
- * The SupportedProfile structure.
+ * The CloseSessionRequest structure.
  *===========================================================================*/
-typedef struct _OpcUa_SupportedProfile
+typedef struct _OpcUa_CloseSessionRequest
 {
-    OpcUa_String          OrganizationUri;
-    OpcUa_String          ProfileId;
-    OpcUa_String          ComplianceTool;
-    OpcUa_DateTime        ComplianceDate;
-    OpcUa_ComplianceLevel ComplianceLevel;
-    OpcUa_Int32           NoOfUnsupportedUnitIds;
-    OpcUa_String*         UnsupportedUnitIds;
+    OpcUa_RequestHeader RequestHeader;
+    OpcUa_Boolean       DeleteSubscriptions;
 }
-OpcUa_SupportedProfile;
+OpcUa_CloseSessionRequest;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SupportedProfile_Initialize(OpcUa_SupportedProfile* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionRequest_Initialize(OpcUa_CloseSessionRequest* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SupportedProfile_Clear(OpcUa_SupportedProfile* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionRequest_Clear(OpcUa_CloseSessionRequest* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SupportedProfile_GetSize(OpcUa_SupportedProfile* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_GetSize(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SupportedProfile_Encode(OpcUa_SupportedProfile* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_Encode(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SupportedProfile_Decode(OpcUa_SupportedProfile* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_Decode(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SupportedProfile_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSessionRequest_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_BuildInfo
+#ifndef OPCUA_EXCLUDE_CloseSessionResponse
 /*============================================================================
- * The BuildInfo structure.
+ * The CloseSessionResponse structure.
  *===========================================================================*/
-typedef struct _OpcUa_BuildInfo
+typedef struct _OpcUa_CloseSessionResponse
 {
-    OpcUa_String   ProductUri;
-    OpcUa_String   ManufacturerName;
-    OpcUa_String   ProductName;
-    OpcUa_String   SoftwareVersion;
-    OpcUa_String   BuildNumber;
-    OpcUa_DateTime BuildDate;
+    OpcUa_ResponseHeader ResponseHeader;
 }
-OpcUa_BuildInfo;
+OpcUa_CloseSessionResponse;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_BuildInfo_Initialize(OpcUa_BuildInfo* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionResponse_Initialize(OpcUa_CloseSessionResponse* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_BuildInfo_Clear(OpcUa_BuildInfo* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionResponse_Clear(OpcUa_CloseSessionResponse* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_GetSize(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_Encode(OpcUa_BuildInfo* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_Encode(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_Decode(OpcUa_BuildInfo* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_Decode(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_BuildInfo_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSessionResponse_EncodeableType;
+#endif
 #endif
 
-#ifndef OPCUA_EXCLUDE_SoftwareCertificate
+#ifndef OPCUA_EXCLUDE_Cancel
+#ifndef OPCUA_EXCLUDE_CancelRequest
 /*============================================================================
- * The SoftwareCertificate structure.
+ * The CancelRequest structure.
  *===========================================================================*/
-typedef struct _OpcUa_SoftwareCertificate
+typedef struct _OpcUa_CancelRequest
 {
-    OpcUa_String            ProductName;
-    OpcUa_String            ProductUri;
-    OpcUa_String            VendorName;
-    OpcUa_ByteString        VendorProductCertificate;
-    OpcUa_String            SoftwareVersion;
-    OpcUa_String            BuildNumber;
-    OpcUa_DateTime          BuildDate;
-    OpcUa_String            IssuedBy;
-    OpcUa_DateTime          IssueDate;
-    OpcUa_Int32             NoOfSupportedProfiles;
-    OpcUa_SupportedProfile* SupportedProfiles;
+    OpcUa_RequestHeader RequestHeader;
+    OpcUa_UInt32        RequestHandle;
 }
-OpcUa_SoftwareCertificate;
+OpcUa_CancelRequest;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SoftwareCertificate_Initialize(OpcUa_SoftwareCertificate* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CancelRequest_Initialize(OpcUa_CancelRequest* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SoftwareCertificate_Clear(OpcUa_SoftwareCertificate* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CancelRequest_Clear(OpcUa_CancelRequest* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SoftwareCertificate_GetSize(OpcUa_SoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_GetSize(OpcUa_CancelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SoftwareCertificate_Encode(OpcUa_SoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_Encode(OpcUa_CancelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SoftwareCertificate_Decode(OpcUa_SoftwareCertificate* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_Decode(OpcUa_CancelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SoftwareCertificate_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CancelRequest_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
+#ifndef OPCUA_EXCLUDE_CancelResponse
 /*============================================================================
- * The SignedSoftwareCertificate structure.
+ * The CancelResponse structure.
  *===========================================================================*/
-typedef struct _OpcUa_SignedSoftwareCertificate
+typedef struct _OpcUa_CancelResponse
 {
-    OpcUa_ByteString CertificateData;
-    OpcUa_ByteString Signature;
+    OpcUa_ResponseHeader ResponseHeader;
+    OpcUa_UInt32         CancelCount;
 }
-OpcUa_SignedSoftwareCertificate;
+OpcUa_CancelResponse;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SignedSoftwareCertificate_Initialize(OpcUa_SignedSoftwareCertificate* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CancelResponse_Initialize(OpcUa_CancelResponse* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_SignedSoftwareCertificate_Clear(OpcUa_SignedSoftwareCertificate* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_CancelResponse_Clear(OpcUa_CancelResponse* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_GetSize(OpcUa_CancelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Encode(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_Encode(OpcUa_CancelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Decode(OpcUa_SignedSoftwareCertificate* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_Decode(OpcUa_CancelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SignedSoftwareCertificate_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CancelResponse_EncodeableType;
 #endif
-
-#ifndef OPCUA_EXCLUDE_AttributeWriteMask
-/*============================================================================
- * The AttributeWriteMask enumeration.
- *===========================================================================*/
-typedef enum _OpcUa_AttributeWriteMask
-{
-    OpcUa_AttributeWriteMask_None                    = 0,
-    OpcUa_AttributeWriteMask_AccessLevel             = 1,
-    OpcUa_AttributeWriteMask_ArrayDimensions         = 2,
-    OpcUa_AttributeWriteMask_BrowseName              = 4,
-    OpcUa_AttributeWriteMask_ContainsNoLoops         = 8,
-    OpcUa_AttributeWriteMask_DataType                = 16,
-    OpcUa_AttributeWriteMask_Description             = 32,
-    OpcUa_AttributeWriteMask_DisplayName             = 64,
-    OpcUa_AttributeWriteMask_EventNotifier           = 128,
-    OpcUa_AttributeWriteMask_Executable              = 256,
-    OpcUa_AttributeWriteMask_Historizing             = 512,
-    OpcUa_AttributeWriteMask_InverseName             = 1024,
-    OpcUa_AttributeWriteMask_IsAbstract              = 2048,
-    OpcUa_AttributeWriteMask_MinimumSamplingInterval = 4096,
-    OpcUa_AttributeWriteMask_NodeClass               = 8192,
-    OpcUa_AttributeWriteMask_NodeId                  = 16384,
-    OpcUa_AttributeWriteMask_Symmetric               = 32768,
-    OpcUa_AttributeWriteMask_UserAccessLevel         = 65536,
-    OpcUa_AttributeWriteMask_UserExecutable          = 131072,
-    OpcUa_AttributeWriteMask_UserWriteMask           = 262144,
-    OpcUa_AttributeWriteMask_ValueRank               = 524288,
-    OpcUa_AttributeWriteMask_WriteMask               = 1048576,
-    OpcUa_AttributeWriteMask_ValueForVariableType    = 2097152
-}
-OpcUa_AttributeWriteMask;
-
-#define OpcUa_AttributeWriteMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, AttributeWriteMask)
-
-#define OpcUa_AttributeWriteMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, AttributeWriteMask)
-
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_AttributeWriteMask_EnumeratedType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_NodeAttributesMask
@@ -1092,12 +1744,15 @@ typedef enum _OpcUa_NodeAttributesMask
     OpcUa_NodeAttributesMask_Method                  = 1466724,
     OpcUa_NodeAttributesMask_ReferenceType           = 1371236,
     OpcUa_NodeAttributesMask_View                    = 1335532
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_NodeAttributesMask_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_NodeAttributesMask;
 
-#define OpcUa_NodeAttributesMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, NodeAttributesMask)
+#define OpcUa_NodeAttributesMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_NodeAttributesMask_None)
 
-#define OpcUa_NodeAttributesMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, NodeAttributesMask)
+#define OpcUa_NodeAttributesMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_NodeAttributesMask_None)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_NodeAttributesMask_EnumeratedType;
 #endif
@@ -1399,1113 +2054,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddNodesItem_Decode(OpcUa_AddNodesItem* pVal
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AddNodesItem_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_AddReferencesItem
-/*============================================================================
- * The AddReferencesItem structure.
- *===========================================================================*/
-typedef struct _OpcUa_AddReferencesItem
-{
-    OpcUa_NodeId         SourceNodeId;
-    OpcUa_NodeId         ReferenceTypeId;
-    OpcUa_Boolean        IsForward;
-    OpcUa_String         TargetServerUri;
-    OpcUa_ExpandedNodeId TargetNodeId;
-    OpcUa_NodeClass      TargetNodeClass;
-}
-OpcUa_AddReferencesItem;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_AddReferencesItem_Initialize(OpcUa_AddReferencesItem* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_AddReferencesItem_Clear(OpcUa_AddReferencesItem* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_GetSize(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_Encode(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_Decode(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AddReferencesItem_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_DeleteNodesItem
-/*============================================================================
- * The DeleteNodesItem structure.
- *===========================================================================*/
-typedef struct _OpcUa_DeleteNodesItem
-{
-    OpcUa_NodeId  NodeId;
-    OpcUa_Boolean DeleteTargetReferences;
-}
-OpcUa_DeleteNodesItem;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_DeleteNodesItem_Initialize(OpcUa_DeleteNodesItem* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_DeleteNodesItem_Clear(OpcUa_DeleteNodesItem* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_GetSize(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_Encode(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_Decode(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteNodesItem_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_DeleteReferencesItem
-/*============================================================================
- * The DeleteReferencesItem structure.
- *===========================================================================*/
-typedef struct _OpcUa_DeleteReferencesItem
-{
-    OpcUa_NodeId         SourceNodeId;
-    OpcUa_NodeId         ReferenceTypeId;
-    OpcUa_Boolean        IsForward;
-    OpcUa_ExpandedNodeId TargetNodeId;
-    OpcUa_Boolean        DeleteBidirectional;
-}
-OpcUa_DeleteReferencesItem;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_DeleteReferencesItem_Initialize(OpcUa_DeleteReferencesItem* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_DeleteReferencesItem_Clear(OpcUa_DeleteReferencesItem* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_GetSize(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_Encode(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_Decode(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteReferencesItem_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_RequestHeader
-/*============================================================================
- * The RequestHeader structure.
- *===========================================================================*/
-typedef struct _OpcUa_RequestHeader
-{
-    OpcUa_NodeId          AuthenticationToken;
-    OpcUa_DateTime        Timestamp;
-    OpcUa_UInt32          RequestHandle;
-    OpcUa_UInt32          ReturnDiagnostics;
-    OpcUa_String          AuditEntryId;
-    OpcUa_UInt32          TimeoutHint;
-    OpcUa_ExtensionObject AdditionalHeader;
-}
-OpcUa_RequestHeader;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RequestHeader_Initialize(OpcUa_RequestHeader* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RequestHeader_Clear(OpcUa_RequestHeader* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_GetSize(OpcUa_RequestHeader* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_Encode(OpcUa_RequestHeader* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RequestHeader_Decode(OpcUa_RequestHeader* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RequestHeader_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ResponseHeader
-/*============================================================================
- * The ResponseHeader structure.
- *===========================================================================*/
-typedef struct _OpcUa_ResponseHeader
-{
-    OpcUa_DateTime        Timestamp;
-    OpcUa_UInt32          RequestHandle;
-    OpcUa_StatusCode      ServiceResult;
-    OpcUa_DiagnosticInfo  ServiceDiagnostics;
-    OpcUa_Int32           NoOfStringTable;
-    OpcUa_String*         StringTable;
-    OpcUa_ExtensionObject AdditionalHeader;
-}
-OpcUa_ResponseHeader;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ResponseHeader_Initialize(OpcUa_ResponseHeader* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ResponseHeader_Clear(OpcUa_ResponseHeader* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_GetSize(OpcUa_ResponseHeader* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_Encode(OpcUa_ResponseHeader* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ResponseHeader_Decode(OpcUa_ResponseHeader* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ResponseHeader_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ServiceFault
-/*============================================================================
- * The ServiceFault structure.
- *===========================================================================*/
-typedef struct _OpcUa_ServiceFault
-{
-    OpcUa_ResponseHeader ResponseHeader;
-}
-OpcUa_ServiceFault;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ServiceFault_Initialize(OpcUa_ServiceFault* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ServiceFault_Clear(OpcUa_ServiceFault* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_GetSize(OpcUa_ServiceFault* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_Encode(OpcUa_ServiceFault* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ServiceFault_Decode(OpcUa_ServiceFault* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ServiceFault_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_EnumeratedTestType
-/*============================================================================
- * The EnumeratedTestType enumeration.
- *===========================================================================*/
-typedef enum _OpcUa_EnumeratedTestType
-{
-    OpcUa_EnumeratedTestType_Red    = 1,
-    OpcUa_EnumeratedTestType_Yellow = 4,
-    OpcUa_EnumeratedTestType_Green  = 5
-}
-OpcUa_EnumeratedTestType;
-
-#define OpcUa_EnumeratedTestType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, EnumeratedTestType)
-
-#define OpcUa_EnumeratedTestType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, EnumeratedTestType)
-
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_EnumeratedTestType_EnumeratedType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ScalarTestType
-/*============================================================================
- * The ScalarTestType structure.
- *===========================================================================*/
-typedef struct _OpcUa_ScalarTestType
-{
-    OpcUa_Boolean            Boolean;
-    OpcUa_SByte              SByte;
-    OpcUa_Byte               Byte;
-    OpcUa_Int16              Int16;
-    OpcUa_UInt16             UInt16;
-    OpcUa_Int32              Int32;
-    OpcUa_UInt32             UInt32;
-    OpcUa_Int64              Int64;
-    OpcUa_UInt64             UInt64;
-    OpcUa_Float              Float;
-    OpcUa_Double             Double;
-    OpcUa_String             String;
-    OpcUa_DateTime           DateTime;
-    OpcUa_Guid               Guid;
-    OpcUa_ByteString         ByteString;
-    OpcUa_XmlElement         XmlElement;
-    OpcUa_NodeId             NodeId;
-    OpcUa_ExpandedNodeId     ExpandedNodeId;
-    OpcUa_StatusCode         StatusCode;
-    OpcUa_DiagnosticInfo     DiagnosticInfo;
-    OpcUa_QualifiedName      QualifiedName;
-    OpcUa_LocalizedText      LocalizedText;
-    OpcUa_ExtensionObject    ExtensionObject;
-    OpcUa_DataValue          DataValue;
-    OpcUa_EnumeratedTestType EnumeratedValue;
-}
-OpcUa_ScalarTestType;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ScalarTestType_Initialize(OpcUa_ScalarTestType* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ScalarTestType_Clear(OpcUa_ScalarTestType* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ScalarTestType_GetSize(OpcUa_ScalarTestType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ScalarTestType_Encode(OpcUa_ScalarTestType* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ScalarTestType_Decode(OpcUa_ScalarTestType* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ScalarTestType_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ArrayTestType
-/*============================================================================
- * The ArrayTestType structure.
- *===========================================================================*/
-typedef struct _OpcUa_ArrayTestType
-{
-    OpcUa_Int32               NoOfBooleans;
-    OpcUa_Boolean*            Booleans;
-    OpcUa_Int32               NoOfSBytes;
-    OpcUa_SByte*              SBytes;
-    OpcUa_Int32               NoOfInt16s;
-    OpcUa_Int16*              Int16s;
-    OpcUa_Int32               NoOfUInt16s;
-    OpcUa_UInt16*             UInt16s;
-    OpcUa_Int32               NoOfInt32s;
-    OpcUa_Int32*              Int32s;
-    OpcUa_Int32               NoOfUInt32s;
-    OpcUa_UInt32*             UInt32s;
-    OpcUa_Int32               NoOfInt64s;
-    OpcUa_Int64*              Int64s;
-    OpcUa_Int32               NoOfUInt64s;
-    OpcUa_UInt64*             UInt64s;
-    OpcUa_Int32               NoOfFloats;
-    OpcUa_Float*              Floats;
-    OpcUa_Int32               NoOfDoubles;
-    OpcUa_Double*             Doubles;
-    OpcUa_Int32               NoOfStrings;
-    OpcUa_String*             Strings;
-    OpcUa_Int32               NoOfDateTimes;
-    OpcUa_DateTime*           DateTimes;
-    OpcUa_Int32               NoOfGuids;
-    OpcUa_Guid*               Guids;
-    OpcUa_Int32               NoOfByteStrings;
-    OpcUa_ByteString*         ByteStrings;
-    OpcUa_Int32               NoOfXmlElements;
-    OpcUa_XmlElement*         XmlElements;
-    OpcUa_Int32               NoOfNodeIds;
-    OpcUa_NodeId*             NodeIds;
-    OpcUa_Int32               NoOfExpandedNodeIds;
-    OpcUa_ExpandedNodeId*     ExpandedNodeIds;
-    OpcUa_Int32               NoOfStatusCodes;
-    OpcUa_StatusCode*         StatusCodes;
-    OpcUa_Int32               NoOfDiagnosticInfos;
-    OpcUa_DiagnosticInfo*     DiagnosticInfos;
-    OpcUa_Int32               NoOfQualifiedNames;
-    OpcUa_QualifiedName*      QualifiedNames;
-    OpcUa_Int32               NoOfLocalizedTexts;
-    OpcUa_LocalizedText*      LocalizedTexts;
-    OpcUa_Int32               NoOfExtensionObjects;
-    OpcUa_ExtensionObject*    ExtensionObjects;
-    OpcUa_Int32               NoOfDataValues;
-    OpcUa_DataValue*          DataValues;
-    OpcUa_Int32               NoOfVariants;
-    OpcUa_Variant*            Variants;
-    OpcUa_Int32               NoOfEnumeratedValues;
-    OpcUa_EnumeratedTestType* EnumeratedValues;
-}
-OpcUa_ArrayTestType;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ArrayTestType_Initialize(OpcUa_ArrayTestType* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ArrayTestType_Clear(OpcUa_ArrayTestType* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ArrayTestType_GetSize(OpcUa_ArrayTestType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ArrayTestType_Encode(OpcUa_ArrayTestType* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ArrayTestType_Decode(OpcUa_ArrayTestType* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ArrayTestType_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CompositeTestType
-/*============================================================================
- * The CompositeTestType structure.
- *===========================================================================*/
-typedef struct _OpcUa_CompositeTestType
-{
-    OpcUa_ScalarTestType Field1;
-    OpcUa_ArrayTestType  Field2;
-}
-OpcUa_CompositeTestType;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CompositeTestType_Initialize(OpcUa_CompositeTestType* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CompositeTestType_Clear(OpcUa_CompositeTestType* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CompositeTestType_GetSize(OpcUa_CompositeTestType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CompositeTestType_Encode(OpcUa_CompositeTestType* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CompositeTestType_Decode(OpcUa_CompositeTestType* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CompositeTestType_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStack
-#ifndef OPCUA_EXCLUDE_TestStackRequest
-/*============================================================================
- * The TestStackRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_TestStackRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_UInt32        TestId;
-    OpcUa_Int32         Iteration;
-    OpcUa_Variant       Input;
-}
-OpcUa_TestStackRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackRequest_Initialize(OpcUa_TestStackRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackRequest_Clear(OpcUa_TestStackRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackRequest_GetSize(OpcUa_TestStackRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackRequest_Encode(OpcUa_TestStackRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackRequest_Decode(OpcUa_TestStackRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TestStackRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackResponse
-/*============================================================================
- * The TestStackResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_TestStackResponse
-{
-    OpcUa_ResponseHeader ResponseHeader;
-    OpcUa_Variant        Output;
-}
-OpcUa_TestStackResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackResponse_Initialize(OpcUa_TestStackResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackResponse_Clear(OpcUa_TestStackResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackResponse_GetSize(OpcUa_TestStackResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackResponse_Encode(OpcUa_TestStackResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackResponse_Decode(OpcUa_TestStackResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TestStackResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-#ifndef OPCUA_EXCLUDE_TestStackExRequest
-/*============================================================================
- * The TestStackExRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_TestStackExRequest
-{
-    OpcUa_RequestHeader     RequestHeader;
-    OpcUa_UInt32            TestId;
-    OpcUa_Int32             Iteration;
-    OpcUa_CompositeTestType Input;
-}
-OpcUa_TestStackExRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackExRequest_Initialize(OpcUa_TestStackExRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackExRequest_Clear(OpcUa_TestStackExRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExRequest_GetSize(OpcUa_TestStackExRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExRequest_Encode(OpcUa_TestStackExRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExRequest_Decode(OpcUa_TestStackExRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TestStackExRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackExResponse
-/*============================================================================
- * The TestStackExResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_TestStackExResponse
-{
-    OpcUa_ResponseHeader    ResponseHeader;
-    OpcUa_CompositeTestType Output;
-}
-OpcUa_TestStackExResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackExResponse_Initialize(OpcUa_TestStackExResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_TestStackExResponse_Clear(OpcUa_TestStackExResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExResponse_GetSize(OpcUa_TestStackExResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExResponse_Encode(OpcUa_TestStackExResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TestStackExResponse_Decode(OpcUa_TestStackExResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_TestStackExResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServers
-#ifndef OPCUA_EXCLUDE_FindServersRequest
-/*============================================================================
- * The FindServersRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_FindServersRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_String        EndpointUrl;
-    OpcUa_Int32         NoOfLocaleIds;
-    OpcUa_String*       LocaleIds;
-    OpcUa_Int32         NoOfServerUris;
-    OpcUa_String*       ServerUris;
-}
-OpcUa_FindServersRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersRequest_Initialize(OpcUa_FindServersRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersRequest_Clear(OpcUa_FindServersRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_GetSize(OpcUa_FindServersRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_Encode(OpcUa_FindServersRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersRequest_Decode(OpcUa_FindServersRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersResponse
-/*============================================================================
- * The FindServersResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_FindServersResponse
-{
-    OpcUa_ResponseHeader          ResponseHeader;
-    OpcUa_Int32                   NoOfServers;
-    OpcUa_ApplicationDescription* Servers;
-}
-OpcUa_FindServersResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersResponse_Initialize(OpcUa_FindServersResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersResponse_Clear(OpcUa_FindServersResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_GetSize(OpcUa_FindServersResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_Encode(OpcUa_FindServersResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersResponse_Decode(OpcUa_FindServersResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersOnNetwork
-#ifndef OPCUA_EXCLUDE_FindServersOnNetworkRequest
-/*============================================================================
- * The FindServersOnNetworkRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_FindServersOnNetworkRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_UInt32        StartingRecordId;
-    OpcUa_UInt32        MaxRecordsToReturn;
-    OpcUa_Int32         NoOfServerCapabilityFilter;
-    OpcUa_String*       ServerCapabilityFilter;
-}
-OpcUa_FindServersOnNetworkRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkRequest_Initialize(OpcUa_FindServersOnNetworkRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkRequest_Clear(OpcUa_FindServersOnNetworkRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_GetSize(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Encode(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Decode(OpcUa_FindServersOnNetworkRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersOnNetworkResponse
-/*============================================================================
- * The FindServersOnNetworkResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_FindServersOnNetworkResponse
-{
-    OpcUa_ResponseHeader          ResponseHeader;
-    OpcUa_DateTime                LastCounterResetTime;
-    OpcUa_Int32                   NoOfServers;
-    OpcUa_ServerOnNetwork*        Servers;
-}
-OpcUa_FindServersOnNetworkResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkResponse_Initialize(OpcUa_FindServersOnNetworkResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_FindServersOnNetworkResponse_Clear(OpcUa_FindServersOnNetworkResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_GetSize(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Encode(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Decode(OpcUa_FindServersOnNetworkResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_GetEndpoints
-#ifndef OPCUA_EXCLUDE_GetEndpointsRequest
-/*============================================================================
- * The GetEndpointsRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_GetEndpointsRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_String        EndpointUrl;
-    OpcUa_Int32         NoOfLocaleIds;
-    OpcUa_String*       LocaleIds;
-    OpcUa_Int32         NoOfProfileUris;
-    OpcUa_String*       ProfileUris;
-}
-OpcUa_GetEndpointsRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsRequest_Initialize(OpcUa_GetEndpointsRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsRequest_Clear(OpcUa_GetEndpointsRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_GetSize(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_Encode(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsRequest_Decode(OpcUa_GetEndpointsRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_GetEndpointsRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_GetEndpointsResponse
-/*============================================================================
- * The GetEndpointsResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_GetEndpointsResponse
-{
-    OpcUa_ResponseHeader       ResponseHeader;
-    OpcUa_Int32                NoOfEndpoints;
-    OpcUa_EndpointDescription* Endpoints;
-}
-OpcUa_GetEndpointsResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsResponse_Initialize(OpcUa_GetEndpointsResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_GetEndpointsResponse_Clear(OpcUa_GetEndpointsResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_GetSize(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_Encode(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_GetEndpointsResponse_Decode(OpcUa_GetEndpointsResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_GetEndpointsResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisteredServer
-/*============================================================================
- * The RegisteredServer structure.
- *===========================================================================*/
-typedef struct _OpcUa_RegisteredServer
-{
-    OpcUa_String          ServerUri;
-    OpcUa_String          ProductUri;
-    OpcUa_Int32           NoOfServerNames;
-    OpcUa_LocalizedText*  ServerNames;
-    OpcUa_ApplicationType ServerType;
-    OpcUa_String          GatewayServerUri;
-    OpcUa_Int32           NoOfDiscoveryUrls;
-    OpcUa_String*         DiscoveryUrls;
-    OpcUa_String          SemaphoreFilePath;
-    OpcUa_Boolean         IsOnline;
-}
-OpcUa_RegisteredServer;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisteredServer_Initialize(OpcUa_RegisteredServer* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisteredServer_Clear(OpcUa_RegisteredServer* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_GetSize(OpcUa_RegisteredServer* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_Encode(OpcUa_RegisteredServer* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisteredServer_Decode(OpcUa_RegisteredServer* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisteredServer_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer
-#ifndef OPCUA_EXCLUDE_RegisterServerRequest
-/*============================================================================
- * The RegisterServerRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_RegisterServerRequest
-{
-    OpcUa_RequestHeader    RequestHeader;
-    OpcUa_RegisteredServer Server;
-}
-OpcUa_RegisterServerRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerRequest_Initialize(OpcUa_RegisterServerRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerRequest_Clear(OpcUa_RegisterServerRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_GetSize(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_Encode(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerRequest_Decode(OpcUa_RegisterServerRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServerRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServerResponse
-/*============================================================================
- * The RegisterServerResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_RegisterServerResponse
-{
-    OpcUa_ResponseHeader ResponseHeader;
-}
-OpcUa_RegisterServerResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerResponse_Initialize(OpcUa_RegisterServerResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServerResponse_Clear(OpcUa_RegisterServerResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_GetSize(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_Encode(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServerResponse_Decode(OpcUa_RegisterServerResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServerResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer2
-#ifndef OPCUA_EXCLUDE_RegisterServer2Request
-/*============================================================================
- * The RegisterServer2Request structure.
- *===========================================================================*/
-typedef struct _OpcUa_RegisterServer2Request
-{
-    OpcUa_RequestHeader    RequestHeader;
-    OpcUa_RegisteredServer Server;
-    OpcUa_Int32            NoOfDiscoveryConfiguration;
-    OpcUa_ExtensionObject* DiscoveryConfiguration;
-}
-OpcUa_RegisterServer2Request;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Request_Initialize(OpcUa_RegisterServer2Request* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Request_Clear(OpcUa_RegisterServer2Request* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_GetSize(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_Encode(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Request_Decode(OpcUa_RegisterServer2Request* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServer2Request_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer2Response
-/*============================================================================
- * The RegisterServer2Response structure.
- *===========================================================================*/
-typedef struct _OpcUa_RegisterServer2Response
-{
-    OpcUa_ResponseHeader  ResponseHeader;
-    OpcUa_Int32           NoOfConfigurationResults;
-    OpcUa_StatusCode*     ConfigurationResults;
-    OpcUa_Int32           NoOfDiagnosticInfos;
-    OpcUa_DiagnosticInfo* DiagnosticInfos;
-}
-OpcUa_RegisterServer2Response;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Response_Initialize(OpcUa_RegisterServer2Response* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_RegisterServer2Response_Clear(OpcUa_RegisterServer2Response* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_GetSize(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_Encode(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_RegisterServer2Response_Decode(OpcUa_RegisterServer2Response* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_RegisterServer2Response_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_ChannelSecurityToken
-/*============================================================================
- * The ChannelSecurityToken structure.
- *===========================================================================*/
-typedef struct _OpcUa_ChannelSecurityToken
-{
-    OpcUa_UInt32   ChannelId;
-    OpcUa_UInt32   TokenId;
-    OpcUa_DateTime CreatedAt;
-    OpcUa_UInt32   RevisedLifetime;
-}
-OpcUa_ChannelSecurityToken;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ChannelSecurityToken_Initialize(OpcUa_ChannelSecurityToken* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ChannelSecurityToken_Clear(OpcUa_ChannelSecurityToken* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_GetSize(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_Encode(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ChannelSecurityToken_Decode(OpcUa_ChannelSecurityToken* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ChannelSecurityToken_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_OpenSecureChannel
-#ifndef OPCUA_EXCLUDE_OpenSecureChannelRequest
-/*============================================================================
- * The OpenSecureChannelRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_OpenSecureChannelRequest
-{
-    OpcUa_RequestHeader            RequestHeader;
-    OpcUa_UInt32                   ClientProtocolVersion;
-    OpcUa_SecurityTokenRequestType RequestType;
-    OpcUa_MessageSecurityMode      SecurityMode;
-    OpcUa_ByteString               ClientNonce;
-    OpcUa_UInt32                   RequestedLifetime;
-}
-OpcUa_OpenSecureChannelRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelRequest_Initialize(OpcUa_OpenSecureChannelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelRequest_Clear(OpcUa_OpenSecureChannelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_GetSize(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Encode(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Decode(OpcUa_OpenSecureChannelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_OpenSecureChannelResponse
-/*============================================================================
- * The OpenSecureChannelResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_OpenSecureChannelResponse
-{
-    OpcUa_ResponseHeader       ResponseHeader;
-    OpcUa_UInt32               ServerProtocolVersion;
-    OpcUa_ChannelSecurityToken SecurityToken;
-    OpcUa_ByteString           ServerNonce;
-}
-OpcUa_OpenSecureChannelResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelResponse_Initialize(OpcUa_OpenSecureChannelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_OpenSecureChannelResponse_Clear(OpcUa_OpenSecureChannelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_GetSize(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Encode(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Decode(OpcUa_OpenSecureChannelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSecureChannel
-#ifndef OPCUA_EXCLUDE_CloseSecureChannelRequest
-/*============================================================================
- * The CloseSecureChannelRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_CloseSecureChannelRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-}
-OpcUa_CloseSecureChannelRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelRequest_Initialize(OpcUa_CloseSecureChannelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelRequest_Clear(OpcUa_CloseSecureChannelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_GetSize(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Encode(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Decode(OpcUa_CloseSecureChannelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSecureChannelResponse
-/*============================================================================
- * The CloseSecureChannelResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_CloseSecureChannelResponse
-{
-    OpcUa_ResponseHeader ResponseHeader;
-}
-OpcUa_CloseSecureChannelResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelResponse_Initialize(OpcUa_CloseSecureChannelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSecureChannelResponse_Clear(OpcUa_CloseSecureChannelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_GetSize(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Encode(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Decode(OpcUa_CloseSecureChannelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_SignatureData
-/*============================================================================
- * The SignatureData structure.
- *===========================================================================*/
-typedef struct _OpcUa_SignatureData
-{
-    OpcUa_String     Algorithm;
-    OpcUa_ByteString Signature;
-}
-OpcUa_SignatureData;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_SignatureData_Initialize(OpcUa_SignatureData* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_SignatureData_Clear(OpcUa_SignatureData* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_GetSize(OpcUa_SignatureData* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_Encode(OpcUa_SignatureData* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SignatureData_Decode(OpcUa_SignatureData* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SignatureData_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CreateSession
-#ifndef OPCUA_EXCLUDE_CreateSessionRequest
-/*============================================================================
- * The CreateSessionRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_CreateSessionRequest
-{
-    OpcUa_RequestHeader          RequestHeader;
-    OpcUa_ApplicationDescription ClientDescription;
-    OpcUa_String                 ServerUri;
-    OpcUa_String                 EndpointUrl;
-    OpcUa_String                 SessionName;
-    OpcUa_ByteString             ClientNonce;
-    OpcUa_ByteString             ClientCertificate;
-    OpcUa_Double                 RequestedSessionTimeout;
-    OpcUa_UInt32                 MaxResponseMessageSize;
-}
-OpcUa_CreateSessionRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionRequest_Initialize(OpcUa_CreateSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionRequest_Clear(OpcUa_CreateSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_GetSize(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_Encode(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionRequest_Decode(OpcUa_CreateSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CreateSessionRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CreateSessionResponse
-/*============================================================================
- * The CreateSessionResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_CreateSessionResponse
-{
-    OpcUa_ResponseHeader             ResponseHeader;
-    OpcUa_NodeId                     SessionId;
-    OpcUa_NodeId                     AuthenticationToken;
-    OpcUa_Double                     RevisedSessionTimeout;
-    OpcUa_ByteString                 ServerNonce;
-    OpcUa_ByteString                 ServerCertificate;
-    OpcUa_Int32                      NoOfServerEndpoints;
-    OpcUa_EndpointDescription*       ServerEndpoints;
-    OpcUa_Int32                      NoOfServerSoftwareCertificates;
-    OpcUa_SignedSoftwareCertificate* ServerSoftwareCertificates;
-    OpcUa_SignatureData              ServerSignature;
-    OpcUa_UInt32                     MaxRequestMessageSize;
-}
-OpcUa_CreateSessionResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionResponse_Initialize(OpcUa_CreateSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CreateSessionResponse_Clear(OpcUa_CreateSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_GetSize(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_Encode(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CreateSessionResponse_Decode(OpcUa_CreateSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CreateSessionResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_ActivateSession
-#ifndef OPCUA_EXCLUDE_ActivateSessionRequest
-/*============================================================================
- * The ActivateSessionRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_ActivateSessionRequest
-{
-    OpcUa_RequestHeader              RequestHeader;
-    OpcUa_SignatureData              ClientSignature;
-    OpcUa_Int32                      NoOfClientSoftwareCertificates;
-    OpcUa_SignedSoftwareCertificate* ClientSoftwareCertificates;
-    OpcUa_Int32                      NoOfLocaleIds;
-    OpcUa_String*                    LocaleIds;
-    OpcUa_ExtensionObject            UserIdentityToken;
-    OpcUa_SignatureData              UserTokenSignature;
-}
-OpcUa_ActivateSessionRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionRequest_Initialize(OpcUa_ActivateSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionRequest_Clear(OpcUa_ActivateSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_GetSize(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_Encode(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionRequest_Decode(OpcUa_ActivateSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ActivateSessionRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ActivateSessionResponse
-/*============================================================================
- * The ActivateSessionResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_ActivateSessionResponse
-{
-    OpcUa_ResponseHeader  ResponseHeader;
-    OpcUa_ByteString      ServerNonce;
-    OpcUa_Int32           NoOfResults;
-    OpcUa_StatusCode*     Results;
-    OpcUa_Int32           NoOfDiagnosticInfos;
-    OpcUa_DiagnosticInfo* DiagnosticInfos;
-}
-OpcUa_ActivateSessionResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionResponse_Initialize(OpcUa_ActivateSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_ActivateSessionResponse_Clear(OpcUa_ActivateSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_GetSize(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_Encode(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ActivateSessionResponse_Decode(OpcUa_ActivateSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ActivateSessionResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSession
-#ifndef OPCUA_EXCLUDE_CloseSessionRequest
-/*============================================================================
- * The CloseSessionRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_CloseSessionRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_Boolean       DeleteSubscriptions;
-}
-OpcUa_CloseSessionRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionRequest_Initialize(OpcUa_CloseSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionRequest_Clear(OpcUa_CloseSessionRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_GetSize(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_Encode(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionRequest_Decode(OpcUa_CloseSessionRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSessionRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSessionResponse
-/*============================================================================
- * The CloseSessionResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_CloseSessionResponse
-{
-    OpcUa_ResponseHeader ResponseHeader;
-}
-OpcUa_CloseSessionResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionResponse_Initialize(OpcUa_CloseSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CloseSessionResponse_Clear(OpcUa_CloseSessionResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_GetSize(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_Encode(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CloseSessionResponse_Decode(OpcUa_CloseSessionResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CloseSessionResponse_EncodeableType;
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_Cancel
-#ifndef OPCUA_EXCLUDE_CancelRequest
-/*============================================================================
- * The CancelRequest structure.
- *===========================================================================*/
-typedef struct _OpcUa_CancelRequest
-{
-    OpcUa_RequestHeader RequestHeader;
-    OpcUa_UInt32        RequestHandle;
-}
-OpcUa_CancelRequest;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CancelRequest_Initialize(OpcUa_CancelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CancelRequest_Clear(OpcUa_CancelRequest* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_GetSize(OpcUa_CancelRequest* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_Encode(OpcUa_CancelRequest* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelRequest_Decode(OpcUa_CancelRequest* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CancelRequest_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_CancelResponse
-/*============================================================================
- * The CancelResponse structure.
- *===========================================================================*/
-typedef struct _OpcUa_CancelResponse
-{
-    OpcUa_ResponseHeader ResponseHeader;
-    OpcUa_UInt32         CancelCount;
-}
-OpcUa_CancelResponse;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CancelResponse_Initialize(OpcUa_CancelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_CancelResponse_Clear(OpcUa_CancelResponse* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_GetSize(OpcUa_CancelResponse* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_Encode(OpcUa_CancelResponse* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_CancelResponse_Decode(OpcUa_CancelResponse* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_CancelResponse_EncodeableType;
-#endif
-#endif
-
 #ifndef OPCUA_EXCLUDE_AddNodesResult
 /*============================================================================
  * The AddNodesResult structure.
@@ -2584,6 +2132,34 @@ OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AddNodesResponse_Encode
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_AddReferencesItem
+/*============================================================================
+ * The AddReferencesItem structure.
+ *===========================================================================*/
+typedef struct _OpcUa_AddReferencesItem
+{
+    OpcUa_NodeId         SourceNodeId;
+    OpcUa_NodeId         ReferenceTypeId;
+    OpcUa_Boolean        IsForward;
+    OpcUa_String         TargetServerUri;
+    OpcUa_ExpandedNodeId TargetNodeId;
+    OpcUa_NodeClass      TargetNodeClass;
+}
+OpcUa_AddReferencesItem;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_AddReferencesItem_Initialize(OpcUa_AddReferencesItem* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_AddReferencesItem_Clear(OpcUa_AddReferencesItem* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_GetSize(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_Encode(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesItem_Decode(OpcUa_AddReferencesItem* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AddReferencesItem_EncodeableType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_AddReferences
 #ifndef OPCUA_EXCLUDE_AddReferencesRequest
 /*============================================================================
@@ -2636,6 +2212,30 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_AddReferencesResponse_Decode(OpcUa_AddRefere
 
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AddReferencesResponse_EncodeableType;
 #endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_DeleteNodesItem
+/*============================================================================
+ * The DeleteNodesItem structure.
+ *===========================================================================*/
+typedef struct _OpcUa_DeleteNodesItem
+{
+    OpcUa_NodeId  NodeId;
+    OpcUa_Boolean DeleteTargetReferences;
+}
+OpcUa_DeleteNodesItem;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_DeleteNodesItem_Initialize(OpcUa_DeleteNodesItem* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_DeleteNodesItem_Clear(OpcUa_DeleteNodesItem* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_GetSize(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_Encode(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteNodesItem_Decode(OpcUa_DeleteNodesItem* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteNodesItem_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_DeleteNodes
@@ -2692,6 +2292,33 @@ OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteNodesResponse_Enc
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_DeleteReferencesItem
+/*============================================================================
+ * The DeleteReferencesItem structure.
+ *===========================================================================*/
+typedef struct _OpcUa_DeleteReferencesItem
+{
+    OpcUa_NodeId         SourceNodeId;
+    OpcUa_NodeId         ReferenceTypeId;
+    OpcUa_Boolean        IsForward;
+    OpcUa_ExpandedNodeId TargetNodeId;
+    OpcUa_Boolean        DeleteBidirectional;
+}
+OpcUa_DeleteReferencesItem;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_DeleteReferencesItem_Initialize(OpcUa_DeleteReferencesItem* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_DeleteReferencesItem_Clear(OpcUa_DeleteReferencesItem* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_GetSize(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_Encode(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DeleteReferencesItem_Decode(OpcUa_DeleteReferencesItem* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteReferencesItem_EncodeableType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_DeleteReferences
 #ifndef OPCUA_EXCLUDE_DeleteReferencesRequest
 /*============================================================================
@@ -2746,6 +2373,48 @@ OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteReferencesRespons
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_AttributeWriteMask
+/*============================================================================
+ * The AttributeWriteMask enumeration.
+ *===========================================================================*/
+typedef enum _OpcUa_AttributeWriteMask
+{
+    OpcUa_AttributeWriteMask_None                    = 0,
+    OpcUa_AttributeWriteMask_AccessLevel             = 1,
+    OpcUa_AttributeWriteMask_ArrayDimensions         = 2,
+    OpcUa_AttributeWriteMask_BrowseName              = 4,
+    OpcUa_AttributeWriteMask_ContainsNoLoops         = 8,
+    OpcUa_AttributeWriteMask_DataType                = 16,
+    OpcUa_AttributeWriteMask_Description             = 32,
+    OpcUa_AttributeWriteMask_DisplayName             = 64,
+    OpcUa_AttributeWriteMask_EventNotifier           = 128,
+    OpcUa_AttributeWriteMask_Executable              = 256,
+    OpcUa_AttributeWriteMask_Historizing             = 512,
+    OpcUa_AttributeWriteMask_InverseName             = 1024,
+    OpcUa_AttributeWriteMask_IsAbstract              = 2048,
+    OpcUa_AttributeWriteMask_MinimumSamplingInterval = 4096,
+    OpcUa_AttributeWriteMask_NodeClass               = 8192,
+    OpcUa_AttributeWriteMask_NodeId                  = 16384,
+    OpcUa_AttributeWriteMask_Symmetric               = 32768,
+    OpcUa_AttributeWriteMask_UserAccessLevel         = 65536,
+    OpcUa_AttributeWriteMask_UserExecutable          = 131072,
+    OpcUa_AttributeWriteMask_UserWriteMask           = 262144,
+    OpcUa_AttributeWriteMask_ValueRank               = 524288,
+    OpcUa_AttributeWriteMask_WriteMask               = 1048576,
+    OpcUa_AttributeWriteMask_ValueForVariableType    = 2097152
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_AttributeWriteMask_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
+}
+OpcUa_AttributeWriteMask;
+
+#define OpcUa_AttributeWriteMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_AttributeWriteMask_None)
+
+#define OpcUa_AttributeWriteMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_AttributeWriteMask_None)
+
+OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_AttributeWriteMask_EnumeratedType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_BrowseDirection
 /*============================================================================
  * The BrowseDirection enumeration.
@@ -2756,12 +2425,15 @@ typedef enum _OpcUa_BrowseDirection
     OpcUa_BrowseDirection_Inverse = 1,
     OpcUa_BrowseDirection_Both    = 2,
     OpcUa_BrowseDirection_Invalid = 3
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_BrowseDirection_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_BrowseDirection;
 
-#define OpcUa_BrowseDirection_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, BrowseDirection)
+#define OpcUa_BrowseDirection_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_BrowseDirection_Forward)
 
-#define OpcUa_BrowseDirection_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, BrowseDirection)
+#define OpcUa_BrowseDirection_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_BrowseDirection_Forward)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_BrowseDirection_EnumeratedType;
 #endif
@@ -2835,12 +2507,15 @@ typedef enum _OpcUa_BrowseResultMask
     OpcUa_BrowseResultMask_All               = 63,
     OpcUa_BrowseResultMask_ReferenceTypeInfo = 3,
     OpcUa_BrowseResultMask_TargetInfo        = 60
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_BrowseResultMask_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_BrowseResultMask;
 
-#define OpcUa_BrowseResultMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, BrowseResultMask)
+#define OpcUa_BrowseResultMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_BrowseResultMask_None)
 
-#define OpcUa_BrowseResultMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, BrowseResultMask)
+#define OpcUa_BrowseResultMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_BrowseResultMask_None)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_BrowseResultMask_EnumeratedType;
 #endif
@@ -3290,6 +2965,37 @@ OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_UnregisterNodesResponse
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_EndpointConfiguration
+/*============================================================================
+ * The EndpointConfiguration structure.
+ *===========================================================================*/
+typedef struct _OpcUa_EndpointConfiguration
+{
+    OpcUa_Int32   OperationTimeout;
+    OpcUa_Boolean UseBinaryEncoding;
+    OpcUa_Int32   MaxStringLength;
+    OpcUa_Int32   MaxByteStringLength;
+    OpcUa_Int32   MaxArrayLength;
+    OpcUa_Int32   MaxMessageSize;
+    OpcUa_Int32   MaxBufferSize;
+    OpcUa_Int32   ChannelLifetime;
+    OpcUa_Int32   SecurityTokenLifetime;
+}
+OpcUa_EndpointConfiguration;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_EndpointConfiguration_Initialize(OpcUa_EndpointConfiguration* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_EndpointConfiguration_Clear(OpcUa_EndpointConfiguration* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_Encode(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EndpointConfiguration_Decode(OpcUa_EndpointConfiguration* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EndpointConfiguration_EncodeableType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_QueryDataDescription
 /*============================================================================
  * The QueryDataDescription structure.
@@ -3365,12 +3071,15 @@ typedef enum _OpcUa_FilterOperator
     OpcUa_FilterOperator_RelatedTo          = 15,
     OpcUa_FilterOperator_BitwiseAnd         = 16,
     OpcUa_FilterOperator_BitwiseOr          = 17
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_FilterOperator_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_FilterOperator;
 
-#define OpcUa_FilterOperator_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, FilterOperator)
+#define OpcUa_FilterOperator_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_FilterOperator_Equals)
 
-#define OpcUa_FilterOperator_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, FilterOperator)
+#define OpcUa_FilterOperator_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_FilterOperator_Equals)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_FilterOperator_EnumeratedType;
 #endif
@@ -3783,12 +3492,15 @@ typedef enum _OpcUa_TimestampsToReturn
     OpcUa_TimestampsToReturn_Both    = 2,
     OpcUa_TimestampsToReturn_Neither = 3,
     OpcUa_TimestampsToReturn_Invalid = 4
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_TimestampsToReturn_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_TimestampsToReturn;
 
-#define OpcUa_TimestampsToReturn_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, TimestampsToReturn)
+#define OpcUa_TimestampsToReturn_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_TimestampsToReturn_Source)
 
-#define OpcUa_TimestampsToReturn_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, TimestampsToReturn)
+#define OpcUa_TimestampsToReturn_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_TimestampsToReturn_Source)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_TimestampsToReturn_EnumeratedType;
 #endif
@@ -4118,12 +3830,15 @@ typedef enum _OpcUa_HistoryUpdateType
     OpcUa_HistoryUpdateType_Replace = 2,
     OpcUa_HistoryUpdateType_Update  = 3,
     OpcUa_HistoryUpdateType_Delete  = 4
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_HistoryUpdateType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_HistoryUpdateType;
 
-#define OpcUa_HistoryUpdateType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, HistoryUpdateType)
+#define OpcUa_HistoryUpdateType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_HistoryUpdateType_Insert)
 
-#define OpcUa_HistoryUpdateType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, HistoryUpdateType)
+#define OpcUa_HistoryUpdateType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_HistoryUpdateType_Insert)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_HistoryUpdateType_EnumeratedType;
 #endif
@@ -4397,12 +4112,15 @@ typedef enum _OpcUa_PerformUpdateType
     OpcUa_PerformUpdateType_Replace = 2,
     OpcUa_PerformUpdateType_Update  = 3,
     OpcUa_PerformUpdateType_Remove  = 4
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_PerformUpdateType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_PerformUpdateType;
 
-#define OpcUa_PerformUpdateType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, PerformUpdateType)
+#define OpcUa_PerformUpdateType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_PerformUpdateType_Insert)
 
-#define OpcUa_PerformUpdateType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, PerformUpdateType)
+#define OpcUa_PerformUpdateType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_PerformUpdateType_Insert)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_PerformUpdateType_EnumeratedType;
 #endif
@@ -4589,57 +4307,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_HistoryUpdateResult_Decode(OpcUa_HistoryUpda
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_HistoryUpdateResult_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_EventFilterResult
-/*============================================================================
- * The EventFilterResult structure.
- *===========================================================================*/
-typedef struct _OpcUa_EventFilterResult
-{
-    OpcUa_Int32               NoOfSelectClauseResults;
-    OpcUa_StatusCode*         SelectClauseResults;
-    OpcUa_Int32               NoOfSelectClauseDiagnosticInfos;
-    OpcUa_DiagnosticInfo*     SelectClauseDiagnosticInfos;
-    OpcUa_ContentFilterResult WhereClauseResult;
-}
-OpcUa_EventFilterResult;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_EventFilterResult_Initialize(OpcUa_EventFilterResult* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_EventFilterResult_Clear(OpcUa_EventFilterResult* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_GetSize(OpcUa_EventFilterResult* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_Encode(OpcUa_EventFilterResult* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_Decode(OpcUa_EventFilterResult* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EventFilterResult_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_HistoryUpdateEventResult
-/*============================================================================
- * The HistoryUpdateEventResult structure.
- *===========================================================================*/
-typedef struct _OpcUa_HistoryUpdateEventResult
-{
-    OpcUa_StatusCode        StatusCode;
-    OpcUa_EventFilterResult EventFilterResult;
-}
-OpcUa_HistoryUpdateEventResult;
-
-OPCUA_EXPORT OpcUa_Void OpcUa_HistoryUpdateEventResult_Initialize(OpcUa_HistoryUpdateEventResult* pValue);
-
-OPCUA_EXPORT OpcUa_Void OpcUa_HistoryUpdateEventResult_Clear(OpcUa_HistoryUpdateEventResult* pValue);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_GetSize(OpcUa_HistoryUpdateEventResult* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_Encode(OpcUa_HistoryUpdateEventResult* pValue, struct _OpcUa_Encoder* pEncoder);
-
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_Decode(OpcUa_HistoryUpdateEventResult* pValue, struct _OpcUa_Decoder* pDecoder);
-
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_HistoryUpdateEventResult_EncodeableType;
-#endif
-
 #ifndef OPCUA_EXCLUDE_HistoryUpdate
 #ifndef OPCUA_EXCLUDE_HistoryUpdateRequest
 /*============================================================================
@@ -4812,12 +4479,15 @@ typedef enum _OpcUa_MonitoringMode
     OpcUa_MonitoringMode_Disabled  = 0,
     OpcUa_MonitoringMode_Sampling  = 1,
     OpcUa_MonitoringMode_Reporting = 2
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_MonitoringMode_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_MonitoringMode;
 
-#define OpcUa_MonitoringMode_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, MonitoringMode)
+#define OpcUa_MonitoringMode_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_MonitoringMode_Disabled)
 
-#define OpcUa_MonitoringMode_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, MonitoringMode)
+#define OpcUa_MonitoringMode_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_MonitoringMode_Disabled)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_MonitoringMode_EnumeratedType;
 #endif
@@ -4831,12 +4501,15 @@ typedef enum _OpcUa_DataChangeTrigger
     OpcUa_DataChangeTrigger_Status               = 0,
     OpcUa_DataChangeTrigger_StatusValue          = 1,
     OpcUa_DataChangeTrigger_StatusValueTimestamp = 2
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_DataChangeTrigger_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_DataChangeTrigger;
 
-#define OpcUa_DataChangeTrigger_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, DataChangeTrigger)
+#define OpcUa_DataChangeTrigger_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_DataChangeTrigger_Status)
 
-#define OpcUa_DataChangeTrigger_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, DataChangeTrigger)
+#define OpcUa_DataChangeTrigger_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_DataChangeTrigger_Status)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_DataChangeTrigger_EnumeratedType;
 #endif
@@ -4850,12 +4523,15 @@ typedef enum _OpcUa_DeadbandType
     OpcUa_DeadbandType_None     = 0,
     OpcUa_DeadbandType_Absolute = 1,
     OpcUa_DeadbandType_Percent  = 2
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_DeadbandType_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_DeadbandType;
 
-#define OpcUa_DeadbandType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, DeadbandType)
+#define OpcUa_DeadbandType_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_DeadbandType_None)
 
-#define OpcUa_DeadbandType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, DeadbandType)
+#define OpcUa_DeadbandType_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_DeadbandType_None)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_DeadbandType_EnumeratedType;
 #endif
@@ -4909,6 +4585,33 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_AggregateFilter_Encode(OpcUa_AggregateFilter
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_AggregateFilter_Decode(OpcUa_AggregateFilter* pValue, struct _OpcUa_Decoder* pDecoder);
 
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_AggregateFilter_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_EventFilterResult
+/*============================================================================
+ * The EventFilterResult structure.
+ *===========================================================================*/
+typedef struct _OpcUa_EventFilterResult
+{
+    OpcUa_Int32               NoOfSelectClauseResults;
+    OpcUa_StatusCode*         SelectClauseResults;
+    OpcUa_Int32               NoOfSelectClauseDiagnosticInfos;
+    OpcUa_DiagnosticInfo*     SelectClauseDiagnosticInfos;
+    OpcUa_ContentFilterResult WhereClauseResult;
+}
+OpcUa_EventFilterResult;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_EventFilterResult_Initialize(OpcUa_EventFilterResult* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_EventFilterResult_Clear(OpcUa_EventFilterResult* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_GetSize(OpcUa_EventFilterResult* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_Encode(OpcUa_EventFilterResult* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_EventFilterResult_Decode(OpcUa_EventFilterResult* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_EventFilterResult_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_AggregateFilterResult
@@ -5937,6 +5640,34 @@ OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DeleteSubscriptionsResp
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_BuildInfo
+/*============================================================================
+ * The BuildInfo structure.
+ *===========================================================================*/
+typedef struct _OpcUa_BuildInfo
+{
+    OpcUa_String   ProductUri;
+    OpcUa_String   ManufacturerName;
+    OpcUa_String   ProductName;
+    OpcUa_String   SoftwareVersion;
+    OpcUa_String   BuildNumber;
+    OpcUa_DateTime BuildDate;
+}
+OpcUa_BuildInfo;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_BuildInfo_Initialize(OpcUa_BuildInfo* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_BuildInfo_Clear(OpcUa_BuildInfo* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_Encode(OpcUa_BuildInfo* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_BuildInfo_Decode(OpcUa_BuildInfo* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_BuildInfo_EncodeableType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_RedundancySupport
 /*============================================================================
  * The RedundancySupport enumeration.
@@ -5949,12 +5680,15 @@ typedef enum _OpcUa_RedundancySupport
     OpcUa_RedundancySupport_Hot            = 3,
     OpcUa_RedundancySupport_Transparent    = 4,
     OpcUa_RedundancySupport_HotAndMirrored = 5
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_RedundancySupport_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_RedundancySupport;
 
-#define OpcUa_RedundancySupport_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, RedundancySupport)
+#define OpcUa_RedundancySupport_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_RedundancySupport_None)
 
-#define OpcUa_RedundancySupport_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, RedundancySupport)
+#define OpcUa_RedundancySupport_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_RedundancySupport_None)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_RedundancySupport_EnumeratedType;
 #endif
@@ -5973,12 +5707,15 @@ typedef enum _OpcUa_ServerState
     OpcUa_ServerState_Test               = 5,
     OpcUa_ServerState_CommunicationFault = 6,
     OpcUa_ServerState_Unknown            = 7
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_ServerState_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_ServerState;
 
-#define OpcUa_ServerState_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, ServerState)
+#define OpcUa_ServerState_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_ServerState_Running)
 
-#define OpcUa_ServerState_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, ServerState)
+#define OpcUa_ServerState_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_ServerState_Running)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ServerState_EnumeratedType;
 #endif
@@ -6267,6 +6004,30 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_SessionSecurityDiagnosticsDataType_Decode(Op
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SessionSecurityDiagnosticsDataType_EncodeableType;
 #endif
 
+#ifndef OPCUA_EXCLUDE_StatusResult
+/*============================================================================
+ * The StatusResult structure.
+ *===========================================================================*/
+typedef struct _OpcUa_StatusResult
+{
+    OpcUa_StatusCode     StatusCode;
+    OpcUa_DiagnosticInfo DiagnosticInfo;
+}
+OpcUa_StatusResult;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_StatusResult_Initialize(OpcUa_StatusResult* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_StatusResult_Clear(OpcUa_StatusResult* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_Encode(OpcUa_StatusResult* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_StatusResult_Decode(OpcUa_StatusResult* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_StatusResult_EncodeableType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_SubscriptionDiagnosticsDataType
 /*============================================================================
  * The SubscriptionDiagnosticsDataType structure.
@@ -6320,6 +6081,30 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_SubscriptionDiagnosticsDataType_Decode(OpcUa
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_SubscriptionDiagnosticsDataType_EncodeableType;
 #endif
 
+#ifndef OPCUA_EXCLUDE_ModelChangeStructureVerbMask
+/*============================================================================
+ * The ModelChangeStructureVerbMask enumeration.
+ *===========================================================================*/
+typedef enum _OpcUa_ModelChangeStructureVerbMask
+{
+    OpcUa_ModelChangeStructureVerbMask_NodeAdded        = 1,
+    OpcUa_ModelChangeStructureVerbMask_NodeDeleted      = 2,
+    OpcUa_ModelChangeStructureVerbMask_ReferenceAdded   = 4,
+    OpcUa_ModelChangeStructureVerbMask_ReferenceDeleted = 8,
+    OpcUa_ModelChangeStructureVerbMask_DataTypeChanged  = 16
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_ModelChangeStructureVerbMask_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
+}
+OpcUa_ModelChangeStructureVerbMask;
+
+#define OpcUa_ModelChangeStructureVerbMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_ModelChangeStructureVerbMask_NodeAdded)
+
+#define OpcUa_ModelChangeStructureVerbMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_ModelChangeStructureVerbMask_NodeAdded)
+
+OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ModelChangeStructureVerbMask_EnumeratedType;
+#endif
+
 #ifndef OPCUA_EXCLUDE_ModelChangeStructureDataType
 /*============================================================================
  * The ModelChangeStructureDataType structure.
@@ -6343,27 +6128,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ModelChangeStructureDataType_Encode(OpcUa_Mo
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ModelChangeStructureDataType_Decode(OpcUa_ModelChangeStructureDataType* pValue, struct _OpcUa_Decoder* pDecoder);
 
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ModelChangeStructureDataType_EncodeableType;
-#endif
-
-#ifndef OPCUA_EXCLUDE_ModelChangeStructureVerbMask
-/*============================================================================
- * The ModelChangeStructureVerbMask enumeration.
- *===========================================================================*/
-typedef enum _OpcUa_ModelChangeStructureVerbMask
-{
-    OpcUa_ModelChangeStructureVerbMask_NodeAdded        = 1,
-    OpcUa_ModelChangeStructureVerbMask_NodeDeleted      = 2,
-    OpcUa_ModelChangeStructureVerbMask_ReferenceAdded   = 4,
-    OpcUa_ModelChangeStructureVerbMask_ReferenceDeleted = 8,
-    OpcUa_ModelChangeStructureVerbMask_DataTypeChanged  = 16
-}
-OpcUa_ModelChangeStructureVerbMask;
-
-#define OpcUa_ModelChangeStructureVerbMask_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, ModelChangeStructureVerbMask)
-
-#define OpcUa_ModelChangeStructureVerbMask_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, ModelChangeStructureVerbMask)
-
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ModelChangeStructureVerbMask_EnumeratedType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_SemanticChangeStructureDataType
@@ -6449,60 +6213,65 @@ typedef enum _OpcUa_AxisScaleEnumeration
     OpcUa_AxisScaleEnumeration_Linear = 0,
     OpcUa_AxisScaleEnumeration_Log    = 1,
     OpcUa_AxisScaleEnumeration_Ln     = 2
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_AxisScaleEnumeration_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
 }
 OpcUa_AxisScaleEnumeration;
 
-#define OpcUa_AxisScaleEnumeration_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, AxisScaleEnumeration)
+#define OpcUa_AxisScaleEnumeration_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_AxisScaleEnumeration_Linear)
 
-#define OpcUa_AxisScaleEnumeration_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, AxisScaleEnumeration)
+#define OpcUa_AxisScaleEnumeration_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_AxisScaleEnumeration_Linear)
 
 OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_AxisScaleEnumeration_EnumeratedType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_ExceptionDeviationFormat
+#ifndef OPCUA_EXCLUDE_ComplexNumberType
 /*============================================================================
- * The ExceptionDeviationFormat enumeration.
+ * The ComplexNumberType structure.
  *===========================================================================*/
-typedef enum _OpcUa_ExceptionDeviationFormat
+typedef struct _OpcUa_ComplexNumberType
 {
-    OpcUa_ExceptionDeviationFormat_AbsoluteValue    = 0,
-    OpcUa_ExceptionDeviationFormat_PercentOfRange   = 1,
-    OpcUa_ExceptionDeviationFormat_PercentOfValue   = 2,
-    OpcUa_ExceptionDeviationFormat_PercentOfEURange = 3,
-    OpcUa_ExceptionDeviationFormat_Unknown          = 4
+    OpcUa_Float Real;
+    OpcUa_Float Imaginary;
 }
-OpcUa_ExceptionDeviationFormat;
+OpcUa_ComplexNumberType;
 
-#define OpcUa_ExceptionDeviationFormat_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, ExceptionDeviationFormat)
+OPCUA_EXPORT OpcUa_Void OpcUa_ComplexNumberType_Initialize(OpcUa_ComplexNumberType* pValue);
 
-#define OpcUa_ExceptionDeviationFormat_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, ExceptionDeviationFormat)
+OPCUA_EXPORT OpcUa_Void OpcUa_ComplexNumberType_Clear(OpcUa_ComplexNumberType* pValue);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ExceptionDeviationFormat_EnumeratedType;
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ComplexNumberType_GetSize(OpcUa_ComplexNumberType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ComplexNumberType_Encode(OpcUa_ComplexNumberType* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ComplexNumberType_Decode(OpcUa_ComplexNumberType* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ComplexNumberType_EncodeableType;
 #endif
 
-#ifndef OPCUA_EXCLUDE_Annotation
+#ifndef OPCUA_EXCLUDE_DoubleComplexNumberType
 /*============================================================================
- * The Annotation structure.
+ * The DoubleComplexNumberType structure.
  *===========================================================================*/
-typedef struct _OpcUa_Annotation
+typedef struct _OpcUa_DoubleComplexNumberType
 {
-    OpcUa_String   Message;
-    OpcUa_String   UserName;
-    OpcUa_DateTime AnnotationTime;
+    OpcUa_Double Real;
+    OpcUa_Double Imaginary;
 }
-OpcUa_Annotation;
+OpcUa_DoubleComplexNumberType;
 
-OPCUA_EXPORT OpcUa_Void OpcUa_Annotation_Initialize(OpcUa_Annotation* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_DoubleComplexNumberType_Initialize(OpcUa_DoubleComplexNumberType* pValue);
 
-OPCUA_EXPORT OpcUa_Void OpcUa_Annotation_Clear(OpcUa_Annotation* pValue);
+OPCUA_EXPORT OpcUa_Void OpcUa_DoubleComplexNumberType_Clear(OpcUa_DoubleComplexNumberType* pValue);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DoubleComplexNumberType_GetSize(OpcUa_DoubleComplexNumberType* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_Encode(OpcUa_Annotation* pValue, struct _OpcUa_Encoder* pEncoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DoubleComplexNumberType_Encode(OpcUa_DoubleComplexNumberType* pValue, struct _OpcUa_Encoder* pEncoder);
 
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_Decode(OpcUa_Annotation* pValue, struct _OpcUa_Decoder* pDecoder);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DoubleComplexNumberType_Decode(OpcUa_DoubleComplexNumberType* pValue, struct _OpcUa_Decoder* pDecoder);
 
-OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_Annotation_EncodeableType;
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_DoubleComplexNumberType_EncodeableType;
 #endif
 
 #ifndef OPCUA_EXCLUDE_AxisInformation
@@ -6589,6 +6358,55 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ProgramDiagnosticDataType_Encode(OpcUa_Progr
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ProgramDiagnosticDataType_Decode(OpcUa_ProgramDiagnosticDataType* pValue, struct _OpcUa_Decoder* pDecoder);
 
 OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_ProgramDiagnosticDataType_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_Annotation
+/*============================================================================
+ * The Annotation structure.
+ *===========================================================================*/
+typedef struct _OpcUa_Annotation
+{
+    OpcUa_String   Message;
+    OpcUa_String   UserName;
+    OpcUa_DateTime AnnotationTime;
+}
+OpcUa_Annotation;
+
+OPCUA_EXPORT OpcUa_Void OpcUa_Annotation_Initialize(OpcUa_Annotation* pValue);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_Annotation_Clear(OpcUa_Annotation* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* pValue, struct _OpcUa_Encoder* pEncoder, OpcUa_Int32* pSize);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_Encode(OpcUa_Annotation* pValue, struct _OpcUa_Encoder* pEncoder);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Annotation_Decode(OpcUa_Annotation* pValue, struct _OpcUa_Decoder* pDecoder);
+
+OPCUA_IMEXPORT extern struct _OpcUa_EncodeableType OpcUa_Annotation_EncodeableType;
+#endif
+
+#ifndef OPCUA_EXCLUDE_ExceptionDeviationFormat
+/*============================================================================
+ * The ExceptionDeviationFormat enumeration.
+ *===========================================================================*/
+typedef enum _OpcUa_ExceptionDeviationFormat
+{
+    OpcUa_ExceptionDeviationFormat_AbsoluteValue    = 0,
+    OpcUa_ExceptionDeviationFormat_PercentOfValue   = 1,
+    OpcUa_ExceptionDeviationFormat_PercentOfRange   = 2,
+    OpcUa_ExceptionDeviationFormat_PercentOfEURange = 3,
+    OpcUa_ExceptionDeviationFormat_Unknown          = 4
+#if OPCUA_FORCE_INT32_ENUMS
+    ,_OpcUa_ExceptionDeviationFormat_MaxEnumerationValue = OpcUa_Int32_Max
+#endif
+}
+OpcUa_ExceptionDeviationFormat;
+
+#define OpcUa_ExceptionDeviationFormat_Clear(xValue) OpcUa_EnumeratedType_Clear(xValue, OpcUa_ExceptionDeviationFormat_AbsoluteValue)
+
+#define OpcUa_ExceptionDeviationFormat_Initialize(xValue) OpcUa_EnumeratedType_Initialize(xValue, OpcUa_ExceptionDeviationFormat_AbsoluteValue)
+
+OPCUA_IMEXPORT extern struct _OpcUa_EnumeratedType OpcUa_ExceptionDeviationFormat_EnumeratedType;
 #endif
 
 /*============================================================================

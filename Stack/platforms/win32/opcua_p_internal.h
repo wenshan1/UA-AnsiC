@@ -82,8 +82,7 @@
 #define OpcUa_Module_P_OpenSSL 0
 #define OpcUa_Module_P_CryptoFactory 1
 #define OpcUa_Module_P_PKIFactory 2
-#define OpcUa_Module_P_WinCrypt 3
-#define OpcUa_Module_P_Win32 4
+#define OpcUa_Module_P_Win32 3
 
 /**********************************************************************************/
 /*/  Evaluate Security Config.                                                   /*/

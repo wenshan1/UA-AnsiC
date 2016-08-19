@@ -23,54 +23,6 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-#ifndef OPCUA_EXCLUDE_TestStack
-/*============================================================================
- * Synchronously calls the TestStack service.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerApi_TestStack(
-    OpcUa_Endpoint             hEndpoint,
-    OpcUa_Handle               hContext,
-    const OpcUa_RequestHeader* pRequestHeader,
-    OpcUa_UInt32               nTestId,
-    OpcUa_Int32                nIteration,
-    const OpcUa_Variant*       pInput,
-    OpcUa_ResponseHeader*      pResponseHeader,
-    OpcUa_Variant*             pOutput);
-
-/*============================================================================
- * Begins processing of a TestStack service request.
- *===========================================================================*/
-OPCUA_EXPORT_SYNC_SERVER_API OpcUa_StatusCode OpcUa_Server_BeginTestStack(
-    OpcUa_Endpoint        a_hEndpoint,
-    OpcUa_Handle          a_hContext,
-    OpcUa_Void**          a_ppRequest,
-    OpcUa_EncodeableType* a_pRequestType);
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-/*============================================================================
- * Synchronously calls the TestStackEx service.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerApi_TestStackEx(
-    OpcUa_Endpoint                 hEndpoint,
-    OpcUa_Handle                   hContext,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nTestId,
-    OpcUa_Int32                    nIteration,
-    const OpcUa_CompositeTestType* pInput,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_CompositeTestType*       pOutput);
-
-/*============================================================================
- * Begins processing of a TestStackEx service request.
- *===========================================================================*/
-OPCUA_EXPORT_SYNC_SERVER_API OpcUa_StatusCode OpcUa_Server_BeginTestStackEx(
-    OpcUa_Endpoint        a_hEndpoint,
-    OpcUa_Handle          a_hContext,
-    OpcUa_Void**          a_ppRequest,
-    OpcUa_EncodeableType* a_pRequestType);
-#endif
-
 #ifndef OPCUA_EXCLUDE_FindServers
 /*============================================================================
  * Synchronously calls the FindServers service.
@@ -103,17 +55,17 @@ OPCUA_EXPORT_SYNC_SERVER_API OpcUa_StatusCode OpcUa_Server_BeginFindServers(
  * Synchronously calls the FindServersOnNetwork service.
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_ServerApi_FindServersOnNetwork(
-    OpcUa_Endpoint                 hEndpoint,
-    OpcUa_Handle                   hContext,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nStartingRecordId,
-    OpcUa_UInt32                   nMaxRecordsToReturn,
-    OpcUa_Int32                    nNoOfServerCapabilityFilter,
-    const OpcUa_String*            pServerCapabilityFilter,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_DateTime*                pLastCounterResetTime,
-    OpcUa_Int32*                   pNoOfServers,
-    OpcUa_ServerOnNetwork**        pServers);
+    OpcUa_Endpoint             hEndpoint,
+    OpcUa_Handle               hContext,
+    const OpcUa_RequestHeader* pRequestHeader,
+    OpcUa_UInt32               nStartingRecordId,
+    OpcUa_UInt32               nMaxRecordsToReturn,
+    OpcUa_Int32                nNoOfServerCapabilityFilter,
+    const OpcUa_String*        pServerCapabilityFilter,
+    OpcUa_ResponseHeader*      pResponseHeader,
+    OpcUa_DateTime*            pLastCounterResetTime,
+    OpcUa_Int32*               pNoOfServers,
+    OpcUa_ServerOnNetwork**    pServers);
 
 /*============================================================================
  * Begins processing of a FindServersOnNetwork service request.

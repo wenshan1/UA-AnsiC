@@ -30,260 +30,6 @@
 #include <opcua_identifiers.h>
 #include <opcua_clientapi.h>
 
-#ifndef OPCUA_EXCLUDE_TestStack
-/*============================================================================
- * Synchronously calls the TestStack service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TestStack(
-    OpcUa_Channel              a_hChannel,
-    const OpcUa_RequestHeader* a_pRequestHeader,
-    OpcUa_UInt32               a_nTestId,
-    OpcUa_Int32                a_nIteration,
-    const OpcUa_Variant*       a_pInput,
-    OpcUa_ResponseHeader*      a_pResponseHeader,
-    OpcUa_Variant*             a_pOutput)
-{    
-    OpcUa_TestStackRequest cRequest;
-    OpcUa_TestStackResponse* pResponse = OpcUa_Null;
-    OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
-    OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_TestStack");
-
-    OpcUa_TestStackRequest_Initialize(&cRequest);
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-    OpcUa_ReturnErrorIfArgumentNull(a_pResponseHeader);
-    OpcUa_ReturnErrorIfArgumentNull(a_pOutput);
-
-    /* copy parameters into request object. */
-    cRequest.RequestHeader = *a_pRequestHeader;
-    cRequest.TestId        = a_nTestId;
-    cRequest.Iteration     = a_nIteration;
-    cRequest.Input         = *a_pInput;
-
-    /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "TestStack", 
-        (OpcUa_Void*)&cRequest, 
-        &OpcUa_TestStackRequest_EncodeableType,
-        (OpcUa_Void**)&pResponse,
-        &pResponseType);
-    
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* check for fault */
-    if (pResponseType->TypeId == OpcUaId_ServiceFault)
-    {
-        *a_pResponseHeader = ((OpcUa_ServiceFault*)pResponse)->ResponseHeader;
-        OpcUa_Free(pResponse);
-        OpcUa_ReturnStatusCode;
-    }
-    else if (pResponseType->TypeId != OpcUaId_TestStackResponse)
-    {
-        pResponseType->Clear(pResponse);
-        OpcUa_GotoErrorWithStatus(OpcUa_BadUnknownResponse);
-    }
-
-    /* copy parameters from response object into return parameters. */
-    else
-    {
-        *a_pResponseHeader = pResponse->ResponseHeader;
-        *a_pOutput         = pResponse->Output;
-    }
-
-    /* memory contained in the reponse objects is owned by the caller */
-    OpcUa_Free(pResponse);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_Free(pResponse);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * Asynchronously calls the TestStack service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTestStack(
-    OpcUa_Channel                     a_hChannel,
-    const OpcUa_RequestHeader*        a_pRequestHeader,
-    OpcUa_UInt32                      a_nTestId,
-    OpcUa_Int32                       a_nIteration,
-    const OpcUa_Variant*              a_pInput,
-    OpcUa_Channel_PfnRequestComplete* a_pCallback,
-    OpcUa_Void*                       a_pCallbackData)
-{
-    OpcUa_TestStackRequest cRequest;
-    
-    OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginTestStack");
-
-    OpcUa_TestStackRequest_Initialize(&cRequest);
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-
-    /* copy parameters into request object. */
-    cRequest.RequestHeader = *a_pRequestHeader;
-    cRequest.TestId        = a_nTestId;
-    cRequest.Iteration     = a_nIteration;
-    cRequest.Input         = *a_pInput;
-
-    /* begin invoke service */
-    uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "TestStack", 
-        (OpcUa_Void*)&cRequest, 
-        &OpcUa_TestStackRequest_EncodeableType,
-        (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
-        a_pCallbackData);
-    
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-/*============================================================================
- * Synchronously calls the TestStackEx service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TestStackEx(
-    OpcUa_Channel                  a_hChannel,
-    const OpcUa_RequestHeader*     a_pRequestHeader,
-    OpcUa_UInt32                   a_nTestId,
-    OpcUa_Int32                    a_nIteration,
-    const OpcUa_CompositeTestType* a_pInput,
-    OpcUa_ResponseHeader*          a_pResponseHeader,
-    OpcUa_CompositeTestType*       a_pOutput)
-{    
-    OpcUa_TestStackExRequest cRequest;
-    OpcUa_TestStackExResponse* pResponse = OpcUa_Null;
-    OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
-    OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_TestStackEx");
-
-    OpcUa_TestStackExRequest_Initialize(&cRequest);
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-    OpcUa_ReturnErrorIfArgumentNull(a_pResponseHeader);
-    OpcUa_ReturnErrorIfArgumentNull(a_pOutput);
-
-    /* copy parameters into request object. */
-    cRequest.RequestHeader = *a_pRequestHeader;
-    cRequest.TestId        = a_nTestId;
-    cRequest.Iteration     = a_nIteration;
-    cRequest.Input         = *a_pInput;
-
-    /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "TestStackEx", 
-        (OpcUa_Void*)&cRequest, 
-        &OpcUa_TestStackExRequest_EncodeableType,
-        (OpcUa_Void**)&pResponse,
-        &pResponseType);
-    
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* check for fault */
-    if (pResponseType->TypeId == OpcUaId_ServiceFault)
-    {
-        *a_pResponseHeader = ((OpcUa_ServiceFault*)pResponse)->ResponseHeader;
-        OpcUa_Free(pResponse);
-        OpcUa_ReturnStatusCode;
-    }
-    else if (pResponseType->TypeId != OpcUaId_TestStackExResponse)
-    {
-        pResponseType->Clear(pResponse);
-        OpcUa_GotoErrorWithStatus(OpcUa_BadUnknownResponse);
-    }
-
-    /* copy parameters from response object into return parameters. */
-    else
-    {
-        *a_pResponseHeader = pResponse->ResponseHeader;
-        *a_pOutput         = pResponse->Output;
-    }
-
-    /* memory contained in the reponse objects is owned by the caller */
-    OpcUa_Free(pResponse);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_Free(pResponse);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * Asynchronously calls the TestStackEx service.
- *===========================================================================*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTestStackEx(
-    OpcUa_Channel                     a_hChannel,
-    const OpcUa_RequestHeader*        a_pRequestHeader,
-    OpcUa_UInt32                      a_nTestId,
-    OpcUa_Int32                       a_nIteration,
-    const OpcUa_CompositeTestType*    a_pInput,
-    OpcUa_Channel_PfnRequestComplete* a_pCallback,
-    OpcUa_Void*                       a_pCallbackData)
-{
-    OpcUa_TestStackExRequest cRequest;
-    
-    OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginTestStackEx");
-
-    OpcUa_TestStackExRequest_Initialize(&cRequest);
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-
-    /* copy parameters into request object. */
-    cRequest.RequestHeader = *a_pRequestHeader;
-    cRequest.TestId        = a_nTestId;
-    cRequest.Iteration     = a_nIteration;
-    cRequest.Input         = *a_pInput;
-
-    /* begin invoke service */
-    uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "TestStackEx", 
-        (OpcUa_Void*)&cRequest, 
-        &OpcUa_TestStackExRequest_EncodeableType,
-        (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
-        a_pCallbackData);
-    
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-#endif
-
 #ifndef OPCUA_EXCLUDE_FindServers
 /*============================================================================
  * Synchronously calls the FindServers service.
@@ -299,11 +45,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServers(
     OpcUa_ResponseHeader*          a_pResponseHeader,
     OpcUa_Int32*                   a_pNoOfServers,
     OpcUa_ApplicationDescription** a_pServers)
-{    
+{
     OpcUa_FindServersRequest cRequest;
     OpcUa_FindServersResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_FindServers");
 
     OpcUa_FindServersRequest_Initialize(&cRequest);
@@ -326,14 +72,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServers(
     cRequest.ServerUris     = (OpcUa_String*)a_pServerUris;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "FindServers", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "FindServers",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_FindServersRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -343,6 +89,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServers(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_FindServersResponse)
     {
         pResponseType->Clear(pResponse);
@@ -383,7 +131,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginFindServers(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_FindServersRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginFindServers");
 
     OpcUa_FindServersRequest_Initialize(&cRequest);
@@ -404,13 +152,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginFindServers(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "FindServers", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "FindServers",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_FindServersRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -427,16 +175,16 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginFindServers(
  * Synchronously calls the FindServersOnNetwork service.
  *===========================================================================*/
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServersOnNetwork(
-    OpcUa_Channel                  a_hChannel,
-    const OpcUa_RequestHeader*     a_pRequestHeader,
-    OpcUa_UInt32                   a_nStartingRecordId,
-    OpcUa_UInt32                   a_nMaxRecordsToReturn,
-    OpcUa_Int32                    a_nNoOfServerCapabilityFilter,
-    const OpcUa_String*            a_pServerCapabilityFilter,
-    OpcUa_ResponseHeader*          a_pResponseHeader,
-    OpcUa_DateTime*                a_pLastCounterResetTime,
-    OpcUa_Int32*                   a_pNoOfServers,
-    OpcUa_ServerOnNetwork**        a_pServers)
+    OpcUa_Channel              a_hChannel,
+    const OpcUa_RequestHeader* a_pRequestHeader,
+    OpcUa_UInt32               a_nStartingRecordId,
+    OpcUa_UInt32               a_nMaxRecordsToReturn,
+    OpcUa_Int32                a_nNoOfServerCapabilityFilter,
+    const OpcUa_String*        a_pServerCapabilityFilter,
+    OpcUa_ResponseHeader*      a_pResponseHeader,
+    OpcUa_DateTime*            a_pLastCounterResetTime,
+    OpcUa_Int32*               a_pNoOfServers,
+    OpcUa_ServerOnNetwork**    a_pServers)
 {
     OpcUa_FindServersOnNetworkRequest cRequest;
     OpcUa_FindServersOnNetworkResponse* pResponse = OpcUa_Null;
@@ -448,6 +196,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_FindServersOnNetwork(
 
     /* validate arguments. */
     OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
+    OpcUa_ReferenceParameter(a_nStartingRecordId);
+    OpcUa_ReferenceParameter(a_nMaxRecordsToReturn);
     OpcUa_ReturnErrorIfArrayArgumentNull(a_nNoOfServerCapabilityFilter, a_pServerCapabilityFilter);
     OpcUa_ReturnErrorIfArgumentNull(a_pResponseHeader);
     OpcUa_ReturnErrorIfArgumentNull(a_pLastCounterResetTime);
@@ -528,10 +278,12 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginFindServersOnNetwork(
 
     /* validate arguments. */
     OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
+    OpcUa_ReferenceParameter(a_nStartingRecordId);
+    OpcUa_ReferenceParameter(a_nMaxRecordsToReturn);
     OpcUa_ReturnErrorIfArrayArgumentNull(a_nNoOfServerCapabilityFilter, a_pServerCapabilityFilter);
 
     /* copy parameters into request object. */
-    cRequest.RequestHeader  = *a_pRequestHeader;
+    cRequest.RequestHeader              = *a_pRequestHeader;
     cRequest.StartingRecordId           = a_nStartingRecordId;
     cRequest.MaxRecordsToReturn         = a_nMaxRecordsToReturn;
     cRequest.NoOfServerCapabilityFilter = a_nNoOfServerCapabilityFilter;
@@ -572,11 +324,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_GetEndpoints(
     OpcUa_ResponseHeader*       a_pResponseHeader,
     OpcUa_Int32*                a_pNoOfEndpoints,
     OpcUa_EndpointDescription** a_pEndpoints)
-{    
+{
     OpcUa_GetEndpointsRequest cRequest;
     OpcUa_GetEndpointsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_GetEndpoints");
 
     OpcUa_GetEndpointsRequest_Initialize(&cRequest);
@@ -599,14 +351,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_GetEndpoints(
     cRequest.ProfileUris     = (OpcUa_String*)a_pProfileUris;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "GetEndpoints", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "GetEndpoints",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_GetEndpointsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -616,6 +368,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_GetEndpoints(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_GetEndpointsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -656,7 +410,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginGetEndpoints(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_GetEndpointsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginGetEndpoints");
 
     OpcUa_GetEndpointsRequest_Initialize(&cRequest);
@@ -677,13 +431,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginGetEndpoints(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "GetEndpoints", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "GetEndpoints",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_GetEndpointsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -704,11 +458,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterServer(
     const OpcUa_RequestHeader*    a_pRequestHeader,
     const OpcUa_RegisteredServer* a_pServer,
     OpcUa_ResponseHeader*         a_pResponseHeader)
-{    
+{
     OpcUa_RegisterServerRequest cRequest;
     OpcUa_RegisterServerResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_RegisterServer");
 
     OpcUa_RegisterServerRequest_Initialize(&cRequest);
@@ -723,14 +477,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterServer(
     cRequest.Server        = *a_pServer;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "RegisterServer", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "RegisterServer",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RegisterServerRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -740,6 +494,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterServer(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_RegisterServerResponse)
     {
         pResponseType->Clear(pResponse);
@@ -774,7 +530,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRegisterServer(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_RegisterServerRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginRegisterServer");
 
     OpcUa_RegisterServerRequest_Initialize(&cRequest);
@@ -789,13 +545,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRegisterServer(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "RegisterServer", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "RegisterServer",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RegisterServerRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -852,7 +608,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterServer2(
         a_hChannel,
         "RegisterServer2",
         (OpcUa_Void*)&cRequest,
-        &OpcUa_RegisterServerRequest_EncodeableType,
+        &OpcUa_RegisterServer2Request_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
 
@@ -881,7 +637,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterServer2(
         *a_pConfigurationResults     = pResponse->ConfigurationResults;
         *a_pNoOfDiagnosticInfos      = pResponse->NoOfDiagnosticInfos;
         *a_pDiagnosticInfos          = pResponse->DiagnosticInfos;
-
     }
 
     /* memory contained in the reponse objects is owned by the caller */
@@ -929,7 +684,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRegisterServer2(
         a_hChannel,
         "RegisterServer2",
         (OpcUa_Void*)&cRequest,
-        &OpcUa_RegisterServerRequest_EncodeableType,
+        &OpcUa_RegisterServer2Request_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
 
@@ -971,11 +726,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSession(
     OpcUa_SignedSoftwareCertificate**   a_pServerSoftwareCertificates,
     OpcUa_SignatureData*                a_pServerSignature,
     OpcUa_UInt32*                       a_pMaxRequestMessageSize)
-{    
+{
     OpcUa_CreateSessionRequest cRequest;
     OpcUa_CreateSessionResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_CreateSession");
 
     OpcUa_CreateSessionRequest_Initialize(&cRequest);
@@ -1015,14 +770,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSession(
     cRequest.MaxResponseMessageSize  = a_nMaxResponseMessageSize;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "CreateSession", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "CreateSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateSessionRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1032,6 +787,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSession(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CreateSessionResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1084,7 +841,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateSession(
     OpcUa_Void*                         a_pCallbackData)
 {
     OpcUa_CreateSessionRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCreateSession");
 
     OpcUa_CreateSessionRequest_Initialize(&cRequest);
@@ -1113,13 +870,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateSession(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "CreateSession", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "CreateSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateSessionRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1151,11 +908,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ActivateSession(
     OpcUa_StatusCode**                     a_pResults,
     OpcUa_Int32*                           a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**                 a_pDiagnosticInfos)
-{    
+{
     OpcUa_ActivateSessionRequest cRequest;
     OpcUa_ActivateSessionResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_ActivateSession");
 
     OpcUa_ActivateSessionRequest_Initialize(&cRequest);
@@ -1185,14 +942,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ActivateSession(
     cRequest.UserTokenSignature             = *a_pUserTokenSignature;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "ActivateSession", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "ActivateSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ActivateSessionRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1202,6 +959,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ActivateSession(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_ActivateSessionResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1247,7 +1006,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginActivateSession(
     OpcUa_Void*                            a_pCallbackData)
 {
     OpcUa_ActivateSessionRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginActivateSession");
 
     OpcUa_ActivateSessionRequest_Initialize(&cRequest);
@@ -1272,13 +1031,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginActivateSession(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "ActivateSession", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "ActivateSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ActivateSessionRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1299,11 +1058,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CloseSession(
     const OpcUa_RequestHeader* a_pRequestHeader,
     OpcUa_Boolean              a_bDeleteSubscriptions,
     OpcUa_ResponseHeader*      a_pResponseHeader)
-{    
+{
     OpcUa_CloseSessionRequest cRequest;
     OpcUa_CloseSessionResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_CloseSession");
 
     OpcUa_CloseSessionRequest_Initialize(&cRequest);
@@ -1318,14 +1077,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CloseSession(
     cRequest.DeleteSubscriptions = a_bDeleteSubscriptions;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "CloseSession", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "CloseSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CloseSessionRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1335,6 +1094,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CloseSession(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CloseSessionResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1369,7 +1130,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCloseSession(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_CloseSessionRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCloseSession");
 
     OpcUa_CloseSessionRequest_Initialize(&cRequest);
@@ -1384,13 +1145,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCloseSession(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "CloseSession", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "CloseSession",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CloseSessionRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1412,11 +1173,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Cancel(
     OpcUa_UInt32               a_nRequestHandle,
     OpcUa_ResponseHeader*      a_pResponseHeader,
     OpcUa_UInt32*              a_pCancelCount)
-{    
+{
     OpcUa_CancelRequest cRequest;
     OpcUa_CancelResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Cancel");
 
     OpcUa_CancelRequest_Initialize(&cRequest);
@@ -1432,14 +1193,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Cancel(
     cRequest.RequestHandle = a_nRequestHandle;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Cancel", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Cancel",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CancelRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1449,6 +1210,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Cancel(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CancelResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1484,7 +1247,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCancel(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_CancelRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCancel");
 
     OpcUa_CancelRequest_Initialize(&cRequest);
@@ -1499,13 +1262,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCancel(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Cancel", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Cancel",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CancelRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1531,11 +1294,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddNodes(
     OpcUa_AddNodesResult**     a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_AddNodesRequest cRequest;
     OpcUa_AddNodesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_AddNodes");
 
     OpcUa_AddNodesRequest_Initialize(&cRequest);
@@ -1555,14 +1318,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddNodes(
     cRequest.NodesToAdd     = (OpcUa_AddNodesItem*)a_pNodesToAdd;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "AddNodes", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "AddNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_AddNodesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1572,6 +1335,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddNodes(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_AddNodesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1611,7 +1376,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginAddNodes(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_AddNodesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginAddNodes");
 
     OpcUa_AddNodesRequest_Initialize(&cRequest);
@@ -1627,13 +1392,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginAddNodes(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "AddNodes", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "AddNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_AddNodesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1659,11 +1424,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddReferences(
     OpcUa_StatusCode**             a_pResults,
     OpcUa_Int32*                   a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**         a_pDiagnosticInfos)
-{    
+{
     OpcUa_AddReferencesRequest cRequest;
     OpcUa_AddReferencesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_AddReferences");
 
     OpcUa_AddReferencesRequest_Initialize(&cRequest);
@@ -1683,14 +1448,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddReferences(
     cRequest.ReferencesToAdd     = (OpcUa_AddReferencesItem*)a_pReferencesToAdd;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "AddReferences", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "AddReferences",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_AddReferencesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1700,6 +1465,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_AddReferences(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_AddReferencesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1739,7 +1506,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginAddReferences(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_AddReferencesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginAddReferences");
 
     OpcUa_AddReferencesRequest_Initialize(&cRequest);
@@ -1755,13 +1522,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginAddReferences(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "AddReferences", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "AddReferences",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_AddReferencesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1787,11 +1554,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteNodes(
     OpcUa_StatusCode**           a_pResults,
     OpcUa_Int32*                 a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**       a_pDiagnosticInfos)
-{    
+{
     OpcUa_DeleteNodesRequest cRequest;
     OpcUa_DeleteNodesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_DeleteNodes");
 
     OpcUa_DeleteNodesRequest_Initialize(&cRequest);
@@ -1811,14 +1578,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteNodes(
     cRequest.NodesToDelete     = (OpcUa_DeleteNodesItem*)a_pNodesToDelete;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "DeleteNodes", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "DeleteNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteNodesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1828,6 +1595,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteNodes(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_DeleteNodesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1867,7 +1636,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteNodes(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_DeleteNodesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginDeleteNodes");
 
     OpcUa_DeleteNodesRequest_Initialize(&cRequest);
@@ -1883,13 +1652,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteNodes(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "DeleteNodes", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "DeleteNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteNodesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -1915,11 +1684,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteReferences(
     OpcUa_StatusCode**                a_pResults,
     OpcUa_Int32*                      a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**            a_pDiagnosticInfos)
-{    
+{
     OpcUa_DeleteReferencesRequest cRequest;
     OpcUa_DeleteReferencesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_DeleteReferences");
 
     OpcUa_DeleteReferencesRequest_Initialize(&cRequest);
@@ -1939,14 +1708,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteReferences(
     cRequest.ReferencesToDelete     = (OpcUa_DeleteReferencesItem*)a_pReferencesToDelete;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "DeleteReferences", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "DeleteReferences",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteReferencesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -1956,6 +1725,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteReferences(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_DeleteReferencesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -1995,7 +1766,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteReferences(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_DeleteReferencesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginDeleteReferences");
 
     OpcUa_DeleteReferencesRequest_Initialize(&cRequest);
@@ -2011,13 +1782,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteReferences(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "DeleteReferences", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "DeleteReferences",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteReferencesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2045,11 +1816,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Browse(
     OpcUa_BrowseResult**           a_pResults,
     OpcUa_Int32*                   a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**         a_pDiagnosticInfos)
-{    
+{
     OpcUa_BrowseRequest cRequest;
     OpcUa_BrowseResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Browse");
 
     OpcUa_BrowseRequest_Initialize(&cRequest);
@@ -2073,14 +1844,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Browse(
     cRequest.NodesToBrowse                 = (OpcUa_BrowseDescription*)a_pNodesToBrowse;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Browse", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Browse",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_BrowseRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2090,6 +1861,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Browse(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_BrowseResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2131,7 +1904,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginBrowse(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_BrowseRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginBrowse");
 
     OpcUa_BrowseRequest_Initialize(&cRequest);
@@ -2151,13 +1924,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginBrowse(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Browse", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Browse",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_BrowseRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2184,11 +1957,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BrowseNext(
     OpcUa_BrowseResult**       a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_BrowseNextRequest cRequest;
     OpcUa_BrowseNextResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BrowseNext");
 
     OpcUa_BrowseNextRequest_Initialize(&cRequest);
@@ -2210,14 +1983,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BrowseNext(
     cRequest.ContinuationPoints        = (OpcUa_ByteString*)a_pContinuationPoints;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "BrowseNext", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "BrowseNext",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_BrowseNextRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2227,6 +2000,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BrowseNext(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_BrowseNextResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2267,7 +2042,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginBrowseNext(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_BrowseNextRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginBrowseNext");
 
     OpcUa_BrowseNextRequest_Initialize(&cRequest);
@@ -2285,13 +2060,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginBrowseNext(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "BrowseNext", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "BrowseNext",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_BrowseNextRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2317,11 +2092,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TranslateBrowsePathsToNodeIds(
     OpcUa_BrowsePathResult**   a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_TranslateBrowsePathsToNodeIdsRequest cRequest;
     OpcUa_TranslateBrowsePathsToNodeIdsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_TranslateBrowsePathsToNodeIds");
 
     OpcUa_TranslateBrowsePathsToNodeIdsRequest_Initialize(&cRequest);
@@ -2341,14 +2116,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TranslateBrowsePathsToNodeIds(
     cRequest.BrowsePaths     = (OpcUa_BrowsePath*)a_pBrowsePaths;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "TranslateBrowsePathsToNodeIds", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "TranslateBrowsePathsToNodeIds",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_TranslateBrowsePathsToNodeIdsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2358,6 +2133,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TranslateBrowsePathsToNodeIds(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_TranslateBrowsePathsToNodeIdsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2397,7 +2174,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTranslateBrowsePathsToNodeIds
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_TranslateBrowsePathsToNodeIdsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginTranslateBrowsePathsToNodeIds");
 
     OpcUa_TranslateBrowsePathsToNodeIdsRequest_Initialize(&cRequest);
@@ -2413,13 +2190,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTranslateBrowsePathsToNodeIds
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "TranslateBrowsePathsToNodeIds", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "TranslateBrowsePathsToNodeIds",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_TranslateBrowsePathsToNodeIdsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2443,11 +2220,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterNodes(
     OpcUa_ResponseHeader*      a_pResponseHeader,
     OpcUa_Int32*               a_pNoOfRegisteredNodeIds,
     OpcUa_NodeId**             a_pRegisteredNodeIds)
-{    
+{
     OpcUa_RegisterNodesRequest cRequest;
     OpcUa_RegisterNodesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_RegisterNodes");
 
     OpcUa_RegisterNodesRequest_Initialize(&cRequest);
@@ -2465,14 +2242,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterNodes(
     cRequest.NodesToRegister     = (OpcUa_NodeId*)a_pNodesToRegister;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "RegisterNodes", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "RegisterNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RegisterNodesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2482,6 +2259,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_RegisterNodes(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_RegisterNodesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2519,7 +2298,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRegisterNodes(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_RegisterNodesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginRegisterNodes");
 
     OpcUa_RegisterNodesRequest_Initialize(&cRequest);
@@ -2535,13 +2314,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRegisterNodes(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "RegisterNodes", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "RegisterNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RegisterNodesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2563,11 +2342,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_UnregisterNodes(
     OpcUa_Int32                a_nNoOfNodesToUnregister,
     const OpcUa_NodeId*        a_pNodesToUnregister,
     OpcUa_ResponseHeader*      a_pResponseHeader)
-{    
+{
     OpcUa_UnregisterNodesRequest cRequest;
     OpcUa_UnregisterNodesResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_UnregisterNodes");
 
     OpcUa_UnregisterNodesRequest_Initialize(&cRequest);
@@ -2583,14 +2362,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_UnregisterNodes(
     cRequest.NodesToUnregister     = (OpcUa_NodeId*)a_pNodesToUnregister;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "UnregisterNodes", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "UnregisterNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_UnregisterNodesRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2600,6 +2379,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_UnregisterNodes(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_UnregisterNodesResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2635,7 +2416,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginUnregisterNodes(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_UnregisterNodesRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginUnregisterNodes");
 
     OpcUa_UnregisterNodesRequest_Initialize(&cRequest);
@@ -2651,13 +2432,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginUnregisterNodes(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "UnregisterNodes", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "UnregisterNodes",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_UnregisterNodesRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2691,11 +2472,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryFirst(
     OpcUa_Int32*                     a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**           a_pDiagnosticInfos,
     OpcUa_ContentFilterResult*       a_pFilterResult)
-{    
+{
     OpcUa_QueryFirstRequest cRequest;
     OpcUa_QueryFirstResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_QueryFirst");
 
     OpcUa_QueryFirstRequest_Initialize(&cRequest);
@@ -2727,14 +2508,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryFirst(
     cRequest.MaxReferencesToReturn = a_nMaxReferencesToReturn;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "QueryFirst", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "QueryFirst",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_QueryFirstRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2744,6 +2525,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryFirst(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_QueryFirstResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2791,7 +2574,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginQueryFirst(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_QueryFirstRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginQueryFirst");
 
     OpcUa_QueryFirstRequest_Initialize(&cRequest);
@@ -2815,13 +2598,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginQueryFirst(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "QueryFirst", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "QueryFirst",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_QueryFirstRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2846,11 +2629,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryNext(
     OpcUa_Int32*               a_pNoOfQueryDataSets,
     OpcUa_QueryDataSet**       a_pQueryDataSets,
     OpcUa_ByteString*          a_pRevisedContinuationPoint)
-{    
+{
     OpcUa_QueryNextRequest cRequest;
     OpcUa_QueryNextResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_QueryNext");
 
     OpcUa_QueryNextRequest_Initialize(&cRequest);
@@ -2870,14 +2653,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryNext(
     cRequest.ContinuationPoint        = *a_pContinuationPoint;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "QueryNext", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "QueryNext",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_QueryNextRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -2887,6 +2670,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_QueryNext(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_QueryNextResponse)
     {
         pResponseType->Clear(pResponse);
@@ -2925,7 +2710,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginQueryNext(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_QueryNextRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginQueryNext");
 
     OpcUa_QueryNextRequest_Initialize(&cRequest);
@@ -2942,13 +2727,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginQueryNext(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "QueryNext", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "QueryNext",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_QueryNextRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -2976,11 +2761,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Read(
     OpcUa_DataValue**          a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_ReadRequest cRequest;
     OpcUa_ReadResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Read");
 
     OpcUa_ReadRequest_Initialize(&cRequest);
@@ -3004,14 +2789,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Read(
     cRequest.NodesToRead        = (OpcUa_ReadValueId*)a_pNodesToRead;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Read", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Read",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ReadRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3021,6 +2806,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Read(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_ReadResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3062,7 +2849,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRead(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_ReadRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginRead");
 
     OpcUa_ReadRequest_Initialize(&cRequest);
@@ -3082,13 +2869,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRead(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Read", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Read",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ReadRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3117,11 +2904,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryRead(
     OpcUa_HistoryReadResult**       a_pResults,
     OpcUa_Int32*                    a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**          a_pDiagnosticInfos)
-{    
+{
     OpcUa_HistoryReadRequest cRequest;
     OpcUa_HistoryReadResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_HistoryRead");
 
     OpcUa_HistoryReadRequest_Initialize(&cRequest);
@@ -3147,14 +2934,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryRead(
     cRequest.NodesToRead               = (OpcUa_HistoryReadValueId*)a_pNodesToRead;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "HistoryRead", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "HistoryRead",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_HistoryReadRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3164,6 +2951,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryRead(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_HistoryReadResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3206,7 +2995,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginHistoryRead(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_HistoryReadRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginHistoryRead");
 
     OpcUa_HistoryReadRequest_Initialize(&cRequest);
@@ -3228,13 +3017,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginHistoryRead(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "HistoryRead", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "HistoryRead",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_HistoryReadRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3260,11 +3049,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Write(
     OpcUa_StatusCode**         a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_WriteRequest cRequest;
     OpcUa_WriteResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Write");
 
     OpcUa_WriteRequest_Initialize(&cRequest);
@@ -3284,14 +3073,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Write(
     cRequest.NodesToWrite     = (OpcUa_WriteValue*)a_pNodesToWrite;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Write", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Write",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_WriteRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3301,6 +3090,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Write(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_WriteResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3340,7 +3131,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginWrite(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_WriteRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginWrite");
 
     OpcUa_WriteRequest_Initialize(&cRequest);
@@ -3356,13 +3147,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginWrite(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Write", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Write",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_WriteRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3388,11 +3179,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryUpdate(
     OpcUa_HistoryUpdateResult**  a_pResults,
     OpcUa_Int32*                 a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**       a_pDiagnosticInfos)
-{    
+{
     OpcUa_HistoryUpdateRequest cRequest;
     OpcUa_HistoryUpdateResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_HistoryUpdate");
 
     OpcUa_HistoryUpdateRequest_Initialize(&cRequest);
@@ -3412,14 +3203,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryUpdate(
     cRequest.HistoryUpdateDetails     = (OpcUa_ExtensionObject*)a_pHistoryUpdateDetails;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "HistoryUpdate", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "HistoryUpdate",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_HistoryUpdateRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3429,6 +3220,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_HistoryUpdate(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_HistoryUpdateResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3468,7 +3261,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginHistoryUpdate(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_HistoryUpdateRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginHistoryUpdate");
 
     OpcUa_HistoryUpdateRequest_Initialize(&cRequest);
@@ -3484,13 +3277,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginHistoryUpdate(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "HistoryUpdate", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "HistoryUpdate",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_HistoryUpdateRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3516,11 +3309,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Call(
     OpcUa_CallMethodResult**       a_pResults,
     OpcUa_Int32*                   a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**         a_pDiagnosticInfos)
-{    
+{
     OpcUa_CallRequest cRequest;
     OpcUa_CallResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Call");
 
     OpcUa_CallRequest_Initialize(&cRequest);
@@ -3540,14 +3333,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Call(
     cRequest.MethodsToCall     = (OpcUa_CallMethodRequest*)a_pMethodsToCall;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Call", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Call",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CallRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3557,6 +3350,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Call(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CallResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3596,7 +3391,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCall(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_CallRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCall");
 
     OpcUa_CallRequest_Initialize(&cRequest);
@@ -3612,13 +3407,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCall(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Call", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Call",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CallRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3646,11 +3441,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateMonitoredItems(
     OpcUa_MonitoredItemCreateResult**       a_pResults,
     OpcUa_Int32*                            a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**                  a_pDiagnosticInfos)
-{    
+{
     OpcUa_CreateMonitoredItemsRequest cRequest;
     OpcUa_CreateMonitoredItemsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_CreateMonitoredItems");
 
     OpcUa_CreateMonitoredItemsRequest_Initialize(&cRequest);
@@ -3674,14 +3469,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateMonitoredItems(
     cRequest.ItemsToCreate      = (OpcUa_MonitoredItemCreateRequest*)a_pItemsToCreate;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "CreateMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "CreateMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateMonitoredItemsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3691,6 +3486,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateMonitoredItems(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CreateMonitoredItemsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3732,7 +3529,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateMonitoredItems(
     OpcUa_Void*                             a_pCallbackData)
 {
     OpcUa_CreateMonitoredItemsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCreateMonitoredItems");
 
     OpcUa_CreateMonitoredItemsRequest_Initialize(&cRequest);
@@ -3752,13 +3549,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateMonitoredItems(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "CreateMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "CreateMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateMonitoredItemsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3786,11 +3583,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifyMonitoredItems(
     OpcUa_MonitoredItemModifyResult**       a_pResults,
     OpcUa_Int32*                            a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**                  a_pDiagnosticInfos)
-{    
+{
     OpcUa_ModifyMonitoredItemsRequest cRequest;
     OpcUa_ModifyMonitoredItemsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_ModifyMonitoredItems");
 
     OpcUa_ModifyMonitoredItemsRequest_Initialize(&cRequest);
@@ -3814,14 +3611,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifyMonitoredItems(
     cRequest.ItemsToModify      = (OpcUa_MonitoredItemModifyRequest*)a_pItemsToModify;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "ModifyMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "ModifyMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ModifyMonitoredItemsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3831,6 +3628,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifyMonitoredItems(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_ModifyMonitoredItemsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -3872,7 +3671,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginModifyMonitoredItems(
     OpcUa_Void*                             a_pCallbackData)
 {
     OpcUa_ModifyMonitoredItemsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginModifyMonitoredItems");
 
     OpcUa_ModifyMonitoredItemsRequest_Initialize(&cRequest);
@@ -3892,13 +3691,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginModifyMonitoredItems(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "ModifyMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "ModifyMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ModifyMonitoredItemsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -3926,11 +3725,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetMonitoringMode(
     OpcUa_StatusCode**         a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_SetMonitoringModeRequest cRequest;
     OpcUa_SetMonitoringModeResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_SetMonitoringMode");
 
     OpcUa_SetMonitoringModeRequest_Initialize(&cRequest);
@@ -3954,14 +3753,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetMonitoringMode(
     cRequest.MonitoredItemIds     = (OpcUa_UInt32*)a_pMonitoredItemIds;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "SetMonitoringMode", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "SetMonitoringMode",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetMonitoringModeRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -3971,6 +3770,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetMonitoringMode(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_SetMonitoringModeResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4012,7 +3813,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetMonitoringMode(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_SetMonitoringModeRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginSetMonitoringMode");
 
     OpcUa_SetMonitoringModeRequest_Initialize(&cRequest);
@@ -4032,13 +3833,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetMonitoringMode(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "SetMonitoringMode", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "SetMonitoringMode",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetMonitoringModeRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4072,11 +3873,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetTriggering(
     OpcUa_StatusCode**         a_pRemoveResults,
     OpcUa_Int32*               a_pNoOfRemoveDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pRemoveDiagnosticInfos)
-{    
+{
     OpcUa_SetTriggeringRequest cRequest;
     OpcUa_SetTriggeringResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_SetTriggering");
 
     OpcUa_SetTriggeringRequest_Initialize(&cRequest);
@@ -4107,14 +3908,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetTriggering(
     cRequest.LinksToRemove     = (OpcUa_UInt32*)a_pLinksToRemove;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "SetTriggering", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "SetTriggering",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetTriggeringRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4124,6 +3925,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetTriggering(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_SetTriggeringResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4171,7 +3974,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetTriggering(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_SetTriggeringRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginSetTriggering");
 
     OpcUa_SetTriggeringRequest_Initialize(&cRequest);
@@ -4194,13 +3997,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetTriggering(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "SetTriggering", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "SetTriggering",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetTriggeringRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4227,11 +4030,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteMonitoredItems(
     OpcUa_StatusCode**         a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_DeleteMonitoredItemsRequest cRequest;
     OpcUa_DeleteMonitoredItemsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_DeleteMonitoredItems");
 
     OpcUa_DeleteMonitoredItemsRequest_Initialize(&cRequest);
@@ -4253,14 +4056,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteMonitoredItems(
     cRequest.MonitoredItemIds     = (OpcUa_UInt32*)a_pMonitoredItemIds;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "DeleteMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "DeleteMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteMonitoredItemsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4270,6 +4073,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteMonitoredItems(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_DeleteMonitoredItemsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4310,7 +4115,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteMonitoredItems(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_DeleteMonitoredItemsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginDeleteMonitoredItems");
 
     OpcUa_DeleteMonitoredItemsRequest_Initialize(&cRequest);
@@ -4328,13 +4133,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteMonitoredItems(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "DeleteMonitoredItems", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "DeleteMonitoredItems",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteMonitoredItemsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4364,11 +4169,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSubscription(
     OpcUa_Double*              a_pRevisedPublishingInterval,
     OpcUa_UInt32*              a_pRevisedLifetimeCount,
     OpcUa_UInt32*              a_pRevisedMaxKeepAliveCount)
-{    
+{
     OpcUa_CreateSubscriptionRequest cRequest;
     OpcUa_CreateSubscriptionResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_CreateSubscription");
 
     OpcUa_CreateSubscriptionRequest_Initialize(&cRequest);
@@ -4397,14 +4202,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSubscription(
     cRequest.Priority                    = a_nPriority;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "CreateSubscription", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "CreateSubscription",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateSubscriptionRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4414,6 +4219,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_CreateSubscription(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_CreateSubscriptionResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4457,7 +4264,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateSubscription(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_CreateSubscriptionRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginCreateSubscription");
 
     OpcUa_CreateSubscriptionRequest_Initialize(&cRequest);
@@ -4482,13 +4289,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginCreateSubscription(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "CreateSubscription", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "CreateSubscription",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_CreateSubscriptionRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4517,11 +4324,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifySubscription(
     OpcUa_Double*              a_pRevisedPublishingInterval,
     OpcUa_UInt32*              a_pRevisedLifetimeCount,
     OpcUa_UInt32*              a_pRevisedMaxKeepAliveCount)
-{    
+{
     OpcUa_ModifySubscriptionRequest cRequest;
     OpcUa_ModifySubscriptionResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_ModifySubscription");
 
     OpcUa_ModifySubscriptionRequest_Initialize(&cRequest);
@@ -4549,14 +4356,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifySubscription(
     cRequest.Priority                    = a_nPriority;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "ModifySubscription", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "ModifySubscription",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ModifySubscriptionRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4566,6 +4373,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_ModifySubscription(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_ModifySubscriptionResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4608,7 +4417,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginModifySubscription(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_ModifySubscriptionRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginModifySubscription");
 
     OpcUa_ModifySubscriptionRequest_Initialize(&cRequest);
@@ -4633,13 +4442,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginModifySubscription(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "ModifySubscription", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "ModifySubscription",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_ModifySubscriptionRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4666,11 +4475,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetPublishingMode(
     OpcUa_StatusCode**         a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_SetPublishingModeRequest cRequest;
     OpcUa_SetPublishingModeResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_SetPublishingMode");
 
     OpcUa_SetPublishingModeRequest_Initialize(&cRequest);
@@ -4692,14 +4501,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetPublishingMode(
     cRequest.SubscriptionIds     = (OpcUa_UInt32*)a_pSubscriptionIds;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "SetPublishingMode", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "SetPublishingMode",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetPublishingModeRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4709,6 +4518,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_SetPublishingMode(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_SetPublishingModeResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4749,7 +4560,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetPublishingMode(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_SetPublishingModeRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginSetPublishingMode");
 
     OpcUa_SetPublishingModeRequest_Initialize(&cRequest);
@@ -4767,13 +4578,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginSetPublishingMode(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "SetPublishingMode", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "SetPublishingMode",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_SetPublishingModeRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4804,11 +4615,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Publish(
     OpcUa_StatusCode**                       a_pResults,
     OpcUa_Int32*                             a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**                   a_pDiagnosticInfos)
-{    
+{
     OpcUa_PublishRequest cRequest;
     OpcUa_PublishResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Publish");
 
     OpcUa_PublishRequest_Initialize(&cRequest);
@@ -4833,14 +4644,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Publish(
     cRequest.SubscriptionAcknowledgements     = (OpcUa_SubscriptionAcknowledgement*)a_pSubscriptionAcknowledgements;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Publish", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Publish",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_PublishRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4850,6 +4661,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Publish(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_PublishResponse)
     {
         pResponseType->Clear(pResponse);
@@ -4894,7 +4707,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginPublish(
     OpcUa_Void*                              a_pCallbackData)
 {
     OpcUa_PublishRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginPublish");
 
     OpcUa_PublishRequest_Initialize(&cRequest);
@@ -4910,13 +4723,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginPublish(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Publish", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Publish",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_PublishRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -4939,11 +4752,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Republish(
     OpcUa_UInt32               a_nRetransmitSequenceNumber,
     OpcUa_ResponseHeader*      a_pResponseHeader,
     OpcUa_NotificationMessage* a_pNotificationMessage)
-{    
+{
     OpcUa_RepublishRequest cRequest;
     OpcUa_RepublishResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_Republish");
 
     OpcUa_RepublishRequest_Initialize(&cRequest);
@@ -4961,14 +4774,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Republish(
     cRequest.RetransmitSequenceNumber = a_nRetransmitSequenceNumber;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "Republish", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "Republish",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RepublishRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -4978,6 +4791,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_Republish(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_RepublishResponse)
     {
         pResponseType->Clear(pResponse);
@@ -5014,7 +4829,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRepublish(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_RepublishRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginRepublish");
 
     OpcUa_RepublishRequest_Initialize(&cRequest);
@@ -5031,13 +4846,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginRepublish(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "Republish", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "Republish",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_RepublishRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -5064,11 +4879,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TransferSubscriptions(
     OpcUa_TransferResult**     a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_TransferSubscriptionsRequest cRequest;
     OpcUa_TransferSubscriptionsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_TransferSubscriptions");
 
     OpcUa_TransferSubscriptionsRequest_Initialize(&cRequest);
@@ -5090,14 +4905,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TransferSubscriptions(
     cRequest.SendInitialValues   = a_bSendInitialValues;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "TransferSubscriptions", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "TransferSubscriptions",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_TransferSubscriptionsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -5107,6 +4922,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_TransferSubscriptions(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_TransferSubscriptionsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -5147,7 +4964,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTransferSubscriptions(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_TransferSubscriptionsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginTransferSubscriptions");
 
     OpcUa_TransferSubscriptionsRequest_Initialize(&cRequest);
@@ -5165,13 +4982,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginTransferSubscriptions(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "TransferSubscriptions", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "TransferSubscriptions",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_TransferSubscriptionsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;
@@ -5197,11 +5014,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteSubscriptions(
     OpcUa_StatusCode**         a_pResults,
     OpcUa_Int32*               a_pNoOfDiagnosticInfos,
     OpcUa_DiagnosticInfo**     a_pDiagnosticInfos)
-{    
+{
     OpcUa_DeleteSubscriptionsRequest cRequest;
     OpcUa_DeleteSubscriptionsResponse* pResponse = OpcUa_Null;
     OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_DeleteSubscriptions");
 
     OpcUa_DeleteSubscriptionsRequest_Initialize(&cRequest);
@@ -5221,14 +5038,14 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteSubscriptions(
     cRequest.SubscriptionIds     = (OpcUa_UInt32*)a_pSubscriptionIds;
 
     /* invoke service */
-    uStatus = OpcUa_Channel_InvokeService(  
-        a_hChannel, 
-        "DeleteSubscriptions", 
-        (OpcUa_Void*)&cRequest, 
+    uStatus = OpcUa_Channel_InvokeService(
+        a_hChannel,
+        "DeleteSubscriptions",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteSubscriptionsRequest_EncodeableType,
         (OpcUa_Void**)&pResponse,
         &pResponseType);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check for fault */
@@ -5238,6 +5055,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_DeleteSubscriptions(
         OpcUa_Free(pResponse);
         OpcUa_ReturnStatusCode;
     }
+
+    /* check response type */
     else if (pResponseType->TypeId != OpcUaId_DeleteSubscriptionsResponse)
     {
         pResponseType->Clear(pResponse);
@@ -5277,7 +5096,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteSubscriptions(
     OpcUa_Void*                       a_pCallbackData)
 {
     OpcUa_DeleteSubscriptionsRequest cRequest;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_Client, "OpcUa_ClientApi_BeginDeleteSubscriptions");
 
     OpcUa_DeleteSubscriptionsRequest_Initialize(&cRequest);
@@ -5293,13 +5112,13 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ClientApi_BeginDeleteSubscriptions(
 
     /* begin invoke service */
     uStatus = OpcUa_Channel_BeginInvokeService(
-        a_hChannel, 
-        "DeleteSubscriptions", 
-        (OpcUa_Void*)&cRequest, 
+        a_hChannel,
+        "DeleteSubscriptions",
+        (OpcUa_Void*)&cRequest,
         &OpcUa_DeleteSubscriptionsRequest_EncodeableType,
         (OpcUa_Channel_PfnRequestComplete*)a_pCallback,
         a_pCallbackData);
-    
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_ReturnStatusCode;

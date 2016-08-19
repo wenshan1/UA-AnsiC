@@ -208,7 +208,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
         }
         if(pAddr->sin6_scope_id)
         {
-            char *pScopeAddress = OpcUa_P_Memory_Alloc(strlen(sHostName)+1+10);
+            char *pScopeAddress = OpcUa_P_Memory_Alloc(strlen(sHostName) + 12);
             OpcUa_GotoErrorIfAllocFailed(pScopeAddress);
             sprintf(pScopeAddress, "%s%%%u", sHostName, pAddr->sin6_scope_id);
             OpcUa_P_Memory_Free(sHostName);

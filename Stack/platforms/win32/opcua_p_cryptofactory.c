@@ -23,7 +23,6 @@
 /* own headers */
 #include <opcua_p_cryptofactory.h>
 #include <opcua_p_openssl.h>
-#include <opcua_p_wincrypt.h>
 
 /*============================================================================
  * OpcUa_P_CryptoFactory_CreateCryptoProvider
@@ -169,7 +168,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->DeriveKey                  = OpcUa_P_OpenSSL_Random_Key_Derive;
 
         /* random key generation */
-        a_pProvider->GenerateKey                = OpcUa_P_WinCrypt_Random_Key_Generate;
+        a_pProvider->GenerateKey                = OpcUa_P_OpenSSL_Random_Key_Generate;
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;
@@ -305,7 +304,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->DeriveKey                  = OpcUa_P_OpenSSL_Random_Key_Derive;
 
         /* random key generation */
-        a_pProvider->GenerateKey                = OpcUa_P_WinCrypt_Random_Key_Generate;
+        a_pProvider->GenerateKey                = OpcUa_P_OpenSSL_Random_Key_Generate;
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;

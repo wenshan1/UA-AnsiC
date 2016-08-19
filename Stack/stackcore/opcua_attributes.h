@@ -45,12 +45,12 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_Attributes_Description 5
 
 /*============================================================================
- * Indicates which attributes are writeable.
+ * Indicates which attributes are writable.
  *===========================================================================*/
 #define OpcUa_Attributes_WriteMask 6
 
 /*============================================================================
- * Indicates which attributes are writeable by the current user.
+ * Indicates which attributes are writable by the current user.
  *===========================================================================*/
 #define OpcUa_Attributes_UserWriteMask 7
 

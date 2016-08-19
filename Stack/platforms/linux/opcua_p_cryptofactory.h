@@ -35,28 +35,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_CreateCryptoProvider(  OpcU
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_DeleteCryptoProvider(  OpcUa_CryptoProvider* pProvider);
 
-/* HA: 22.02.2009 -> STACK_INTEGRATION */
-/* the following 2 functions are commented by an #if 0 in the LINUX version!*/ 
-
-/** 
-  @brief OpcUa_CryptoFactory_GetEncryptionMethods.
-  
-  @param ppSignatureMethods                [out] The pointer for encryption methods.
-  @param pSignatureMethodsCount         [out] The amount of available signature methods.
-*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_GetEncryptionMethods(    OpcUa_StringA**                 ppEncryptionMethods,
-                                                                            OpcUa_UInt*                  pEncryptionMethodsCount);
-
-/** 
-  @brief OpcUa_CryptoFactory_GetEncryptionMethods.
-  
-  @param pSignatureMethods                [out] The pointer for encryption methods.
-  @param pSignatureMethodsCount         [out] The amount of available signature methods.
-*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_GetSignatureMethods(    OpcUa_StringA**                 pSignatureMethods,
-                                                                            OpcUa_UInt*                  pSignatureMethodsCount);
-/* HA: 22.02.2009 -> STACK_INTEGRATION */
-
 /*============================================================================
  * The OpcUa_CryptoProvider interface.
  *===========================================================================*/
@@ -68,8 +46,6 @@ typedef struct _OpcUa_CryptoProviderConfig
     OpcUa_UInt32 MaximumAsymmetricKeyLength;
     OpcUa_UInt32 DerivedEncryptionKeyLength;
     OpcUa_UInt32 DerivedSignatureKeyLength;
-
-    OpcUa_Void*  WindowsCryptoProvHandle;   /* Windows CryptoProvider Handle ->wincrypt.h */
 }
 OpcUa_CryptoProviderConfig;
 

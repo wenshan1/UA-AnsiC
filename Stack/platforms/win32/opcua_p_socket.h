@@ -124,6 +124,20 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Connect( OpcUa_RawSocket RawSocket,
                                             OpcUa_StringA   Host);
 
 /*!
+ * @brief Connect the given IPv6 socket to the specified address.
+ *
+ * @param RawSocket [in]    The socket to connect.
+ * @param Port      [in]    To which port should be connected.
+ * @param Host      [in]    The server IP address in string representation.
+ *
+ * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ *         OpcUa_BadWouldBlock should not be handled as error, if non blocking sockets are used.
+ */
+OpcUa_StatusCode OpcUa_P_RawSocket_ConnectV6( OpcUa_RawSocket RawSocket,
+                                              OpcUa_Int16     Port,
+                                              OpcUa_StringA   Host);
+
+/*!
  * @brief Bind the given system socket to all network interfaces.
  *
  * @param RawSocket [in]    The socket to bind.

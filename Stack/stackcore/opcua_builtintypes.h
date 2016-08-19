@@ -20,6 +20,18 @@
 OPCUA_BEGIN_EXTERN_C
 
 /*============================================================================
+* OpcUa_EnumeratedType_Initialize
+*===========================================================================*/
+#define OpcUa_EnumeratedType_Initialize(xValue, xDefault) \
+    do { *(xValue) = xDefault; } while(0)
+
+/*============================================================================
+* OpcUa_EnumeratedType_Clear
+*===========================================================================*/
+#define OpcUa_EnumeratedType_Clear(xValue, xDefault) \
+    do { *(xValue) = xDefault; } while(0)
+
+/*============================================================================
  * OpcUa_InitializeArray
  *===========================================================================*/
 #define OpcUa_InitializeArray(xArray, xLength, xType) \

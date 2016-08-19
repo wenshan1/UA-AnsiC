@@ -284,7 +284,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_GetKeyLength(
 
     if((uKeySize < a_pProvider->MinimumAsymmetricKeyLength) || (uKeySize > a_pProvider->MaximumAsymmetricKeyLength))
     {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+        OpcUa_GotoErrorWithStatus(OpcUa_BadSecurityConfig);
     }
 
     *a_pKeyLen = uKeySize*8;

@@ -18,7 +18,6 @@
 #include <opcua_platformdefs.h>
 #include <opcua_statuscodes.h>
 #include <opcua_errorhandling.h>
-#include <opcua_trace.h>
 
 /* core */
 #include <opcua_memory.h>
@@ -223,6 +222,298 @@ struct _OpcUa_EncodeableType OpcUa_Node_EncodeableType =
     (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_Node_GetSize,
     (OpcUa_EncodeableObject_PfnEncode*)OpcUa_Node_Encode,
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_Node_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_InstanceNode
+/*============================================================================
+ * OpcUa_InstanceNode_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_InstanceNode_Initialize(OpcUa_InstanceNode* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, NodeId);
+        OpcUa_Field_InitializeEnumerated(OpcUa_NodeClass, NodeClass);
+        OpcUa_Field_Initialize(QualifiedName, BrowseName);
+        OpcUa_Field_Initialize(LocalizedText, DisplayName);
+        OpcUa_Field_Initialize(LocalizedText, Description);
+        OpcUa_Field_Initialize(UInt32, WriteMask);
+        OpcUa_Field_Initialize(UInt32, UserWriteMask);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_ReferenceNode, References);
+    }
+}
+
+/*============================================================================
+ * OpcUa_InstanceNode_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_InstanceNode_Clear(OpcUa_InstanceNode* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, NodeId);
+        OpcUa_Field_ClearEnumerated(OpcUa_NodeClass, NodeClass);
+        OpcUa_Field_Clear(QualifiedName, BrowseName);
+        OpcUa_Field_Clear(LocalizedText, DisplayName);
+        OpcUa_Field_Clear(LocalizedText, Description);
+        OpcUa_Field_Clear(UInt32, WriteMask);
+        OpcUa_Field_Clear(UInt32, UserWriteMask);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_ReferenceNode, References);
+    }
+}
+
+/*============================================================================
+ * OpcUa_InstanceNode_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_InstanceNode_GetSize(OpcUa_InstanceNode* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "InstanceNode_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, NodeId);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_GetSize(QualifiedName, BrowseName);
+    OpcUa_Field_GetSize(LocalizedText, DisplayName);
+    OpcUa_Field_GetSize(LocalizedText, Description);
+    OpcUa_Field_GetSize(UInt32, WriteMask);
+    OpcUa_Field_GetSize(UInt32, UserWriteMask);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ReferenceNode, References);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_InstanceNode_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_InstanceNode_Encode(OpcUa_InstanceNode* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "InstanceNode_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, NodeId);
+    OpcUa_Field_WriteEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_Write(QualifiedName, BrowseName);
+    OpcUa_Field_Write(LocalizedText, DisplayName);
+    OpcUa_Field_Write(LocalizedText, Description);
+    OpcUa_Field_Write(UInt32, WriteMask);
+    OpcUa_Field_Write(UInt32, UserWriteMask);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_ReferenceNode, References);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_InstanceNode_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_InstanceNode_Decode(OpcUa_InstanceNode* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "InstanceNode_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_InstanceNode_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, NodeId);
+    OpcUa_Field_ReadEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_Read(QualifiedName, BrowseName);
+    OpcUa_Field_Read(LocalizedText, DisplayName);
+    OpcUa_Field_Read(LocalizedText, Description);
+    OpcUa_Field_Read(UInt32, WriteMask);
+    OpcUa_Field_Read(UInt32, UserWriteMask);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_ReferenceNode, References);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_InstanceNode_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_InstanceNode_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_InstanceNode_EncodeableType =
+{
+    "InstanceNode",
+    OpcUaId_InstanceNode,
+    OpcUaId_InstanceNode_Encoding_DefaultBinary,
+    OpcUaId_InstanceNode_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_InstanceNode),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_InstanceNode_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_InstanceNode_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_InstanceNode_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_InstanceNode_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_InstanceNode_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_TypeNode
+/*============================================================================
+ * OpcUa_TypeNode_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_TypeNode_Initialize(OpcUa_TypeNode* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, NodeId);
+        OpcUa_Field_InitializeEnumerated(OpcUa_NodeClass, NodeClass);
+        OpcUa_Field_Initialize(QualifiedName, BrowseName);
+        OpcUa_Field_Initialize(LocalizedText, DisplayName);
+        OpcUa_Field_Initialize(LocalizedText, Description);
+        OpcUa_Field_Initialize(UInt32, WriteMask);
+        OpcUa_Field_Initialize(UInt32, UserWriteMask);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_ReferenceNode, References);
+    }
+}
+
+/*============================================================================
+ * OpcUa_TypeNode_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_TypeNode_Clear(OpcUa_TypeNode* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, NodeId);
+        OpcUa_Field_ClearEnumerated(OpcUa_NodeClass, NodeClass);
+        OpcUa_Field_Clear(QualifiedName, BrowseName);
+        OpcUa_Field_Clear(LocalizedText, DisplayName);
+        OpcUa_Field_Clear(LocalizedText, Description);
+        OpcUa_Field_Clear(UInt32, WriteMask);
+        OpcUa_Field_Clear(UInt32, UserWriteMask);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_ReferenceNode, References);
+    }
+}
+
+/*============================================================================
+ * OpcUa_TypeNode_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TypeNode_GetSize(OpcUa_TypeNode* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TypeNode_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, NodeId);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_GetSize(QualifiedName, BrowseName);
+    OpcUa_Field_GetSize(LocalizedText, DisplayName);
+    OpcUa_Field_GetSize(LocalizedText, Description);
+    OpcUa_Field_GetSize(UInt32, WriteMask);
+    OpcUa_Field_GetSize(UInt32, UserWriteMask);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ReferenceNode, References);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TypeNode_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TypeNode_Encode(OpcUa_TypeNode* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TypeNode_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, NodeId);
+    OpcUa_Field_WriteEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_Write(QualifiedName, BrowseName);
+    OpcUa_Field_Write(LocalizedText, DisplayName);
+    OpcUa_Field_Write(LocalizedText, Description);
+    OpcUa_Field_Write(UInt32, WriteMask);
+    OpcUa_Field_Write(UInt32, UserWriteMask);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_ReferenceNode, References);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TypeNode_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TypeNode_Decode(OpcUa_TypeNode* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TypeNode_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_TypeNode_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, NodeId);
+    OpcUa_Field_ReadEnumerated(OpcUa_NodeClass, NodeClass);
+    OpcUa_Field_Read(QualifiedName, BrowseName);
+    OpcUa_Field_Read(LocalizedText, DisplayName);
+    OpcUa_Field_Read(LocalizedText, Description);
+    OpcUa_Field_Read(UInt32, WriteMask);
+    OpcUa_Field_Read(UInt32, UserWriteMask);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_ReferenceNode, References);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_TypeNode_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TypeNode_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_TypeNode_EncodeableType =
+{
+    "TypeNode",
+    OpcUaId_TypeNode,
+    OpcUaId_TypeNode_Encoding_DefaultBinary,
+    OpcUaId_TypeNode_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_TypeNode),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TypeNode_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TypeNode_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TypeNode_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TypeNode_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TypeNode_Decode
 };
 #endif
 
@@ -1761,122 +2052,6 @@ struct _OpcUa_EncodeableType OpcUa_Argument_EncodeableType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_TimeZoneDataType
-/*============================================================================
- * OpcUa_TimeZoneDataType_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_TimeZoneDataType_Initialize(OpcUa_TimeZoneDataType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(Int16, Offset);
-        OpcUa_Field_Initialize(Boolean, DaylightSavingInOffset);
-    }
-}
-
-/*============================================================================
- * OpcUa_TimeZoneDataType_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_TimeZoneDataType_Clear(OpcUa_TimeZoneDataType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(Int16, Offset);
-        OpcUa_Field_Clear(Boolean, DaylightSavingInOffset);
-    }
-}
-
-/*============================================================================
- * OpcUa_TimeZoneDataType_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TimeZoneDataType_GetSize(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(Int16, Offset);
-    OpcUa_Field_GetSize(Boolean, DaylightSavingInOffset);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TimeZoneDataType_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TimeZoneDataType_Encode(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(Int16, Offset);
-    OpcUa_Field_Write(Boolean, DaylightSavingInOffset);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TimeZoneDataType_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TimeZoneDataType_Decode(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_TimeZoneDataType_Initialize(a_pValue);
-
-    OpcUa_Field_Read(Int16, Offset);
-    OpcUa_Field_Read(Boolean, DaylightSavingInOffset);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_TimeZoneDataType_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TimeZoneDataType_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_TimeZoneDataType_EncodeableType =
-{
-    "TimeZoneDataType",
-    OpcUaId_TimeZoneDataType,
-    OpcUaId_TimeZoneDataType_Encoding_DefaultBinary,
-    OpcUaId_TimeZoneDataType_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_TimeZoneDataType),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TimeZoneDataType_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TimeZoneDataType_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TimeZoneDataType_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TimeZoneDataType_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TimeZoneDataType_Decode
-};
-#endif
-
 #ifndef OPCUA_EXCLUDE_EnumValueType
 /*============================================================================
  * OpcUa_EnumValueType_Initialize
@@ -1998,39 +2173,39 @@ struct _OpcUa_EncodeableType OpcUa_EnumValueType_EncodeableType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_StatusResult
+#ifndef OPCUA_EXCLUDE_OptionSet
 /*============================================================================
- * OpcUa_StatusResult_Initialize
+ * OpcUa_OptionSet_Initialize
  *===========================================================================*/
-OpcUa_Void OpcUa_StatusResult_Initialize(OpcUa_StatusResult* a_pValue)
+OpcUa_Void OpcUa_OptionSet_Initialize(OpcUa_OptionSet* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(StatusCode, StatusCode);
-        OpcUa_Field_Initialize(DiagnosticInfo, DiagnosticInfo);
+        OpcUa_Field_Initialize(ByteString, Value);
+        OpcUa_Field_Initialize(ByteString, ValidBits);
     }
 }
 
 /*============================================================================
- * OpcUa_StatusResult_Clear
+ * OpcUa_OptionSet_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_StatusResult_Clear(OpcUa_StatusResult* a_pValue)
+OpcUa_Void OpcUa_OptionSet_Clear(OpcUa_OptionSet* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(StatusCode, StatusCode);
-        OpcUa_Field_Clear(DiagnosticInfo, DiagnosticInfo);
+        OpcUa_Field_Clear(ByteString, Value);
+        OpcUa_Field_Clear(ByteString, ValidBits);
     }
 }
 
 /*============================================================================
- * OpcUa_StatusResult_GetSize
+ * OpcUa_OptionSet_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_OptionSet_GetSize(OpcUa_OptionSet* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OptionSet_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -2038,8 +2213,8 @@ OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* a_pValue, OpcUa_
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(StatusCode, StatusCode);
-    OpcUa_Field_GetSize(DiagnosticInfo, DiagnosticInfo);
+    OpcUa_Field_GetSize(ByteString, Value);
+    OpcUa_Field_GetSize(ByteString, ValidBits);
 
     *a_pSize = iSize;
 
@@ -2052,17 +2227,17 @@ OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* a_pValue, OpcUa_
 }
 
 /*============================================================================
- * OpcUa_StatusResult_Encode
+ * OpcUa_OptionSet_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_StatusResult_Encode(OpcUa_StatusResult* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_OptionSet_Encode(OpcUa_OptionSet* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OptionSet_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(StatusCode, StatusCode);
-    OpcUa_Field_Write(DiagnosticInfo, DiagnosticInfo);
+    OpcUa_Field_Write(ByteString, Value);
+    OpcUa_Field_Write(ByteString, ValidBits);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -2073,45 +2248,1329 @@ OpcUa_StatusCode OpcUa_StatusResult_Encode(OpcUa_StatusResult* a_pValue, OpcUa_E
 }
 
 /*============================================================================
- * OpcUa_StatusResult_Decode
+ * OpcUa_OptionSet_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_StatusResult_Decode(OpcUa_StatusResult* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_OptionSet_Decode(OpcUa_OptionSet* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OptionSet_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_StatusResult_Initialize(a_pValue);
+    OpcUa_OptionSet_Initialize(a_pValue);
 
-    OpcUa_Field_Read(StatusCode, StatusCode);
-    OpcUa_Field_Read(DiagnosticInfo, DiagnosticInfo);
+    OpcUa_Field_Read(ByteString, Value);
+    OpcUa_Field_Read(ByteString, ValidBits);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_StatusResult_Clear(a_pValue);
+    OpcUa_OptionSet_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_StatusResult_EncodeableType
+ * OpcUa_OptionSet_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_StatusResult_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_OptionSet_EncodeableType =
 {
-    "StatusResult",
-    OpcUaId_StatusResult,
-    OpcUaId_StatusResult_Encoding_DefaultBinary,
-    OpcUaId_StatusResult_Encoding_DefaultXml,
+    "OptionSet",
+    OpcUaId_OptionSet,
+    OpcUaId_OptionSet_Encoding_DefaultBinary,
+    OpcUaId_OptionSet_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_StatusResult),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_StatusResult_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_StatusResult_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_StatusResult_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_StatusResult_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_StatusResult_Decode
+    sizeof(OpcUa_OptionSet),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_OptionSet_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_OptionSet_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_OptionSet_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_OptionSet_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_OptionSet_Decode
 };
+#endif
+
+#ifndef OPCUA_EXCLUDE_TimeZoneDataType
+/*============================================================================
+ * OpcUa_TimeZoneDataType_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_TimeZoneDataType_Initialize(OpcUa_TimeZoneDataType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(Int16, Offset);
+        OpcUa_Field_Initialize(Boolean, DaylightSavingInOffset);
+    }
+}
+
+/*============================================================================
+ * OpcUa_TimeZoneDataType_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_TimeZoneDataType_Clear(OpcUa_TimeZoneDataType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(Int16, Offset);
+        OpcUa_Field_Clear(Boolean, DaylightSavingInOffset);
+    }
+}
+
+/*============================================================================
+ * OpcUa_TimeZoneDataType_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TimeZoneDataType_GetSize(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(Int16, Offset);
+    OpcUa_Field_GetSize(Boolean, DaylightSavingInOffset);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TimeZoneDataType_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TimeZoneDataType_Encode(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(Int16, Offset);
+    OpcUa_Field_Write(Boolean, DaylightSavingInOffset);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TimeZoneDataType_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_TimeZoneDataType_Decode(OpcUa_TimeZoneDataType* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TimeZoneDataType_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_TimeZoneDataType_Initialize(a_pValue);
+
+    OpcUa_Field_Read(Int16, Offset);
+    OpcUa_Field_Read(Boolean, DaylightSavingInOffset);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_TimeZoneDataType_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_TimeZoneDataType_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_TimeZoneDataType_EncodeableType =
+{
+    "TimeZoneDataType",
+    OpcUaId_TimeZoneDataType,
+    OpcUaId_TimeZoneDataType_Encoding_DefaultBinary,
+    OpcUaId_TimeZoneDataType_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_TimeZoneDataType),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TimeZoneDataType_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TimeZoneDataType_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TimeZoneDataType_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TimeZoneDataType_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TimeZoneDataType_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_ApplicationType
+/*============================================================================
+ * OpcUa_ApplicationType_EnumeratedType
+ *===========================================================================*/
+static struct _OpcUa_EnumeratedValue g_OpcUa_ApplicationType_EnumeratedValues[] =
+{
+    { "Server", 0 },
+    { "Client", 1 },
+    { "ClientAndServer", 2 },
+    { "DiscoveryServer", 3 },
+    { OpcUa_Null, 0 }
+};
+
+struct _OpcUa_EnumeratedType OpcUa_ApplicationType_EnumeratedType =
+{
+    "ApplicationType",
+    g_OpcUa_ApplicationType_EnumeratedValues
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_ApplicationDescription
+/*============================================================================
+ * OpcUa_ApplicationDescription_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_ApplicationDescription_Initialize(OpcUa_ApplicationDescription* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, ApplicationUri);
+        OpcUa_Field_Initialize(String, ProductUri);
+        OpcUa_Field_Initialize(LocalizedText, ApplicationName);
+        OpcUa_Field_InitializeEnumerated(OpcUa_ApplicationType, ApplicationType);
+        OpcUa_Field_Initialize(String, GatewayServerUri);
+        OpcUa_Field_Initialize(String, DiscoveryProfileUri);
+        OpcUa_Field_InitializeArray(String, DiscoveryUrls);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ApplicationDescription_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_ApplicationDescription_Clear(OpcUa_ApplicationDescription* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, ApplicationUri);
+        OpcUa_Field_Clear(String, ProductUri);
+        OpcUa_Field_Clear(LocalizedText, ApplicationName);
+        OpcUa_Field_ClearEnumerated(OpcUa_ApplicationType, ApplicationType);
+        OpcUa_Field_Clear(String, GatewayServerUri);
+        OpcUa_Field_Clear(String, DiscoveryProfileUri);
+        OpcUa_Field_ClearArray(String, DiscoveryUrls);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ApplicationDescription_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ApplicationDescription_GetSize(OpcUa_ApplicationDescription* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, ApplicationUri);
+    OpcUa_Field_GetSize(String, ProductUri);
+    OpcUa_Field_GetSize(LocalizedText, ApplicationName);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_ApplicationType, ApplicationType);
+    OpcUa_Field_GetSize(String, GatewayServerUri);
+    OpcUa_Field_GetSize(String, DiscoveryProfileUri);
+    OpcUa_Field_GetSizeArray(String, DiscoveryUrls);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ApplicationDescription_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ApplicationDescription_Encode(OpcUa_ApplicationDescription* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, ApplicationUri);
+    OpcUa_Field_Write(String, ProductUri);
+    OpcUa_Field_Write(LocalizedText, ApplicationName);
+    OpcUa_Field_WriteEnumerated(OpcUa_ApplicationType, ApplicationType);
+    OpcUa_Field_Write(String, GatewayServerUri);
+    OpcUa_Field_Write(String, DiscoveryProfileUri);
+    OpcUa_Field_WriteArray(String, DiscoveryUrls);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ApplicationDescription_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ApplicationDescription_Decode(OpcUa_ApplicationDescription* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_ApplicationDescription_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, ApplicationUri);
+    OpcUa_Field_Read(String, ProductUri);
+    OpcUa_Field_Read(LocalizedText, ApplicationName);
+    OpcUa_Field_ReadEnumerated(OpcUa_ApplicationType, ApplicationType);
+    OpcUa_Field_Read(String, GatewayServerUri);
+    OpcUa_Field_Read(String, DiscoveryProfileUri);
+    OpcUa_Field_ReadArray(String, DiscoveryUrls);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_ApplicationDescription_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ApplicationDescription_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_ApplicationDescription_EncodeableType =
+{
+    "ApplicationDescription",
+    OpcUaId_ApplicationDescription,
+    OpcUaId_ApplicationDescription_Encoding_DefaultBinary,
+    OpcUaId_ApplicationDescription_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_ApplicationDescription),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ApplicationDescription_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ApplicationDescription_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ApplicationDescription_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ApplicationDescription_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ApplicationDescription_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_RequestHeader
+/*============================================================================
+ * OpcUa_RequestHeader_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RequestHeader_Initialize(OpcUa_RequestHeader* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, AuthenticationToken);
+        OpcUa_Field_Initialize(DateTime, Timestamp);
+        OpcUa_Field_Initialize(UInt32, RequestHandle);
+        OpcUa_Field_Initialize(UInt32, ReturnDiagnostics);
+        OpcUa_Field_Initialize(String, AuditEntryId);
+        OpcUa_Field_Initialize(UInt32, TimeoutHint);
+        OpcUa_Field_Initialize(ExtensionObject, AdditionalHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RequestHeader_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RequestHeader_Clear(OpcUa_RequestHeader* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, AuthenticationToken);
+        OpcUa_Field_Clear(DateTime, Timestamp);
+        OpcUa_Field_Clear(UInt32, RequestHandle);
+        OpcUa_Field_Clear(UInt32, ReturnDiagnostics);
+        OpcUa_Field_Clear(String, AuditEntryId);
+        OpcUa_Field_Clear(UInt32, TimeoutHint);
+        OpcUa_Field_Clear(ExtensionObject, AdditionalHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RequestHeader_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RequestHeader_GetSize(OpcUa_RequestHeader* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, AuthenticationToken);
+    OpcUa_Field_GetSize(DateTime, Timestamp);
+    OpcUa_Field_GetSize(UInt32, RequestHandle);
+    OpcUa_Field_GetSize(UInt32, ReturnDiagnostics);
+    OpcUa_Field_GetSize(String, AuditEntryId);
+    OpcUa_Field_GetSize(UInt32, TimeoutHint);
+    OpcUa_Field_GetSize(ExtensionObject, AdditionalHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RequestHeader_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RequestHeader_Encode(OpcUa_RequestHeader* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, AuthenticationToken);
+    OpcUa_Field_Write(DateTime, Timestamp);
+    OpcUa_Field_Write(UInt32, RequestHandle);
+    OpcUa_Field_Write(UInt32, ReturnDiagnostics);
+    OpcUa_Field_Write(String, AuditEntryId);
+    OpcUa_Field_Write(UInt32, TimeoutHint);
+    OpcUa_Field_Write(ExtensionObject, AdditionalHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RequestHeader_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RequestHeader_Decode(OpcUa_RequestHeader* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RequestHeader_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, AuthenticationToken);
+    OpcUa_Field_Read(DateTime, Timestamp);
+    OpcUa_Field_Read(UInt32, RequestHandle);
+    OpcUa_Field_Read(UInt32, ReturnDiagnostics);
+    OpcUa_Field_Read(String, AuditEntryId);
+    OpcUa_Field_Read(UInt32, TimeoutHint);
+    OpcUa_Field_Read(ExtensionObject, AdditionalHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RequestHeader_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RequestHeader_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RequestHeader_EncodeableType =
+{
+    "RequestHeader",
+    OpcUaId_RequestHeader,
+    OpcUaId_RequestHeader_Encoding_DefaultBinary,
+    OpcUaId_RequestHeader_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RequestHeader),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RequestHeader_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RequestHeader_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RequestHeader_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RequestHeader_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RequestHeader_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_ResponseHeader
+/*============================================================================
+ * OpcUa_ResponseHeader_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_ResponseHeader_Initialize(OpcUa_ResponseHeader* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(DateTime, Timestamp);
+        OpcUa_Field_Initialize(UInt32, RequestHandle);
+        OpcUa_Field_Initialize(StatusCode, ServiceResult);
+        OpcUa_Field_Initialize(DiagnosticInfo, ServiceDiagnostics);
+        OpcUa_Field_InitializeArray(String, StringTable);
+        OpcUa_Field_Initialize(ExtensionObject, AdditionalHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ResponseHeader_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_ResponseHeader_Clear(OpcUa_ResponseHeader* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(DateTime, Timestamp);
+        OpcUa_Field_Clear(UInt32, RequestHandle);
+        OpcUa_Field_Clear(StatusCode, ServiceResult);
+        OpcUa_Field_Clear(DiagnosticInfo, ServiceDiagnostics);
+        OpcUa_Field_ClearArray(String, StringTable);
+        OpcUa_Field_Clear(ExtensionObject, AdditionalHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ResponseHeader_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ResponseHeader_GetSize(OpcUa_ResponseHeader* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(DateTime, Timestamp);
+    OpcUa_Field_GetSize(UInt32, RequestHandle);
+    OpcUa_Field_GetSize(StatusCode, ServiceResult);
+    OpcUa_Field_GetSize(DiagnosticInfo, ServiceDiagnostics);
+    OpcUa_Field_GetSizeArray(String, StringTable);
+    OpcUa_Field_GetSize(ExtensionObject, AdditionalHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ResponseHeader_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ResponseHeader_Encode(OpcUa_ResponseHeader* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(DateTime, Timestamp);
+    OpcUa_Field_Write(UInt32, RequestHandle);
+    OpcUa_Field_Write(StatusCode, ServiceResult);
+    OpcUa_Field_Write(DiagnosticInfo, ServiceDiagnostics);
+    OpcUa_Field_WriteArray(String, StringTable);
+    OpcUa_Field_Write(ExtensionObject, AdditionalHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ResponseHeader_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ResponseHeader_Decode(OpcUa_ResponseHeader* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_ResponseHeader_Initialize(a_pValue);
+
+    OpcUa_Field_Read(DateTime, Timestamp);
+    OpcUa_Field_Read(UInt32, RequestHandle);
+    OpcUa_Field_Read(StatusCode, ServiceResult);
+    OpcUa_Field_Read(DiagnosticInfo, ServiceDiagnostics);
+    OpcUa_Field_ReadArray(String, StringTable);
+    OpcUa_Field_Read(ExtensionObject, AdditionalHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_ResponseHeader_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ResponseHeader_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_ResponseHeader_EncodeableType =
+{
+    "ResponseHeader",
+    OpcUaId_ResponseHeader,
+    OpcUaId_ResponseHeader_Encoding_DefaultBinary,
+    OpcUaId_ResponseHeader_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_ResponseHeader),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ResponseHeader_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ResponseHeader_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ResponseHeader_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ResponseHeader_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ResponseHeader_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_ServiceFault
+/*============================================================================
+ * OpcUa_ServiceFault_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_ServiceFault_Initialize(OpcUa_ServiceFault* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ServiceFault_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_ServiceFault_Clear(OpcUa_ServiceFault* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ServiceFault_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServiceFault_GetSize(OpcUa_ServiceFault* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServiceFault_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServiceFault_Encode(OpcUa_ServiceFault* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServiceFault_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServiceFault_Decode(OpcUa_ServiceFault* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_ServiceFault_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_ServiceFault_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServiceFault_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_ServiceFault_EncodeableType =
+{
+    "ServiceFault",
+    OpcUaId_ServiceFault,
+    OpcUaId_ServiceFault_Encoding_DefaultBinary,
+    OpcUaId_ServiceFault_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_ServiceFault),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ServiceFault_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ServiceFault_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ServiceFault_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ServiceFault_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ServiceFault_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServers
+#ifndef OPCUA_EXCLUDE_FindServersRequest
+/*============================================================================
+ * OpcUa_FindServersRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersRequest_Initialize(OpcUa_FindServersRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(String, EndpointUrl);
+        OpcUa_Field_InitializeArray(String, LocaleIds);
+        OpcUa_Field_InitializeArray(String, ServerUris);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersRequest_Clear(OpcUa_FindServersRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(String, EndpointUrl);
+        OpcUa_Field_ClearArray(String, LocaleIds);
+        OpcUa_Field_ClearArray(String, ServerUris);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersRequest_GetSize(OpcUa_FindServersRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(String, EndpointUrl);
+    OpcUa_Field_GetSizeArray(String, LocaleIds);
+    OpcUa_Field_GetSizeArray(String, ServerUris);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersRequest_Encode(OpcUa_FindServersRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(String, EndpointUrl);
+    OpcUa_Field_WriteArray(String, LocaleIds);
+    OpcUa_Field_WriteArray(String, ServerUris);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersRequest_Decode(OpcUa_FindServersRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_FindServersRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(String, EndpointUrl);
+    OpcUa_Field_ReadArray(String, LocaleIds);
+    OpcUa_Field_ReadArray(String, ServerUris);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_FindServersRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_FindServersRequest_EncodeableType =
+{
+    "FindServersRequest",
+    OpcUaId_FindServersRequest,
+    OpcUaId_FindServersRequest_Encoding_DefaultBinary,
+    OpcUaId_FindServersRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_FindServersRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServersResponse
+/*============================================================================
+ * OpcUa_FindServersResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersResponse_Initialize(OpcUa_FindServersResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_ApplicationDescription, Servers);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersResponse_Clear(OpcUa_FindServersResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_ApplicationDescription, Servers);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersResponse_GetSize(OpcUa_FindServersResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ApplicationDescription, Servers);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersResponse_Encode(OpcUa_FindServersResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_ApplicationDescription, Servers);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersResponse_Decode(OpcUa_FindServersResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_FindServersResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_ApplicationDescription, Servers);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_FindServersResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_FindServersResponse_EncodeableType =
+{
+    "FindServersResponse",
+    OpcUaId_FindServersResponse,
+    OpcUaId_FindServersResponse_Encoding_DefaultBinary,
+    OpcUaId_FindServersResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_FindServersResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersResponse_Decode
+};
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_ServerOnNetwork
+/*============================================================================
+ * OpcUa_ServerOnNetwork_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_ServerOnNetwork_Initialize(OpcUa_ServerOnNetwork* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(UInt32, RecordId);
+        OpcUa_Field_Initialize(String, ServerName);
+        OpcUa_Field_Initialize(String, DiscoveryUrl);
+        OpcUa_Field_InitializeArray(String, ServerCapabilities);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ServerOnNetwork_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_ServerOnNetwork_Clear(OpcUa_ServerOnNetwork* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(UInt32, RecordId);
+        OpcUa_Field_Clear(String, ServerName);
+        OpcUa_Field_Clear(String, DiscoveryUrl);
+        OpcUa_Field_ClearArray(String, ServerCapabilities);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ServerOnNetwork_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServerOnNetwork_GetSize(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(UInt32, RecordId);
+    OpcUa_Field_GetSize(String, ServerName);
+    OpcUa_Field_GetSize(String, DiscoveryUrl);
+    OpcUa_Field_GetSizeArray(String, ServerCapabilities);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServerOnNetwork_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServerOnNetwork_Encode(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(UInt32, RecordId);
+    OpcUa_Field_Write(String, ServerName);
+    OpcUa_Field_Write(String, DiscoveryUrl);
+    OpcUa_Field_WriteArray(String, ServerCapabilities);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServerOnNetwork_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ServerOnNetwork_Decode(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_ServerOnNetwork_Initialize(a_pValue);
+
+    OpcUa_Field_Read(UInt32, RecordId);
+    OpcUa_Field_Read(String, ServerName);
+    OpcUa_Field_Read(String, DiscoveryUrl);
+    OpcUa_Field_ReadArray(String, ServerCapabilities);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_ServerOnNetwork_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ServerOnNetwork_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_ServerOnNetwork_EncodeableType =
+{
+    "ServerOnNetwork",
+    OpcUaId_ServerOnNetwork,
+    OpcUaId_ServerOnNetwork_Encoding_DefaultBinary,
+    OpcUaId_ServerOnNetwork_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_ServerOnNetwork),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ServerOnNetwork_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ServerOnNetwork_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ServerOnNetwork_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ServerOnNetwork_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ServerOnNetwork_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServersOnNetwork
+#ifndef OPCUA_EXCLUDE_FindServersOnNetworkRequest
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersOnNetworkRequest_Initialize(OpcUa_FindServersOnNetworkRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(UInt32, StartingRecordId);
+        OpcUa_Field_Initialize(UInt32, MaxRecordsToReturn);
+        OpcUa_Field_InitializeArray(String, ServerCapabilityFilter);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersOnNetworkRequest_Clear(OpcUa_FindServersOnNetworkRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(UInt32, StartingRecordId);
+        OpcUa_Field_Clear(UInt32, MaxRecordsToReturn);
+        OpcUa_Field_ClearArray(String, ServerCapabilityFilter);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_GetSize(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(UInt32, StartingRecordId);
+    OpcUa_Field_GetSize(UInt32, MaxRecordsToReturn);
+    OpcUa_Field_GetSizeArray(String, ServerCapabilityFilter);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Encode(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(UInt32, StartingRecordId);
+    OpcUa_Field_Write(UInt32, MaxRecordsToReturn);
+    OpcUa_Field_WriteArray(String, ServerCapabilityFilter);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Decode(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_FindServersOnNetworkRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(UInt32, StartingRecordId);
+    OpcUa_Field_Read(UInt32, MaxRecordsToReturn);
+    OpcUa_Field_ReadArray(String, ServerCapabilityFilter);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_FindServersOnNetworkRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkRequest_EncodeableType =
+{
+    "FindServersOnNetworkRequest",
+    OpcUaId_FindServersOnNetworkRequest,
+    OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultBinary,
+    OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_FindServersOnNetworkRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersOnNetworkRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersOnNetworkRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersOnNetworkRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersOnNetworkRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersOnNetworkRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_FindServersOnNetworkResponse
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersOnNetworkResponse_Initialize(OpcUa_FindServersOnNetworkResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Initialize(DateTime, LastCounterResetTime);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_ServerOnNetwork, Servers);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_FindServersOnNetworkResponse_Clear(OpcUa_FindServersOnNetworkResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Clear(DateTime, LastCounterResetTime);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_ServerOnNetwork, Servers);
+    }
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_GetSize(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSize(DateTime, LastCounterResetTime);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ServerOnNetwork, Servers);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Encode(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Write(DateTime, LastCounterResetTime);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_ServerOnNetwork, Servers);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Decode(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_FindServersOnNetworkResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Read(DateTime, LastCounterResetTime);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_ServerOnNetwork, Servers);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_FindServersOnNetworkResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_FindServersOnNetworkResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkResponse_EncodeableType =
+{
+    "FindServersOnNetworkResponse",
+    OpcUaId_FindServersOnNetworkResponse,
+    OpcUaId_FindServersOnNetworkResponse_Encoding_DefaultBinary,
+    OpcUaId_FindServersOnNetworkResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_FindServersOnNetworkResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersOnNetworkResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersOnNetworkResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersOnNetworkResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersOnNetworkResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersOnNetworkResponse_Decode
+};
+#endif
 #endif
 
 #ifndef OPCUA_EXCLUDE_MessageSecurityMode
@@ -2285,409 +3744,6 @@ struct _OpcUa_EncodeableType OpcUa_UserTokenPolicy_EncodeableType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_ApplicationType
-/*============================================================================
- * OpcUa_ApplicationType_EnumeratedType
- *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_ApplicationType_EnumeratedValues[] =
-{
-    { "Server", 0 },
-    { "Client", 1 },
-    { "ClientAndServer", 2 },
-    { "DiscoveryServer", 3 },
-    { OpcUa_Null, 0 }
-};
-
-struct _OpcUa_EnumeratedType OpcUa_ApplicationType_EnumeratedType =
-{
-    "ApplicationType",
-    g_OpcUa_ApplicationType_EnumeratedValues
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ApplicationDescription
-/*============================================================================
- * OpcUa_ApplicationDescription_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ApplicationDescription_Initialize(OpcUa_ApplicationDescription* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(String, ApplicationUri);
-        OpcUa_Field_Initialize(String, ProductUri);
-        OpcUa_Field_Initialize(LocalizedText, ApplicationName);
-        OpcUa_Field_InitializeEnumerated(OpcUa_ApplicationType, ApplicationType);
-        OpcUa_Field_Initialize(String, GatewayServerUri);
-        OpcUa_Field_Initialize(String, DiscoveryProfileUri);
-        OpcUa_Field_InitializeArray(String, DiscoveryUrls);
-    }
-}
-
-/*============================================================================
- * OpcUa_ApplicationDescription_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ApplicationDescription_Clear(OpcUa_ApplicationDescription* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(String, ApplicationUri);
-        OpcUa_Field_Clear(String, ProductUri);
-        OpcUa_Field_Clear(LocalizedText, ApplicationName);
-        OpcUa_Field_ClearEnumerated(OpcUa_ApplicationType, ApplicationType);
-        OpcUa_Field_Clear(String, GatewayServerUri);
-        OpcUa_Field_Clear(String, DiscoveryProfileUri);
-        OpcUa_Field_ClearArray(String, DiscoveryUrls);
-    }
-}
-
-/*============================================================================
- * OpcUa_ApplicationDescription_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ApplicationDescription_GetSize(OpcUa_ApplicationDescription* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(String, ApplicationUri);
-    OpcUa_Field_GetSize(String, ProductUri);
-    OpcUa_Field_GetSize(LocalizedText, ApplicationName);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_ApplicationType, ApplicationType);
-    OpcUa_Field_GetSize(String, GatewayServerUri);
-    OpcUa_Field_GetSize(String, DiscoveryProfileUri);
-    OpcUa_Field_GetSizeArray(String, DiscoveryUrls);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ApplicationDescription_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ApplicationDescription_Encode(OpcUa_ApplicationDescription* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(String, ApplicationUri);
-    OpcUa_Field_Write(String, ProductUri);
-    OpcUa_Field_Write(LocalizedText, ApplicationName);
-    OpcUa_Field_WriteEnumerated(OpcUa_ApplicationType, ApplicationType);
-    OpcUa_Field_Write(String, GatewayServerUri);
-    OpcUa_Field_Write(String, DiscoveryProfileUri);
-    OpcUa_Field_WriteArray(String, DiscoveryUrls);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ApplicationDescription_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ApplicationDescription_Decode(OpcUa_ApplicationDescription* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ApplicationDescription_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ApplicationDescription_Initialize(a_pValue);
-
-    OpcUa_Field_Read(String, ApplicationUri);
-    OpcUa_Field_Read(String, ProductUri);
-    OpcUa_Field_Read(LocalizedText, ApplicationName);
-    OpcUa_Field_ReadEnumerated(OpcUa_ApplicationType, ApplicationType);
-    OpcUa_Field_Read(String, GatewayServerUri);
-    OpcUa_Field_Read(String, DiscoveryProfileUri);
-    OpcUa_Field_ReadArray(String, DiscoveryUrls);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ApplicationDescription_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ApplicationDescription_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ApplicationDescription_EncodeableType =
-{
-    "ApplicationDescription",
-    OpcUaId_ApplicationDescription,
-    OpcUaId_ApplicationDescription_Encoding_DefaultBinary,
-    OpcUaId_ApplicationDescription_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ApplicationDescription),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ApplicationDescription_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ApplicationDescription_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ApplicationDescription_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ApplicationDescription_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ApplicationDescription_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ServerOnNetwork
-/*============================================================================
- * OpcUa_ServerOnNetwork_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ServerOnNetwork_Initialize(OpcUa_ServerOnNetwork* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(UInt32, RecordId);
-        OpcUa_Field_Initialize(String, ServerName);
-        OpcUa_Field_Initialize(String, DiscoveryUrl);
-        OpcUa_Field_InitializeArray(String, ServerCapabilities);
-    }
-}
-
-/*============================================================================
- * OpcUa_ServerOnNetwork_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ServerOnNetwork_Clear(OpcUa_ServerOnNetwork* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(UInt32, RecordId);
-        OpcUa_Field_Clear(String, ServerName);
-        OpcUa_Field_Clear(String, DiscoveryUrl);
-        OpcUa_Field_ClearArray(String, ServerCapabilities);
-    }
-}
-
-/*============================================================================
- * OpcUa_ServerOnNetwork_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerOnNetwork_GetSize(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(UInt32, RecordId);
-    OpcUa_Field_GetSize(String, ServerName);
-    OpcUa_Field_GetSize(String, DiscoveryUrl);
-    OpcUa_Field_GetSizeArray(String, ServerCapabilities);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServerOnNetwork_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerOnNetwork_Encode(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(UInt32, RecordId);
-    OpcUa_Field_Write(String, ServerName);
-    OpcUa_Field_Write(String, DiscoveryUrl);
-    OpcUa_Field_WriteArray(String, ServerCapabilities);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServerOnNetwork_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerOnNetwork_Decode(OpcUa_ServerOnNetwork* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServerOnNetwork_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ServerOnNetwork_Initialize(a_pValue);
-
-    OpcUa_Field_Read(UInt32, RecordId);
-    OpcUa_Field_Read(String, ServerName);
-    OpcUa_Field_Read(String, DiscoveryUrl);
-    OpcUa_Field_ReadArray(String, ServerCapabilities);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ServerOnNetwork_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServerOnNetwork_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ServerOnNetwork_EncodeableType =
-{
-    "ServerOnNetwork",
-    OpcUaId_ServerOnNetwork,
-    OpcUaId_ServerOnNetwork_Encoding_DefaultBinary,
-    OpcUaId_ServerOnNetwork_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ServerOnNetwork),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ServerOnNetwork_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ServerOnNetwork_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ServerOnNetwork_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ServerOnNetwork_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ServerOnNetwork_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_MdnsDiscoveryConfiguration
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Initialize(OpcUa_MdnsDiscoveryConfiguration* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(String, MdnsServerName);
-        OpcUa_Field_InitializeArray(String, MdnsServerCapabilities);
-    }
-}
-
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Clear(OpcUa_MdnsDiscoveryConfiguration* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(String, MdnsServerName);
-        OpcUa_Field_ClearArray(String, MdnsServerCapabilities);
-    }
-}
-
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_GetSize(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(String, MdnsServerName);
-    OpcUa_Field_GetSizeArray(String, MdnsServerCapabilities);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Encode(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(String, MdnsServerName);
-    OpcUa_Field_WriteArray(String, MdnsServerCapabilities);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Decode(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_MdnsDiscoveryConfiguration_Initialize(a_pValue);
-
-    OpcUa_Field_Read(String, MdnsServerName);
-    OpcUa_Field_ReadArray(String, MdnsServerCapabilities);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_MdnsDiscoveryConfiguration_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_MdnsDiscoveryConfiguration_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_MdnsDiscoveryConfiguration_EncodeableType =
-{
-    "MdnsDiscoveryConfiguration",
-    OpcUaId_MdnsDiscoveryConfiguration,
-    OpcUaId_MdnsDiscoveryConfiguration_Encoding_DefaultBinary,
-    OpcUaId_MdnsDiscoveryConfiguration_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_MdnsDiscoveryConfiguration),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_MdnsDiscoveryConfiguration_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_MdnsDiscoveryConfiguration_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_MdnsDiscoveryConfiguration_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_MdnsDiscoveryConfiguration_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_MdnsDiscoveryConfiguration_Decode
-};
-#endif
-
 #ifndef OPCUA_EXCLUDE_EndpointDescription
 /*============================================================================
  * OpcUa_EndpointDescription_Initialize
@@ -2834,6 +3890,985 @@ struct _OpcUa_EncodeableType OpcUa_EndpointDescription_EncodeableType =
 };
 #endif
 
+#ifndef OPCUA_EXCLUDE_GetEndpoints
+#ifndef OPCUA_EXCLUDE_GetEndpointsRequest
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_GetEndpointsRequest_Initialize(OpcUa_GetEndpointsRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(String, EndpointUrl);
+        OpcUa_Field_InitializeArray(String, LocaleIds);
+        OpcUa_Field_InitializeArray(String, ProfileUris);
+    }
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_GetEndpointsRequest_Clear(OpcUa_GetEndpointsRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(String, EndpointUrl);
+        OpcUa_Field_ClearArray(String, LocaleIds);
+        OpcUa_Field_ClearArray(String, ProfileUris);
+    }
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsRequest_GetSize(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(String, EndpointUrl);
+    OpcUa_Field_GetSizeArray(String, LocaleIds);
+    OpcUa_Field_GetSizeArray(String, ProfileUris);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsRequest_Encode(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(String, EndpointUrl);
+    OpcUa_Field_WriteArray(String, LocaleIds);
+    OpcUa_Field_WriteArray(String, ProfileUris);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsRequest_Decode(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_GetEndpointsRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(String, EndpointUrl);
+    OpcUa_Field_ReadArray(String, LocaleIds);
+    OpcUa_Field_ReadArray(String, ProfileUris);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_GetEndpointsRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_GetEndpointsRequest_EncodeableType =
+{
+    "GetEndpointsRequest",
+    OpcUaId_GetEndpointsRequest,
+    OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary,
+    OpcUaId_GetEndpointsRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_GetEndpointsRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_GetEndpointsRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_GetEndpointsRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_GetEndpointsRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_GetEndpointsRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_GetEndpointsRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_GetEndpointsResponse
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_GetEndpointsResponse_Initialize(OpcUa_GetEndpointsResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_EndpointDescription, Endpoints);
+    }
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_GetEndpointsResponse_Clear(OpcUa_GetEndpointsResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_EndpointDescription, Endpoints);
+    }
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsResponse_GetSize(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_EndpointDescription, Endpoints);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsResponse_Encode(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_EndpointDescription, Endpoints);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_GetEndpointsResponse_Decode(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_GetEndpointsResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_EndpointDescription, Endpoints);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_GetEndpointsResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_GetEndpointsResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_GetEndpointsResponse_EncodeableType =
+{
+    "GetEndpointsResponse",
+    OpcUaId_GetEndpointsResponse,
+    OpcUaId_GetEndpointsResponse_Encoding_DefaultBinary,
+    OpcUaId_GetEndpointsResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_GetEndpointsResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_GetEndpointsResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_GetEndpointsResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_GetEndpointsResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_GetEndpointsResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_GetEndpointsResponse_Decode
+};
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisteredServer
+/*============================================================================
+ * OpcUa_RegisteredServer_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisteredServer_Initialize(OpcUa_RegisteredServer* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, ServerUri);
+        OpcUa_Field_Initialize(String, ProductUri);
+        OpcUa_Field_InitializeArray(LocalizedText, ServerNames);
+        OpcUa_Field_InitializeEnumerated(OpcUa_ApplicationType, ServerType);
+        OpcUa_Field_Initialize(String, GatewayServerUri);
+        OpcUa_Field_InitializeArray(String, DiscoveryUrls);
+        OpcUa_Field_Initialize(String, SemaphoreFilePath);
+        OpcUa_Field_Initialize(Boolean, IsOnline);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisteredServer_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisteredServer_Clear(OpcUa_RegisteredServer* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, ServerUri);
+        OpcUa_Field_Clear(String, ProductUri);
+        OpcUa_Field_ClearArray(LocalizedText, ServerNames);
+        OpcUa_Field_ClearEnumerated(OpcUa_ApplicationType, ServerType);
+        OpcUa_Field_Clear(String, GatewayServerUri);
+        OpcUa_Field_ClearArray(String, DiscoveryUrls);
+        OpcUa_Field_Clear(String, SemaphoreFilePath);
+        OpcUa_Field_Clear(Boolean, IsOnline);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisteredServer_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisteredServer_GetSize(OpcUa_RegisteredServer* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, ServerUri);
+    OpcUa_Field_GetSize(String, ProductUri);
+    OpcUa_Field_GetSizeArray(LocalizedText, ServerNames);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_ApplicationType, ServerType);
+    OpcUa_Field_GetSize(String, GatewayServerUri);
+    OpcUa_Field_GetSizeArray(String, DiscoveryUrls);
+    OpcUa_Field_GetSize(String, SemaphoreFilePath);
+    OpcUa_Field_GetSize(Boolean, IsOnline);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisteredServer_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisteredServer_Encode(OpcUa_RegisteredServer* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, ServerUri);
+    OpcUa_Field_Write(String, ProductUri);
+    OpcUa_Field_WriteArray(LocalizedText, ServerNames);
+    OpcUa_Field_WriteEnumerated(OpcUa_ApplicationType, ServerType);
+    OpcUa_Field_Write(String, GatewayServerUri);
+    OpcUa_Field_WriteArray(String, DiscoveryUrls);
+    OpcUa_Field_Write(String, SemaphoreFilePath);
+    OpcUa_Field_Write(Boolean, IsOnline);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisteredServer_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisteredServer_Decode(OpcUa_RegisteredServer* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RegisteredServer_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, ServerUri);
+    OpcUa_Field_Read(String, ProductUri);
+    OpcUa_Field_ReadArray(LocalizedText, ServerNames);
+    OpcUa_Field_ReadEnumerated(OpcUa_ApplicationType, ServerType);
+    OpcUa_Field_Read(String, GatewayServerUri);
+    OpcUa_Field_ReadArray(String, DiscoveryUrls);
+    OpcUa_Field_Read(String, SemaphoreFilePath);
+    OpcUa_Field_Read(Boolean, IsOnline);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RegisteredServer_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisteredServer_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RegisteredServer_EncodeableType =
+{
+    "RegisteredServer",
+    OpcUaId_RegisteredServer,
+    OpcUaId_RegisteredServer_Encoding_DefaultBinary,
+    OpcUaId_RegisteredServer_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RegisteredServer),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisteredServer_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisteredServer_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisteredServer_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisteredServer_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisteredServer_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer
+#ifndef OPCUA_EXCLUDE_RegisterServerRequest
+/*============================================================================
+ * OpcUa_RegisterServerRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServerRequest_Initialize(OpcUa_RegisterServerRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_InitializeEncodeable(OpcUa_RegisteredServer, Server);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServerRequest_Clear(OpcUa_RegisterServerRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_ClearEncodeable(OpcUa_RegisteredServer, Server);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerRequest_GetSize(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RegisteredServer, Server);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerRequest_Encode(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_WriteEncodeable(OpcUa_RegisteredServer, Server);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerRequest_Decode(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RegisterServerRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_ReadEncodeable(OpcUa_RegisteredServer, Server);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RegisterServerRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RegisterServerRequest_EncodeableType =
+{
+    "RegisterServerRequest",
+    OpcUaId_RegisterServerRequest,
+    OpcUaId_RegisterServerRequest_Encoding_DefaultBinary,
+    OpcUaId_RegisterServerRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RegisterServerRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServerRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServerRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServerRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServerRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServerRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServerResponse
+/*============================================================================
+ * OpcUa_RegisterServerResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServerResponse_Initialize(OpcUa_RegisterServerResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServerResponse_Clear(OpcUa_RegisterServerResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerResponse_GetSize(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerResponse_Encode(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServerResponse_Decode(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RegisterServerResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RegisterServerResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServerResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RegisterServerResponse_EncodeableType =
+{
+    "RegisterServerResponse",
+    OpcUaId_RegisterServerResponse,
+    OpcUaId_RegisterServerResponse_Encoding_DefaultBinary,
+    OpcUaId_RegisterServerResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RegisterServerResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServerResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServerResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServerResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServerResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServerResponse_Decode
+};
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_MdnsDiscoveryConfiguration
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Initialize(OpcUa_MdnsDiscoveryConfiguration* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, MdnsServerName);
+        OpcUa_Field_InitializeArray(String, ServerCapabilities);
+    }
+}
+
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_MdnsDiscoveryConfiguration_Clear(OpcUa_MdnsDiscoveryConfiguration* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, MdnsServerName);
+        OpcUa_Field_ClearArray(String, ServerCapabilities);
+    }
+}
+
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_GetSize(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, MdnsServerName);
+    OpcUa_Field_GetSizeArray(String, ServerCapabilities);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Encode(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, MdnsServerName);
+    OpcUa_Field_WriteArray(String, ServerCapabilities);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_MdnsDiscoveryConfiguration_Decode(OpcUa_MdnsDiscoveryConfiguration* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "MdnsDiscoveryConfiguration_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_MdnsDiscoveryConfiguration_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, MdnsServerName);
+    OpcUa_Field_ReadArray(String, ServerCapabilities);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_MdnsDiscoveryConfiguration_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_MdnsDiscoveryConfiguration_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_MdnsDiscoveryConfiguration_EncodeableType =
+{
+    "MdnsDiscoveryConfiguration",
+    OpcUaId_MdnsDiscoveryConfiguration,
+    OpcUaId_MdnsDiscoveryConfiguration_Encoding_DefaultBinary,
+    OpcUaId_MdnsDiscoveryConfiguration_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_MdnsDiscoveryConfiguration),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_MdnsDiscoveryConfiguration_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_MdnsDiscoveryConfiguration_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_MdnsDiscoveryConfiguration_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_MdnsDiscoveryConfiguration_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_MdnsDiscoveryConfiguration_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer2
+#ifndef OPCUA_EXCLUDE_RegisterServer2Request
+/*============================================================================
+ * OpcUa_RegisterServer2Request_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServer2Request_Initialize(OpcUa_RegisterServer2Request* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_InitializeEncodeable(OpcUa_RegisteredServer, Server);
+        OpcUa_Field_InitializeArray(ExtensionObject, DiscoveryConfiguration);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Request_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServer2Request_Clear(OpcUa_RegisterServer2Request* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_ClearEncodeable(OpcUa_RegisteredServer, Server);
+        OpcUa_Field_ClearArray(ExtensionObject, DiscoveryConfiguration);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Request_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Request_GetSize(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RegisteredServer, Server);
+    OpcUa_Field_GetSizeArray(ExtensionObject, DiscoveryConfiguration);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Request_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Request_Encode(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_WriteEncodeable(OpcUa_RegisteredServer, Server);
+    OpcUa_Field_WriteArray(ExtensionObject, DiscoveryConfiguration);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Request_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Request_Decode(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RegisterServer2Request_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_ReadEncodeable(OpcUa_RegisteredServer, Server);
+    OpcUa_Field_ReadArray(ExtensionObject, DiscoveryConfiguration);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RegisterServer2Request_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Request_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RegisterServer2Request_EncodeableType =
+{
+    "RegisterServer2Request",
+    OpcUaId_RegisterServer2Request,
+    OpcUaId_RegisterServer2Request_Encoding_DefaultBinary,
+    OpcUaId_RegisterServer2Request_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RegisterServer2Request),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServer2Request_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServer2Request_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServer2Request_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServer2Request_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServer2Request_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_RegisterServer2Response
+/*============================================================================
+ * OpcUa_RegisterServer2Response_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServer2Response_Initialize(OpcUa_RegisterServer2Response* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_InitializeArray(StatusCode, ConfigurationResults);
+        OpcUa_Field_InitializeArray(DiagnosticInfo, DiagnosticInfos);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Response_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_RegisterServer2Response_Clear(OpcUa_RegisterServer2Response* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_ClearArray(StatusCode, ConfigurationResults);
+        OpcUa_Field_ClearArray(DiagnosticInfo, DiagnosticInfos);
+    }
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Response_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Response_GetSize(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSizeArray(StatusCode, ConfigurationResults);
+    OpcUa_Field_GetSizeArray(DiagnosticInfo, DiagnosticInfos);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Response_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Response_Encode(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_WriteArray(StatusCode, ConfigurationResults);
+    OpcUa_Field_WriteArray(DiagnosticInfo, DiagnosticInfos);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Response_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_RegisterServer2Response_Decode(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_RegisterServer2Response_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_ReadArray(StatusCode, ConfigurationResults);
+    OpcUa_Field_ReadArray(DiagnosticInfo, DiagnosticInfos);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_RegisterServer2Response_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_RegisterServer2Response_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_RegisterServer2Response_EncodeableType =
+{
+    "RegisterServer2Response",
+    OpcUaId_RegisterServer2Response,
+    OpcUaId_RegisterServer2Response_Encoding_DefaultBinary,
+    OpcUaId_RegisterServer2Response_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_RegisterServer2Response),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServer2Response_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServer2Response_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServer2Response_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServer2Response_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServer2Response_Decode
+};
+#endif
+#endif
+
 #ifndef OPCUA_EXCLUDE_SecurityTokenRequestType
 /*============================================================================
  * OpcUa_SecurityTokenRequestType_EnumeratedType
@@ -2850,6 +4885,1161 @@ struct _OpcUa_EnumeratedType OpcUa_SecurityTokenRequestType_EnumeratedType =
     "SecurityTokenRequestType",
     g_OpcUa_SecurityTokenRequestType_EnumeratedValues
 };
+#endif
+
+#ifndef OPCUA_EXCLUDE_ChannelSecurityToken
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_ChannelSecurityToken_Initialize(OpcUa_ChannelSecurityToken* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(UInt32, ChannelId);
+        OpcUa_Field_Initialize(UInt32, TokenId);
+        OpcUa_Field_Initialize(DateTime, CreatedAt);
+        OpcUa_Field_Initialize(UInt32, RevisedLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_ChannelSecurityToken_Clear(OpcUa_ChannelSecurityToken* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(UInt32, ChannelId);
+        OpcUa_Field_Clear(UInt32, TokenId);
+        OpcUa_Field_Clear(DateTime, CreatedAt);
+        OpcUa_Field_Clear(UInt32, RevisedLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ChannelSecurityToken_GetSize(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(UInt32, ChannelId);
+    OpcUa_Field_GetSize(UInt32, TokenId);
+    OpcUa_Field_GetSize(DateTime, CreatedAt);
+    OpcUa_Field_GetSize(UInt32, RevisedLifetime);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ChannelSecurityToken_Encode(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(UInt32, ChannelId);
+    OpcUa_Field_Write(UInt32, TokenId);
+    OpcUa_Field_Write(DateTime, CreatedAt);
+    OpcUa_Field_Write(UInt32, RevisedLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_ChannelSecurityToken_Decode(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_ChannelSecurityToken_Initialize(a_pValue);
+
+    OpcUa_Field_Read(UInt32, ChannelId);
+    OpcUa_Field_Read(UInt32, TokenId);
+    OpcUa_Field_Read(DateTime, CreatedAt);
+    OpcUa_Field_Read(UInt32, RevisedLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_ChannelSecurityToken_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_ChannelSecurityToken_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_ChannelSecurityToken_EncodeableType =
+{
+    "ChannelSecurityToken",
+    OpcUaId_ChannelSecurityToken,
+    OpcUaId_ChannelSecurityToken_Encoding_DefaultBinary,
+    OpcUaId_ChannelSecurityToken_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_ChannelSecurityToken),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ChannelSecurityToken_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ChannelSecurityToken_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ChannelSecurityToken_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ChannelSecurityToken_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ChannelSecurityToken_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_OpenSecureChannel
+#ifndef OPCUA_EXCLUDE_OpenSecureChannelRequest
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_OpenSecureChannelRequest_Initialize(OpcUa_OpenSecureChannelRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(UInt32, ClientProtocolVersion);
+        OpcUa_Field_InitializeEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
+        OpcUa_Field_InitializeEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
+        OpcUa_Field_Initialize(ByteString, ClientNonce);
+        OpcUa_Field_Initialize(UInt32, RequestedLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_OpenSecureChannelRequest_Clear(OpcUa_OpenSecureChannelRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(UInt32, ClientProtocolVersion);
+        OpcUa_Field_ClearEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
+        OpcUa_Field_ClearEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
+        OpcUa_Field_Clear(ByteString, ClientNonce);
+        OpcUa_Field_Clear(UInt32, RequestedLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_GetSize(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(UInt32, ClientProtocolVersion);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
+    OpcUa_Field_GetSize(ByteString, ClientNonce);
+    OpcUa_Field_GetSize(UInt32, RequestedLifetime);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Encode(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(UInt32, ClientProtocolVersion);
+    OpcUa_Field_WriteEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
+    OpcUa_Field_WriteEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
+    OpcUa_Field_Write(ByteString, ClientNonce);
+    OpcUa_Field_Write(UInt32, RequestedLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Decode(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_OpenSecureChannelRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(UInt32, ClientProtocolVersion);
+    OpcUa_Field_ReadEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
+    OpcUa_Field_ReadEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
+    OpcUa_Field_Read(ByteString, ClientNonce);
+    OpcUa_Field_Read(UInt32, RequestedLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_OpenSecureChannelRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelRequest_EncodeableType =
+{
+    "OpenSecureChannelRequest",
+    OpcUaId_OpenSecureChannelRequest,
+    OpcUaId_OpenSecureChannelRequest_Encoding_DefaultBinary,
+    OpcUaId_OpenSecureChannelRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_OpenSecureChannelRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_OpenSecureChannelRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_OpenSecureChannelRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_OpenSecureChannelRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_OpenSecureChannelRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_OpenSecureChannelRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_OpenSecureChannelResponse
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_OpenSecureChannelResponse_Initialize(OpcUa_OpenSecureChannelResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Initialize(UInt32, ServerProtocolVersion);
+        OpcUa_Field_InitializeEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
+        OpcUa_Field_Initialize(ByteString, ServerNonce);
+    }
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_OpenSecureChannelResponse_Clear(OpcUa_OpenSecureChannelResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Clear(UInt32, ServerProtocolVersion);
+        OpcUa_Field_ClearEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
+        OpcUa_Field_Clear(ByteString, ServerNonce);
+    }
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_GetSize(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSize(UInt32, ServerProtocolVersion);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
+    OpcUa_Field_GetSize(ByteString, ServerNonce);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Encode(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Write(UInt32, ServerProtocolVersion);
+    OpcUa_Field_WriteEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
+    OpcUa_Field_Write(ByteString, ServerNonce);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Decode(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_OpenSecureChannelResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Read(UInt32, ServerProtocolVersion);
+    OpcUa_Field_ReadEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
+    OpcUa_Field_Read(ByteString, ServerNonce);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_OpenSecureChannelResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_OpenSecureChannelResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelResponse_EncodeableType =
+{
+    "OpenSecureChannelResponse",
+    OpcUaId_OpenSecureChannelResponse,
+    OpcUaId_OpenSecureChannelResponse_Encoding_DefaultBinary,
+    OpcUaId_OpenSecureChannelResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_OpenSecureChannelResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_OpenSecureChannelResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_OpenSecureChannelResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_OpenSecureChannelResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_OpenSecureChannelResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_OpenSecureChannelResponse_Decode
+};
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_CloseSecureChannel
+#ifndef OPCUA_EXCLUDE_CloseSecureChannelRequest
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_CloseSecureChannelRequest_Initialize(OpcUa_CloseSecureChannelRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_CloseSecureChannelRequest_Clear(OpcUa_CloseSecureChannelRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_GetSize(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Encode(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Decode(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_CloseSecureChannelRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_CloseSecureChannelRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelRequest_EncodeableType =
+{
+    "CloseSecureChannelRequest",
+    OpcUaId_CloseSecureChannelRequest,
+    OpcUaId_CloseSecureChannelRequest_Encoding_DefaultBinary,
+    OpcUaId_CloseSecureChannelRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_CloseSecureChannelRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSecureChannelRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSecureChannelRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSecureChannelRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSecureChannelRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSecureChannelRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_CloseSecureChannelResponse
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_CloseSecureChannelResponse_Initialize(OpcUa_CloseSecureChannelResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_CloseSecureChannelResponse_Clear(OpcUa_CloseSecureChannelResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_GetSize(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Encode(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Decode(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_CloseSecureChannelResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_CloseSecureChannelResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CloseSecureChannelResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelResponse_EncodeableType =
+{
+    "CloseSecureChannelResponse",
+    OpcUaId_CloseSecureChannelResponse,
+    OpcUaId_CloseSecureChannelResponse_Encoding_DefaultBinary,
+    OpcUaId_CloseSecureChannelResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_CloseSecureChannelResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSecureChannelResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSecureChannelResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSecureChannelResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSecureChannelResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSecureChannelResponse_Decode
+};
+#endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_SignedSoftwareCertificate_Initialize(OpcUa_SignedSoftwareCertificate* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(ByteString, CertificateData);
+        OpcUa_Field_Initialize(ByteString, Signature);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_SignedSoftwareCertificate_Clear(OpcUa_SignedSoftwareCertificate* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(ByteString, CertificateData);
+        OpcUa_Field_Clear(ByteString, Signature);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(ByteString, CertificateData);
+    OpcUa_Field_GetSize(ByteString, Signature);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Encode(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(ByteString, CertificateData);
+    OpcUa_Field_Write(ByteString, Signature);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Decode(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_SignedSoftwareCertificate_Initialize(a_pValue);
+
+    OpcUa_Field_Read(ByteString, CertificateData);
+    OpcUa_Field_Read(ByteString, Signature);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_SignedSoftwareCertificate_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignedSoftwareCertificate_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_SignedSoftwareCertificate_EncodeableType =
+{
+    "SignedSoftwareCertificate",
+    OpcUaId_SignedSoftwareCertificate,
+    OpcUaId_SignedSoftwareCertificate_Encoding_DefaultBinary,
+    OpcUaId_SignedSoftwareCertificate_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_SignedSoftwareCertificate),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SignedSoftwareCertificate_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SignedSoftwareCertificate_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SignedSoftwareCertificate_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SignedSoftwareCertificate_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SignedSoftwareCertificate_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_SignatureData
+/*============================================================================
+ * OpcUa_SignatureData_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_SignatureData_Initialize(OpcUa_SignatureData* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, Algorithm);
+        OpcUa_Field_Initialize(ByteString, Signature);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SignatureData_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_SignatureData_Clear(OpcUa_SignatureData* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, Algorithm);
+        OpcUa_Field_Clear(ByteString, Signature);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SignatureData_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignatureData_GetSize(OpcUa_SignatureData* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, Algorithm);
+    OpcUa_Field_GetSize(ByteString, Signature);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignatureData_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignatureData_Encode(OpcUa_SignatureData* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, Algorithm);
+    OpcUa_Field_Write(ByteString, Signature);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignatureData_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SignatureData_Decode(OpcUa_SignatureData* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_SignatureData_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, Algorithm);
+    OpcUa_Field_Read(ByteString, Signature);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_SignatureData_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SignatureData_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_SignatureData_EncodeableType =
+{
+    "SignatureData",
+    OpcUaId_SignatureData,
+    OpcUaId_SignatureData_Encoding_DefaultBinary,
+    OpcUaId_SignatureData_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_SignatureData),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SignatureData_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SignatureData_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SignatureData_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SignatureData_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SignatureData_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_CreateSession
+#ifndef OPCUA_EXCLUDE_CreateSessionRequest
+/*============================================================================
+ * OpcUa_CreateSessionRequest_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_CreateSessionRequest_Initialize(OpcUa_CreateSessionRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_InitializeEncodeable(OpcUa_ApplicationDescription, ClientDescription);
+        OpcUa_Field_Initialize(String, ServerUri);
+        OpcUa_Field_Initialize(String, EndpointUrl);
+        OpcUa_Field_Initialize(String, SessionName);
+        OpcUa_Field_Initialize(ByteString, ClientNonce);
+        OpcUa_Field_Initialize(ByteString, ClientCertificate);
+        OpcUa_Field_Initialize(Double, RequestedSessionTimeout);
+        OpcUa_Field_Initialize(UInt32, MaxResponseMessageSize);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionRequest_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_CreateSessionRequest_Clear(OpcUa_CreateSessionRequest* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_ClearEncodeable(OpcUa_ApplicationDescription, ClientDescription);
+        OpcUa_Field_Clear(String, ServerUri);
+        OpcUa_Field_Clear(String, EndpointUrl);
+        OpcUa_Field_Clear(String, SessionName);
+        OpcUa_Field_Clear(ByteString, ClientNonce);
+        OpcUa_Field_Clear(ByteString, ClientCertificate);
+        OpcUa_Field_Clear(Double, RequestedSessionTimeout);
+        OpcUa_Field_Clear(UInt32, MaxResponseMessageSize);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionRequest_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionRequest_GetSize(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ApplicationDescription, ClientDescription);
+    OpcUa_Field_GetSize(String, ServerUri);
+    OpcUa_Field_GetSize(String, EndpointUrl);
+    OpcUa_Field_GetSize(String, SessionName);
+    OpcUa_Field_GetSize(ByteString, ClientNonce);
+    OpcUa_Field_GetSize(ByteString, ClientCertificate);
+    OpcUa_Field_GetSize(Double, RequestedSessionTimeout);
+    OpcUa_Field_GetSize(UInt32, MaxResponseMessageSize);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionRequest_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionRequest_Encode(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_WriteEncodeable(OpcUa_ApplicationDescription, ClientDescription);
+    OpcUa_Field_Write(String, ServerUri);
+    OpcUa_Field_Write(String, EndpointUrl);
+    OpcUa_Field_Write(String, SessionName);
+    OpcUa_Field_Write(ByteString, ClientNonce);
+    OpcUa_Field_Write(ByteString, ClientCertificate);
+    OpcUa_Field_Write(Double, RequestedSessionTimeout);
+    OpcUa_Field_Write(UInt32, MaxResponseMessageSize);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionRequest_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionRequest_Decode(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_CreateSessionRequest_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_ReadEncodeable(OpcUa_ApplicationDescription, ClientDescription);
+    OpcUa_Field_Read(String, ServerUri);
+    OpcUa_Field_Read(String, EndpointUrl);
+    OpcUa_Field_Read(String, SessionName);
+    OpcUa_Field_Read(ByteString, ClientNonce);
+    OpcUa_Field_Read(ByteString, ClientCertificate);
+    OpcUa_Field_Read(Double, RequestedSessionTimeout);
+    OpcUa_Field_Read(UInt32, MaxResponseMessageSize);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_CreateSessionRequest_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionRequest_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_CreateSessionRequest_EncodeableType =
+{
+    "CreateSessionRequest",
+    OpcUaId_CreateSessionRequest,
+    OpcUaId_CreateSessionRequest_Encoding_DefaultBinary,
+    OpcUaId_CreateSessionRequest_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_CreateSessionRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CreateSessionRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CreateSessionRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CreateSessionRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CreateSessionRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CreateSessionRequest_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_CreateSessionResponse
+/*============================================================================
+ * OpcUa_CreateSessionResponse_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_CreateSessionResponse_Initialize(OpcUa_CreateSessionResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Initialize(NodeId, SessionId);
+        OpcUa_Field_Initialize(NodeId, AuthenticationToken);
+        OpcUa_Field_Initialize(Double, RevisedSessionTimeout);
+        OpcUa_Field_Initialize(ByteString, ServerNonce);
+        OpcUa_Field_Initialize(ByteString, ServerCertificate);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
+        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, ServerSignature);
+        OpcUa_Field_Initialize(UInt32, MaxRequestMessageSize);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_CreateSessionResponse_Clear(OpcUa_CreateSessionResponse* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Clear(NodeId, SessionId);
+        OpcUa_Field_Clear(NodeId, AuthenticationToken);
+        OpcUa_Field_Clear(Double, RevisedSessionTimeout);
+        OpcUa_Field_Clear(ByteString, ServerNonce);
+        OpcUa_Field_Clear(ByteString, ServerCertificate);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
+        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, ServerSignature);
+        OpcUa_Field_Clear(UInt32, MaxRequestMessageSize);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionResponse_GetSize(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSize(NodeId, SessionId);
+    OpcUa_Field_GetSize(NodeId, AuthenticationToken);
+    OpcUa_Field_GetSize(Double, RevisedSessionTimeout);
+    OpcUa_Field_GetSize(ByteString, ServerNonce);
+    OpcUa_Field_GetSize(ByteString, ServerCertificate);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, ServerSignature);
+    OpcUa_Field_GetSize(UInt32, MaxRequestMessageSize);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionResponse_Encode(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Write(NodeId, SessionId);
+    OpcUa_Field_Write(NodeId, AuthenticationToken);
+    OpcUa_Field_Write(Double, RevisedSessionTimeout);
+    OpcUa_Field_Write(ByteString, ServerNonce);
+    OpcUa_Field_Write(ByteString, ServerCertificate);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
+    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, ServerSignature);
+    OpcUa_Field_Write(UInt32, MaxRequestMessageSize);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CreateSessionResponse_Decode(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_CreateSessionResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Read(NodeId, SessionId);
+    OpcUa_Field_Read(NodeId, AuthenticationToken);
+    OpcUa_Field_Read(Double, RevisedSessionTimeout);
+    OpcUa_Field_Read(ByteString, ServerNonce);
+    OpcUa_Field_Read(ByteString, ServerCertificate);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
+    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, ServerSignature);
+    OpcUa_Field_Read(UInt32, MaxRequestMessageSize);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_CreateSessionResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CreateSessionResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_CreateSessionResponse_EncodeableType =
+{
+    "CreateSessionResponse",
+    OpcUaId_CreateSessionResponse,
+    OpcUaId_CreateSessionResponse_Encoding_DefaultBinary,
+    OpcUaId_CreateSessionResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_CreateSessionResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CreateSessionResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CreateSessionResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CreateSessionResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CreateSessionResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CreateSessionResponse_Decode
+};
+#endif
 #endif
 
 #ifndef OPCUA_EXCLUDE_UserIdentityToken
@@ -3437,53 +6627,48 @@ struct _OpcUa_EncodeableType OpcUa_IssuedIdentityToken_EncodeableType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_EndpointConfiguration
+#ifndef OPCUA_EXCLUDE_ActivateSession
+#ifndef OPCUA_EXCLUDE_ActivateSessionRequest
 /*============================================================================
- * OpcUa_EndpointConfiguration_Initialize
+ * OpcUa_ActivateSessionRequest_Initialize
  *===========================================================================*/
-OpcUa_Void OpcUa_EndpointConfiguration_Initialize(OpcUa_EndpointConfiguration* a_pValue)
+OpcUa_Void OpcUa_ActivateSessionRequest_Initialize(OpcUa_ActivateSessionRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(Int32, OperationTimeout);
-        OpcUa_Field_Initialize(Boolean, UseBinaryEncoding);
-        OpcUa_Field_Initialize(Int32, MaxStringLength);
-        OpcUa_Field_Initialize(Int32, MaxByteStringLength);
-        OpcUa_Field_Initialize(Int32, MaxArrayLength);
-        OpcUa_Field_Initialize(Int32, MaxMessageSize);
-        OpcUa_Field_Initialize(Int32, MaxBufferSize);
-        OpcUa_Field_Initialize(Int32, ChannelLifetime);
-        OpcUa_Field_Initialize(Int32, SecurityTokenLifetime);
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, ClientSignature);
+        OpcUa_Field_InitializeEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
+        OpcUa_Field_InitializeArray(String, LocaleIds);
+        OpcUa_Field_Initialize(ExtensionObject, UserIdentityToken);
+        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, UserTokenSignature);
     }
 }
 
 /*============================================================================
- * OpcUa_EndpointConfiguration_Clear
+ * OpcUa_ActivateSessionRequest_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_EndpointConfiguration_Clear(OpcUa_EndpointConfiguration* a_pValue)
+OpcUa_Void OpcUa_ActivateSessionRequest_Clear(OpcUa_ActivateSessionRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(Int32, OperationTimeout);
-        OpcUa_Field_Clear(Boolean, UseBinaryEncoding);
-        OpcUa_Field_Clear(Int32, MaxStringLength);
-        OpcUa_Field_Clear(Int32, MaxByteStringLength);
-        OpcUa_Field_Clear(Int32, MaxArrayLength);
-        OpcUa_Field_Clear(Int32, MaxMessageSize);
-        OpcUa_Field_Clear(Int32, MaxBufferSize);
-        OpcUa_Field_Clear(Int32, ChannelLifetime);
-        OpcUa_Field_Clear(Int32, SecurityTokenLifetime);
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, ClientSignature);
+        OpcUa_Field_ClearEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
+        OpcUa_Field_ClearArray(String, LocaleIds);
+        OpcUa_Field_Clear(ExtensionObject, UserIdentityToken);
+        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, UserTokenSignature);
     }
 }
 
 /*============================================================================
- * OpcUa_EndpointConfiguration_GetSize
+ * OpcUa_ActivateSessionRequest_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_ActivateSessionRequest_GetSize(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -3491,15 +6676,12 @@ OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(Int32, OperationTimeout);
-    OpcUa_Field_GetSize(Boolean, UseBinaryEncoding);
-    OpcUa_Field_GetSize(Int32, MaxStringLength);
-    OpcUa_Field_GetSize(Int32, MaxByteStringLength);
-    OpcUa_Field_GetSize(Int32, MaxArrayLength);
-    OpcUa_Field_GetSize(Int32, MaxMessageSize);
-    OpcUa_Field_GetSize(Int32, MaxBufferSize);
-    OpcUa_Field_GetSize(Int32, ChannelLifetime);
-    OpcUa_Field_GetSize(Int32, SecurityTokenLifetime);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, ClientSignature);
+    OpcUa_Field_GetSizeEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
+    OpcUa_Field_GetSizeArray(String, LocaleIds);
+    OpcUa_Field_GetSize(ExtensionObject, UserIdentityToken);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, UserTokenSignature);
 
     *a_pSize = iSize;
 
@@ -3512,24 +6694,21 @@ OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration
 }
 
 /*============================================================================
- * OpcUa_EndpointConfiguration_Encode
+ * OpcUa_ActivateSessionRequest_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_EndpointConfiguration_Encode(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_ActivateSessionRequest_Encode(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(Int32, OperationTimeout);
-    OpcUa_Field_Write(Boolean, UseBinaryEncoding);
-    OpcUa_Field_Write(Int32, MaxStringLength);
-    OpcUa_Field_Write(Int32, MaxByteStringLength);
-    OpcUa_Field_Write(Int32, MaxArrayLength);
-    OpcUa_Field_Write(Int32, MaxMessageSize);
-    OpcUa_Field_Write(Int32, MaxBufferSize);
-    OpcUa_Field_Write(Int32, ChannelLifetime);
-    OpcUa_Field_Write(Int32, SecurityTokenLifetime);
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, ClientSignature);
+    OpcUa_Field_WriteEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
+    OpcUa_Field_WriteArray(String, LocaleIds);
+    OpcUa_Field_Write(ExtensionObject, UserIdentityToken);
+    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, UserTokenSignature);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -3540,115 +6719,88 @@ OpcUa_StatusCode OpcUa_EndpointConfiguration_Encode(OpcUa_EndpointConfiguration*
 }
 
 /*============================================================================
- * OpcUa_EndpointConfiguration_Decode
+ * OpcUa_ActivateSessionRequest_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_EndpointConfiguration_Decode(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_ActivateSessionRequest_Decode(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_EndpointConfiguration_Initialize(a_pValue);
+    OpcUa_ActivateSessionRequest_Initialize(a_pValue);
 
-    OpcUa_Field_Read(Int32, OperationTimeout);
-    OpcUa_Field_Read(Boolean, UseBinaryEncoding);
-    OpcUa_Field_Read(Int32, MaxStringLength);
-    OpcUa_Field_Read(Int32, MaxByteStringLength);
-    OpcUa_Field_Read(Int32, MaxArrayLength);
-    OpcUa_Field_Read(Int32, MaxMessageSize);
-    OpcUa_Field_Read(Int32, MaxBufferSize);
-    OpcUa_Field_Read(Int32, ChannelLifetime);
-    OpcUa_Field_Read(Int32, SecurityTokenLifetime);
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, ClientSignature);
+    OpcUa_Field_ReadEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
+    OpcUa_Field_ReadArray(String, LocaleIds);
+    OpcUa_Field_Read(ExtensionObject, UserIdentityToken);
+    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, UserTokenSignature);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_EndpointConfiguration_Clear(a_pValue);
+    OpcUa_ActivateSessionRequest_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_EndpointConfiguration_EncodeableType
+ * OpcUa_ActivateSessionRequest_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_EndpointConfiguration_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_ActivateSessionRequest_EncodeableType =
 {
-    "EndpointConfiguration",
-    OpcUaId_EndpointConfiguration,
-    OpcUaId_EndpointConfiguration_Encoding_DefaultBinary,
-    OpcUaId_EndpointConfiguration_Encoding_DefaultXml,
+    "ActivateSessionRequest",
+    OpcUaId_ActivateSessionRequest,
+    OpcUaId_ActivateSessionRequest_Encoding_DefaultBinary,
+    OpcUaId_ActivateSessionRequest_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_EndpointConfiguration),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_EndpointConfiguration_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_EndpointConfiguration_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_EndpointConfiguration_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_EndpointConfiguration_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_EndpointConfiguration_Decode
+    sizeof(OpcUa_ActivateSessionRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ActivateSessionRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ActivateSessionRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ActivateSessionRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ActivateSessionRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ActivateSessionRequest_Decode
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_ComplianceLevel
+#ifndef OPCUA_EXCLUDE_ActivateSessionResponse
 /*============================================================================
- * OpcUa_ComplianceLevel_EnumeratedType
+ * OpcUa_ActivateSessionResponse_Initialize
  *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_ComplianceLevel_EnumeratedValues[] =
-{
-    { "Untested", 0 },
-    { "Partial", 1 },
-    { "SelfTested", 2 },
-    { "Certified", 3 },
-    { OpcUa_Null, 0 }
-};
-
-struct _OpcUa_EnumeratedType OpcUa_ComplianceLevel_EnumeratedType =
-{
-    "ComplianceLevel",
-    g_OpcUa_ComplianceLevel_EnumeratedValues
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_SupportedProfile
-/*============================================================================
- * OpcUa_SupportedProfile_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_SupportedProfile_Initialize(OpcUa_SupportedProfile* a_pValue)
+OpcUa_Void OpcUa_ActivateSessionResponse_Initialize(OpcUa_ActivateSessionResponse* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(String, OrganizationUri);
-        OpcUa_Field_Initialize(String, ProfileId);
-        OpcUa_Field_Initialize(String, ComplianceTool);
-        OpcUa_Field_Initialize(DateTime, ComplianceDate);
-        OpcUa_Field_InitializeEnumerated(OpcUa_ComplianceLevel, ComplianceLevel);
-        OpcUa_Field_InitializeArray(String, UnsupportedUnitIds);
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Initialize(ByteString, ServerNonce);
+        OpcUa_Field_InitializeArray(StatusCode, Results);
+        OpcUa_Field_InitializeArray(DiagnosticInfo, DiagnosticInfos);
     }
 }
 
 /*============================================================================
- * OpcUa_SupportedProfile_Clear
+ * OpcUa_ActivateSessionResponse_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_SupportedProfile_Clear(OpcUa_SupportedProfile* a_pValue)
+OpcUa_Void OpcUa_ActivateSessionResponse_Clear(OpcUa_ActivateSessionResponse* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(String, OrganizationUri);
-        OpcUa_Field_Clear(String, ProfileId);
-        OpcUa_Field_Clear(String, ComplianceTool);
-        OpcUa_Field_Clear(DateTime, ComplianceDate);
-        OpcUa_Field_ClearEnumerated(OpcUa_ComplianceLevel, ComplianceLevel);
-        OpcUa_Field_ClearArray(String, UnsupportedUnitIds);
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Clear(ByteString, ServerNonce);
+        OpcUa_Field_ClearArray(StatusCode, Results);
+        OpcUa_Field_ClearArray(DiagnosticInfo, DiagnosticInfos);
     }
 }
 
 /*============================================================================
- * OpcUa_SupportedProfile_GetSize
+ * OpcUa_ActivateSessionResponse_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SupportedProfile_GetSize(OpcUa_SupportedProfile* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_ActivateSessionResponse_GetSize(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SupportedProfile_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -3656,12 +6808,10 @@ OpcUa_StatusCode OpcUa_SupportedProfile_GetSize(OpcUa_SupportedProfile* a_pValue
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(String, OrganizationUri);
-    OpcUa_Field_GetSize(String, ProfileId);
-    OpcUa_Field_GetSize(String, ComplianceTool);
-    OpcUa_Field_GetSize(DateTime, ComplianceDate);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_ComplianceLevel, ComplianceLevel);
-    OpcUa_Field_GetSizeArray(String, UnsupportedUnitIds);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSize(ByteString, ServerNonce);
+    OpcUa_Field_GetSizeArray(StatusCode, Results);
+    OpcUa_Field_GetSizeArray(DiagnosticInfo, DiagnosticInfos);
 
     *a_pSize = iSize;
 
@@ -3674,21 +6824,19 @@ OpcUa_StatusCode OpcUa_SupportedProfile_GetSize(OpcUa_SupportedProfile* a_pValue
 }
 
 /*============================================================================
- * OpcUa_SupportedProfile_Encode
+ * OpcUa_ActivateSessionResponse_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SupportedProfile_Encode(OpcUa_SupportedProfile* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_ActivateSessionResponse_Encode(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SupportedProfile_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(String, OrganizationUri);
-    OpcUa_Field_Write(String, ProfileId);
-    OpcUa_Field_Write(String, ComplianceTool);
-    OpcUa_Field_Write(DateTime, ComplianceDate);
-    OpcUa_Field_WriteEnumerated(OpcUa_ComplianceLevel, ComplianceLevel);
-    OpcUa_Field_WriteArray(String, UnsupportedUnitIds);
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Write(ByteString, ServerNonce);
+    OpcUa_Field_WriteArray(StatusCode, Results);
+    OpcUa_Field_WriteArray(DiagnosticInfo, DiagnosticInfos);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -3699,92 +6847,84 @@ OpcUa_StatusCode OpcUa_SupportedProfile_Encode(OpcUa_SupportedProfile* a_pValue,
 }
 
 /*============================================================================
- * OpcUa_SupportedProfile_Decode
+ * OpcUa_ActivateSessionResponse_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SupportedProfile_Decode(OpcUa_SupportedProfile* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_ActivateSessionResponse_Decode(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SupportedProfile_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_SupportedProfile_Initialize(a_pValue);
+    OpcUa_ActivateSessionResponse_Initialize(a_pValue);
 
-    OpcUa_Field_Read(String, OrganizationUri);
-    OpcUa_Field_Read(String, ProfileId);
-    OpcUa_Field_Read(String, ComplianceTool);
-    OpcUa_Field_Read(DateTime, ComplianceDate);
-    OpcUa_Field_ReadEnumerated(OpcUa_ComplianceLevel, ComplianceLevel);
-    OpcUa_Field_ReadArray(String, UnsupportedUnitIds);
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Read(ByteString, ServerNonce);
+    OpcUa_Field_ReadArray(StatusCode, Results);
+    OpcUa_Field_ReadArray(DiagnosticInfo, DiagnosticInfos);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_SupportedProfile_Clear(a_pValue);
+    OpcUa_ActivateSessionResponse_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_SupportedProfile_EncodeableType
+ * OpcUa_ActivateSessionResponse_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_SupportedProfile_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_ActivateSessionResponse_EncodeableType =
 {
-    "SupportedProfile",
-    OpcUaId_SupportedProfile,
-    OpcUaId_SupportedProfile_Encoding_DefaultBinary,
-    OpcUaId_SupportedProfile_Encoding_DefaultXml,
+    "ActivateSessionResponse",
+    OpcUaId_ActivateSessionResponse,
+    OpcUaId_ActivateSessionResponse_Encoding_DefaultBinary,
+    OpcUaId_ActivateSessionResponse_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_SupportedProfile),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SupportedProfile_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SupportedProfile_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SupportedProfile_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SupportedProfile_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SupportedProfile_Decode
+    sizeof(OpcUa_ActivateSessionResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ActivateSessionResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ActivateSessionResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ActivateSessionResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ActivateSessionResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ActivateSessionResponse_Decode
 };
 #endif
+#endif
 
-#ifndef OPCUA_EXCLUDE_BuildInfo
+#ifndef OPCUA_EXCLUDE_CloseSession
+#ifndef OPCUA_EXCLUDE_CloseSessionRequest
 /*============================================================================
- * OpcUa_BuildInfo_Initialize
+ * OpcUa_CloseSessionRequest_Initialize
  *===========================================================================*/
-OpcUa_Void OpcUa_BuildInfo_Initialize(OpcUa_BuildInfo* a_pValue)
+OpcUa_Void OpcUa_CloseSessionRequest_Initialize(OpcUa_CloseSessionRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(String, ProductUri);
-        OpcUa_Field_Initialize(String, ManufacturerName);
-        OpcUa_Field_Initialize(String, ProductName);
-        OpcUa_Field_Initialize(String, SoftwareVersion);
-        OpcUa_Field_Initialize(String, BuildNumber);
-        OpcUa_Field_Initialize(DateTime, BuildDate);
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(Boolean, DeleteSubscriptions);
     }
 }
 
 /*============================================================================
- * OpcUa_BuildInfo_Clear
+ * OpcUa_CloseSessionRequest_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_BuildInfo_Clear(OpcUa_BuildInfo* a_pValue)
+OpcUa_Void OpcUa_CloseSessionRequest_Clear(OpcUa_CloseSessionRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(String, ProductUri);
-        OpcUa_Field_Clear(String, ManufacturerName);
-        OpcUa_Field_Clear(String, ProductName);
-        OpcUa_Field_Clear(String, SoftwareVersion);
-        OpcUa_Field_Clear(String, BuildNumber);
-        OpcUa_Field_Clear(DateTime, BuildDate);
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(Boolean, DeleteSubscriptions);
     }
 }
 
 /*============================================================================
- * OpcUa_BuildInfo_GetSize
+ * OpcUa_CloseSessionRequest_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_CloseSessionRequest_GetSize(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -3792,12 +6932,8 @@ OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* a_pValue, OpcUa_Encode
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(String, ProductUri);
-    OpcUa_Field_GetSize(String, ManufacturerName);
-    OpcUa_Field_GetSize(String, ProductName);
-    OpcUa_Field_GetSize(String, SoftwareVersion);
-    OpcUa_Field_GetSize(String, BuildNumber);
-    OpcUa_Field_GetSize(DateTime, BuildDate);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(Boolean, DeleteSubscriptions);
 
     *a_pSize = iSize;
 
@@ -3810,21 +6946,17 @@ OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* a_pValue, OpcUa_Encode
 }
 
 /*============================================================================
- * OpcUa_BuildInfo_Encode
+ * OpcUa_CloseSessionRequest_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_BuildInfo_Encode(OpcUa_BuildInfo* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_CloseSessionRequest_Encode(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(String, ProductUri);
-    OpcUa_Field_Write(String, ManufacturerName);
-    OpcUa_Field_Write(String, ProductName);
-    OpcUa_Field_Write(String, SoftwareVersion);
-    OpcUa_Field_Write(String, BuildNumber);
-    OpcUa_Field_Write(DateTime, BuildDate);
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(Boolean, DeleteSubscriptions);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -3835,100 +6967,78 @@ OpcUa_StatusCode OpcUa_BuildInfo_Encode(OpcUa_BuildInfo* a_pValue, OpcUa_Encoder
 }
 
 /*============================================================================
- * OpcUa_BuildInfo_Decode
+ * OpcUa_CloseSessionRequest_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_BuildInfo_Decode(OpcUa_BuildInfo* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_CloseSessionRequest_Decode(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_BuildInfo_Initialize(a_pValue);
+    OpcUa_CloseSessionRequest_Initialize(a_pValue);
 
-    OpcUa_Field_Read(String, ProductUri);
-    OpcUa_Field_Read(String, ManufacturerName);
-    OpcUa_Field_Read(String, ProductName);
-    OpcUa_Field_Read(String, SoftwareVersion);
-    OpcUa_Field_Read(String, BuildNumber);
-    OpcUa_Field_Read(DateTime, BuildDate);
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(Boolean, DeleteSubscriptions);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_BuildInfo_Clear(a_pValue);
+    OpcUa_CloseSessionRequest_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_BuildInfo_EncodeableType
+ * OpcUa_CloseSessionRequest_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_BuildInfo_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_CloseSessionRequest_EncodeableType =
 {
-    "BuildInfo",
-    OpcUaId_BuildInfo,
-    OpcUaId_BuildInfo_Encoding_DefaultBinary,
-    OpcUaId_BuildInfo_Encoding_DefaultXml,
+    "CloseSessionRequest",
+    OpcUaId_CloseSessionRequest,
+    OpcUaId_CloseSessionRequest_Encoding_DefaultBinary,
+    OpcUaId_CloseSessionRequest_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_BuildInfo),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_BuildInfo_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_BuildInfo_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_BuildInfo_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_BuildInfo_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_BuildInfo_Decode
+    sizeof(OpcUa_CloseSessionRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSessionRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSessionRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSessionRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSessionRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSessionRequest_Decode
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_SoftwareCertificate
+#ifndef OPCUA_EXCLUDE_CloseSessionResponse
 /*============================================================================
- * OpcUa_SoftwareCertificate_Initialize
+ * OpcUa_CloseSessionResponse_Initialize
  *===========================================================================*/
-OpcUa_Void OpcUa_SoftwareCertificate_Initialize(OpcUa_SoftwareCertificate* a_pValue)
+OpcUa_Void OpcUa_CloseSessionResponse_Initialize(OpcUa_CloseSessionResponse* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(String, ProductName);
-        OpcUa_Field_Initialize(String, ProductUri);
-        OpcUa_Field_Initialize(String, VendorName);
-        OpcUa_Field_Initialize(ByteString, VendorProductCertificate);
-        OpcUa_Field_Initialize(String, SoftwareVersion);
-        OpcUa_Field_Initialize(String, BuildNumber);
-        OpcUa_Field_Initialize(DateTime, BuildDate);
-        OpcUa_Field_Initialize(String, IssuedBy);
-        OpcUa_Field_Initialize(DateTime, IssueDate);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_SupportedProfile, SupportedProfiles);
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
     }
 }
 
 /*============================================================================
- * OpcUa_SoftwareCertificate_Clear
+ * OpcUa_CloseSessionResponse_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_SoftwareCertificate_Clear(OpcUa_SoftwareCertificate* a_pValue)
+OpcUa_Void OpcUa_CloseSessionResponse_Clear(OpcUa_CloseSessionResponse* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(String, ProductName);
-        OpcUa_Field_Clear(String, ProductUri);
-        OpcUa_Field_Clear(String, VendorName);
-        OpcUa_Field_Clear(ByteString, VendorProductCertificate);
-        OpcUa_Field_Clear(String, SoftwareVersion);
-        OpcUa_Field_Clear(String, BuildNumber);
-        OpcUa_Field_Clear(DateTime, BuildDate);
-        OpcUa_Field_Clear(String, IssuedBy);
-        OpcUa_Field_Clear(DateTime, IssueDate);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_SupportedProfile, SupportedProfiles);
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
     }
 }
 
 /*============================================================================
- * OpcUa_SoftwareCertificate_GetSize
+ * OpcUa_CloseSessionResponse_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SoftwareCertificate_GetSize(OpcUa_SoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_CloseSessionResponse_GetSize(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SoftwareCertificate_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -3936,16 +7046,7 @@ OpcUa_StatusCode OpcUa_SoftwareCertificate_GetSize(OpcUa_SoftwareCertificate* a_
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(String, ProductName);
-    OpcUa_Field_GetSize(String, ProductUri);
-    OpcUa_Field_GetSize(String, VendorName);
-    OpcUa_Field_GetSize(ByteString, VendorProductCertificate);
-    OpcUa_Field_GetSize(String, SoftwareVersion);
-    OpcUa_Field_GetSize(String, BuildNumber);
-    OpcUa_Field_GetSize(DateTime, BuildDate);
-    OpcUa_Field_GetSize(String, IssuedBy);
-    OpcUa_Field_GetSize(DateTime, IssueDate);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_SupportedProfile, SupportedProfiles);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
 
     *a_pSize = iSize;
 
@@ -3958,25 +7059,16 @@ OpcUa_StatusCode OpcUa_SoftwareCertificate_GetSize(OpcUa_SoftwareCertificate* a_
 }
 
 /*============================================================================
- * OpcUa_SoftwareCertificate_Encode
+ * OpcUa_CloseSessionResponse_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SoftwareCertificate_Encode(OpcUa_SoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_CloseSessionResponse_Encode(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SoftwareCertificate_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(String, ProductName);
-    OpcUa_Field_Write(String, ProductUri);
-    OpcUa_Field_Write(String, VendorName);
-    OpcUa_Field_Write(ByteString, VendorProductCertificate);
-    OpcUa_Field_Write(String, SoftwareVersion);
-    OpcUa_Field_Write(String, BuildNumber);
-    OpcUa_Field_Write(DateTime, BuildDate);
-    OpcUa_Field_Write(String, IssuedBy);
-    OpcUa_Field_Write(DateTime, IssueDate);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_SupportedProfile, SupportedProfiles);
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -3987,88 +7079,81 @@ OpcUa_StatusCode OpcUa_SoftwareCertificate_Encode(OpcUa_SoftwareCertificate* a_p
 }
 
 /*============================================================================
- * OpcUa_SoftwareCertificate_Decode
+ * OpcUa_CloseSessionResponse_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SoftwareCertificate_Decode(OpcUa_SoftwareCertificate* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_CloseSessionResponse_Decode(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SoftwareCertificate_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_SoftwareCertificate_Initialize(a_pValue);
+    OpcUa_CloseSessionResponse_Initialize(a_pValue);
 
-    OpcUa_Field_Read(String, ProductName);
-    OpcUa_Field_Read(String, ProductUri);
-    OpcUa_Field_Read(String, VendorName);
-    OpcUa_Field_Read(ByteString, VendorProductCertificate);
-    OpcUa_Field_Read(String, SoftwareVersion);
-    OpcUa_Field_Read(String, BuildNumber);
-    OpcUa_Field_Read(DateTime, BuildDate);
-    OpcUa_Field_Read(String, IssuedBy);
-    OpcUa_Field_Read(DateTime, IssueDate);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_SupportedProfile, SupportedProfiles);
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_SoftwareCertificate_Clear(a_pValue);
+    OpcUa_CloseSessionResponse_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_SoftwareCertificate_EncodeableType
+ * OpcUa_CloseSessionResponse_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_SoftwareCertificate_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_CloseSessionResponse_EncodeableType =
 {
-    "SoftwareCertificate",
-    OpcUaId_SoftwareCertificate,
-    OpcUaId_SoftwareCertificate_Encoding_DefaultBinary,
-    OpcUaId_SoftwareCertificate_Encoding_DefaultXml,
+    "CloseSessionResponse",
+    OpcUaId_CloseSessionResponse,
+    OpcUaId_CloseSessionResponse_Encoding_DefaultBinary,
+    OpcUaId_CloseSessionResponse_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_SoftwareCertificate),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SoftwareCertificate_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SoftwareCertificate_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SoftwareCertificate_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SoftwareCertificate_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SoftwareCertificate_Decode
+    sizeof(OpcUa_CloseSessionResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSessionResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSessionResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSessionResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSessionResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSessionResponse_Decode
 };
 #endif
+#endif
 
-#ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
+#ifndef OPCUA_EXCLUDE_Cancel
+#ifndef OPCUA_EXCLUDE_CancelRequest
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_Initialize
+ * OpcUa_CancelRequest_Initialize
  *===========================================================================*/
-OpcUa_Void OpcUa_SignedSoftwareCertificate_Initialize(OpcUa_SignedSoftwareCertificate* a_pValue)
+OpcUa_Void OpcUa_CancelRequest_Initialize(OpcUa_CancelRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(ByteString, CertificateData);
-        OpcUa_Field_Initialize(ByteString, Signature);
+        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Initialize(UInt32, RequestHandle);
     }
 }
 
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_Clear
+ * OpcUa_CancelRequest_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_SignedSoftwareCertificate_Clear(OpcUa_SignedSoftwareCertificate* a_pValue)
+OpcUa_Void OpcUa_CancelRequest_Clear(OpcUa_CancelRequest* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(ByteString, CertificateData);
-        OpcUa_Field_Clear(ByteString, Signature);
+        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
+        OpcUa_Field_Clear(UInt32, RequestHandle);
     }
 }
 
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_GetSize
+ * OpcUa_CancelRequest_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_CancelRequest_GetSize(OpcUa_CancelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -4076,8 +7161,8 @@ OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCer
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(ByteString, CertificateData);
-    OpcUa_Field_GetSize(ByteString, Signature);
+    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_GetSize(UInt32, RequestHandle);
 
     *a_pSize = iSize;
 
@@ -4090,17 +7175,17 @@ OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_GetSize(OpcUa_SignedSoftwareCer
 }
 
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_Encode
+ * OpcUa_CancelRequest_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Encode(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_CancelRequest_Encode(OpcUa_CancelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(ByteString, CertificateData);
-    OpcUa_Field_Write(ByteString, Signature);
+    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Write(UInt32, RequestHandle);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -4111,84 +7196,162 @@ OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Encode(OpcUa_SignedSoftwareCert
 }
 
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_Decode
+ * OpcUa_CancelRequest_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignedSoftwareCertificate_Decode(OpcUa_SignedSoftwareCertificate* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_CancelRequest_Decode(OpcUa_CancelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignedSoftwareCertificate_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_SignedSoftwareCertificate_Initialize(a_pValue);
+    OpcUa_CancelRequest_Initialize(a_pValue);
 
-    OpcUa_Field_Read(ByteString, CertificateData);
-    OpcUa_Field_Read(ByteString, Signature);
+    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
+    OpcUa_Field_Read(UInt32, RequestHandle);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_SignedSoftwareCertificate_Clear(a_pValue);
+    OpcUa_CancelRequest_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_SignedSoftwareCertificate_EncodeableType
+ * OpcUa_CancelRequest_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_SignedSoftwareCertificate_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_CancelRequest_EncodeableType =
 {
-    "SignedSoftwareCertificate",
-    OpcUaId_SignedSoftwareCertificate,
-    OpcUaId_SignedSoftwareCertificate_Encoding_DefaultBinary,
-    OpcUaId_SignedSoftwareCertificate_Encoding_DefaultXml,
+    "CancelRequest",
+    OpcUaId_CancelRequest,
+    OpcUaId_CancelRequest_Encoding_DefaultBinary,
+    OpcUaId_CancelRequest_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_SignedSoftwareCertificate),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SignedSoftwareCertificate_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SignedSoftwareCertificate_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SignedSoftwareCertificate_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SignedSoftwareCertificate_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SignedSoftwareCertificate_Decode
+    sizeof(OpcUa_CancelRequest),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CancelRequest_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CancelRequest_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CancelRequest_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CancelRequest_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CancelRequest_Decode
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_AttributeWriteMask
+#ifndef OPCUA_EXCLUDE_CancelResponse
 /*============================================================================
- * OpcUa_AttributeWriteMask_EnumeratedType
+ * OpcUa_CancelResponse_Initialize
  *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_AttributeWriteMask_EnumeratedValues[] =
+OpcUa_Void OpcUa_CancelResponse_Initialize(OpcUa_CancelResponse* a_pValue)
 {
-    { "None", 0 },
-    { "AccessLevel", 1 },
-    { "ArrayDimensions", 2 },
-    { "BrowseName", 4 },
-    { "ContainsNoLoops", 8 },
-    { "DataType", 16 },
-    { "Description", 32 },
-    { "DisplayName", 64 },
-    { "EventNotifier", 128 },
-    { "Executable", 256 },
-    { "Historizing", 512 },
-    { "InverseName", 1024 },
-    { "IsAbstract", 2048 },
-    { "MinimumSamplingInterval", 4096 },
-    { "NodeClass", 8192 },
-    { "NodeId", 16384 },
-    { "Symmetric", 32768 },
-    { "UserAccessLevel", 65536 },
-    { "UserExecutable", 131072 },
-    { "UserWriteMask", 262144 },
-    { "ValueRank", 524288 },
-    { "WriteMask", 1048576 },
-    { "ValueForVariableType", 2097152 },
-    { OpcUa_Null, 0 }
-};
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Initialize(UInt32, CancelCount);
+    }
+}
 
-struct _OpcUa_EnumeratedType OpcUa_AttributeWriteMask_EnumeratedType =
+/*============================================================================
+ * OpcUa_CancelResponse_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_CancelResponse_Clear(OpcUa_CancelResponse* a_pValue)
 {
-    "AttributeWriteMask",
-    g_OpcUa_AttributeWriteMask_EnumeratedValues
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+        OpcUa_Field_Clear(UInt32, CancelCount);
+    }
+}
+
+/*============================================================================
+ * OpcUa_CancelResponse_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CancelResponse_GetSize(OpcUa_CancelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_GetSize(UInt32, CancelCount);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CancelResponse_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CancelResponse_Encode(OpcUa_CancelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Write(UInt32, CancelCount);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CancelResponse_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_CancelResponse_Decode(OpcUa_CancelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_CancelResponse_Initialize(a_pValue);
+
+    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
+    OpcUa_Field_Read(UInt32, CancelCount);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_CancelResponse_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_CancelResponse_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_CancelResponse_EncodeableType =
+{
+    "CancelResponse",
+    OpcUaId_CancelResponse,
+    OpcUaId_CancelResponse_Encoding_DefaultBinary,
+    OpcUaId_CancelResponse_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_CancelResponse),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CancelResponse_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CancelResponse_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CancelResponse_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CancelResponse_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CancelResponse_Decode
 };
+#endif
 #endif
 
 #ifndef OPCUA_EXCLUDE_NodeAttributesMask
@@ -5674,4984 +8837,6 @@ struct _OpcUa_EncodeableType OpcUa_AddNodesItem_EncodeableType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_AddReferencesItem
-/*============================================================================
- * OpcUa_AddReferencesItem_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_AddReferencesItem_Initialize(OpcUa_AddReferencesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(NodeId, SourceNodeId);
-        OpcUa_Field_Initialize(NodeId, ReferenceTypeId);
-        OpcUa_Field_Initialize(Boolean, IsForward);
-        OpcUa_Field_Initialize(String, TargetServerUri);
-        OpcUa_Field_Initialize(ExpandedNodeId, TargetNodeId);
-        OpcUa_Field_InitializeEnumerated(OpcUa_NodeClass, TargetNodeClass);
-    }
-}
-
-/*============================================================================
- * OpcUa_AddReferencesItem_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_AddReferencesItem_Clear(OpcUa_AddReferencesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(NodeId, SourceNodeId);
-        OpcUa_Field_Clear(NodeId, ReferenceTypeId);
-        OpcUa_Field_Clear(Boolean, IsForward);
-        OpcUa_Field_Clear(String, TargetServerUri);
-        OpcUa_Field_Clear(ExpandedNodeId, TargetNodeId);
-        OpcUa_Field_ClearEnumerated(OpcUa_NodeClass, TargetNodeClass);
-    }
-}
-
-/*============================================================================
- * OpcUa_AddReferencesItem_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_AddReferencesItem_GetSize(OpcUa_AddReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(NodeId, SourceNodeId);
-    OpcUa_Field_GetSize(NodeId, ReferenceTypeId);
-    OpcUa_Field_GetSize(Boolean, IsForward);
-    OpcUa_Field_GetSize(String, TargetServerUri);
-    OpcUa_Field_GetSize(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_NodeClass, TargetNodeClass);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_AddReferencesItem_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_AddReferencesItem_Encode(OpcUa_AddReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(NodeId, SourceNodeId);
-    OpcUa_Field_Write(NodeId, ReferenceTypeId);
-    OpcUa_Field_Write(Boolean, IsForward);
-    OpcUa_Field_Write(String, TargetServerUri);
-    OpcUa_Field_Write(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_WriteEnumerated(OpcUa_NodeClass, TargetNodeClass);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_AddReferencesItem_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_AddReferencesItem_Decode(OpcUa_AddReferencesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_AddReferencesItem_Initialize(a_pValue);
-
-    OpcUa_Field_Read(NodeId, SourceNodeId);
-    OpcUa_Field_Read(NodeId, ReferenceTypeId);
-    OpcUa_Field_Read(Boolean, IsForward);
-    OpcUa_Field_Read(String, TargetServerUri);
-    OpcUa_Field_Read(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_ReadEnumerated(OpcUa_NodeClass, TargetNodeClass);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_AddReferencesItem_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_AddReferencesItem_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_AddReferencesItem_EncodeableType =
-{
-    "AddReferencesItem",
-    OpcUaId_AddReferencesItem,
-    OpcUaId_AddReferencesItem_Encoding_DefaultBinary,
-    OpcUaId_AddReferencesItem_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_AddReferencesItem),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_AddReferencesItem_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_AddReferencesItem_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_AddReferencesItem_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_AddReferencesItem_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_AddReferencesItem_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_DeleteNodesItem
-/*============================================================================
- * OpcUa_DeleteNodesItem_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_DeleteNodesItem_Initialize(OpcUa_DeleteNodesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(NodeId, NodeId);
-        OpcUa_Field_Initialize(Boolean, DeleteTargetReferences);
-    }
-}
-
-/*============================================================================
- * OpcUa_DeleteNodesItem_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_DeleteNodesItem_Clear(OpcUa_DeleteNodesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(NodeId, NodeId);
-        OpcUa_Field_Clear(Boolean, DeleteTargetReferences);
-    }
-}
-
-/*============================================================================
- * OpcUa_DeleteNodesItem_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteNodesItem_GetSize(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(NodeId, NodeId);
-    OpcUa_Field_GetSize(Boolean, DeleteTargetReferences);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteNodesItem_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteNodesItem_Encode(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(NodeId, NodeId);
-    OpcUa_Field_Write(Boolean, DeleteTargetReferences);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteNodesItem_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteNodesItem_Decode(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_DeleteNodesItem_Initialize(a_pValue);
-
-    OpcUa_Field_Read(NodeId, NodeId);
-    OpcUa_Field_Read(Boolean, DeleteTargetReferences);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_DeleteNodesItem_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteNodesItem_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_DeleteNodesItem_EncodeableType =
-{
-    "DeleteNodesItem",
-    OpcUaId_DeleteNodesItem,
-    OpcUaId_DeleteNodesItem_Encoding_DefaultBinary,
-    OpcUaId_DeleteNodesItem_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_DeleteNodesItem),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_DeleteNodesItem_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_DeleteNodesItem_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_DeleteNodesItem_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_DeleteNodesItem_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DeleteNodesItem_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_DeleteReferencesItem
-/*============================================================================
- * OpcUa_DeleteReferencesItem_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_DeleteReferencesItem_Initialize(OpcUa_DeleteReferencesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(NodeId, SourceNodeId);
-        OpcUa_Field_Initialize(NodeId, ReferenceTypeId);
-        OpcUa_Field_Initialize(Boolean, IsForward);
-        OpcUa_Field_Initialize(ExpandedNodeId, TargetNodeId);
-        OpcUa_Field_Initialize(Boolean, DeleteBidirectional);
-    }
-}
-
-/*============================================================================
- * OpcUa_DeleteReferencesItem_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_DeleteReferencesItem_Clear(OpcUa_DeleteReferencesItem* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(NodeId, SourceNodeId);
-        OpcUa_Field_Clear(NodeId, ReferenceTypeId);
-        OpcUa_Field_Clear(Boolean, IsForward);
-        OpcUa_Field_Clear(ExpandedNodeId, TargetNodeId);
-        OpcUa_Field_Clear(Boolean, DeleteBidirectional);
-    }
-}
-
-/*============================================================================
- * OpcUa_DeleteReferencesItem_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteReferencesItem_GetSize(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(NodeId, SourceNodeId);
-    OpcUa_Field_GetSize(NodeId, ReferenceTypeId);
-    OpcUa_Field_GetSize(Boolean, IsForward);
-    OpcUa_Field_GetSize(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_GetSize(Boolean, DeleteBidirectional);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteReferencesItem_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteReferencesItem_Encode(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(NodeId, SourceNodeId);
-    OpcUa_Field_Write(NodeId, ReferenceTypeId);
-    OpcUa_Field_Write(Boolean, IsForward);
-    OpcUa_Field_Write(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_Write(Boolean, DeleteBidirectional);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteReferencesItem_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_DeleteReferencesItem_Decode(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_DeleteReferencesItem_Initialize(a_pValue);
-
-    OpcUa_Field_Read(NodeId, SourceNodeId);
-    OpcUa_Field_Read(NodeId, ReferenceTypeId);
-    OpcUa_Field_Read(Boolean, IsForward);
-    OpcUa_Field_Read(ExpandedNodeId, TargetNodeId);
-    OpcUa_Field_Read(Boolean, DeleteBidirectional);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_DeleteReferencesItem_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_DeleteReferencesItem_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_DeleteReferencesItem_EncodeableType =
-{
-    "DeleteReferencesItem",
-    OpcUaId_DeleteReferencesItem,
-    OpcUaId_DeleteReferencesItem_Encoding_DefaultBinary,
-    OpcUaId_DeleteReferencesItem_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_DeleteReferencesItem),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_DeleteReferencesItem_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_DeleteReferencesItem_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_DeleteReferencesItem_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_DeleteReferencesItem_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DeleteReferencesItem_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_RequestHeader
-/*============================================================================
- * OpcUa_RequestHeader_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RequestHeader_Initialize(OpcUa_RequestHeader* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(NodeId, AuthenticationToken);
-        OpcUa_Field_Initialize(DateTime, Timestamp);
-        OpcUa_Field_Initialize(UInt32, RequestHandle);
-        OpcUa_Field_Initialize(UInt32, ReturnDiagnostics);
-        OpcUa_Field_Initialize(String, AuditEntryId);
-        OpcUa_Field_Initialize(UInt32, TimeoutHint);
-        OpcUa_Field_Initialize(ExtensionObject, AdditionalHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_RequestHeader_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RequestHeader_Clear(OpcUa_RequestHeader* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(NodeId, AuthenticationToken);
-        OpcUa_Field_Clear(DateTime, Timestamp);
-        OpcUa_Field_Clear(UInt32, RequestHandle);
-        OpcUa_Field_Clear(UInt32, ReturnDiagnostics);
-        OpcUa_Field_Clear(String, AuditEntryId);
-        OpcUa_Field_Clear(UInt32, TimeoutHint);
-        OpcUa_Field_Clear(ExtensionObject, AdditionalHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_RequestHeader_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RequestHeader_GetSize(OpcUa_RequestHeader* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(NodeId, AuthenticationToken);
-    OpcUa_Field_GetSize(DateTime, Timestamp);
-    OpcUa_Field_GetSize(UInt32, RequestHandle);
-    OpcUa_Field_GetSize(UInt32, ReturnDiagnostics);
-    OpcUa_Field_GetSize(String, AuditEntryId);
-    OpcUa_Field_GetSize(UInt32, TimeoutHint);
-    OpcUa_Field_GetSize(ExtensionObject, AdditionalHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RequestHeader_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RequestHeader_Encode(OpcUa_RequestHeader* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(NodeId, AuthenticationToken);
-    OpcUa_Field_Write(DateTime, Timestamp);
-    OpcUa_Field_Write(UInt32, RequestHandle);
-    OpcUa_Field_Write(UInt32, ReturnDiagnostics);
-    OpcUa_Field_Write(String, AuditEntryId);
-    OpcUa_Field_Write(UInt32, TimeoutHint);
-    OpcUa_Field_Write(ExtensionObject, AdditionalHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RequestHeader_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RequestHeader_Decode(OpcUa_RequestHeader* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RequestHeader_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RequestHeader_Initialize(a_pValue);
-
-    OpcUa_Field_Read(NodeId, AuthenticationToken);
-    OpcUa_Field_Read(DateTime, Timestamp);
-    OpcUa_Field_Read(UInt32, RequestHandle);
-    OpcUa_Field_Read(UInt32, ReturnDiagnostics);
-    OpcUa_Field_Read(String, AuditEntryId);
-    OpcUa_Field_Read(UInt32, TimeoutHint);
-    OpcUa_Field_Read(ExtensionObject, AdditionalHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RequestHeader_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RequestHeader_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RequestHeader_EncodeableType =
-{
-    "RequestHeader",
-    OpcUaId_RequestHeader,
-    OpcUaId_RequestHeader_Encoding_DefaultBinary,
-    OpcUaId_RequestHeader_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RequestHeader),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RequestHeader_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RequestHeader_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RequestHeader_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RequestHeader_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RequestHeader_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ResponseHeader
-/*============================================================================
- * OpcUa_ResponseHeader_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ResponseHeader_Initialize(OpcUa_ResponseHeader* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(DateTime, Timestamp);
-        OpcUa_Field_Initialize(UInt32, RequestHandle);
-        OpcUa_Field_Initialize(StatusCode, ServiceResult);
-        OpcUa_Field_Initialize(DiagnosticInfo, ServiceDiagnostics);
-        OpcUa_Field_InitializeArray(String, StringTable);
-        OpcUa_Field_Initialize(ExtensionObject, AdditionalHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_ResponseHeader_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ResponseHeader_Clear(OpcUa_ResponseHeader* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(DateTime, Timestamp);
-        OpcUa_Field_Clear(UInt32, RequestHandle);
-        OpcUa_Field_Clear(StatusCode, ServiceResult);
-        OpcUa_Field_Clear(DiagnosticInfo, ServiceDiagnostics);
-        OpcUa_Field_ClearArray(String, StringTable);
-        OpcUa_Field_Clear(ExtensionObject, AdditionalHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_ResponseHeader_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ResponseHeader_GetSize(OpcUa_ResponseHeader* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(DateTime, Timestamp);
-    OpcUa_Field_GetSize(UInt32, RequestHandle);
-    OpcUa_Field_GetSize(StatusCode, ServiceResult);
-    OpcUa_Field_GetSize(DiagnosticInfo, ServiceDiagnostics);
-    OpcUa_Field_GetSizeArray(String, StringTable);
-    OpcUa_Field_GetSize(ExtensionObject, AdditionalHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ResponseHeader_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ResponseHeader_Encode(OpcUa_ResponseHeader* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(DateTime, Timestamp);
-    OpcUa_Field_Write(UInt32, RequestHandle);
-    OpcUa_Field_Write(StatusCode, ServiceResult);
-    OpcUa_Field_Write(DiagnosticInfo, ServiceDiagnostics);
-    OpcUa_Field_WriteArray(String, StringTable);
-    OpcUa_Field_Write(ExtensionObject, AdditionalHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ResponseHeader_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ResponseHeader_Decode(OpcUa_ResponseHeader* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ResponseHeader_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ResponseHeader_Initialize(a_pValue);
-
-    OpcUa_Field_Read(DateTime, Timestamp);
-    OpcUa_Field_Read(UInt32, RequestHandle);
-    OpcUa_Field_Read(StatusCode, ServiceResult);
-    OpcUa_Field_Read(DiagnosticInfo, ServiceDiagnostics);
-    OpcUa_Field_ReadArray(String, StringTable);
-    OpcUa_Field_Read(ExtensionObject, AdditionalHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ResponseHeader_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ResponseHeader_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ResponseHeader_EncodeableType =
-{
-    "ResponseHeader",
-    OpcUaId_ResponseHeader,
-    OpcUaId_ResponseHeader_Encoding_DefaultBinary,
-    OpcUaId_ResponseHeader_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ResponseHeader),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ResponseHeader_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ResponseHeader_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ResponseHeader_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ResponseHeader_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ResponseHeader_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ServiceFault
-/*============================================================================
- * OpcUa_ServiceFault_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ServiceFault_Initialize(OpcUa_ServiceFault* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_ServiceFault_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ServiceFault_Clear(OpcUa_ServiceFault* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_ServiceFault_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServiceFault_GetSize(OpcUa_ServiceFault* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServiceFault_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServiceFault_Encode(OpcUa_ServiceFault* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServiceFault_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServiceFault_Decode(OpcUa_ServiceFault* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ServiceFault_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ServiceFault_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ServiceFault_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ServiceFault_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ServiceFault_EncodeableType =
-{
-    "ServiceFault",
-    OpcUaId_ServiceFault,
-    OpcUaId_ServiceFault_Encoding_DefaultBinary,
-    OpcUaId_ServiceFault_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ServiceFault),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ServiceFault_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ServiceFault_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ServiceFault_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ServiceFault_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ServiceFault_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_EnumeratedTestType
-/*============================================================================
- * OpcUa_EnumeratedTestType_EnumeratedType
- *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_EnumeratedTestType_EnumeratedValues[] =
-{
-    { "Red", 1 },
-    { "Yellow", 4 },
-    { "Green", 5 },
-    { OpcUa_Null, 0 }
-};
-
-struct _OpcUa_EnumeratedType OpcUa_EnumeratedTestType_EnumeratedType =
-{
-    "EnumeratedTestType",
-    g_OpcUa_EnumeratedTestType_EnumeratedValues
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ScalarTestType
-/*============================================================================
- * OpcUa_ScalarTestType_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ScalarTestType_Initialize(OpcUa_ScalarTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(Boolean, Boolean);
-        OpcUa_Field_Initialize(SByte, SByte);
-        OpcUa_Field_Initialize(Byte, Byte);
-        OpcUa_Field_Initialize(Int16, Int16);
-        OpcUa_Field_Initialize(UInt16, UInt16);
-        OpcUa_Field_Initialize(Int32, Int32);
-        OpcUa_Field_Initialize(UInt32, UInt32);
-        OpcUa_Field_Initialize(Int64, Int64);
-        OpcUa_Field_Initialize(UInt64, UInt64);
-        OpcUa_Field_Initialize(Float, Float);
-        OpcUa_Field_Initialize(Double, Double);
-        OpcUa_Field_Initialize(String, String);
-        OpcUa_Field_Initialize(DateTime, DateTime);
-        OpcUa_Field_Initialize(Guid, Guid);
-        OpcUa_Field_Initialize(ByteString, ByteString);
-        OpcUa_Field_Initialize(XmlElement, XmlElement);
-        OpcUa_Field_Initialize(NodeId, NodeId);
-        OpcUa_Field_Initialize(ExpandedNodeId, ExpandedNodeId);
-        OpcUa_Field_Initialize(StatusCode, StatusCode);
-        OpcUa_Field_Initialize(DiagnosticInfo, DiagnosticInfo);
-        OpcUa_Field_Initialize(QualifiedName, QualifiedName);
-        OpcUa_Field_Initialize(LocalizedText, LocalizedText);
-        OpcUa_Field_Initialize(ExtensionObject, ExtensionObject);
-        OpcUa_Field_Initialize(DataValue, DataValue);
-        OpcUa_Field_InitializeEnumerated(OpcUa_EnumeratedTestType, EnumeratedValue);
-    }
-}
-
-/*============================================================================
- * OpcUa_ScalarTestType_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ScalarTestType_Clear(OpcUa_ScalarTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(Boolean, Boolean);
-        OpcUa_Field_Clear(SByte, SByte);
-        OpcUa_Field_Clear(Byte, Byte);
-        OpcUa_Field_Clear(Int16, Int16);
-        OpcUa_Field_Clear(UInt16, UInt16);
-        OpcUa_Field_Clear(Int32, Int32);
-        OpcUa_Field_Clear(UInt32, UInt32);
-        OpcUa_Field_Clear(Int64, Int64);
-        OpcUa_Field_Clear(UInt64, UInt64);
-        OpcUa_Field_Clear(Float, Float);
-        OpcUa_Field_Clear(Double, Double);
-        OpcUa_Field_Clear(String, String);
-        OpcUa_Field_Clear(DateTime, DateTime);
-        OpcUa_Field_Clear(Guid, Guid);
-        OpcUa_Field_Clear(ByteString, ByteString);
-        OpcUa_Field_Clear(XmlElement, XmlElement);
-        OpcUa_Field_Clear(NodeId, NodeId);
-        OpcUa_Field_Clear(ExpandedNodeId, ExpandedNodeId);
-        OpcUa_Field_Clear(StatusCode, StatusCode);
-        OpcUa_Field_Clear(DiagnosticInfo, DiagnosticInfo);
-        OpcUa_Field_Clear(QualifiedName, QualifiedName);
-        OpcUa_Field_Clear(LocalizedText, LocalizedText);
-        OpcUa_Field_Clear(ExtensionObject, ExtensionObject);
-        OpcUa_Field_Clear(DataValue, DataValue);
-        OpcUa_Field_ClearEnumerated(OpcUa_EnumeratedTestType, EnumeratedValue);
-    }
-}
-
-/*============================================================================
- * OpcUa_ScalarTestType_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ScalarTestType_GetSize(OpcUa_ScalarTestType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ScalarTestType_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(Boolean, Boolean);
-    OpcUa_Field_GetSize(SByte, SByte);
-    OpcUa_Field_GetSize(Byte, Byte);
-    OpcUa_Field_GetSize(Int16, Int16);
-    OpcUa_Field_GetSize(UInt16, UInt16);
-    OpcUa_Field_GetSize(Int32, Int32);
-    OpcUa_Field_GetSize(UInt32, UInt32);
-    OpcUa_Field_GetSize(Int64, Int64);
-    OpcUa_Field_GetSize(UInt64, UInt64);
-    OpcUa_Field_GetSize(Float, Float);
-    OpcUa_Field_GetSize(Double, Double);
-    OpcUa_Field_GetSize(String, String);
-    OpcUa_Field_GetSize(DateTime, DateTime);
-    OpcUa_Field_GetSize(Guid, Guid);
-    OpcUa_Field_GetSize(ByteString, ByteString);
-    OpcUa_Field_GetSize(XmlElement, XmlElement);
-    OpcUa_Field_GetSize(NodeId, NodeId);
-    OpcUa_Field_GetSize(ExpandedNodeId, ExpandedNodeId);
-    OpcUa_Field_GetSize(StatusCode, StatusCode);
-    OpcUa_Field_GetSize(DiagnosticInfo, DiagnosticInfo);
-    OpcUa_Field_GetSize(QualifiedName, QualifiedName);
-    OpcUa_Field_GetSize(LocalizedText, LocalizedText);
-    OpcUa_Field_GetSize(ExtensionObject, ExtensionObject);
-    OpcUa_Field_GetSize(DataValue, DataValue);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_EnumeratedTestType, EnumeratedValue);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ScalarTestType_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ScalarTestType_Encode(OpcUa_ScalarTestType* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ScalarTestType_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(Boolean, Boolean);
-    OpcUa_Field_Write(SByte, SByte);
-    OpcUa_Field_Write(Byte, Byte);
-    OpcUa_Field_Write(Int16, Int16);
-    OpcUa_Field_Write(UInt16, UInt16);
-    OpcUa_Field_Write(Int32, Int32);
-    OpcUa_Field_Write(UInt32, UInt32);
-    OpcUa_Field_Write(Int64, Int64);
-    OpcUa_Field_Write(UInt64, UInt64);
-    OpcUa_Field_Write(Float, Float);
-    OpcUa_Field_Write(Double, Double);
-    OpcUa_Field_Write(String, String);
-    OpcUa_Field_Write(DateTime, DateTime);
-    OpcUa_Field_Write(Guid, Guid);
-    OpcUa_Field_Write(ByteString, ByteString);
-    OpcUa_Field_Write(XmlElement, XmlElement);
-    OpcUa_Field_Write(NodeId, NodeId);
-    OpcUa_Field_Write(ExpandedNodeId, ExpandedNodeId);
-    OpcUa_Field_Write(StatusCode, StatusCode);
-    OpcUa_Field_Write(DiagnosticInfo, DiagnosticInfo);
-    OpcUa_Field_Write(QualifiedName, QualifiedName);
-    OpcUa_Field_Write(LocalizedText, LocalizedText);
-    OpcUa_Field_Write(ExtensionObject, ExtensionObject);
-    OpcUa_Field_Write(DataValue, DataValue);
-    OpcUa_Field_WriteEnumerated(OpcUa_EnumeratedTestType, EnumeratedValue);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ScalarTestType_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ScalarTestType_Decode(OpcUa_ScalarTestType* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ScalarTestType_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ScalarTestType_Initialize(a_pValue);
-
-    OpcUa_Field_Read(Boolean, Boolean);
-    OpcUa_Field_Read(SByte, SByte);
-    OpcUa_Field_Read(Byte, Byte);
-    OpcUa_Field_Read(Int16, Int16);
-    OpcUa_Field_Read(UInt16, UInt16);
-    OpcUa_Field_Read(Int32, Int32);
-    OpcUa_Field_Read(UInt32, UInt32);
-    OpcUa_Field_Read(Int64, Int64);
-    OpcUa_Field_Read(UInt64, UInt64);
-    OpcUa_Field_Read(Float, Float);
-    OpcUa_Field_Read(Double, Double);
-    OpcUa_Field_Read(String, String);
-    OpcUa_Field_Read(DateTime, DateTime);
-    OpcUa_Field_Read(Guid, Guid);
-    OpcUa_Field_Read(ByteString, ByteString);
-    OpcUa_Field_Read(XmlElement, XmlElement);
-    OpcUa_Field_Read(NodeId, NodeId);
-    OpcUa_Field_Read(ExpandedNodeId, ExpandedNodeId);
-    OpcUa_Field_Read(StatusCode, StatusCode);
-    OpcUa_Field_Read(DiagnosticInfo, DiagnosticInfo);
-    OpcUa_Field_Read(QualifiedName, QualifiedName);
-    OpcUa_Field_Read(LocalizedText, LocalizedText);
-    OpcUa_Field_Read(ExtensionObject, ExtensionObject);
-    OpcUa_Field_Read(DataValue, DataValue);
-    OpcUa_Field_ReadEnumerated(OpcUa_EnumeratedTestType, EnumeratedValue);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ScalarTestType_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ScalarTestType_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ScalarTestType_EncodeableType =
-{
-    "ScalarTestType",
-    OpcUaId_ScalarTestType,
-    OpcUaId_ScalarTestType_Encoding_DefaultBinary,
-    OpcUaId_ScalarTestType_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ScalarTestType),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ScalarTestType_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ScalarTestType_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ScalarTestType_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ScalarTestType_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ScalarTestType_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ArrayTestType
-/*============================================================================
- * OpcUa_ArrayTestType_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ArrayTestType_Initialize(OpcUa_ArrayTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeArray(Boolean, Booleans);
-        OpcUa_Field_InitializeArray(SByte, SBytes);
-        OpcUa_Field_InitializeArray(Int16, Int16s);
-        OpcUa_Field_InitializeArray(UInt16, UInt16s);
-        OpcUa_Field_InitializeArray(Int32, Int32s);
-        OpcUa_Field_InitializeArray(UInt32, UInt32s);
-        OpcUa_Field_InitializeArray(Int64, Int64s);
-        OpcUa_Field_InitializeArray(UInt64, UInt64s);
-        OpcUa_Field_InitializeArray(Float, Floats);
-        OpcUa_Field_InitializeArray(Double, Doubles);
-        OpcUa_Field_InitializeArray(String, Strings);
-        OpcUa_Field_InitializeArray(DateTime, DateTimes);
-        OpcUa_Field_InitializeArray(Guid, Guids);
-        OpcUa_Field_InitializeArray(ByteString, ByteStrings);
-        OpcUa_Field_InitializeArray(XmlElement, XmlElements);
-        OpcUa_Field_InitializeArray(NodeId, NodeIds);
-        OpcUa_Field_InitializeArray(ExpandedNodeId, ExpandedNodeIds);
-        OpcUa_Field_InitializeArray(StatusCode, StatusCodes);
-        OpcUa_Field_InitializeArray(DiagnosticInfo, DiagnosticInfos);
-        OpcUa_Field_InitializeArray(QualifiedName, QualifiedNames);
-        OpcUa_Field_InitializeArray(LocalizedText, LocalizedTexts);
-        OpcUa_Field_InitializeArray(ExtensionObject, ExtensionObjects);
-        OpcUa_Field_InitializeArray(DataValue, DataValues);
-        OpcUa_Field_InitializeArray(Variant, Variants);
-        OpcUa_Field_InitializeEnumeratedArray(OpcUa_EnumeratedTestType, EnumeratedValues);
-    }
-}
-
-/*============================================================================
- * OpcUa_ArrayTestType_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ArrayTestType_Clear(OpcUa_ArrayTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearArray(Boolean, Booleans);
-        OpcUa_Field_ClearArray(SByte, SBytes);
-        OpcUa_Field_ClearArray(Int16, Int16s);
-        OpcUa_Field_ClearArray(UInt16, UInt16s);
-        OpcUa_Field_ClearArray(Int32, Int32s);
-        OpcUa_Field_ClearArray(UInt32, UInt32s);
-        OpcUa_Field_ClearArray(Int64, Int64s);
-        OpcUa_Field_ClearArray(UInt64, UInt64s);
-        OpcUa_Field_ClearArray(Float, Floats);
-        OpcUa_Field_ClearArray(Double, Doubles);
-        OpcUa_Field_ClearArray(String, Strings);
-        OpcUa_Field_ClearArray(DateTime, DateTimes);
-        OpcUa_Field_ClearArray(Guid, Guids);
-        OpcUa_Field_ClearArray(ByteString, ByteStrings);
-        OpcUa_Field_ClearArray(XmlElement, XmlElements);
-        OpcUa_Field_ClearArray(NodeId, NodeIds);
-        OpcUa_Field_ClearArray(ExpandedNodeId, ExpandedNodeIds);
-        OpcUa_Field_ClearArray(StatusCode, StatusCodes);
-        OpcUa_Field_ClearArray(DiagnosticInfo, DiagnosticInfos);
-        OpcUa_Field_ClearArray(QualifiedName, QualifiedNames);
-        OpcUa_Field_ClearArray(LocalizedText, LocalizedTexts);
-        OpcUa_Field_ClearArray(ExtensionObject, ExtensionObjects);
-        OpcUa_Field_ClearArray(DataValue, DataValues);
-        OpcUa_Field_ClearArray(Variant, Variants);
-        OpcUa_Field_ClearEnumeratedArray(OpcUa_EnumeratedTestType, EnumeratedValues);
-    }
-}
-
-/*============================================================================
- * OpcUa_ArrayTestType_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ArrayTestType_GetSize(OpcUa_ArrayTestType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ArrayTestType_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeArray(Boolean, Booleans);
-    OpcUa_Field_GetSizeArray(SByte, SBytes);
-    OpcUa_Field_GetSizeArray(Int16, Int16s);
-    OpcUa_Field_GetSizeArray(UInt16, UInt16s);
-    OpcUa_Field_GetSizeArray(Int32, Int32s);
-    OpcUa_Field_GetSizeArray(UInt32, UInt32s);
-    OpcUa_Field_GetSizeArray(Int64, Int64s);
-    OpcUa_Field_GetSizeArray(UInt64, UInt64s);
-    OpcUa_Field_GetSizeArray(Float, Floats);
-    OpcUa_Field_GetSizeArray(Double, Doubles);
-    OpcUa_Field_GetSizeArray(String, Strings);
-    OpcUa_Field_GetSizeArray(DateTime, DateTimes);
-    OpcUa_Field_GetSizeArray(Guid, Guids);
-    OpcUa_Field_GetSizeArray(ByteString, ByteStrings);
-    OpcUa_Field_GetSizeArray(XmlElement, XmlElements);
-    OpcUa_Field_GetSizeArray(NodeId, NodeIds);
-    OpcUa_Field_GetSizeArray(ExpandedNodeId, ExpandedNodeIds);
-    OpcUa_Field_GetSizeArray(StatusCode, StatusCodes);
-    OpcUa_Field_GetSizeArray(DiagnosticInfo, DiagnosticInfos);
-    OpcUa_Field_GetSizeArray(QualifiedName, QualifiedNames);
-    OpcUa_Field_GetSizeArray(LocalizedText, LocalizedTexts);
-    OpcUa_Field_GetSizeArray(ExtensionObject, ExtensionObjects);
-    OpcUa_Field_GetSizeArray(DataValue, DataValues);
-    OpcUa_Field_GetSizeArray(Variant, Variants);
-    OpcUa_Field_GetSizeEnumeratedArray(OpcUa_EnumeratedTestType, EnumeratedValues);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ArrayTestType_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ArrayTestType_Encode(OpcUa_ArrayTestType* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ArrayTestType_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteArray(Boolean, Booleans);
-    OpcUa_Field_WriteArray(SByte, SBytes);
-    OpcUa_Field_WriteArray(Int16, Int16s);
-    OpcUa_Field_WriteArray(UInt16, UInt16s);
-    OpcUa_Field_WriteArray(Int32, Int32s);
-    OpcUa_Field_WriteArray(UInt32, UInt32s);
-    OpcUa_Field_WriteArray(Int64, Int64s);
-    OpcUa_Field_WriteArray(UInt64, UInt64s);
-    OpcUa_Field_WriteArray(Float, Floats);
-    OpcUa_Field_WriteArray(Double, Doubles);
-    OpcUa_Field_WriteArray(String, Strings);
-    OpcUa_Field_WriteArray(DateTime, DateTimes);
-    OpcUa_Field_WriteArray(Guid, Guids);
-    OpcUa_Field_WriteArray(ByteString, ByteStrings);
-    OpcUa_Field_WriteArray(XmlElement, XmlElements);
-    OpcUa_Field_WriteArray(NodeId, NodeIds);
-    OpcUa_Field_WriteArray(ExpandedNodeId, ExpandedNodeIds);
-    OpcUa_Field_WriteArray(StatusCode, StatusCodes);
-    OpcUa_Field_WriteArray(DiagnosticInfo, DiagnosticInfos);
-    OpcUa_Field_WriteArray(QualifiedName, QualifiedNames);
-    OpcUa_Field_WriteArray(LocalizedText, LocalizedTexts);
-    OpcUa_Field_WriteArray(ExtensionObject, ExtensionObjects);
-    OpcUa_Field_WriteArray(DataValue, DataValues);
-    OpcUa_Field_WriteArray(Variant, Variants);
-    OpcUa_Field_WriteEnumeratedArray(OpcUa_EnumeratedTestType, EnumeratedValues);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ArrayTestType_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ArrayTestType_Decode(OpcUa_ArrayTestType* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ArrayTestType_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ArrayTestType_Initialize(a_pValue);
-
-    OpcUa_Field_ReadArray(Boolean, Booleans);
-    OpcUa_Field_ReadArray(SByte, SBytes);
-    OpcUa_Field_ReadArray(Int16, Int16s);
-    OpcUa_Field_ReadArray(UInt16, UInt16s);
-    OpcUa_Field_ReadArray(Int32, Int32s);
-    OpcUa_Field_ReadArray(UInt32, UInt32s);
-    OpcUa_Field_ReadArray(Int64, Int64s);
-    OpcUa_Field_ReadArray(UInt64, UInt64s);
-    OpcUa_Field_ReadArray(Float, Floats);
-    OpcUa_Field_ReadArray(Double, Doubles);
-    OpcUa_Field_ReadArray(String, Strings);
-    OpcUa_Field_ReadArray(DateTime, DateTimes);
-    OpcUa_Field_ReadArray(Guid, Guids);
-    OpcUa_Field_ReadArray(ByteString, ByteStrings);
-    OpcUa_Field_ReadArray(XmlElement, XmlElements);
-    OpcUa_Field_ReadArray(NodeId, NodeIds);
-    OpcUa_Field_ReadArray(ExpandedNodeId, ExpandedNodeIds);
-    OpcUa_Field_ReadArray(StatusCode, StatusCodes);
-    OpcUa_Field_ReadArray(DiagnosticInfo, DiagnosticInfos);
-    OpcUa_Field_ReadArray(QualifiedName, QualifiedNames);
-    OpcUa_Field_ReadArray(LocalizedText, LocalizedTexts);
-    OpcUa_Field_ReadArray(ExtensionObject, ExtensionObjects);
-    OpcUa_Field_ReadArray(DataValue, DataValues);
-    OpcUa_Field_ReadArray(Variant, Variants);
-    OpcUa_Field_ReadEnumeratedArray(OpcUa_EnumeratedTestType, EnumeratedValues);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ArrayTestType_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ArrayTestType_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ArrayTestType_EncodeableType =
-{
-    "ArrayTestType",
-    OpcUaId_ArrayTestType,
-    OpcUaId_ArrayTestType_Encoding_DefaultBinary,
-    OpcUaId_ArrayTestType_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ArrayTestType),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ArrayTestType_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ArrayTestType_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ArrayTestType_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ArrayTestType_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ArrayTestType_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CompositeTestType
-/*============================================================================
- * OpcUa_CompositeTestType_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CompositeTestType_Initialize(OpcUa_CompositeTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ScalarTestType, Field1);
-        OpcUa_Field_InitializeEncodeable(OpcUa_ArrayTestType, Field2);
-    }
-}
-
-/*============================================================================
- * OpcUa_CompositeTestType_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CompositeTestType_Clear(OpcUa_CompositeTestType* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ScalarTestType, Field1);
-        OpcUa_Field_ClearEncodeable(OpcUa_ArrayTestType, Field2);
-    }
-}
-
-/*============================================================================
- * OpcUa_CompositeTestType_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CompositeTestType_GetSize(OpcUa_CompositeTestType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CompositeTestType_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ScalarTestType, Field1);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ArrayTestType, Field2);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CompositeTestType_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CompositeTestType_Encode(OpcUa_CompositeTestType* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CompositeTestType_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ScalarTestType, Field1);
-    OpcUa_Field_WriteEncodeable(OpcUa_ArrayTestType, Field2);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CompositeTestType_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CompositeTestType_Decode(OpcUa_CompositeTestType* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CompositeTestType_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CompositeTestType_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ScalarTestType, Field1);
-    OpcUa_Field_ReadEncodeable(OpcUa_ArrayTestType, Field2);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CompositeTestType_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CompositeTestType_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CompositeTestType_EncodeableType =
-{
-    "CompositeTestType",
-    OpcUaId_CompositeTestType,
-    OpcUaId_CompositeTestType_Encoding_DefaultBinary,
-    OpcUaId_CompositeTestType_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CompositeTestType),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CompositeTestType_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CompositeTestType_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CompositeTestType_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CompositeTestType_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CompositeTestType_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStack
-#ifndef OPCUA_EXCLUDE_TestStackRequest
-/*============================================================================
- * OpcUa_TestStackRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackRequest_Initialize(OpcUa_TestStackRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(UInt32, TestId);
-        OpcUa_Field_Initialize(Int32, Iteration);
-        OpcUa_Field_Initialize(Variant, Input);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackRequest_Clear(OpcUa_TestStackRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(UInt32, TestId);
-        OpcUa_Field_Clear(Int32, Iteration);
-        OpcUa_Field_Clear(Variant, Input);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackRequest_GetSize(OpcUa_TestStackRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(UInt32, TestId);
-    OpcUa_Field_GetSize(Int32, Iteration);
-    OpcUa_Field_GetSize(Variant, Input);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackRequest_Encode(OpcUa_TestStackRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(UInt32, TestId);
-    OpcUa_Field_Write(Int32, Iteration);
-    OpcUa_Field_Write(Variant, Input);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackRequest_Decode(OpcUa_TestStackRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_TestStackRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(UInt32, TestId);
-    OpcUa_Field_Read(Int32, Iteration);
-    OpcUa_Field_Read(Variant, Input);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_TestStackRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_TestStackRequest_EncodeableType =
-{
-    "TestStackRequest",
-    OpcUaId_TestStackRequest,
-    OpcUaId_TestStackRequest_Encoding_DefaultBinary,
-    OpcUaId_TestStackRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_TestStackRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TestStackRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TestStackRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TestStackRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TestStackRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TestStackRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackResponse
-/*============================================================================
- * OpcUa_TestStackResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackResponse_Initialize(OpcUa_TestStackResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(Variant, Output);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackResponse_Clear(OpcUa_TestStackResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(Variant, Output);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackResponse_GetSize(OpcUa_TestStackResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(Variant, Output);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackResponse_Encode(OpcUa_TestStackResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(Variant, Output);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackResponse_Decode(OpcUa_TestStackResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_TestStackResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(Variant, Output);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_TestStackResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_TestStackResponse_EncodeableType =
-{
-    "TestStackResponse",
-    OpcUaId_TestStackResponse,
-    OpcUaId_TestStackResponse_Encoding_DefaultBinary,
-    OpcUaId_TestStackResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_TestStackResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TestStackResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TestStackResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TestStackResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TestStackResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TestStackResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-#ifndef OPCUA_EXCLUDE_TestStackExRequest
-/*============================================================================
- * OpcUa_TestStackExRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackExRequest_Initialize(OpcUa_TestStackExRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(UInt32, TestId);
-        OpcUa_Field_Initialize(Int32, Iteration);
-        OpcUa_Field_InitializeEncodeable(OpcUa_CompositeTestType, Input);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackExRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackExRequest_Clear(OpcUa_TestStackExRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(UInt32, TestId);
-        OpcUa_Field_Clear(Int32, Iteration);
-        OpcUa_Field_ClearEncodeable(OpcUa_CompositeTestType, Input);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackExRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExRequest_GetSize(OpcUa_TestStackExRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(UInt32, TestId);
-    OpcUa_Field_GetSize(Int32, Iteration);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_CompositeTestType, Input);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExRequest_Encode(OpcUa_TestStackExRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(UInt32, TestId);
-    OpcUa_Field_Write(Int32, Iteration);
-    OpcUa_Field_WriteEncodeable(OpcUa_CompositeTestType, Input);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExRequest_Decode(OpcUa_TestStackExRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_TestStackExRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(UInt32, TestId);
-    OpcUa_Field_Read(Int32, Iteration);
-    OpcUa_Field_ReadEncodeable(OpcUa_CompositeTestType, Input);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_TestStackExRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_TestStackExRequest_EncodeableType =
-{
-    "TestStackExRequest",
-    OpcUaId_TestStackExRequest,
-    OpcUaId_TestStackExRequest_Encoding_DefaultBinary,
-    OpcUaId_TestStackExRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_TestStackExRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TestStackExRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TestStackExRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TestStackExRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TestStackExRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TestStackExRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackExResponse
-/*============================================================================
- * OpcUa_TestStackExResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackExResponse_Initialize(OpcUa_TestStackExResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_InitializeEncodeable(OpcUa_CompositeTestType, Output);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackExResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_TestStackExResponse_Clear(OpcUa_TestStackExResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_ClearEncodeable(OpcUa_CompositeTestType, Output);
-    }
-}
-
-/*============================================================================
- * OpcUa_TestStackExResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExResponse_GetSize(OpcUa_TestStackExResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_CompositeTestType, Output);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExResponse_Encode(OpcUa_TestStackExResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_WriteEncodeable(OpcUa_CompositeTestType, Output);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_TestStackExResponse_Decode(OpcUa_TestStackExResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "TestStackExResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_TestStackExResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_ReadEncodeable(OpcUa_CompositeTestType, Output);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_TestStackExResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_TestStackExResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_TestStackExResponse_EncodeableType =
-{
-    "TestStackExResponse",
-    OpcUaId_TestStackExResponse,
-    OpcUaId_TestStackExResponse_Encoding_DefaultBinary,
-    OpcUaId_TestStackExResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_TestStackExResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_TestStackExResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_TestStackExResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_TestStackExResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_TestStackExResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_TestStackExResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServers
-#ifndef OPCUA_EXCLUDE_FindServersRequest
-/*============================================================================
- * OpcUa_FindServersRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersRequest_Initialize(OpcUa_FindServersRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(String, EndpointUrl);
-        OpcUa_Field_InitializeArray(String, LocaleIds);
-        OpcUa_Field_InitializeArray(String, ServerUris);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersRequest_Clear(OpcUa_FindServersRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(String, EndpointUrl);
-        OpcUa_Field_ClearArray(String, LocaleIds);
-        OpcUa_Field_ClearArray(String, ServerUris);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersRequest_GetSize(OpcUa_FindServersRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(String, EndpointUrl);
-    OpcUa_Field_GetSizeArray(String, LocaleIds);
-    OpcUa_Field_GetSizeArray(String, ServerUris);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersRequest_Encode(OpcUa_FindServersRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(String, EndpointUrl);
-    OpcUa_Field_WriteArray(String, LocaleIds);
-    OpcUa_Field_WriteArray(String, ServerUris);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersRequest_Decode(OpcUa_FindServersRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_FindServersRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(String, EndpointUrl);
-    OpcUa_Field_ReadArray(String, LocaleIds);
-    OpcUa_Field_ReadArray(String, ServerUris);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_FindServersRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_FindServersRequest_EncodeableType =
-{
-    "FindServersRequest",
-    OpcUaId_FindServersRequest,
-    OpcUaId_FindServersRequest_Encoding_DefaultBinary,
-    OpcUaId_FindServersRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_FindServersRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersResponse
-/*============================================================================
- * OpcUa_FindServersResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersResponse_Initialize(OpcUa_FindServersResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_ApplicationDescription, Servers);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersResponse_Clear(OpcUa_FindServersResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_ApplicationDescription, Servers);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersResponse_GetSize(OpcUa_FindServersResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ApplicationDescription, Servers);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersResponse_Encode(OpcUa_FindServersResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_ApplicationDescription, Servers);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersResponse_Decode(OpcUa_FindServersResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_FindServersResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_ApplicationDescription, Servers);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_FindServersResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_FindServersResponse_EncodeableType =
-{
-    "FindServersResponse",
-    OpcUaId_FindServersResponse,
-    OpcUaId_FindServersResponse_Encoding_DefaultBinary,
-    OpcUaId_FindServersResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_FindServersResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersOnNetwork
-#ifndef OPCUA_EXCLUDE_FindServersOnNetworkRequest
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersOnNetworkRequest_Initialize(OpcUa_FindServersOnNetworkRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(UInt32, StartingRecordId);
-        OpcUa_Field_Initialize(UInt32, MaxRecordsToReturn);
-        OpcUa_Field_InitializeArray(String, ServerCapabilityFilter);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersOnNetworkRequest_Clear(OpcUa_FindServersOnNetworkRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(UInt32, StartingRecordId);
-        OpcUa_Field_Clear(UInt32, MaxRecordsToReturn);
-        OpcUa_Field_ClearArray(String, ServerCapabilityFilter);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_GetSize(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(UInt32, StartingRecordId);
-    OpcUa_Field_GetSize(UInt32, MaxRecordsToReturn);
-    OpcUa_Field_GetSizeArray(String, ServerCapabilityFilter);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Encode(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(UInt32, StartingRecordId);
-    OpcUa_Field_Write(UInt32, MaxRecordsToReturn);
-    OpcUa_Field_WriteArray(String, ServerCapabilityFilter);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkRequest_Decode(OpcUa_FindServersOnNetworkRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_FindServersOnNetworkRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(UInt32, StartingRecordId);
-    OpcUa_Field_Read(UInt32, MaxRecordsToReturn);
-    OpcUa_Field_ReadArray(String, ServerCapabilityFilter);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_FindServersOnNetworkRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkRequest_EncodeableType =
-{
-    "FindServersOnNetworkRequest",
-    OpcUaId_FindServersOnNetworkRequest,
-    OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultBinary,
-    OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_FindServersOnNetworkRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersOnNetworkRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersOnNetworkRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersOnNetworkRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersOnNetworkRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersOnNetworkRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_FindServersOnNetworkResponse
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersOnNetworkResponse_Initialize(OpcUa_FindServersOnNetworkResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(DateTime, LastCounterResetTime);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_ServerOnNetwork, Servers);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_FindServersOnNetworkResponse_Clear(OpcUa_FindServersOnNetworkResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(DateTime, LastCounterResetTime);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_ServerOnNetwork, Servers);
-    }
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_GetSize(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(DateTime, LastCounterResetTime);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_ServerOnNetwork, Servers);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Encode(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(DateTime, LastCounterResetTime);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_ServerOnNetwork, Servers);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_FindServersOnNetworkResponse_Decode(OpcUa_FindServersOnNetworkResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "FindServersOnNetworkResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_FindServersOnNetworkResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(DateTime, LastCounterResetTime);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_ServerOnNetwork, Servers);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_FindServersOnNetworkResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_FindServersOnNetworkResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_FindServersOnNetworkResponse_EncodeableType =
-{
-    "FindServersOnNetworkResponse",
-    OpcUaId_FindServersOnNetworkResponse,
-    OpcUaId_FindServersOnNetworkResponse_Encoding_DefaultBinary,
-    OpcUaId_FindServersOnNetworkResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_FindServersOnNetworkResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_FindServersOnNetworkResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_FindServersOnNetworkResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_FindServersOnNetworkResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_FindServersOnNetworkResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_FindServersOnNetworkResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_GetEndpoints
-#ifndef OPCUA_EXCLUDE_GetEndpointsRequest
-/*============================================================================
- * OpcUa_GetEndpointsRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_GetEndpointsRequest_Initialize(OpcUa_GetEndpointsRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(String, EndpointUrl);
-        OpcUa_Field_InitializeArray(String, LocaleIds);
-        OpcUa_Field_InitializeArray(String, ProfileUris);
-    }
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_GetEndpointsRequest_Clear(OpcUa_GetEndpointsRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(String, EndpointUrl);
-        OpcUa_Field_ClearArray(String, LocaleIds);
-        OpcUa_Field_ClearArray(String, ProfileUris);
-    }
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsRequest_GetSize(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(String, EndpointUrl);
-    OpcUa_Field_GetSizeArray(String, LocaleIds);
-    OpcUa_Field_GetSizeArray(String, ProfileUris);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsRequest_Encode(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(String, EndpointUrl);
-    OpcUa_Field_WriteArray(String, LocaleIds);
-    OpcUa_Field_WriteArray(String, ProfileUris);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsRequest_Decode(OpcUa_GetEndpointsRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_GetEndpointsRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(String, EndpointUrl);
-    OpcUa_Field_ReadArray(String, LocaleIds);
-    OpcUa_Field_ReadArray(String, ProfileUris);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_GetEndpointsRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_GetEndpointsRequest_EncodeableType =
-{
-    "GetEndpointsRequest",
-    OpcUaId_GetEndpointsRequest,
-    OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary,
-    OpcUaId_GetEndpointsRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_GetEndpointsRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_GetEndpointsRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_GetEndpointsRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_GetEndpointsRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_GetEndpointsRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_GetEndpointsRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_GetEndpointsResponse
-/*============================================================================
- * OpcUa_GetEndpointsResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_GetEndpointsResponse_Initialize(OpcUa_GetEndpointsResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_EndpointDescription, Endpoints);
-    }
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_GetEndpointsResponse_Clear(OpcUa_GetEndpointsResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_EndpointDescription, Endpoints);
-    }
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsResponse_GetSize(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_EndpointDescription, Endpoints);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsResponse_Encode(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_EndpointDescription, Endpoints);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_GetEndpointsResponse_Decode(OpcUa_GetEndpointsResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "GetEndpointsResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_GetEndpointsResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_EndpointDescription, Endpoints);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_GetEndpointsResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_GetEndpointsResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_GetEndpointsResponse_EncodeableType =
-{
-    "GetEndpointsResponse",
-    OpcUaId_GetEndpointsResponse,
-    OpcUaId_GetEndpointsResponse_Encoding_DefaultBinary,
-    OpcUaId_GetEndpointsResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_GetEndpointsResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_GetEndpointsResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_GetEndpointsResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_GetEndpointsResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_GetEndpointsResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_GetEndpointsResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisteredServer
-/*============================================================================
- * OpcUa_RegisteredServer_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisteredServer_Initialize(OpcUa_RegisteredServer* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(String, ServerUri);
-        OpcUa_Field_Initialize(String, ProductUri);
-        OpcUa_Field_InitializeArray(LocalizedText, ServerNames);
-        OpcUa_Field_InitializeEnumerated(OpcUa_ApplicationType, ServerType);
-        OpcUa_Field_Initialize(String, GatewayServerUri);
-        OpcUa_Field_InitializeArray(String, DiscoveryUrls);
-        OpcUa_Field_Initialize(String, SemaphoreFilePath);
-        OpcUa_Field_Initialize(Boolean, IsOnline);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisteredServer_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisteredServer_Clear(OpcUa_RegisteredServer* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(String, ServerUri);
-        OpcUa_Field_Clear(String, ProductUri);
-        OpcUa_Field_ClearArray(LocalizedText, ServerNames);
-        OpcUa_Field_ClearEnumerated(OpcUa_ApplicationType, ServerType);
-        OpcUa_Field_Clear(String, GatewayServerUri);
-        OpcUa_Field_ClearArray(String, DiscoveryUrls);
-        OpcUa_Field_Clear(String, SemaphoreFilePath);
-        OpcUa_Field_Clear(Boolean, IsOnline);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisteredServer_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisteredServer_GetSize(OpcUa_RegisteredServer* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(String, ServerUri);
-    OpcUa_Field_GetSize(String, ProductUri);
-    OpcUa_Field_GetSizeArray(LocalizedText, ServerNames);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_ApplicationType, ServerType);
-    OpcUa_Field_GetSize(String, GatewayServerUri);
-    OpcUa_Field_GetSizeArray(String, DiscoveryUrls);
-    OpcUa_Field_GetSize(String, SemaphoreFilePath);
-    OpcUa_Field_GetSize(Boolean, IsOnline);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisteredServer_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisteredServer_Encode(OpcUa_RegisteredServer* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(String, ServerUri);
-    OpcUa_Field_Write(String, ProductUri);
-    OpcUa_Field_WriteArray(LocalizedText, ServerNames);
-    OpcUa_Field_WriteEnumerated(OpcUa_ApplicationType, ServerType);
-    OpcUa_Field_Write(String, GatewayServerUri);
-    OpcUa_Field_WriteArray(String, DiscoveryUrls);
-    OpcUa_Field_Write(String, SemaphoreFilePath);
-    OpcUa_Field_Write(Boolean, IsOnline);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisteredServer_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisteredServer_Decode(OpcUa_RegisteredServer* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisteredServer_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RegisteredServer_Initialize(a_pValue);
-
-    OpcUa_Field_Read(String, ServerUri);
-    OpcUa_Field_Read(String, ProductUri);
-    OpcUa_Field_ReadArray(LocalizedText, ServerNames);
-    OpcUa_Field_ReadEnumerated(OpcUa_ApplicationType, ServerType);
-    OpcUa_Field_Read(String, GatewayServerUri);
-    OpcUa_Field_ReadArray(String, DiscoveryUrls);
-    OpcUa_Field_Read(String, SemaphoreFilePath);
-    OpcUa_Field_Read(Boolean, IsOnline);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RegisteredServer_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisteredServer_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RegisteredServer_EncodeableType =
-{
-    "RegisteredServer",
-    OpcUaId_RegisteredServer,
-    OpcUaId_RegisteredServer_Encoding_DefaultBinary,
-    OpcUaId_RegisteredServer_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RegisteredServer),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisteredServer_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisteredServer_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisteredServer_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisteredServer_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisteredServer_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer
-#ifndef OPCUA_EXCLUDE_RegisterServerRequest
-/*============================================================================
- * OpcUa_RegisterServerRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServerRequest_Initialize(OpcUa_RegisterServerRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_InitializeEncodeable(OpcUa_RegisteredServer, Server);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServerRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServerRequest_Clear(OpcUa_RegisterServerRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_ClearEncodeable(OpcUa_RegisteredServer, Server);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServerRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerRequest_GetSize(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RegisteredServer, Server);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerRequest_Encode(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_WriteEncodeable(OpcUa_RegisteredServer, Server);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerRequest_Decode(OpcUa_RegisterServerRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RegisterServerRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_ReadEncodeable(OpcUa_RegisteredServer, Server);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RegisterServerRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RegisterServerRequest_EncodeableType =
-{
-    "RegisterServerRequest",
-    OpcUaId_RegisterServerRequest,
-    OpcUaId_RegisterServerRequest_Encoding_DefaultBinary,
-    OpcUaId_RegisterServerRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RegisterServerRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServerRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServerRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServerRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServerRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServerRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServerResponse
-/*============================================================================
- * OpcUa_RegisterServerResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServerResponse_Initialize(OpcUa_RegisterServerResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServerResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServerResponse_Clear(OpcUa_RegisterServerResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServerResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerResponse_GetSize(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerResponse_Encode(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServerResponse_Decode(OpcUa_RegisterServerResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServerResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RegisterServerResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RegisterServerResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServerResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RegisterServerResponse_EncodeableType =
-{
-    "RegisterServerResponse",
-    OpcUaId_RegisterServerResponse,
-    OpcUaId_RegisterServerResponse_Encoding_DefaultBinary,
-    OpcUaId_RegisterServerResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RegisterServerResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServerResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServerResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServerResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServerResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServerResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer2
-#ifndef OPCUA_EXCLUDE_RegisterServer2Request
-/*============================================================================
- * OpcUa_RegisterServer2Request_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServer2Request_Initialize(OpcUa_RegisterServer2Request* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_InitializeEncodeable(OpcUa_RegisteredServer, Server);
-        OpcUa_Field_InitializeArray(ExtensionObject, DiscoveryConfiguration);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Request_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServer2Request_Clear(OpcUa_RegisterServer2Request* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_ClearEncodeable(OpcUa_RegisteredServer, Server);
-        OpcUa_Field_ClearArray(ExtensionObject, DiscoveryConfiguration);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Request_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Request_GetSize(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RegisteredServer, Server);
-    OpcUa_Field_GetSizeArray(ExtensionObject, DiscoveryConfiguration);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Request_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Request_Encode(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_WriteEncodeable(OpcUa_RegisteredServer, Server);
-    OpcUa_Field_WriteArray(ExtensionObject, DiscoveryConfiguration);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Request_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Request_Decode(OpcUa_RegisterServer2Request* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Request_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RegisterServer2Request_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_ReadEncodeable(OpcUa_RegisteredServer, Server);
-    OpcUa_Field_ReadArray(ExtensionObject, DiscoveryConfiguration);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RegisterServer2Request_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Request_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RegisterServer2Request_EncodeableType =
-{
-    "RegisterServer2Request",
-    OpcUaId_RegisterServer2Request,
-    OpcUaId_RegisterServer2Request_Encoding_DefaultBinary,
-    OpcUaId_RegisterServer2Request_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RegisterServer2Request),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServer2Request_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServer2Request_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServer2Request_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServer2Request_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServer2Request_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_RegisterServer2Response
-/*============================================================================
- * OpcUa_RegisterServer2Response_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServer2Response_Initialize(OpcUa_RegisterServer2Response* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_InitializeArray(StatusCode, ConfigurationResults);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_DiagnosticInfo, DiagnosticInfos);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Response_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_RegisterServer2Response_Clear(OpcUa_RegisterServer2Response* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_ClearArray(StatusCode, ConfigurationResults);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_DiagnosticInfo, DiagnosticInfos);
-    }
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Response_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Response_GetSize(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSizeArray(StatusCode, ConfigurationResults);
-    OpcUa_Field_GetSizeArray(DiagnosticInfo, DiagnosticInfos);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Response_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Response_Encode(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_WriteArray(StatusCode, ConfigurationResults);
-    OpcUa_Field_WriteArray(DiagnosticInfo, DiagnosticInfos);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Response_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_RegisterServer2Response_Decode(OpcUa_RegisterServer2Response* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "RegisterServer2Response_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_RegisterServer2Response_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_ReadArray(StatusCode, ConfigurationResults);
-    OpcUa_Field_ReadArray(DiagnosticInfo, DiagnosticInfos);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_RegisterServer2Response_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_RegisterServer2Response_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_RegisterServer2Response_EncodeableType =
-{
-    "RegisterServer2Response",
-    OpcUaId_RegisterServer2Response,
-    OpcUaId_RegisterServer2Response_Encoding_DefaultBinary,
-    OpcUaId_RegisterServer2Response_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_RegisterServer2Response),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_RegisterServer2Response_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_RegisterServer2Response_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_RegisterServer2Response_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_RegisterServer2Response_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_RegisterServer2Response_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_ChannelSecurityToken
-/*============================================================================
- * OpcUa_ChannelSecurityToken_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ChannelSecurityToken_Initialize(OpcUa_ChannelSecurityToken* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(UInt32, ChannelId);
-        OpcUa_Field_Initialize(UInt32, TokenId);
-        OpcUa_Field_Initialize(DateTime, CreatedAt);
-        OpcUa_Field_Initialize(UInt32, RevisedLifetime);
-    }
-}
-
-/*============================================================================
- * OpcUa_ChannelSecurityToken_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ChannelSecurityToken_Clear(OpcUa_ChannelSecurityToken* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(UInt32, ChannelId);
-        OpcUa_Field_Clear(UInt32, TokenId);
-        OpcUa_Field_Clear(DateTime, CreatedAt);
-        OpcUa_Field_Clear(UInt32, RevisedLifetime);
-    }
-}
-
-/*============================================================================
- * OpcUa_ChannelSecurityToken_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ChannelSecurityToken_GetSize(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(UInt32, ChannelId);
-    OpcUa_Field_GetSize(UInt32, TokenId);
-    OpcUa_Field_GetSize(DateTime, CreatedAt);
-    OpcUa_Field_GetSize(UInt32, RevisedLifetime);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ChannelSecurityToken_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ChannelSecurityToken_Encode(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(UInt32, ChannelId);
-    OpcUa_Field_Write(UInt32, TokenId);
-    OpcUa_Field_Write(DateTime, CreatedAt);
-    OpcUa_Field_Write(UInt32, RevisedLifetime);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ChannelSecurityToken_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ChannelSecurityToken_Decode(OpcUa_ChannelSecurityToken* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ChannelSecurityToken_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ChannelSecurityToken_Initialize(a_pValue);
-
-    OpcUa_Field_Read(UInt32, ChannelId);
-    OpcUa_Field_Read(UInt32, TokenId);
-    OpcUa_Field_Read(DateTime, CreatedAt);
-    OpcUa_Field_Read(UInt32, RevisedLifetime);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ChannelSecurityToken_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ChannelSecurityToken_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ChannelSecurityToken_EncodeableType =
-{
-    "ChannelSecurityToken",
-    OpcUaId_ChannelSecurityToken,
-    OpcUaId_ChannelSecurityToken_Encoding_DefaultBinary,
-    OpcUaId_ChannelSecurityToken_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ChannelSecurityToken),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ChannelSecurityToken_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ChannelSecurityToken_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ChannelSecurityToken_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ChannelSecurityToken_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ChannelSecurityToken_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_OpenSecureChannel
-#ifndef OPCUA_EXCLUDE_OpenSecureChannelRequest
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_OpenSecureChannelRequest_Initialize(OpcUa_OpenSecureChannelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(UInt32, ClientProtocolVersion);
-        OpcUa_Field_InitializeEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
-        OpcUa_Field_InitializeEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
-        OpcUa_Field_Initialize(ByteString, ClientNonce);
-        OpcUa_Field_Initialize(UInt32, RequestedLifetime);
-    }
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_OpenSecureChannelRequest_Clear(OpcUa_OpenSecureChannelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(UInt32, ClientProtocolVersion);
-        OpcUa_Field_ClearEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
-        OpcUa_Field_ClearEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
-        OpcUa_Field_Clear(ByteString, ClientNonce);
-        OpcUa_Field_Clear(UInt32, RequestedLifetime);
-    }
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_GetSize(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(UInt32, ClientProtocolVersion);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
-    OpcUa_Field_GetSizeEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
-    OpcUa_Field_GetSize(ByteString, ClientNonce);
-    OpcUa_Field_GetSize(UInt32, RequestedLifetime);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Encode(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(UInt32, ClientProtocolVersion);
-    OpcUa_Field_WriteEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
-    OpcUa_Field_WriteEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
-    OpcUa_Field_Write(ByteString, ClientNonce);
-    OpcUa_Field_Write(UInt32, RequestedLifetime);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelRequest_Decode(OpcUa_OpenSecureChannelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_OpenSecureChannelRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(UInt32, ClientProtocolVersion);
-    OpcUa_Field_ReadEnumerated(OpcUa_SecurityTokenRequestType, RequestType);
-    OpcUa_Field_ReadEnumerated(OpcUa_MessageSecurityMode, SecurityMode);
-    OpcUa_Field_Read(ByteString, ClientNonce);
-    OpcUa_Field_Read(UInt32, RequestedLifetime);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_OpenSecureChannelRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelRequest_EncodeableType =
-{
-    "OpenSecureChannelRequest",
-    OpcUaId_OpenSecureChannelRequest,
-    OpcUaId_OpenSecureChannelRequest_Encoding_DefaultBinary,
-    OpcUaId_OpenSecureChannelRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_OpenSecureChannelRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_OpenSecureChannelRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_OpenSecureChannelRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_OpenSecureChannelRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_OpenSecureChannelRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_OpenSecureChannelRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_OpenSecureChannelResponse
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_OpenSecureChannelResponse_Initialize(OpcUa_OpenSecureChannelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(UInt32, ServerProtocolVersion);
-        OpcUa_Field_InitializeEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
-        OpcUa_Field_Initialize(ByteString, ServerNonce);
-    }
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_OpenSecureChannelResponse_Clear(OpcUa_OpenSecureChannelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(UInt32, ServerProtocolVersion);
-        OpcUa_Field_ClearEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
-        OpcUa_Field_Clear(ByteString, ServerNonce);
-    }
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_GetSize(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(UInt32, ServerProtocolVersion);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
-    OpcUa_Field_GetSize(ByteString, ServerNonce);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Encode(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(UInt32, ServerProtocolVersion);
-    OpcUa_Field_WriteEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
-    OpcUa_Field_Write(ByteString, ServerNonce);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_OpenSecureChannelResponse_Decode(OpcUa_OpenSecureChannelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpenSecureChannelResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_OpenSecureChannelResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(UInt32, ServerProtocolVersion);
-    OpcUa_Field_ReadEncodeable(OpcUa_ChannelSecurityToken, SecurityToken);
-    OpcUa_Field_Read(ByteString, ServerNonce);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_OpenSecureChannelResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_OpenSecureChannelResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_OpenSecureChannelResponse_EncodeableType =
-{
-    "OpenSecureChannelResponse",
-    OpcUaId_OpenSecureChannelResponse,
-    OpcUaId_OpenSecureChannelResponse_Encoding_DefaultBinary,
-    OpcUaId_OpenSecureChannelResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_OpenSecureChannelResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_OpenSecureChannelResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_OpenSecureChannelResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_OpenSecureChannelResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_OpenSecureChannelResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_OpenSecureChannelResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSecureChannel
-#ifndef OPCUA_EXCLUDE_CloseSecureChannelRequest
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSecureChannelRequest_Initialize(OpcUa_CloseSecureChannelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSecureChannelRequest_Clear(OpcUa_CloseSecureChannelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_GetSize(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Encode(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelRequest_Decode(OpcUa_CloseSecureChannelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CloseSecureChannelRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CloseSecureChannelRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelRequest_EncodeableType =
-{
-    "CloseSecureChannelRequest",
-    OpcUaId_CloseSecureChannelRequest,
-    OpcUaId_CloseSecureChannelRequest_Encoding_DefaultBinary,
-    OpcUaId_CloseSecureChannelRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CloseSecureChannelRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSecureChannelRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSecureChannelRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSecureChannelRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSecureChannelRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSecureChannelRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSecureChannelResponse
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSecureChannelResponse_Initialize(OpcUa_CloseSecureChannelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSecureChannelResponse_Clear(OpcUa_CloseSecureChannelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_GetSize(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Encode(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSecureChannelResponse_Decode(OpcUa_CloseSecureChannelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSecureChannelResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CloseSecureChannelResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CloseSecureChannelResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSecureChannelResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CloseSecureChannelResponse_EncodeableType =
-{
-    "CloseSecureChannelResponse",
-    OpcUaId_CloseSecureChannelResponse,
-    OpcUaId_CloseSecureChannelResponse_Encoding_DefaultBinary,
-    OpcUaId_CloseSecureChannelResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CloseSecureChannelResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSecureChannelResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSecureChannelResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSecureChannelResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSecureChannelResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSecureChannelResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_SignatureData
-/*============================================================================
- * OpcUa_SignatureData_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_SignatureData_Initialize(OpcUa_SignatureData* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(String, Algorithm);
-        OpcUa_Field_Initialize(ByteString, Signature);
-    }
-}
-
-/*============================================================================
- * OpcUa_SignatureData_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_SignatureData_Clear(OpcUa_SignatureData* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(String, Algorithm);
-        OpcUa_Field_Clear(ByteString, Signature);
-    }
-}
-
-/*============================================================================
- * OpcUa_SignatureData_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignatureData_GetSize(OpcUa_SignatureData* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(String, Algorithm);
-    OpcUa_Field_GetSize(ByteString, Signature);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_SignatureData_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignatureData_Encode(OpcUa_SignatureData* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(String, Algorithm);
-    OpcUa_Field_Write(ByteString, Signature);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_SignatureData_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_SignatureData_Decode(OpcUa_SignatureData* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SignatureData_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_SignatureData_Initialize(a_pValue);
-
-    OpcUa_Field_Read(String, Algorithm);
-    OpcUa_Field_Read(ByteString, Signature);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_SignatureData_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_SignatureData_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_SignatureData_EncodeableType =
-{
-    "SignatureData",
-    OpcUaId_SignatureData,
-    OpcUaId_SignatureData_Encoding_DefaultBinary,
-    OpcUaId_SignatureData_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_SignatureData),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SignatureData_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SignatureData_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SignatureData_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SignatureData_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SignatureData_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CreateSession
-#ifndef OPCUA_EXCLUDE_CreateSessionRequest
-/*============================================================================
- * OpcUa_CreateSessionRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CreateSessionRequest_Initialize(OpcUa_CreateSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_InitializeEncodeable(OpcUa_ApplicationDescription, ClientDescription);
-        OpcUa_Field_Initialize(String, ServerUri);
-        OpcUa_Field_Initialize(String, EndpointUrl);
-        OpcUa_Field_Initialize(String, SessionName);
-        OpcUa_Field_Initialize(ByteString, ClientNonce);
-        OpcUa_Field_Initialize(ByteString, ClientCertificate);
-        OpcUa_Field_Initialize(Double, RequestedSessionTimeout);
-        OpcUa_Field_Initialize(UInt32, MaxResponseMessageSize);
-    }
-}
-
-/*============================================================================
- * OpcUa_CreateSessionRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CreateSessionRequest_Clear(OpcUa_CreateSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_ClearEncodeable(OpcUa_ApplicationDescription, ClientDescription);
-        OpcUa_Field_Clear(String, ServerUri);
-        OpcUa_Field_Clear(String, EndpointUrl);
-        OpcUa_Field_Clear(String, SessionName);
-        OpcUa_Field_Clear(ByteString, ClientNonce);
-        OpcUa_Field_Clear(ByteString, ClientCertificate);
-        OpcUa_Field_Clear(Double, RequestedSessionTimeout);
-        OpcUa_Field_Clear(UInt32, MaxResponseMessageSize);
-    }
-}
-
-/*============================================================================
- * OpcUa_CreateSessionRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionRequest_GetSize(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ApplicationDescription, ClientDescription);
-    OpcUa_Field_GetSize(String, ServerUri);
-    OpcUa_Field_GetSize(String, EndpointUrl);
-    OpcUa_Field_GetSize(String, SessionName);
-    OpcUa_Field_GetSize(ByteString, ClientNonce);
-    OpcUa_Field_GetSize(ByteString, ClientCertificate);
-    OpcUa_Field_GetSize(Double, RequestedSessionTimeout);
-    OpcUa_Field_GetSize(UInt32, MaxResponseMessageSize);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionRequest_Encode(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_WriteEncodeable(OpcUa_ApplicationDescription, ClientDescription);
-    OpcUa_Field_Write(String, ServerUri);
-    OpcUa_Field_Write(String, EndpointUrl);
-    OpcUa_Field_Write(String, SessionName);
-    OpcUa_Field_Write(ByteString, ClientNonce);
-    OpcUa_Field_Write(ByteString, ClientCertificate);
-    OpcUa_Field_Write(Double, RequestedSessionTimeout);
-    OpcUa_Field_Write(UInt32, MaxResponseMessageSize);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionRequest_Decode(OpcUa_CreateSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CreateSessionRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_ReadEncodeable(OpcUa_ApplicationDescription, ClientDescription);
-    OpcUa_Field_Read(String, ServerUri);
-    OpcUa_Field_Read(String, EndpointUrl);
-    OpcUa_Field_Read(String, SessionName);
-    OpcUa_Field_Read(ByteString, ClientNonce);
-    OpcUa_Field_Read(ByteString, ClientCertificate);
-    OpcUa_Field_Read(Double, RequestedSessionTimeout);
-    OpcUa_Field_Read(UInt32, MaxResponseMessageSize);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CreateSessionRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CreateSessionRequest_EncodeableType =
-{
-    "CreateSessionRequest",
-    OpcUaId_CreateSessionRequest,
-    OpcUaId_CreateSessionRequest_Encoding_DefaultBinary,
-    OpcUaId_CreateSessionRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CreateSessionRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CreateSessionRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CreateSessionRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CreateSessionRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CreateSessionRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CreateSessionRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CreateSessionResponse
-/*============================================================================
- * OpcUa_CreateSessionResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CreateSessionResponse_Initialize(OpcUa_CreateSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(NodeId, SessionId);
-        OpcUa_Field_Initialize(NodeId, AuthenticationToken);
-        OpcUa_Field_Initialize(Double, RevisedSessionTimeout);
-        OpcUa_Field_Initialize(ByteString, ServerNonce);
-        OpcUa_Field_Initialize(ByteString, ServerCertificate);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
-        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, ServerSignature);
-        OpcUa_Field_Initialize(UInt32, MaxRequestMessageSize);
-    }
-}
-
-/*============================================================================
- * OpcUa_CreateSessionResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CreateSessionResponse_Clear(OpcUa_CreateSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(NodeId, SessionId);
-        OpcUa_Field_Clear(NodeId, AuthenticationToken);
-        OpcUa_Field_Clear(Double, RevisedSessionTimeout);
-        OpcUa_Field_Clear(ByteString, ServerNonce);
-        OpcUa_Field_Clear(ByteString, ServerCertificate);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
-        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, ServerSignature);
-        OpcUa_Field_Clear(UInt32, MaxRequestMessageSize);
-    }
-}
-
-/*============================================================================
- * OpcUa_CreateSessionResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionResponse_GetSize(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(NodeId, SessionId);
-    OpcUa_Field_GetSize(NodeId, AuthenticationToken);
-    OpcUa_Field_GetSize(Double, RevisedSessionTimeout);
-    OpcUa_Field_GetSize(ByteString, ServerNonce);
-    OpcUa_Field_GetSize(ByteString, ServerCertificate);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, ServerSignature);
-    OpcUa_Field_GetSize(UInt32, MaxRequestMessageSize);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionResponse_Encode(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(NodeId, SessionId);
-    OpcUa_Field_Write(NodeId, AuthenticationToken);
-    OpcUa_Field_Write(Double, RevisedSessionTimeout);
-    OpcUa_Field_Write(ByteString, ServerNonce);
-    OpcUa_Field_Write(ByteString, ServerCertificate);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
-    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, ServerSignature);
-    OpcUa_Field_Write(UInt32, MaxRequestMessageSize);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CreateSessionResponse_Decode(OpcUa_CreateSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CreateSessionResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CreateSessionResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(NodeId, SessionId);
-    OpcUa_Field_Read(NodeId, AuthenticationToken);
-    OpcUa_Field_Read(Double, RevisedSessionTimeout);
-    OpcUa_Field_Read(ByteString, ServerNonce);
-    OpcUa_Field_Read(ByteString, ServerCertificate);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_EndpointDescription, ServerEndpoints);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_SignedSoftwareCertificate, ServerSoftwareCertificates);
-    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, ServerSignature);
-    OpcUa_Field_Read(UInt32, MaxRequestMessageSize);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CreateSessionResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CreateSessionResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CreateSessionResponse_EncodeableType =
-{
-    "CreateSessionResponse",
-    OpcUaId_CreateSessionResponse,
-    OpcUaId_CreateSessionResponse_Encoding_DefaultBinary,
-    OpcUaId_CreateSessionResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CreateSessionResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CreateSessionResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CreateSessionResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CreateSessionResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CreateSessionResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CreateSessionResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_ActivateSession
-#ifndef OPCUA_EXCLUDE_ActivateSessionRequest
-/*============================================================================
- * OpcUa_ActivateSessionRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ActivateSessionRequest_Initialize(OpcUa_ActivateSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, ClientSignature);
-        OpcUa_Field_InitializeEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
-        OpcUa_Field_InitializeArray(String, LocaleIds);
-        OpcUa_Field_Initialize(ExtensionObject, UserIdentityToken);
-        OpcUa_Field_InitializeEncodeable(OpcUa_SignatureData, UserTokenSignature);
-    }
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ActivateSessionRequest_Clear(OpcUa_ActivateSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, ClientSignature);
-        OpcUa_Field_ClearEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
-        OpcUa_Field_ClearArray(String, LocaleIds);
-        OpcUa_Field_Clear(ExtensionObject, UserIdentityToken);
-        OpcUa_Field_ClearEncodeable(OpcUa_SignatureData, UserTokenSignature);
-    }
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionRequest_GetSize(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, ClientSignature);
-    OpcUa_Field_GetSizeEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
-    OpcUa_Field_GetSizeArray(String, LocaleIds);
-    OpcUa_Field_GetSize(ExtensionObject, UserIdentityToken);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_SignatureData, UserTokenSignature);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionRequest_Encode(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, ClientSignature);
-    OpcUa_Field_WriteEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
-    OpcUa_Field_WriteArray(String, LocaleIds);
-    OpcUa_Field_Write(ExtensionObject, UserIdentityToken);
-    OpcUa_Field_WriteEncodeable(OpcUa_SignatureData, UserTokenSignature);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionRequest_Decode(OpcUa_ActivateSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ActivateSessionRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, ClientSignature);
-    OpcUa_Field_ReadEncodeableArray(OpcUa_SignedSoftwareCertificate, ClientSoftwareCertificates);
-    OpcUa_Field_ReadArray(String, LocaleIds);
-    OpcUa_Field_Read(ExtensionObject, UserIdentityToken);
-    OpcUa_Field_ReadEncodeable(OpcUa_SignatureData, UserTokenSignature);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ActivateSessionRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ActivateSessionRequest_EncodeableType =
-{
-    "ActivateSessionRequest",
-    OpcUaId_ActivateSessionRequest,
-    OpcUaId_ActivateSessionRequest_Encoding_DefaultBinary,
-    OpcUaId_ActivateSessionRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ActivateSessionRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ActivateSessionRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ActivateSessionRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ActivateSessionRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ActivateSessionRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ActivateSessionRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ActivateSessionResponse
-/*============================================================================
- * OpcUa_ActivateSessionResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_ActivateSessionResponse_Initialize(OpcUa_ActivateSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(ByteString, ServerNonce);
-        OpcUa_Field_InitializeArray(StatusCode, Results);
-        OpcUa_Field_InitializeArray(DiagnosticInfo, DiagnosticInfos);
-    }
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_ActivateSessionResponse_Clear(OpcUa_ActivateSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(ByteString, ServerNonce);
-        OpcUa_Field_ClearArray(StatusCode, Results);
-        OpcUa_Field_ClearArray(DiagnosticInfo, DiagnosticInfos);
-    }
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionResponse_GetSize(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(ByteString, ServerNonce);
-    OpcUa_Field_GetSizeArray(StatusCode, Results);
-    OpcUa_Field_GetSizeArray(DiagnosticInfo, DiagnosticInfos);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionResponse_Encode(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(ByteString, ServerNonce);
-    OpcUa_Field_WriteArray(StatusCode, Results);
-    OpcUa_Field_WriteArray(DiagnosticInfo, DiagnosticInfos);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ActivateSessionResponse_Decode(OpcUa_ActivateSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ActivateSessionResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_ActivateSessionResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(ByteString, ServerNonce);
-    OpcUa_Field_ReadArray(StatusCode, Results);
-    OpcUa_Field_ReadArray(DiagnosticInfo, DiagnosticInfos);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_ActivateSessionResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_ActivateSessionResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_ActivateSessionResponse_EncodeableType =
-{
-    "ActivateSessionResponse",
-    OpcUaId_ActivateSessionResponse,
-    OpcUaId_ActivateSessionResponse_Encoding_DefaultBinary,
-    OpcUaId_ActivateSessionResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_ActivateSessionResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ActivateSessionResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ActivateSessionResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ActivateSessionResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ActivateSessionResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ActivateSessionResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSession
-#ifndef OPCUA_EXCLUDE_CloseSessionRequest
-/*============================================================================
- * OpcUa_CloseSessionRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSessionRequest_Initialize(OpcUa_CloseSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(Boolean, DeleteSubscriptions);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSessionRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSessionRequest_Clear(OpcUa_CloseSessionRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(Boolean, DeleteSubscriptions);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSessionRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionRequest_GetSize(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(Boolean, DeleteSubscriptions);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionRequest_Encode(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(Boolean, DeleteSubscriptions);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionRequest_Decode(OpcUa_CloseSessionRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CloseSessionRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(Boolean, DeleteSubscriptions);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CloseSessionRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CloseSessionRequest_EncodeableType =
-{
-    "CloseSessionRequest",
-    OpcUaId_CloseSessionRequest,
-    OpcUaId_CloseSessionRequest_Encoding_DefaultBinary,
-    OpcUaId_CloseSessionRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CloseSessionRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSessionRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSessionRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSessionRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSessionRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSessionRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CloseSessionResponse
-/*============================================================================
- * OpcUa_CloseSessionResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSessionResponse_Initialize(OpcUa_CloseSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSessionResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CloseSessionResponse_Clear(OpcUa_CloseSessionResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    }
-}
-
-/*============================================================================
- * OpcUa_CloseSessionResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionResponse_GetSize(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionResponse_Encode(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CloseSessionResponse_Decode(OpcUa_CloseSessionResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CloseSessionResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CloseSessionResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CloseSessionResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CloseSessionResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CloseSessionResponse_EncodeableType =
-{
-    "CloseSessionResponse",
-    OpcUaId_CloseSessionResponse,
-    OpcUaId_CloseSessionResponse_Encoding_DefaultBinary,
-    OpcUaId_CloseSessionResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CloseSessionResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CloseSessionResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CloseSessionResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CloseSessionResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CloseSessionResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CloseSessionResponse_Decode
-};
-#endif
-#endif
-
-#ifndef OPCUA_EXCLUDE_Cancel
-#ifndef OPCUA_EXCLUDE_CancelRequest
-/*============================================================================
- * OpcUa_CancelRequest_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CancelRequest_Initialize(OpcUa_CancelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Initialize(UInt32, RequestHandle);
-    }
-}
-
-/*============================================================================
- * OpcUa_CancelRequest_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CancelRequest_Clear(OpcUa_CancelRequest* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_RequestHeader, RequestHeader);
-        OpcUa_Field_Clear(UInt32, RequestHandle);
-    }
-}
-
-/*============================================================================
- * OpcUa_CancelRequest_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelRequest_GetSize(OpcUa_CancelRequest* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_GetSize(UInt32, RequestHandle);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelRequest_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelRequest_Encode(OpcUa_CancelRequest* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Write(UInt32, RequestHandle);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelRequest_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelRequest_Decode(OpcUa_CancelRequest* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelRequest_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CancelRequest_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_RequestHeader, RequestHeader);
-    OpcUa_Field_Read(UInt32, RequestHandle);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CancelRequest_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelRequest_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CancelRequest_EncodeableType =
-{
-    "CancelRequest",
-    OpcUaId_CancelRequest,
-    OpcUaId_CancelRequest_Encoding_DefaultBinary,
-    OpcUaId_CancelRequest_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CancelRequest),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CancelRequest_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CancelRequest_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CancelRequest_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CancelRequest_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CancelRequest_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_CancelResponse
-/*============================================================================
- * OpcUa_CancelResponse_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_CancelResponse_Initialize(OpcUa_CancelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_InitializeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Initialize(UInt32, CancelCount);
-    }
-}
-
-/*============================================================================
- * OpcUa_CancelResponse_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_CancelResponse_Clear(OpcUa_CancelResponse* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_ClearEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-        OpcUa_Field_Clear(UInt32, CancelCount);
-    }
-}
-
-/*============================================================================
- * OpcUa_CancelResponse_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelResponse_GetSize(OpcUa_CancelResponse* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSizeEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_GetSize(UInt32, CancelCount);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelResponse_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelResponse_Encode(OpcUa_CancelResponse* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_WriteEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Write(UInt32, CancelCount);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelResponse_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_CancelResponse_Decode(OpcUa_CancelResponse* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "CancelResponse_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_CancelResponse_Initialize(a_pValue);
-
-    OpcUa_Field_ReadEncodeable(OpcUa_ResponseHeader, ResponseHeader);
-    OpcUa_Field_Read(UInt32, CancelCount);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_CancelResponse_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_CancelResponse_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_CancelResponse_EncodeableType =
-{
-    "CancelResponse",
-    OpcUaId_CancelResponse,
-    OpcUaId_CancelResponse_Encoding_DefaultBinary,
-    OpcUaId_CancelResponse_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_CancelResponse),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_CancelResponse_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_CancelResponse_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_CancelResponse_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_CancelResponse_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_CancelResponse_Decode
-};
-#endif
-#endif
-
 #ifndef OPCUA_EXCLUDE_AddNodesResult
 /*============================================================================
  * OpcUa_AddNodesResult_Initialize
@@ -11007,6 +9192,142 @@ struct _OpcUa_EncodeableType OpcUa_AddNodesResponse_EncodeableType =
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_AddReferencesItem
+/*============================================================================
+ * OpcUa_AddReferencesItem_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_AddReferencesItem_Initialize(OpcUa_AddReferencesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, SourceNodeId);
+        OpcUa_Field_Initialize(NodeId, ReferenceTypeId);
+        OpcUa_Field_Initialize(Boolean, IsForward);
+        OpcUa_Field_Initialize(String, TargetServerUri);
+        OpcUa_Field_Initialize(ExpandedNodeId, TargetNodeId);
+        OpcUa_Field_InitializeEnumerated(OpcUa_NodeClass, TargetNodeClass);
+    }
+}
+
+/*============================================================================
+ * OpcUa_AddReferencesItem_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_AddReferencesItem_Clear(OpcUa_AddReferencesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, SourceNodeId);
+        OpcUa_Field_Clear(NodeId, ReferenceTypeId);
+        OpcUa_Field_Clear(Boolean, IsForward);
+        OpcUa_Field_Clear(String, TargetServerUri);
+        OpcUa_Field_Clear(ExpandedNodeId, TargetNodeId);
+        OpcUa_Field_ClearEnumerated(OpcUa_NodeClass, TargetNodeClass);
+    }
+}
+
+/*============================================================================
+ * OpcUa_AddReferencesItem_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_AddReferencesItem_GetSize(OpcUa_AddReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, SourceNodeId);
+    OpcUa_Field_GetSize(NodeId, ReferenceTypeId);
+    OpcUa_Field_GetSize(Boolean, IsForward);
+    OpcUa_Field_GetSize(String, TargetServerUri);
+    OpcUa_Field_GetSize(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_GetSizeEnumerated(OpcUa_NodeClass, TargetNodeClass);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_AddReferencesItem_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_AddReferencesItem_Encode(OpcUa_AddReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, SourceNodeId);
+    OpcUa_Field_Write(NodeId, ReferenceTypeId);
+    OpcUa_Field_Write(Boolean, IsForward);
+    OpcUa_Field_Write(String, TargetServerUri);
+    OpcUa_Field_Write(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_WriteEnumerated(OpcUa_NodeClass, TargetNodeClass);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_AddReferencesItem_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_AddReferencesItem_Decode(OpcUa_AddReferencesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "AddReferencesItem_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_AddReferencesItem_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, SourceNodeId);
+    OpcUa_Field_Read(NodeId, ReferenceTypeId);
+    OpcUa_Field_Read(Boolean, IsForward);
+    OpcUa_Field_Read(String, TargetServerUri);
+    OpcUa_Field_Read(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_ReadEnumerated(OpcUa_NodeClass, TargetNodeClass);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_AddReferencesItem_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_AddReferencesItem_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_AddReferencesItem_EncodeableType =
+{
+    "AddReferencesItem",
+    OpcUaId_AddReferencesItem,
+    OpcUaId_AddReferencesItem_Encoding_DefaultBinary,
+    OpcUaId_AddReferencesItem_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_AddReferencesItem),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_AddReferencesItem_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_AddReferencesItem_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_AddReferencesItem_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_AddReferencesItem_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_AddReferencesItem_Decode
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_AddReferences
 #ifndef OPCUA_EXCLUDE_AddReferencesRequest
 /*============================================================================
@@ -11244,6 +9565,122 @@ struct _OpcUa_EncodeableType OpcUa_AddReferencesResponse_EncodeableType =
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_AddReferencesResponse_Decode
 };
 #endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_DeleteNodesItem
+/*============================================================================
+ * OpcUa_DeleteNodesItem_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_DeleteNodesItem_Initialize(OpcUa_DeleteNodesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, NodeId);
+        OpcUa_Field_Initialize(Boolean, DeleteTargetReferences);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DeleteNodesItem_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_DeleteNodesItem_Clear(OpcUa_DeleteNodesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, NodeId);
+        OpcUa_Field_Clear(Boolean, DeleteTargetReferences);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DeleteNodesItem_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteNodesItem_GetSize(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, NodeId);
+    OpcUa_Field_GetSize(Boolean, DeleteTargetReferences);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteNodesItem_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteNodesItem_Encode(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, NodeId);
+    OpcUa_Field_Write(Boolean, DeleteTargetReferences);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteNodesItem_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteNodesItem_Decode(OpcUa_DeleteNodesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteNodesItem_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_DeleteNodesItem_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, NodeId);
+    OpcUa_Field_Read(Boolean, DeleteTargetReferences);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_DeleteNodesItem_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteNodesItem_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_DeleteNodesItem_EncodeableType =
+{
+    "DeleteNodesItem",
+    OpcUaId_DeleteNodesItem,
+    OpcUaId_DeleteNodesItem_Encoding_DefaultBinary,
+    OpcUaId_DeleteNodesItem_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_DeleteNodesItem),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_DeleteNodesItem_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_DeleteNodesItem_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_DeleteNodesItem_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_DeleteNodesItem_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DeleteNodesItem_Decode
+};
 #endif
 
 #ifndef OPCUA_EXCLUDE_DeleteNodes
@@ -11485,6 +9922,137 @@ struct _OpcUa_EncodeableType OpcUa_DeleteNodesResponse_EncodeableType =
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_DeleteReferencesItem
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_DeleteReferencesItem_Initialize(OpcUa_DeleteReferencesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(NodeId, SourceNodeId);
+        OpcUa_Field_Initialize(NodeId, ReferenceTypeId);
+        OpcUa_Field_Initialize(Boolean, IsForward);
+        OpcUa_Field_Initialize(ExpandedNodeId, TargetNodeId);
+        OpcUa_Field_Initialize(Boolean, DeleteBidirectional);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_DeleteReferencesItem_Clear(OpcUa_DeleteReferencesItem* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(NodeId, SourceNodeId);
+        OpcUa_Field_Clear(NodeId, ReferenceTypeId);
+        OpcUa_Field_Clear(Boolean, IsForward);
+        OpcUa_Field_Clear(ExpandedNodeId, TargetNodeId);
+        OpcUa_Field_Clear(Boolean, DeleteBidirectional);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteReferencesItem_GetSize(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(NodeId, SourceNodeId);
+    OpcUa_Field_GetSize(NodeId, ReferenceTypeId);
+    OpcUa_Field_GetSize(Boolean, IsForward);
+    OpcUa_Field_GetSize(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_GetSize(Boolean, DeleteBidirectional);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteReferencesItem_Encode(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(NodeId, SourceNodeId);
+    OpcUa_Field_Write(NodeId, ReferenceTypeId);
+    OpcUa_Field_Write(Boolean, IsForward);
+    OpcUa_Field_Write(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_Write(Boolean, DeleteBidirectional);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DeleteReferencesItem_Decode(OpcUa_DeleteReferencesItem* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DeleteReferencesItem_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_DeleteReferencesItem_Initialize(a_pValue);
+
+    OpcUa_Field_Read(NodeId, SourceNodeId);
+    OpcUa_Field_Read(NodeId, ReferenceTypeId);
+    OpcUa_Field_Read(Boolean, IsForward);
+    OpcUa_Field_Read(ExpandedNodeId, TargetNodeId);
+    OpcUa_Field_Read(Boolean, DeleteBidirectional);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_DeleteReferencesItem_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DeleteReferencesItem_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_DeleteReferencesItem_EncodeableType =
+{
+    "DeleteReferencesItem",
+    OpcUaId_DeleteReferencesItem,
+    OpcUaId_DeleteReferencesItem_Encoding_DefaultBinary,
+    OpcUaId_DeleteReferencesItem_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_DeleteReferencesItem),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_DeleteReferencesItem_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_DeleteReferencesItem_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_DeleteReferencesItem_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_DeleteReferencesItem_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DeleteReferencesItem_Decode
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_DeleteReferences
 #ifndef OPCUA_EXCLUDE_DeleteReferencesRequest
 /*============================================================================
@@ -11722,6 +10290,45 @@ struct _OpcUa_EncodeableType OpcUa_DeleteReferencesResponse_EncodeableType =
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DeleteReferencesResponse_Decode
 };
 #endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_AttributeWriteMask
+/*============================================================================
+ * OpcUa_AttributeWriteMask_EnumeratedType
+ *===========================================================================*/
+static struct _OpcUa_EnumeratedValue g_OpcUa_AttributeWriteMask_EnumeratedValues[] =
+{
+    { "None", 0 },
+    { "AccessLevel", 1 },
+    { "ArrayDimensions", 2 },
+    { "BrowseName", 4 },
+    { "ContainsNoLoops", 8 },
+    { "DataType", 16 },
+    { "Description", 32 },
+    { "DisplayName", 64 },
+    { "EventNotifier", 128 },
+    { "Executable", 256 },
+    { "Historizing", 512 },
+    { "InverseName", 1024 },
+    { "IsAbstract", 2048 },
+    { "MinimumSamplingInterval", 4096 },
+    { "NodeClass", 8192 },
+    { "NodeId", 16384 },
+    { "Symmetric", 32768 },
+    { "UserAccessLevel", 65536 },
+    { "UserExecutable", 131072 },
+    { "UserWriteMask", 262144 },
+    { "ValueRank", 524288 },
+    { "WriteMask", 1048576 },
+    { "ValueForVariableType", 2097152 },
+    { OpcUa_Null, 0 }
+};
+
+struct _OpcUa_EnumeratedType OpcUa_AttributeWriteMask_EnumeratedType =
+{
+    "AttributeWriteMask",
+    g_OpcUa_AttributeWriteMask_EnumeratedValues
+};
 #endif
 
 #ifndef OPCUA_EXCLUDE_BrowseDirection
@@ -14067,6 +12674,157 @@ struct _OpcUa_EncodeableType OpcUa_UnregisterNodesResponse_EncodeableType =
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_UnregisterNodesResponse_Decode
 };
 #endif
+#endif
+
+#ifndef OPCUA_EXCLUDE_EndpointConfiguration
+/*============================================================================
+ * OpcUa_EndpointConfiguration_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_EndpointConfiguration_Initialize(OpcUa_EndpointConfiguration* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(Int32, OperationTimeout);
+        OpcUa_Field_Initialize(Boolean, UseBinaryEncoding);
+        OpcUa_Field_Initialize(Int32, MaxStringLength);
+        OpcUa_Field_Initialize(Int32, MaxByteStringLength);
+        OpcUa_Field_Initialize(Int32, MaxArrayLength);
+        OpcUa_Field_Initialize(Int32, MaxMessageSize);
+        OpcUa_Field_Initialize(Int32, MaxBufferSize);
+        OpcUa_Field_Initialize(Int32, ChannelLifetime);
+        OpcUa_Field_Initialize(Int32, SecurityTokenLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_EndpointConfiguration_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_EndpointConfiguration_Clear(OpcUa_EndpointConfiguration* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(Int32, OperationTimeout);
+        OpcUa_Field_Clear(Boolean, UseBinaryEncoding);
+        OpcUa_Field_Clear(Int32, MaxStringLength);
+        OpcUa_Field_Clear(Int32, MaxByteStringLength);
+        OpcUa_Field_Clear(Int32, MaxArrayLength);
+        OpcUa_Field_Clear(Int32, MaxMessageSize);
+        OpcUa_Field_Clear(Int32, MaxBufferSize);
+        OpcUa_Field_Clear(Int32, ChannelLifetime);
+        OpcUa_Field_Clear(Int32, SecurityTokenLifetime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_EndpointConfiguration_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EndpointConfiguration_GetSize(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(Int32, OperationTimeout);
+    OpcUa_Field_GetSize(Boolean, UseBinaryEncoding);
+    OpcUa_Field_GetSize(Int32, MaxStringLength);
+    OpcUa_Field_GetSize(Int32, MaxByteStringLength);
+    OpcUa_Field_GetSize(Int32, MaxArrayLength);
+    OpcUa_Field_GetSize(Int32, MaxMessageSize);
+    OpcUa_Field_GetSize(Int32, MaxBufferSize);
+    OpcUa_Field_GetSize(Int32, ChannelLifetime);
+    OpcUa_Field_GetSize(Int32, SecurityTokenLifetime);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EndpointConfiguration_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EndpointConfiguration_Encode(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(Int32, OperationTimeout);
+    OpcUa_Field_Write(Boolean, UseBinaryEncoding);
+    OpcUa_Field_Write(Int32, MaxStringLength);
+    OpcUa_Field_Write(Int32, MaxByteStringLength);
+    OpcUa_Field_Write(Int32, MaxArrayLength);
+    OpcUa_Field_Write(Int32, MaxMessageSize);
+    OpcUa_Field_Write(Int32, MaxBufferSize);
+    OpcUa_Field_Write(Int32, ChannelLifetime);
+    OpcUa_Field_Write(Int32, SecurityTokenLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EndpointConfiguration_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EndpointConfiguration_Decode(OpcUa_EndpointConfiguration* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EndpointConfiguration_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_EndpointConfiguration_Initialize(a_pValue);
+
+    OpcUa_Field_Read(Int32, OperationTimeout);
+    OpcUa_Field_Read(Boolean, UseBinaryEncoding);
+    OpcUa_Field_Read(Int32, MaxStringLength);
+    OpcUa_Field_Read(Int32, MaxByteStringLength);
+    OpcUa_Field_Read(Int32, MaxArrayLength);
+    OpcUa_Field_Read(Int32, MaxMessageSize);
+    OpcUa_Field_Read(Int32, MaxBufferSize);
+    OpcUa_Field_Read(Int32, ChannelLifetime);
+    OpcUa_Field_Read(Int32, SecurityTokenLifetime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_EndpointConfiguration_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EndpointConfiguration_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_EndpointConfiguration_EncodeableType =
+{
+    "EndpointConfiguration",
+    OpcUaId_EndpointConfiguration,
+    OpcUaId_EndpointConfiguration_Encoding_DefaultBinary,
+    OpcUaId_EndpointConfiguration_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_EndpointConfiguration),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_EndpointConfiguration_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_EndpointConfiguration_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_EndpointConfiguration_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_EndpointConfiguration_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_EndpointConfiguration_Decode
+};
 #endif
 
 #ifndef OPCUA_EXCLUDE_QueryDataDescription
@@ -19394,122 +18152,6 @@ struct _OpcUa_EncodeableType OpcUa_HistoryUpdateResult_EncodeableType =
     (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_HistoryUpdateResult_GetSize,
     (OpcUa_EncodeableObject_PfnEncode*)OpcUa_HistoryUpdateResult_Encode,
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_HistoryUpdateResult_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_HistoryUpdateEventResult
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_HistoryUpdateEventResult_Initialize(OpcUa_HistoryUpdateEventResult* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Initialize(StatusCode, StatusCode);
-        OpcUa_Field_InitializeEncodeable(OpcUa_EventFilterResult, EventFilterResult);
-    }
-}
-
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_HistoryUpdateEventResult_Clear(OpcUa_HistoryUpdateEventResult* a_pValue)
-{
-    if (a_pValue != OpcUa_Null)
-    {
-        OpcUa_Field_Clear(StatusCode, StatusCode);
-        OpcUa_Field_ClearEncodeable(OpcUa_EventFilterResult, EventFilterResult);
-    }
-}
-
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_GetSize
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_GetSize(OpcUa_HistoryUpdateEventResult* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
-{
-    OpcUa_Int32 iSize = 0;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "HistoryUpdateEventResult_GetSize");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
-
-    *a_pSize = -1;
-
-    OpcUa_Field_GetSize(StatusCode, StatusCode);
-    OpcUa_Field_GetSizeEncodeable(OpcUa_EventFilterResult, EventFilterResult);
-
-    *a_pSize = iSize;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    *a_pSize = -1;
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_Encode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_Encode(OpcUa_HistoryUpdateEventResult* a_pValue, OpcUa_Encoder* a_pEncoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "HistoryUpdateEventResult_Encode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-
-    OpcUa_Field_Write(StatusCode, StatusCode);
-    OpcUa_Field_WriteEncodeable(OpcUa_EventFilterResult, EventFilterResult);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_Decode
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_HistoryUpdateEventResult_Decode(OpcUa_HistoryUpdateEventResult* a_pValue, OpcUa_Decoder* a_pDecoder)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "HistoryUpdateEventResult_Decode");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
-    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
-
-    OpcUa_HistoryUpdateEventResult_Initialize(a_pValue);
-
-    OpcUa_Field_Read(StatusCode, StatusCode);
-    OpcUa_Field_ReadEncodeable(OpcUa_EventFilterResult, EventFilterResult);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    OpcUa_HistoryUpdateEventResult_Clear(a_pValue);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_HistoryUpdateEventResult_EncodeableType
- *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_HistoryUpdateEventResult_EncodeableType =
-{
-    "HistoryUpdateEventResult",
-    OpcUaId_HistoryUpdateEventResult,
-    OpcUaId_HistoryUpdateEventResult_Encoding_DefaultBinary,
-    OpcUaId_HistoryUpdateEventResult_Encoding_DefaultXml,
-    OpcUa_Null,
-    sizeof(OpcUa_HistoryUpdateEventResult),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_HistoryUpdateEventResult_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_HistoryUpdateEventResult_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_HistoryUpdateEventResult_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_HistoryUpdateEventResult_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_HistoryUpdateEventResult_Decode
 };
 #endif
 
@@ -25718,6 +24360,142 @@ struct _OpcUa_EncodeableType OpcUa_DeleteSubscriptionsResponse_EncodeableType =
 #endif
 #endif
 
+#ifndef OPCUA_EXCLUDE_BuildInfo
+/*============================================================================
+ * OpcUa_BuildInfo_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_BuildInfo_Initialize(OpcUa_BuildInfo* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, ProductUri);
+        OpcUa_Field_Initialize(String, ManufacturerName);
+        OpcUa_Field_Initialize(String, ProductName);
+        OpcUa_Field_Initialize(String, SoftwareVersion);
+        OpcUa_Field_Initialize(String, BuildNumber);
+        OpcUa_Field_Initialize(DateTime, BuildDate);
+    }
+}
+
+/*============================================================================
+ * OpcUa_BuildInfo_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_BuildInfo_Clear(OpcUa_BuildInfo* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, ProductUri);
+        OpcUa_Field_Clear(String, ManufacturerName);
+        OpcUa_Field_Clear(String, ProductName);
+        OpcUa_Field_Clear(String, SoftwareVersion);
+        OpcUa_Field_Clear(String, BuildNumber);
+        OpcUa_Field_Clear(DateTime, BuildDate);
+    }
+}
+
+/*============================================================================
+ * OpcUa_BuildInfo_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_BuildInfo_GetSize(OpcUa_BuildInfo* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, ProductUri);
+    OpcUa_Field_GetSize(String, ManufacturerName);
+    OpcUa_Field_GetSize(String, ProductName);
+    OpcUa_Field_GetSize(String, SoftwareVersion);
+    OpcUa_Field_GetSize(String, BuildNumber);
+    OpcUa_Field_GetSize(DateTime, BuildDate);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_BuildInfo_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_BuildInfo_Encode(OpcUa_BuildInfo* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, ProductUri);
+    OpcUa_Field_Write(String, ManufacturerName);
+    OpcUa_Field_Write(String, ProductName);
+    OpcUa_Field_Write(String, SoftwareVersion);
+    OpcUa_Field_Write(String, BuildNumber);
+    OpcUa_Field_Write(DateTime, BuildDate);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_BuildInfo_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_BuildInfo_Decode(OpcUa_BuildInfo* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "BuildInfo_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_BuildInfo_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, ProductUri);
+    OpcUa_Field_Read(String, ManufacturerName);
+    OpcUa_Field_Read(String, ProductName);
+    OpcUa_Field_Read(String, SoftwareVersion);
+    OpcUa_Field_Read(String, BuildNumber);
+    OpcUa_Field_Read(DateTime, BuildDate);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_BuildInfo_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_BuildInfo_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_BuildInfo_EncodeableType =
+{
+    "BuildInfo",
+    OpcUaId_BuildInfo,
+    OpcUaId_BuildInfo_Encoding_DefaultBinary,
+    OpcUaId_BuildInfo_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_BuildInfo),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_BuildInfo_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_BuildInfo_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_BuildInfo_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_BuildInfo_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_BuildInfo_Decode
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_RedundancySupport
 /*============================================================================
  * OpcUa_RedundancySupport_EnumeratedType
@@ -27128,6 +25906,122 @@ struct _OpcUa_EncodeableType OpcUa_ServiceCounterDataType_EncodeableType =
 };
 #endif
 
+#ifndef OPCUA_EXCLUDE_StatusResult
+/*============================================================================
+ * OpcUa_StatusResult_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_StatusResult_Initialize(OpcUa_StatusResult* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(StatusCode, StatusCode);
+        OpcUa_Field_Initialize(DiagnosticInfo, DiagnosticInfo);
+    }
+}
+
+/*============================================================================
+ * OpcUa_StatusResult_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_StatusResult_Clear(OpcUa_StatusResult* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(StatusCode, StatusCode);
+        OpcUa_Field_Clear(DiagnosticInfo, DiagnosticInfo);
+    }
+}
+
+/*============================================================================
+ * OpcUa_StatusResult_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_StatusResult_GetSize(OpcUa_StatusResult* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(StatusCode, StatusCode);
+    OpcUa_Field_GetSize(DiagnosticInfo, DiagnosticInfo);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_StatusResult_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_StatusResult_Encode(OpcUa_StatusResult* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(StatusCode, StatusCode);
+    OpcUa_Field_Write(DiagnosticInfo, DiagnosticInfo);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_StatusResult_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_StatusResult_Decode(OpcUa_StatusResult* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "StatusResult_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_StatusResult_Initialize(a_pValue);
+
+    OpcUa_Field_Read(StatusCode, StatusCode);
+    OpcUa_Field_Read(DiagnosticInfo, DiagnosticInfo);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_StatusResult_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_StatusResult_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_StatusResult_EncodeableType =
+{
+    "StatusResult",
+    OpcUaId_StatusResult,
+    OpcUaId_StatusResult_Encoding_DefaultBinary,
+    OpcUaId_StatusResult_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_StatusResult),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_StatusResult_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_StatusResult_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_StatusResult_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_StatusResult_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_StatusResult_Decode
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_SubscriptionDiagnosticsDataType
 /*============================================================================
  * OpcUa_SubscriptionDiagnosticsDataType_Initialize
@@ -27389,6 +26283,27 @@ struct _OpcUa_EncodeableType OpcUa_SubscriptionDiagnosticsDataType_EncodeableTyp
 };
 #endif
 
+#ifndef OPCUA_EXCLUDE_ModelChangeStructureVerbMask
+/*============================================================================
+ * OpcUa_ModelChangeStructureVerbMask_EnumeratedType
+ *===========================================================================*/
+static struct _OpcUa_EnumeratedValue g_OpcUa_ModelChangeStructureVerbMask_EnumeratedValues[] =
+{
+    { "NodeAdded", 1 },
+    { "NodeDeleted", 2 },
+    { "ReferenceAdded", 4 },
+    { "ReferenceDeleted", 8 },
+    { "DataTypeChanged", 16 },
+    { OpcUa_Null, 0 }
+};
+
+struct _OpcUa_EnumeratedType OpcUa_ModelChangeStructureVerbMask_EnumeratedType =
+{
+    "ModelChangeStructureVerbMask",
+    g_OpcUa_ModelChangeStructureVerbMask_EnumeratedValues
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_ModelChangeStructureDataType
 /*============================================================================
  * OpcUa_ModelChangeStructureDataType_Initialize
@@ -27507,27 +26422,6 @@ struct _OpcUa_EncodeableType OpcUa_ModelChangeStructureDataType_EncodeableType =
     (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ModelChangeStructureDataType_GetSize,
     (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ModelChangeStructureDataType_Encode,
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ModelChangeStructureDataType_Decode
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_ModelChangeStructureVerbMask
-/*============================================================================
- * OpcUa_ModelChangeStructureVerbMask_EnumeratedType
- *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_ModelChangeStructureVerbMask_EnumeratedValues[] =
-{
-    { "NodeAdded", 1 },
-    { "NodeDeleted", 2 },
-    { "ReferenceAdded", 4 },
-    { "ReferenceDeleted", 8 },
-    { "DataTypeChanged", 16 },
-    { OpcUa_Null, 0 }
-};
-
-struct _OpcUa_EnumeratedType OpcUa_ModelChangeStructureVerbMask_EnumeratedType =
-{
-    "ModelChangeStructureVerbMask",
-    g_OpcUa_ModelChangeStructureVerbMask_EnumeratedValues
 };
 #endif
 
@@ -27908,62 +26802,39 @@ struct _OpcUa_EnumeratedType OpcUa_AxisScaleEnumeration_EnumeratedType =
 };
 #endif
 
-#ifndef OPCUA_EXCLUDE_ExceptionDeviationFormat
+#ifndef OPCUA_EXCLUDE_ComplexNumberType
 /*============================================================================
- * OpcUa_ExceptionDeviationFormat_EnumeratedType
+ * OpcUa_ComplexNumberType_Initialize
  *===========================================================================*/
-static struct _OpcUa_EnumeratedValue g_OpcUa_ExceptionDeviationFormat_EnumeratedValues[] =
-{
-    { "AbsoluteValue", 0 },
-    { "PercentOfRange", 1 },
-    { "PercentOfValue", 2 },
-    { "PercentOfEURange", 3 },
-    { "Unknown", 4 },
-    { OpcUa_Null, 0 }
-};
-
-struct _OpcUa_EnumeratedType OpcUa_ExceptionDeviationFormat_EnumeratedType =
-{
-    "ExceptionDeviationFormat",
-    g_OpcUa_ExceptionDeviationFormat_EnumeratedValues
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_Annotation
-/*============================================================================
- * OpcUa_Annotation_Initialize
- *===========================================================================*/
-OpcUa_Void OpcUa_Annotation_Initialize(OpcUa_Annotation* a_pValue)
+OpcUa_Void OpcUa_ComplexNumberType_Initialize(OpcUa_ComplexNumberType* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Initialize(String, Message);
-        OpcUa_Field_Initialize(String, UserName);
-        OpcUa_Field_Initialize(DateTime, AnnotationTime);
+        OpcUa_Field_Initialize(Float, Real);
+        OpcUa_Field_Initialize(Float, Imaginary);
     }
 }
 
 /*============================================================================
- * OpcUa_Annotation_Clear
+ * OpcUa_ComplexNumberType_Clear
  *===========================================================================*/
-OpcUa_Void OpcUa_Annotation_Clear(OpcUa_Annotation* a_pValue)
+OpcUa_Void OpcUa_ComplexNumberType_Clear(OpcUa_ComplexNumberType* a_pValue)
 {
     if (a_pValue != OpcUa_Null)
     {
-        OpcUa_Field_Clear(String, Message);
-        OpcUa_Field_Clear(String, UserName);
-        OpcUa_Field_Clear(DateTime, AnnotationTime);
+        OpcUa_Field_Clear(Float, Real);
+        OpcUa_Field_Clear(Float, Imaginary);
     }
 }
 
 /*============================================================================
- * OpcUa_Annotation_GetSize
+ * OpcUa_ComplexNumberType_GetSize
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+OpcUa_StatusCode OpcUa_ComplexNumberType_GetSize(OpcUa_ComplexNumberType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
 {
     OpcUa_Int32 iSize = 0;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_GetSize");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ComplexNumberType_GetSize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
@@ -27971,9 +26842,8 @@ OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* a_pValue, OpcUa_Enco
 
     *a_pSize = -1;
 
-    OpcUa_Field_GetSize(String, Message);
-    OpcUa_Field_GetSize(String, UserName);
-    OpcUa_Field_GetSize(DateTime, AnnotationTime);
+    OpcUa_Field_GetSize(Float, Real);
+    OpcUa_Field_GetSize(Float, Imaginary);
 
     *a_pSize = iSize;
 
@@ -27986,18 +26856,17 @@ OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* a_pValue, OpcUa_Enco
 }
 
 /*============================================================================
- * OpcUa_Annotation_Encode
+ * OpcUa_ComplexNumberType_Encode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_Annotation_Encode(OpcUa_Annotation* a_pValue, OpcUa_Encoder* a_pEncoder)
+OpcUa_StatusCode OpcUa_ComplexNumberType_Encode(OpcUa_ComplexNumberType* a_pValue, OpcUa_Encoder* a_pEncoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_Encode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ComplexNumberType_Encode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
 
-    OpcUa_Field_Write(String, Message);
-    OpcUa_Field_Write(String, UserName);
-    OpcUa_Field_Write(DateTime, AnnotationTime);
+    OpcUa_Field_Write(Float, Real);
+    OpcUa_Field_Write(Float, Imaginary);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -28008,45 +26877,160 @@ OpcUa_StatusCode OpcUa_Annotation_Encode(OpcUa_Annotation* a_pValue, OpcUa_Encod
 }
 
 /*============================================================================
- * OpcUa_Annotation_Decode
+ * OpcUa_ComplexNumberType_Decode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_Annotation_Decode(OpcUa_Annotation* a_pValue, OpcUa_Decoder* a_pDecoder)
+OpcUa_StatusCode OpcUa_ComplexNumberType_Decode(OpcUa_ComplexNumberType* a_pValue, OpcUa_Decoder* a_pDecoder)
 {
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_Decode");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "ComplexNumberType_Decode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
 
-    OpcUa_Annotation_Initialize(a_pValue);
+    OpcUa_ComplexNumberType_Initialize(a_pValue);
 
-    OpcUa_Field_Read(String, Message);
-    OpcUa_Field_Read(String, UserName);
-    OpcUa_Field_Read(DateTime, AnnotationTime);
+    OpcUa_Field_Read(Float, Real);
+    OpcUa_Field_Read(Float, Imaginary);
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_Annotation_Clear(a_pValue);
+    OpcUa_ComplexNumberType_Clear(a_pValue);
 
     OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_Annotation_EncodeableType
+ * OpcUa_ComplexNumberType_EncodeableType
  *===========================================================================*/
-struct _OpcUa_EncodeableType OpcUa_Annotation_EncodeableType =
+struct _OpcUa_EncodeableType OpcUa_ComplexNumberType_EncodeableType =
 {
-    "Annotation",
-    OpcUaId_Annotation,
-    OpcUaId_Annotation_Encoding_DefaultBinary,
-    OpcUaId_Annotation_Encoding_DefaultXml,
+    "ComplexNumberType",
+    OpcUaId_ComplexNumberType,
+    OpcUaId_ComplexNumberType_Encoding_DefaultBinary,
+    OpcUaId_ComplexNumberType_Encoding_DefaultXml,
     OpcUa_Null,
-    sizeof(OpcUa_Annotation),
-    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_Annotation_Initialize,
-    (OpcUa_EncodeableObject_PfnClear*)OpcUa_Annotation_Clear,
-    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_Annotation_GetSize,
-    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_Annotation_Encode,
-    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_Annotation_Decode
+    sizeof(OpcUa_ComplexNumberType),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_ComplexNumberType_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_ComplexNumberType_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ComplexNumberType_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ComplexNumberType_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ComplexNumberType_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_DoubleComplexNumberType
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_DoubleComplexNumberType_Initialize(OpcUa_DoubleComplexNumberType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(Double, Real);
+        OpcUa_Field_Initialize(Double, Imaginary);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_DoubleComplexNumberType_Clear(OpcUa_DoubleComplexNumberType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(Double, Real);
+        OpcUa_Field_Clear(Double, Imaginary);
+    }
+}
+
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DoubleComplexNumberType_GetSize(OpcUa_DoubleComplexNumberType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DoubleComplexNumberType_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(Double, Real);
+    OpcUa_Field_GetSize(Double, Imaginary);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DoubleComplexNumberType_Encode(OpcUa_DoubleComplexNumberType* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DoubleComplexNumberType_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(Double, Real);
+    OpcUa_Field_Write(Double, Imaginary);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_DoubleComplexNumberType_Decode(OpcUa_DoubleComplexNumberType* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "DoubleComplexNumberType_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_DoubleComplexNumberType_Initialize(a_pValue);
+
+    OpcUa_Field_Read(Double, Real);
+    OpcUa_Field_Read(Double, Imaginary);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_DoubleComplexNumberType_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_DoubleComplexNumberType_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_DoubleComplexNumberType_EncodeableType =
+{
+    "DoubleComplexNumberType",
+    OpcUaId_DoubleComplexNumberType,
+    OpcUaId_DoubleComplexNumberType_Encoding_DefaultBinary,
+    OpcUaId_DoubleComplexNumberType_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_DoubleComplexNumberType),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_DoubleComplexNumberType_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_DoubleComplexNumberType_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_DoubleComplexNumberType_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_DoubleComplexNumberType_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_DoubleComplexNumberType_Decode
 };
 #endif
 
@@ -28453,6 +27437,148 @@ struct _OpcUa_EncodeableType OpcUa_ProgramDiagnosticDataType_EncodeableType =
 };
 #endif
 
+#ifndef OPCUA_EXCLUDE_Annotation
+/*============================================================================
+ * OpcUa_Annotation_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_Annotation_Initialize(OpcUa_Annotation* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(String, Message);
+        OpcUa_Field_Initialize(String, UserName);
+        OpcUa_Field_Initialize(DateTime, AnnotationTime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_Annotation_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_Annotation_Clear(OpcUa_Annotation* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(String, Message);
+        OpcUa_Field_Clear(String, UserName);
+        OpcUa_Field_Clear(DateTime, AnnotationTime);
+    }
+}
+
+/*============================================================================
+ * OpcUa_Annotation_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_Annotation_GetSize(OpcUa_Annotation* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(String, Message);
+    OpcUa_Field_GetSize(String, UserName);
+    OpcUa_Field_GetSize(DateTime, AnnotationTime);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_Annotation_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_Annotation_Encode(OpcUa_Annotation* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(String, Message);
+    OpcUa_Field_Write(String, UserName);
+    OpcUa_Field_Write(DateTime, AnnotationTime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_Annotation_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_Annotation_Decode(OpcUa_Annotation* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "Annotation_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_Annotation_Initialize(a_pValue);
+
+    OpcUa_Field_Read(String, Message);
+    OpcUa_Field_Read(String, UserName);
+    OpcUa_Field_Read(DateTime, AnnotationTime);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_Annotation_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_Annotation_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_Annotation_EncodeableType =
+{
+    "Annotation",
+    OpcUaId_Annotation,
+    OpcUaId_Annotation_Encoding_DefaultBinary,
+    OpcUaId_Annotation_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_Annotation),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_Annotation_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_Annotation_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_Annotation_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_Annotation_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_Annotation_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_ExceptionDeviationFormat
+/*============================================================================
+ * OpcUa_ExceptionDeviationFormat_EnumeratedType
+ *===========================================================================*/
+static struct _OpcUa_EnumeratedValue g_OpcUa_ExceptionDeviationFormat_EnumeratedValues[] =
+{
+    { "AbsoluteValue", 0 },
+    { "PercentOfValue", 1 },
+    { "PercentOfRange", 2 },
+    { "PercentOfEURange", 3 },
+    { "Unknown", 4 },
+    { OpcUa_Null, 0 }
+};
+
+struct _OpcUa_EnumeratedType OpcUa_ExceptionDeviationFormat_EnumeratedType =
+{
+    "ExceptionDeviationFormat",
+    g_OpcUa_ExceptionDeviationFormat_EnumeratedValues
+};
+#endif
+
 /*============================================================================
  * Table of known types.
  *===========================================================================*/
@@ -28460,6 +27586,12 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
 {
     #ifndef OPCUA_EXCLUDE_Node
     &OpcUa_Node_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_InstanceNode
+    &OpcUa_InstanceNode_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_TypeNode
+    &OpcUa_TypeNode_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_ObjectNode
     &OpcUa_ObjectNode_EncodeableType,
@@ -28491,29 +27623,82 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_Argument
     &OpcUa_Argument_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_TimeZoneDataType
-    &OpcUa_TimeZoneDataType_EncodeableType,
-    #endif
     #ifndef OPCUA_EXCLUDE_EnumValueType
     &OpcUa_EnumValueType_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_StatusResult
-    &OpcUa_StatusResult_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_OptionSet
+    &OpcUa_OptionSet_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_UserTokenPolicy
-    &OpcUa_UserTokenPolicy_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_TimeZoneDataType
+    &OpcUa_TimeZoneDataType_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_ApplicationDescription
     &OpcUa_ApplicationDescription_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_RequestHeader
+    &OpcUa_RequestHeader_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_ResponseHeader
+    &OpcUa_ResponseHeader_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_ServiceFault
+    &OpcUa_ServiceFault_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_FindServers
+    &OpcUa_FindServersRequest_EncodeableType,
+    &OpcUa_FindServersResponse_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_ServerOnNetwork
     &OpcUa_ServerOnNetwork_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_FindServersOnNetwork
+    &OpcUa_FindServersOnNetworkRequest_EncodeableType,
+    &OpcUa_FindServersOnNetworkResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_UserTokenPolicy
+    &OpcUa_UserTokenPolicy_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_EndpointDescription
+    &OpcUa_EndpointDescription_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_GetEndpoints
+    &OpcUa_GetEndpointsRequest_EncodeableType,
+    &OpcUa_GetEndpointsResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_RegisteredServer
+    &OpcUa_RegisteredServer_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_RegisterServer
+    &OpcUa_RegisterServerRequest_EncodeableType,
+    &OpcUa_RegisterServerResponse_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_MdnsDiscoveryConfiguration
     &OpcUa_MdnsDiscoveryConfiguration_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_EndpointDescription
-    &OpcUa_EndpointDescription_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_RegisterServer2
+    &OpcUa_RegisterServer2Request_EncodeableType,
+    &OpcUa_RegisterServer2Response_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_ChannelSecurityToken
+    &OpcUa_ChannelSecurityToken_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_OpenSecureChannel
+    &OpcUa_OpenSecureChannelRequest_EncodeableType,
+    &OpcUa_OpenSecureChannelResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_CloseSecureChannel
+    &OpcUa_CloseSecureChannelRequest_EncodeableType,
+    &OpcUa_CloseSecureChannelResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
+    &OpcUa_SignedSoftwareCertificate_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_SignatureData
+    &OpcUa_SignatureData_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_CreateSession
+    &OpcUa_CreateSessionRequest_EncodeableType,
+    &OpcUa_CreateSessionResponse_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_UserIdentityToken
     &OpcUa_UserIdentityToken_EncodeableType,
@@ -28530,20 +27715,17 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_IssuedIdentityToken
     &OpcUa_IssuedIdentityToken_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_EndpointConfiguration
-    &OpcUa_EndpointConfiguration_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_ActivateSession
+    &OpcUa_ActivateSessionRequest_EncodeableType,
+    &OpcUa_ActivateSessionResponse_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_SupportedProfile
-    &OpcUa_SupportedProfile_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_CloseSession
+    &OpcUa_CloseSessionRequest_EncodeableType,
+    &OpcUa_CloseSessionResponse_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_BuildInfo
-    &OpcUa_BuildInfo_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_SoftwareCertificate
-    &OpcUa_SoftwareCertificate_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_SignedSoftwareCertificate
-    &OpcUa_SignedSoftwareCertificate_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_Cancel
+    &OpcUa_CancelRequest_EncodeableType,
+    &OpcUa_CancelResponse_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_NodeAttributes
     &OpcUa_NodeAttributes_EncodeableType,
@@ -28575,94 +27757,6 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_AddNodesItem
     &OpcUa_AddNodesItem_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_AddReferencesItem
-    &OpcUa_AddReferencesItem_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_DeleteNodesItem
-    &OpcUa_DeleteNodesItem_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_DeleteReferencesItem
-    &OpcUa_DeleteReferencesItem_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_RequestHeader
-    &OpcUa_RequestHeader_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ResponseHeader
-    &OpcUa_ResponseHeader_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ServiceFault
-    &OpcUa_ServiceFault_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ScalarTestType
-    &OpcUa_ScalarTestType_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ArrayTestType
-    &OpcUa_ArrayTestType_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_CompositeTestType
-    &OpcUa_CompositeTestType_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_TestStack
-    &OpcUa_TestStackRequest_EncodeableType,
-    &OpcUa_TestStackResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_TestStackEx
-    &OpcUa_TestStackExRequest_EncodeableType,
-    &OpcUa_TestStackExResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_FindServers
-    &OpcUa_FindServersRequest_EncodeableType,
-    &OpcUa_FindServersResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_FindServersOnNetwork
-    &OpcUa_FindServersOnNetworkRequest_EncodeableType,
-    &OpcUa_FindServersOnNetworkResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_GetEndpoints
-    &OpcUa_GetEndpointsRequest_EncodeableType,
-    &OpcUa_GetEndpointsResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_RegisteredServer
-    &OpcUa_RegisteredServer_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_RegisterServer
-    &OpcUa_RegisterServerRequest_EncodeableType,
-    &OpcUa_RegisterServerResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_RegisterServer2
-    &OpcUa_RegisterServer2Request_EncodeableType,
-    &OpcUa_RegisterServer2Response_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ChannelSecurityToken
-    &OpcUa_ChannelSecurityToken_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_OpenSecureChannel
-    &OpcUa_OpenSecureChannelRequest_EncodeableType,
-    &OpcUa_OpenSecureChannelResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_CloseSecureChannel
-    &OpcUa_CloseSecureChannelRequest_EncodeableType,
-    &OpcUa_CloseSecureChannelResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_SignatureData
-    &OpcUa_SignatureData_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_CreateSession
-    &OpcUa_CreateSessionRequest_EncodeableType,
-    &OpcUa_CreateSessionResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_ActivateSession
-    &OpcUa_ActivateSessionRequest_EncodeableType,
-    &OpcUa_ActivateSessionResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_CloseSession
-    &OpcUa_CloseSessionRequest_EncodeableType,
-    &OpcUa_CloseSessionResponse_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_Cancel
-    &OpcUa_CancelRequest_EncodeableType,
-    &OpcUa_CancelResponse_EncodeableType,
-    #endif
     #ifndef OPCUA_EXCLUDE_AddNodesResult
     &OpcUa_AddNodesResult_EncodeableType,
     #endif
@@ -28670,13 +27764,22 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     &OpcUa_AddNodesRequest_EncodeableType,
     &OpcUa_AddNodesResponse_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_AddReferencesItem
+    &OpcUa_AddReferencesItem_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_AddReferences
     &OpcUa_AddReferencesRequest_EncodeableType,
     &OpcUa_AddReferencesResponse_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_DeleteNodesItem
+    &OpcUa_DeleteNodesItem_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_DeleteNodes
     &OpcUa_DeleteNodesRequest_EncodeableType,
     &OpcUa_DeleteNodesResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_DeleteReferencesItem
+    &OpcUa_DeleteReferencesItem_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_DeleteReferences
     &OpcUa_DeleteReferencesRequest_EncodeableType,
@@ -28728,6 +27831,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_UnregisterNodes
     &OpcUa_UnregisterNodesRequest_EncodeableType,
     &OpcUa_UnregisterNodesResponse_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_EndpointConfiguration
+    &OpcUa_EndpointConfiguration_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_QueryDataDescription
     &OpcUa_QueryDataDescription_EncodeableType,
@@ -28847,9 +27953,6 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #endif
     #ifndef OPCUA_EXCLUDE_HistoryUpdateResult
     &OpcUa_HistoryUpdateResult_EncodeableType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_HistoryUpdateEventResult
-    &OpcUa_HistoryUpdateEventResult_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_HistoryUpdate
     &OpcUa_HistoryUpdateRequest_EncodeableType,
@@ -28973,6 +28076,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     &OpcUa_DeleteSubscriptionsRequest_EncodeableType,
     &OpcUa_DeleteSubscriptionsResponse_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_BuildInfo
+    &OpcUa_BuildInfo_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_RedundantServerDataType
     &OpcUa_RedundantServerDataType_EncodeableType,
     #endif
@@ -29000,6 +28106,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_ServiceCounterDataType
     &OpcUa_ServiceCounterDataType_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_StatusResult
+    &OpcUa_StatusResult_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_SubscriptionDiagnosticsDataType
     &OpcUa_SubscriptionDiagnosticsDataType_EncodeableType,
     #endif
@@ -29015,8 +28124,11 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_EUInformation
     &OpcUa_EUInformation_EncodeableType,
     #endif
-    #ifndef OPCUA_EXCLUDE_Annotation
-    &OpcUa_Annotation_EncodeableType,
+    #ifndef OPCUA_EXCLUDE_ComplexNumberType
+    &OpcUa_ComplexNumberType_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_DoubleComplexNumberType
+    &OpcUa_DoubleComplexNumberType_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_AxisInformation
     &OpcUa_AxisInformation_EncodeableType,
@@ -29026,6 +28138,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #endif
     #ifndef OPCUA_EXCLUDE_ProgramDiagnosticDataType
     &OpcUa_ProgramDiagnosticDataType_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_Annotation
+    &OpcUa_Annotation_EncodeableType,
     #endif
     OpcUa_Null
 };

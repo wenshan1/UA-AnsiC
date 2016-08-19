@@ -41,7 +41,6 @@
 #include <opcua_p_cryptofactory.h>
 #include <opcua_p_pkifactory.h>
 #include <opcua_p_openssl.h>
-#include <opcua_p_wincrypt.h>
 
 #ifdef OPCUA_HAVE_XMLPARSER
 #include <opcua_p_libxml2.h>
@@ -182,9 +181,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Initialize(OpcUa_Handle* a_pPlatformLayer
     OpcUa_P_OpenSSL_Initialize();
 #endif /* OPCUA_REQUIRE_OPENSSL */
 
-    uStatus = OpcUa_P_WinCrypt_Initialize();
-    OpcUa_ReturnErrorIfBad(uStatus);
-
 #ifdef OPCUA_HAVE_XMLPARSER
     OpcUa_P_Libxml2_Initialize();
 #endif /* OPCUA_HAVE_XMLPARSER */
@@ -219,8 +215,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Clean(OpcUa_Handle* a_pPlatformLayerHandl
 #if OPCUA_REQUIRE_OPENSSL
     OpcUa_P_OpenSSL_Cleanup();
 #endif /* OPCUA_REQUIRE_OPENSSL */
-
-    OpcUa_P_WinCrypt_Cleanup();
 
 #ifdef OPCUA_HAVE_XMLPARSER
     OpcUa_P_Libxml2_Cleanup();

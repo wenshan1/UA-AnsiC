@@ -111,7 +111,6 @@ OBJECTS = \
 	$(ODIR)\opcua_p_trace.obj \
 	$(ODIR)\opcua_p_utilities.obj \
 	$(ODIR)\opcua_p_win32_pki.obj \
-	$(ODIR)\opcua_p_wincrypt_random.obj \
 
 all: $(TARGET)
 

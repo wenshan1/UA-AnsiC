@@ -84,12 +84,12 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA1_Hash_Generate(
 #define OpcUa_P_OpenSSL_PSHA256_SEED(ctx)   ((ctx)->A+32)
 #define OpcUa_P_OpenSSL_PSHA256_SECRET(ctx) ((ctx)->A+32+(ctx)->seed_len)
 
-/** P_SHA1 Context */
+/** P_SHA256 Context */
 struct OpcUa_P_OpenSSL_PSHA256_Ctx_
 {
     OpcUa_Int secret_len;
     OpcUa_Int seed_len;
-    OpcUa_SByte A[32]; /* 32 bytes of SHA1 output */
+    OpcUa_SByte A[32]; /* 32 bytes of SHA256 output */
     /* pseudo elements:
      * char seed[seed_len];
      * char secret[secret_len];

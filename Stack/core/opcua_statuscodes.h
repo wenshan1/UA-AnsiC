@@ -130,59 +130,64 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadSecurityChecksFailed 0x80130000
 
 /*============================================================================
- * The Certificate has expired or is not yet valid.
+ * The certificate has expired or is not yet valid.
  *===========================================================================*/
 #define OpcUa_BadCertificateTimeInvalid 0x80140000
 
 /*============================================================================
- * An Issuer Certificate has expired or is not yet valid.
+ * An issuer certificate has expired or is not yet valid.
  *===========================================================================*/
 #define OpcUa_BadCertificateIssuerTimeInvalid 0x80150000
 
 /*============================================================================
- * The HostName used to connect to a Server does not match a HostName in the Certificate.
+ * The HostName used to connect to a server does not match a HostName in the certificate.
  *===========================================================================*/
 #define OpcUa_BadCertificateHostNameInvalid 0x80160000
 
 /*============================================================================
- * The URI specified in the ApplicationDescription does not match the URI in the Certificate.
+ * The URI specified in the ApplicationDescription does not match the URI in the certificate.
  *===========================================================================*/
 #define OpcUa_BadCertificateUriInvalid 0x80170000
 
 /*============================================================================
- * The Certificate may not be used for the requested operation.
+ * The certificate may not be used for the requested operation.
  *===========================================================================*/
 #define OpcUa_BadCertificateUseNotAllowed 0x80180000
 
 /*============================================================================
- * The Issuer Certificate may not be used for the requested operation.
+ * The issuer certificate may not be used for the requested operation.
  *===========================================================================*/
 #define OpcUa_BadCertificateIssuerUseNotAllowed 0x80190000
 
 /*============================================================================
- * The Certificate is not trusted.
+ * The certificate is not trusted.
  *===========================================================================*/
 #define OpcUa_BadCertificateUntrusted 0x801A0000
 
 /*============================================================================
- * It was not possible to determine if the Certificate has been revoked.
+ * It was not possible to determine if the certificate has been revoked.
  *===========================================================================*/
 #define OpcUa_BadCertificateRevocationUnknown 0x801B0000
 
 /*============================================================================
- * It was not possible to determine if the Issuer Certificate has been revoked.
+ * It was not possible to determine if the issuer certificate has been revoked.
  *===========================================================================*/
 #define OpcUa_BadCertificateIssuerRevocationUnknown 0x801C0000
 
 /*============================================================================
- * The Certificate has been revoked.
+ * The certificate has been revoked.
  *===========================================================================*/
 #define OpcUa_BadCertificateRevoked 0x801D0000
 
 /*============================================================================
- * The Issuer Certificate has been revoked.
+ * The issuer certificate has been revoked.
  *===========================================================================*/
 #define OpcUa_BadCertificateIssuerRevoked 0x801E0000
+
+/*============================================================================
+ * The certificate chain is incomplete.
+ *===========================================================================*/
+#define OpcUa_BadCertificateChainIncomplete 0x810D0000
 
 /*============================================================================
  * User does not have permission to perform the requested operation.
@@ -200,7 +205,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadIdentityTokenRejected 0x80210000
 
 /*============================================================================
- * The specified secure channel is not longer valid.
+ * The specified secure channel is no longer valid.
  *===========================================================================*/
 #define OpcUa_BadSecureChannelIdInvalid 0x80220000
 
@@ -248,6 +253,26 @@ OPCUA_BEGIN_EXTERN_C
  * The request was cancelled by the client.
  *===========================================================================*/
 #define OpcUa_BadRequestCancelledByClient 0x802C0000
+
+/*============================================================================
+ * Too many arguments were provided.
+ *===========================================================================*/
+#define OpcUa_BadTooManyArguments 0x80E50000
+
+/*============================================================================
+ * The server requires a license to operate in general or to perform a service or operation, but existing license is expired.
+ *===========================================================================*/
+#define OpcUa_BadLicenseExpired 0x810E0000
+
+/*============================================================================
+ * The server has limits on number of allowed operations / objects, based on installed licenses, and these limits where exceeded.
+ *===========================================================================*/
+#define OpcUa_BadLicenseLimitsExceeded 0x810F0000
+
+/*============================================================================
+ * The server does not have a license which is required to operate in general or to perform a service or operation.
+ *===========================================================================*/
+#define OpcUa_BadLicenseNotAvailable 0x81100000
 
 /*============================================================================
  * The subscription was transferred to another session.
@@ -470,12 +495,12 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadRequestTypeInvalid 0x80530000
 
 /*============================================================================
- * The security mode does not meet the requirements set by the Server.
+ * The security mode does not meet the requirements set by the server.
  *===========================================================================*/
 #define OpcUa_BadSecurityModeRejected 0x80540000
 
 /*============================================================================
- * The security policy does not meet the requirements set by the Server.
+ * The security policy does not meet the requirements set by the server.
  *===========================================================================*/
 #define OpcUa_BadSecurityPolicyRejected 0x80550000
 
@@ -500,7 +525,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadNoValidCertificates 0x80590000
 
 /*============================================================================
- * The Server does not support changing the user identity assigned to the session.
+ * The server does not support changing the user identity assigned to the session.
  *===========================================================================*/
 #define OpcUa_BadIdentityChangeNotSupported 0x80C60000
 
@@ -555,12 +580,12 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadTypeDefinitionInvalid 0x80630000
 
 /*============================================================================
- * The source node id does reference a valid node.
+ * The source node id does not reference a valid node.
  *===========================================================================*/
 #define OpcUa_BadSourceNodeIdInvalid 0x80640000
 
 /*============================================================================
- * The target node id does reference a valid node.
+ * The target node id does not reference a valid node.
  *===========================================================================*/
 #define OpcUa_BadTargetNodeIdInvalid 0x80650000
 
@@ -655,6 +680,11 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadMaxAgeInvalid 0x80700000
 
 /*============================================================================
+ * The operation is not permitted over the current secure channel.
+ *===========================================================================*/
+#define OpcUa_BadSecurityModeInsufficient 0x80E60000
+
+/*============================================================================
  * The history details parameter is not valid.
  *===========================================================================*/
 #define OpcUa_BadHistoryOperationInvalid 0x80710000
@@ -715,7 +745,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadMessageNotAvailable 0x807B0000
 
 /*============================================================================
- * The Client of the current Session does not support one or more Profiles that are necessary for the Subscription.
+ * The client of the current Session does not support one or more Profiles that are necessary for the Subscription.
  *===========================================================================*/
 #define OpcUa_BadInsufficientClientProfile 0x807C0000
 
@@ -755,7 +785,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadTcpInternalError 0x80820000
 
 /*============================================================================
- * The Server does not recognize the QueryString specified.
+ * The server does not recognize the QueryString specified.
  *===========================================================================*/
 #define OpcUa_BadTcpEndpointUrlInvalid 0x80830000
 
@@ -1013,6 +1043,46 @@ OPCUA_BEGIN_EXTERN_C
  * The request pecifies fields which are not valid for the EventType or cannot be saved by the historian.
  *===========================================================================*/
 #define OpcUa_GoodDataIgnored 0x00D90000
+
+/*============================================================================
+ * The request was rejected by the server because it did not meet the criteria set by the server.
+ *===========================================================================*/
+#define OpcUa_BadRequestNotAllowed 0x80E40000
+
+/*============================================================================
+ * The value does not come from the real source and has been edited by the server.
+ *===========================================================================*/
+#define OpcUa_GoodEdited 0x00DC0000
+
+/*============================================================================
+ * There was an error in execution of these post-actions.
+ *===========================================================================*/
+#define OpcUa_GoodPostActionFailed 0x00DD0000
+
+/*============================================================================
+ * The related EngineeringUnit has been changed but the Variable Value is still provided based on the previous unit.
+ *===========================================================================*/
+#define OpcUa_UncertainDominantValueChanged 0x40DE0000
+
+/*============================================================================
+ * A dependent value has been changed but the change has not been applied to the device.
+ *===========================================================================*/
+#define OpcUa_GoodDependentValueChanged 0x00E00000
+
+/*============================================================================
+ * The related EngineeringUnit has been changed but this change has not been applied to the device. The Variable Value is still dependent on the previous unit but its status is currently Bad.
+ *===========================================================================*/
+#define OpcUa_BadDominantValueChanged 0x80E10000
+
+/*============================================================================
+ * A dependent value has been changed but the change has not been applied to the device. The quality of the dominant variable is uncertain.
+ *===========================================================================*/
+#define OpcUa_UncertainDependentValueChanged 0x40E20000
+
+/*============================================================================
+ * A dependent value has been changed but the change has not been applied to the device. The quality of the dominant variable is Bad.
+ *===========================================================================*/
+#define OpcUa_BadDependentValueChanged 0x80E30000
 
 /*============================================================================
  * The communication layer has raised an event.

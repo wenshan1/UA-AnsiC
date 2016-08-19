@@ -183,9 +183,6 @@
     <ClInclude Include="platforms\win32\opcua_p_win32_pki.h">
       <Filter>platforms\win32</Filter>
     </ClInclude>
-    <ClInclude Include="platforms\win32\opcua_p_wincrypt.h">
-      <Filter>platforms\win32</Filter>
-    </ClInclude>
     <ClInclude Include="platforms\win32\opcua_platformdefs.h">
       <Filter>platforms\win32</Filter>
     </ClInclude>
@@ -468,9 +465,6 @@
       <Filter>platforms\win32</Filter>
     </ClCompile>
     <ClCompile Include="platforms\win32\opcua_p_win32_pki.c">
-      <Filter>platforms\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="platforms\win32\opcua_p_wincrypt_random.c">
       <Filter>platforms\win32</Filter>
     </ClCompile>
     <ClCompile Include="securechannel\opcua_secureconnection.c">

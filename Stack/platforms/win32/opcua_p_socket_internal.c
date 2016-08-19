@@ -1302,6 +1302,14 @@ OpcUa_RawSocket OpcUa_P_Socket_CreateServer(    OpcUa_StringA       IpAddress,
         }
         OpcUa_GotoErrorIfBad(uStatus);
     }
+    else if(strchr(IpAddress, ':'))
+    {
+        uStatus = OpcUa_P_RawSocket_CreateV6(   &RawSocket,
+                                                OpcUa_True,     /* Nagle off */
+                                                OpcUa_False,    /* No keep-alive */
+                                                OpcUa_True);    /* IPv6 only */
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
     else
     {
         bIpV6 = OpcUa_False;
@@ -1487,13 +1495,27 @@ OpcUa_RawSocket OpcUa_P_Socket_CreateClient(    OpcUa_UInt16                    
                                                 OpcUa_StringA                   a_sRemoteAddress,
                                                 OpcUa_StatusCode*               a_uStatus)
 {
-    OpcUa_StatusCode    uStatus      = OpcUa_Good;
+    OpcUa_StatusCode    uStatus     = OpcUa_Good;
     OpcUa_RawSocket     RawSocket   = (OpcUa_RawSocket)OPCUA_P_SOCKET_INVALID;
+    OpcUa_Boolean       bIpV6       = OpcUa_True;
 
-    uStatus = OpcUa_P_RawSocket_Create(    &RawSocket,
-                                           OpcUa_True,     /* Nagle off        */
-                                           OpcUa_False);   /* Keep alive off   */
-    OpcUa_GotoErrorIfBad(uStatus);
+    if(strchr(a_sRemoteAddress, ':'))
+    {
+        uStatus = OpcUa_P_RawSocket_CreateV6(  &RawSocket,
+                                               OpcUa_True,     /* Nagle off */
+                                               OpcUa_False,    /* Keep alive off */
+                                               OpcUa_False);   /* IPv4+6 */
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+    else
+    {
+        bIpV6 = OpcUa_False;
+        uStatus = OpcUa_P_RawSocket_Create(    &RawSocket,
+                                               OpcUa_True,     /* Nagle off */
+                                               OpcUa_False);   /* Keep alive off */
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
     if(RawSocket == (OpcUa_RawSocket)OPCUA_P_SOCKET_INVALID)
     {
         goto Error;
@@ -1506,16 +1528,35 @@ OpcUa_RawSocket OpcUa_P_Socket_CreateClient(    OpcUa_UInt16                    
 
     if(a_uPort != (OpcUa_UInt16)0)
     {
-        /* bind always to any IP address */
-        uStatus = OpcUa_P_RawSocket_Bind(RawSocket, a_uPort);
-        OpcUa_GotoErrorIfBad(uStatus);
+        if(bIpV6)
+        {
+            /* bind always to any IP address */
+            uStatus = OpcUa_P_RawSocket_BindV6(RawSocket, OpcUa_Null, a_uPort);
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+        else
+        {
+            /* bind always to any IP address */
+            uStatus = OpcUa_P_RawSocket_Bind(RawSocket, a_uPort);
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
     }
 
     if(a_uRemotePort != 0)
     {
-        uStatus = OpcUa_P_RawSocket_Connect(    RawSocket,
-                                                a_uRemotePort,
-                                                a_sRemoteAddress);
+        if(bIpV6)
+        {
+            uStatus = OpcUa_P_RawSocket_ConnectV6(  RawSocket,
+                                                    a_uRemotePort,
+                                                    a_sRemoteAddress);
+        }
+        else
+        {
+            uStatus = OpcUa_P_RawSocket_Connect(    RawSocket,
+                                                    a_uRemotePort,
+                                                    a_sRemoteAddress);
+        }
+
         if(OpcUa_IsBad(uStatus))
         {
             /* we are nonblocking and would block is not an error in this mode */

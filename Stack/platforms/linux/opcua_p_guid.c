@@ -20,6 +20,10 @@
 /* UA platform definitions */
 #include <opcua_p_internal.h>
 
+#if OPCUA_REQUIRE_OPENSSL
+#include <openssl/rand.h>
+#endif
+
 /* own headers */
 #include <opcua_guid.h>
 #include <opcua_p_guid.h>
@@ -31,6 +35,9 @@
 */
 OpcUa_Guid* OpcUa_P_Guid_Create(OpcUa_Guid* guid)
 {
+#if OPCUA_REQUIRE_OPENSSL
+    (void) RAND_bytes((unsigned char*)guid, sizeof(guid));
+#else
     unsigned int *data = (unsigned int*)guid;
     int chunks = 16 / sizeof(unsigned int);
     static const int intbits = sizeof(int)*8;
@@ -49,8 +56,9 @@ OpcUa_Guid* OpcUa_P_Guid_Create(OpcUa_Guid* guid)
         int filled;
         for (filled = 0; filled < intbits; filled += randbits)
             randNumber |= (unsigned int)rand()<<filled;
-         *(data+chunks) = randNumber;
+        memcpy(data+chunks, &randNumber, sizeof(randNumber));
     }
+#endif /* OPCUA_REQUIRE_OPENSSL */
 
     guid->Data4[0] = (guid->Data4[0] & 0x3F) | 0x80; /* UV_DCE */
     guid->Data3 = (guid->Data3 & 0x0FFF) | 0x4000;   /* UV_Random */

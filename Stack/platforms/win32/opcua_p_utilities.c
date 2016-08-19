@@ -20,22 +20,16 @@
 /******************************************************************************************************/
 
 /* System Headers */
-#include <windows.h>
-#include <stdlib.h>
-
-#ifdef _WIN32_WCE
-#include "winsock2.h"
-#endif
+#include <winsock2.h>
+#include <ws2tcpip.h>
 
 /* UA platform definitions */
 #include <opcua_p_internal.h>
 #include <opcua_p_memory.h>
+#include <opcua_p_socket.h>
 
 /* own headers */
 #include <opcua_p_utilities.h>
-
-/* maximum number of characters per port including \0 */
-#define MAX_PORT_LENGTH 16
 
 #if defined(_WIN32_WCE) && _WIN32_WCE < 0x700
 /*
@@ -174,26 +168,29 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_CharAToInt(OpcUa_StringA sValue)
  * OpcUa_P_ParseUrl
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_ParseUrl(  OpcUa_StringA   a_psUrl,
-                                    OpcUa_StringA*  a_psIpAdress,
+                                    OpcUa_StringA*  a_psIpAddress,
                                     OpcUa_UInt16*   a_puPort)
 {
-    OpcUa_StringA   sHostName         = OpcUa_Null;
-    OpcUa_UInt32    uHostNameLength   = 0;
+    OpcUa_StringA       sHostName         = OpcUa_Null;
+    OpcUa_UInt32        uHostNameLength   = 0;
 
-    OpcUa_CharA*    pcCursor          = OpcUa_Null;
+    OpcUa_CharA*        sPort             = OpcUa_Null;
 
-    OpcUa_Int       nIndex1           = 0;
-    OpcUa_Int       nIpStart          = 0;
+    OpcUa_CharA*        pcCursor;
 
-    struct hostent* pHostEnt          = OpcUa_Null;
+    OpcUa_Int           nIndex1           = 0;
+    OpcUa_Int           nIpStart;
+
+    struct addrinfo*    pAddrInfo         = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
 
     OpcUa_ReturnErrorIfArgumentNull(a_psUrl);
-    OpcUa_ReturnErrorIfArgumentNull(a_psIpAdress);
+    OpcUa_ReturnErrorIfArgumentNull(a_psIpAddress);
     OpcUa_ReturnErrorIfArgumentNull(a_puPort);
 
-    *a_psIpAdress = OpcUa_Null;
+
+    *a_psIpAddress = OpcUa_Null;
 
     /* check for // (end of protocol header) */
     pcCursor = strstr(a_psUrl, "//");
@@ -208,16 +205,48 @@ OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
     /* skip protocol prefix and store beginning of ip adress */
     nIpStart = nIndex1;
 
-    /* skip host address */
-    while(      a_psUrl[nIndex1] != ':'
-            &&  a_psUrl[nIndex1] != '/'
-            &&  a_psUrl[nIndex1] != 0)
+    /* skip host address (IPv6 address can contain colons!) */
+    while(a_psUrl[nIndex1] != '/' && a_psUrl[nIndex1] != 0)
     {
+        if(a_psUrl[nIndex1] == ':')
+        {
+            sPort = &a_psUrl[nIndex1 + 1];
+            uHostNameLength = nIndex1 - nIpStart;
+        }
+        /* handle "opc.tcp://[::1]:4880/" */
+        if(a_psUrl[nIndex1] == ']' && sPort != OpcUa_Null && a_psUrl[nIpStart] == '[')
+        {
+            nIpStart++;
+            uHostNameLength = nIndex1 - nIpStart;
+            sPort = OpcUa_Null;
+            if(a_psUrl[nIndex1 + 1] == ':')
+            {
+                sPort = &a_psUrl[nIndex1 + 2];
+            }
+            break;
+        }
         nIndex1++;
     }
 
-    uHostNameLength = nIndex1 - nIpStart;
-    sHostName       = (OpcUa_StringA)OpcUa_P_Memory_Alloc(uHostNameLength + 1);
+    if(uHostNameLength == 0)
+    {
+        uHostNameLength = nIndex1 - nIpStart;
+    }
+
+    /* scan port */
+    if(sPort != OpcUa_Null)
+    {
+        /* convert port */
+        *a_puPort = (OpcUa_UInt16)OpcUa_P_CharAToInt(sPort);
+    }
+    else
+    {
+        /* return default port */
+        *a_puPort = OPCUA_TCP_DEFAULT_PORT;
+    }
+
+    sHostName = (OpcUa_StringA)OpcUa_P_Memory_Alloc(uHostNameLength + 1);
+
     if(sHostName == NULL)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadOutOfMemory);
@@ -226,80 +255,90 @@ OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
     memcpy(sHostName, &a_psUrl[nIpStart], uHostNameLength);
     sHostName[uHostNameLength] = '\0';
 
-    /* scan port */
-    if(a_psUrl[nIndex1] == ':')
-    {
-        OpcUa_Int       nIndex2 = 0;
-        OpcUa_CharA*    sPort   = OpcUa_Null;
-        OpcUa_CharA sBuffer[MAX_PORT_LENGTH];
-
-        /* skip delimiter */
-        nIndex1++;
-
-        /* store beginning of port */
-        sPort = &a_psUrl[nIndex1];
-
-        /* search for end of port */
-        while(      a_psUrl[nIndex1] != '/'
-                &&  a_psUrl[nIndex1] != 0
-                &&  nIndex2          <  6)
-        {
-            nIndex1++;
-            nIndex2++;
-        }
-
-        /* convert port */
-        OpcUa_P_Memory_MemCpy(sBuffer, MAX_PORT_LENGTH-1, sPort, nIndex2);
-        sBuffer[nIndex2] = 0;
-        *a_puPort = (OpcUa_UInt16)OpcUa_P_CharAToInt(sBuffer);
-    }
-    else
-    {
-        /* return default port */
-        *a_puPort = OPCUA_TCP_DEFAULT_PORT;
-    }
-
-    pHostEnt = gethostbyname(sHostName);
-
-    if(pHostEnt == NULL)
-    {
-        unsigned long ulInetAddr = inet_addr(sHostName);
-
-        if(ulInetAddr != INADDR_NONE)
-        {
-            /* sHostName is already numeric */
-            *a_psIpAdress = sHostName;
-            OpcUa_ReturnStatusCode;
-        }
-    }
-
-    OpcUa_P_Memory_Free(sHostName);
-
-    if(pHostEnt == NULL)
+    if(getaddrinfo(sHostName, NULL, NULL, &pAddrInfo))
     {
         /* hostname could not be resolved */
+        pAddrInfo = NULL;
         OpcUa_GotoErrorWithStatus(OpcUa_BadHostUnknown);
     }
 
-    *a_psIpAdress = OpcUa_P_Memory_Alloc(16);
-    if(*a_psIpAdress == NULL)
+    if(pAddrInfo->ai_family == AF_INET)
     {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadOutOfMemory);
+        OpcUa_UInt32 IpAddr;
+        struct sockaddr_in* pAddr = (struct sockaddr_in*)pAddrInfo->ai_addr;
+        OpcUa_P_Memory_Free(sHostName);
+        sHostName = OpcUa_P_Memory_Alloc(INET_ADDRSTRLEN);
+        OpcUa_GotoErrorIfAllocFailed(sHostName);
+
+        /* IP */
+        IpAddr = OpcUa_P_RawSocket_NToHL((OpcUa_UInt32)pAddr->sin_addr.s_addr);
+
+        OpcUa_SPrintfA( sHostName,
+#if OPCUA_USE_SAFE_FUNCTIONS
+                        INET_ADDRSTRLEN,
+#endif /* OPCUA_USE_SAFE_FUNCTIONS */
+                        "%u.%u.%u.%u",
+                        (IpAddr >> 24) & 0xFF,
+                        (IpAddr >> 16) & 0xFF,
+                        (IpAddr >> 8) & 0xFF,
+                        IpAddr & 0xFF);
+    }
+    else if(pAddrInfo->ai_family == AF_INET6)
+    {
+        struct sockaddr_in6* pAddr = (struct sockaddr_in6*)pAddrInfo->ai_addr;
+        OpcUa_P_Memory_Free(sHostName);
+        sHostName = OpcUa_P_Memory_Alloc(INET6_ADDRSTRLEN);
+        OpcUa_GotoErrorIfAllocFailed(sHostName);
+        if(IN6_IS_ADDR_V4MAPPED(&pAddr->sin6_addr))
+        {
+            OpcUa_SPrintfA( sHostName,
+#if OPCUA_USE_SAFE_FUNCTIONS
+                            INET6_ADDRSTRLEN,
+#endif /* OPCUA_USE_SAFE_FUNCTIONS */
+                            "%u.%u.%u.%u",
+                            pAddr->sin6_addr.s6_addr[12],
+                            pAddr->sin6_addr.s6_addr[13],
+                            pAddr->sin6_addr.s6_addr[14],
+                            pAddr->sin6_addr.s6_addr[15]);
+        }
+        else
+        {
+            OpcUa_SPrintfA( sHostName,
+#if OPCUA_USE_SAFE_FUNCTIONS
+                            INET6_ADDRSTRLEN,
+#endif /* OPCUA_USE_SAFE_FUNCTIONS */
+                            "%x:%x:%x:%x:%x:%x:%x:%x%%%u",
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[0]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[1]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[2]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[3]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[4]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[5]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[6]),
+                            OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[7]),
+                            pAddr->sin6_scope_id);
+        }
+    }
+    else
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
     }
 
-#if OPCUA_USE_SAFE_FUNCTIONS
-    sprintf_s(*a_psIpAdress, 16,
-#else /* OPCUA_USE_SAFE_FUNCTIONS */
-    sprintf(*a_psIpAdress,
-#endif /* OPCUA_USE_SAFE_FUNCTIONS */
-            "%u.%u.%u.%u",
-            (unsigned char)(*((*pHostEnt).h_addr_list))[0],
-            (unsigned char)(*((*pHostEnt).h_addr_list))[1],
-            (unsigned char)(*((*pHostEnt).h_addr_list))[2],
-            (unsigned char)(*((*pHostEnt).h_addr_list))[3]);
+    *a_psIpAddress = sHostName;
+    freeaddrinfo(pAddrInfo);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    if(sHostName != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(sHostName);
+    }
+
+    if(pAddrInfo != NULL)
+    {
+        freeaddrinfo(pAddrInfo);
+    }
+
 OpcUa_FinishErrorHandling;
 }
-

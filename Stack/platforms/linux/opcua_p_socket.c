@@ -391,7 +391,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_ConnectV6( OpcUa_RawSocket a_RawSocket,
     char                *pScopeId;
     int                 apiResult;
 
-OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_Connect");
+OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ConnectV6");
     OpcUa_GotoErrorIfTrue(a_RawSocket == OPCUA_P_SOCKET_INVALID,
                               OpcUa_BadCommunicationError);
 

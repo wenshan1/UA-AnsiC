@@ -31,300 +31,6 @@
 #include <opcua_servicetable.h>
 #include <opcua_serverapi.h>
 
-#ifndef OPCUA_EXCLUDE_TestStack
-/*============================================================================
- * A pointer to a function that implements the TestStack service.
- *===========================================================================*/
-typedef OpcUa_StatusCode (OpcUa_ServerApi_PfnTestStack)(
-    OpcUa_Endpoint             hEndpoint,
-    OpcUa_Handle               hContext,
-    const OpcUa_RequestHeader* pRequestHeader,
-    OpcUa_UInt32               nTestId,
-    OpcUa_Int32                nIteration,
-    const OpcUa_Variant*       pInput,
-    OpcUa_ResponseHeader*      pResponseHeader,
-    OpcUa_Variant*             pOutput);
-
-/*============================================================================
- * A stub method which implements the TestStack service.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerApi_TestStack(
-    OpcUa_Endpoint             a_hEndpoint,
-    OpcUa_Handle               a_hContext,
-    const OpcUa_RequestHeader* a_pRequestHeader,
-    OpcUa_UInt32               a_nTestId,
-    OpcUa_Int32                a_nIteration,
-    const OpcUa_Variant*       a_pInput,
-    OpcUa_ResponseHeader*      a_pResponseHeader,
-    OpcUa_Variant*             a_pOutput)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Server, "OpcUa_ServerApi_TestStack");
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_hEndpoint);
-    OpcUa_ReturnErrorIfArgumentNull(a_hContext);
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-    OpcUa_ReturnErrorIfArgumentNull(a_pResponseHeader);
-    OpcUa_ReturnErrorIfArgumentNull(a_pOutput);
-
-    uStatus = OpcUa_BadNotImplemented;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * Begins processing of a TestStack service request.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_Server_BeginTestStack(
-    OpcUa_Endpoint        a_hEndpoint,
-    OpcUa_Handle          a_hContext,
-    OpcUa_Void**          a_ppRequest,
-    OpcUa_EncodeableType* a_pRequestType)
-{
-    OpcUa_TestStackRequest* pRequest = OpcUa_Null;
-    OpcUa_TestStackResponse* pResponse = OpcUa_Null;
-    OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    OpcUa_ServerApi_PfnTestStack* pfnInvoke = OpcUa_Null;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Server, "OpcUa_Server_BeginTestStack");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_hEndpoint);
-    OpcUa_ReturnErrorIfArgumentNull(a_hContext);
-    OpcUa_ReturnErrorIfArgumentNull(a_ppRequest);
-    OpcUa_ReturnErrorIfArgumentNull(*a_ppRequest);
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestType);
-
-    OpcUa_ReturnErrorIfTrue(a_pRequestType->TypeId != OpcUaId_TestStackRequest, OpcUa_BadInvalidArgument);
-
-    pRequest = (OpcUa_TestStackRequest*)*a_ppRequest;
-
-    /* create a context to use for sending a response */
-    uStatus = OpcUa_Endpoint_BeginSendResponse(a_hEndpoint, a_hContext, (OpcUa_Void**)&pResponse, &pResponseType);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* get the function that implements the service call. */
-    uStatus = OpcUa_Endpoint_GetServiceFunction(a_hEndpoint, a_hContext, (OpcUa_PfnInvokeService**)&pfnInvoke);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* invoke the service */
-    uStatus = pfnInvoke(
-        a_hEndpoint,        a_hContext,
-        &pRequest->RequestHeader,
-        pRequest->TestId,
-        pRequest->Iteration,
-        &pRequest->Input,
-        &pResponse->ResponseHeader,
-        &pResponse->Output);
-    
-    if (OpcUa_IsBad(uStatus))
-    {        
-        OpcUa_Void* pFault = OpcUa_Null;
-        OpcUa_EncodeableType* pFaultType = OpcUa_Null;
-
-        /* create a fault */
-        uStatus = OpcUa_ServerApi_CreateFault(
-            &pRequest->RequestHeader,
-            uStatus,
-            &pResponse->ResponseHeader.ServiceDiagnostics,
-            &pResponse->ResponseHeader.NoOfStringTable,
-            &pResponse->ResponseHeader.StringTable,
-            &pFault,
-            &pFaultType);
-    
-        OpcUa_GotoErrorIfBad(uStatus);
-        
-        /* free the response */
-        OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-        /* make the response the fault */
-        pResponse = (OpcUa_TestStackResponse*)pFault;
-        pResponseType = pFaultType;
-    }
-
-    /* send the response */
-    uStatus = OpcUa_Endpoint_EndSendResponse(a_hEndpoint, &a_hContext, OpcUa_Good, pResponse, pResponseType);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* send an error response */
-    OpcUa_Endpoint_EndSendResponse(a_hEndpoint, &a_hContext, uStatus, OpcUa_Null, OpcUa_Null);
-
-    OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * The service dispatch information TestStack service.
- *===========================================================================*/
-struct _OpcUa_ServiceType OpcUa_TestStack_ServiceType =
-{
-    OpcUaId_TestStackRequest,
-    &OpcUa_TestStackResponse_EncodeableType,
-    OpcUa_Server_BeginTestStack,
-    (OpcUa_PfnInvokeService*)OpcUa_ServerApi_TestStack
-};
-#endif
-
-#ifndef OPCUA_EXCLUDE_TestStackEx
-/*============================================================================
- * A pointer to a function that implements the TestStackEx service.
- *===========================================================================*/
-typedef OpcUa_StatusCode (OpcUa_ServerApi_PfnTestStackEx)(
-    OpcUa_Endpoint                 hEndpoint,
-    OpcUa_Handle                   hContext,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nTestId,
-    OpcUa_Int32                    nIteration,
-    const OpcUa_CompositeTestType* pInput,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_CompositeTestType*       pOutput);
-
-/*============================================================================
- * A stub method which implements the TestStackEx service.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_ServerApi_TestStackEx(
-    OpcUa_Endpoint                 a_hEndpoint,
-    OpcUa_Handle                   a_hContext,
-    const OpcUa_RequestHeader*     a_pRequestHeader,
-    OpcUa_UInt32                   a_nTestId,
-    OpcUa_Int32                    a_nIteration,
-    const OpcUa_CompositeTestType* a_pInput,
-    OpcUa_ResponseHeader*          a_pResponseHeader,
-    OpcUa_CompositeTestType*       a_pOutput)
-{
-    OpcUa_InitializeStatus(OpcUa_Module_Server, "OpcUa_ServerApi_TestStackEx");
-
-    /* validate arguments. */
-    OpcUa_ReturnErrorIfArgumentNull(a_hEndpoint);
-    OpcUa_ReturnErrorIfArgumentNull(a_hContext);
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestHeader);
-    OpcUa_ReferenceParameter(a_nTestId);
-    OpcUa_ReferenceParameter(a_nIteration);
-    OpcUa_ReturnErrorIfArgumentNull(a_pInput);
-    OpcUa_ReturnErrorIfArgumentNull(a_pResponseHeader);
-    OpcUa_ReturnErrorIfArgumentNull(a_pOutput);
-
-    uStatus = OpcUa_BadNotImplemented;
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* nothing to do */
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * Begins processing of a TestStackEx service request.
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_Server_BeginTestStackEx(
-    OpcUa_Endpoint        a_hEndpoint,
-    OpcUa_Handle          a_hContext,
-    OpcUa_Void**          a_ppRequest,
-    OpcUa_EncodeableType* a_pRequestType)
-{
-    OpcUa_TestStackExRequest* pRequest = OpcUa_Null;
-    OpcUa_TestStackExResponse* pResponse = OpcUa_Null;
-    OpcUa_EncodeableType* pResponseType = OpcUa_Null;
-    OpcUa_ServerApi_PfnTestStackEx* pfnInvoke = OpcUa_Null;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Server, "OpcUa_Server_BeginTestStackEx");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_hEndpoint);
-    OpcUa_ReturnErrorIfArgumentNull(a_hContext);
-    OpcUa_ReturnErrorIfArgumentNull(a_ppRequest);
-    OpcUa_ReturnErrorIfArgumentNull(*a_ppRequest);
-    OpcUa_ReturnErrorIfArgumentNull(a_pRequestType);
-
-    OpcUa_ReturnErrorIfTrue(a_pRequestType->TypeId != OpcUaId_TestStackExRequest, OpcUa_BadInvalidArgument);
-
-    pRequest = (OpcUa_TestStackExRequest*)*a_ppRequest;
-
-    /* create a context to use for sending a response */
-    uStatus = OpcUa_Endpoint_BeginSendResponse(a_hEndpoint, a_hContext, (OpcUa_Void**)&pResponse, &pResponseType);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* get the function that implements the service call. */
-    uStatus = OpcUa_Endpoint_GetServiceFunction(a_hEndpoint, a_hContext, (OpcUa_PfnInvokeService**)&pfnInvoke);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    /* invoke the service */
-    uStatus = pfnInvoke(
-        a_hEndpoint,        a_hContext,
-        &pRequest->RequestHeader,
-        pRequest->TestId,
-        pRequest->Iteration,
-        &pRequest->Input,
-        &pResponse->ResponseHeader,
-        &pResponse->Output);
-    
-    if (OpcUa_IsBad(uStatus))
-    {        
-        OpcUa_Void* pFault = OpcUa_Null;
-        OpcUa_EncodeableType* pFaultType = OpcUa_Null;
-
-        /* create a fault */
-        uStatus = OpcUa_ServerApi_CreateFault(
-            &pRequest->RequestHeader,
-            uStatus,
-            &pResponse->ResponseHeader.ServiceDiagnostics,
-            &pResponse->ResponseHeader.NoOfStringTable,
-            &pResponse->ResponseHeader.StringTable,
-            &pFault,
-            &pFaultType);
-    
-        OpcUa_GotoErrorIfBad(uStatus);
-        
-        /* free the response */
-        OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-        /* make the response the fault */
-        pResponse = (OpcUa_TestStackExResponse*)pFault;
-        pResponseType = pFaultType;
-    }
-
-    /* send the response */
-    uStatus = OpcUa_Endpoint_EndSendResponse(a_hEndpoint, &a_hContext, OpcUa_Good, pResponse, pResponseType);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-    OpcUa_ReturnStatusCode;
-    OpcUa_BeginErrorHandling;
-
-    /* send an error response */
-    OpcUa_Endpoint_EndSendResponse(a_hEndpoint, &a_hContext, uStatus, OpcUa_Null, OpcUa_Null);
-
-    OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
-
-    OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * The service dispatch information TestStackEx service.
- *===========================================================================*/
-struct _OpcUa_ServiceType OpcUa_TestStackEx_ServiceType =
-{
-    OpcUaId_TestStackExRequest,
-    &OpcUa_TestStackExResponse_EncodeableType,
-    OpcUa_Server_BeginTestStackEx,
-    (OpcUa_PfnInvokeService*)OpcUa_ServerApi_TestStackEx
-};
-#endif
-
 #ifndef OPCUA_EXCLUDE_FindServers
 /*============================================================================
  * A pointer to a function that implements the FindServers service.
@@ -427,9 +133,9 @@ OpcUa_StatusCode OpcUa_Server_BeginFindServers(
         &pResponse->ResponseHeader,
         &pResponse->NoOfServers,
         &pResponse->Servers);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -442,9 +148,9 @@ OpcUa_StatusCode OpcUa_Server_BeginFindServers(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -487,33 +193,33 @@ struct _OpcUa_ServiceType OpcUa_FindServers_ServiceType =
  * A pointer to a function that implements the FindServersOnNetwork service.
  *===========================================================================*/
 typedef OpcUa_StatusCode (OpcUa_ServerApi_PfnFindServersOnNetwork)(
-    OpcUa_Endpoint                 hEndpoint,
-    OpcUa_Handle                   hContext,
-    const OpcUa_RequestHeader*     pRequestHeader,
-    OpcUa_UInt32                   nStartingRecordId,
-    OpcUa_UInt32                   nMaxRecordsToReturn,
-    OpcUa_Int32                    nNoOfServerCapabilityFilter,
-    const OpcUa_String*            pServerCapabilityFilter,
-    OpcUa_ResponseHeader*          pResponseHeader,
-    OpcUa_DateTime*                pLastCounterResetTime,
-    OpcUa_Int32*                   pNoOfServers,
-    OpcUa_ServerOnNetwork**        pServers);
+    OpcUa_Endpoint             hEndpoint,
+    OpcUa_Handle               hContext,
+    const OpcUa_RequestHeader* pRequestHeader,
+    OpcUa_UInt32               nStartingRecordId,
+    OpcUa_UInt32               nMaxRecordsToReturn,
+    OpcUa_Int32                nNoOfServerCapabilityFilter,
+    const OpcUa_String*        pServerCapabilityFilter,
+    OpcUa_ResponseHeader*      pResponseHeader,
+    OpcUa_DateTime*            pLastCounterResetTime,
+    OpcUa_Int32*               pNoOfServers,
+    OpcUa_ServerOnNetwork**    pServers);
 
 /*============================================================================
  * A stub method which implements the FindServersOnNetwork service.
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_ServerApi_FindServersOnNetwork(
-    OpcUa_Endpoint                 a_hEndpoint,
-    OpcUa_Handle                   a_hContext,
-    const OpcUa_RequestHeader*     a_pRequestHeader,
-    OpcUa_UInt32                   a_nStartingRecordId,
-    OpcUa_UInt32                   a_nMaxRecordsToReturn,
-    OpcUa_Int32                    a_nNoOfServerCapabilityFilter,
-    const OpcUa_String*            a_pServerCapabilityFilter,
-    OpcUa_ResponseHeader*          a_pResponseHeader,
-    OpcUa_DateTime*                a_pLastCounterResetTime,
-    OpcUa_Int32*                   a_pNoOfServers,
-    OpcUa_ServerOnNetwork**        a_pServers)
+    OpcUa_Endpoint             a_hEndpoint,
+    OpcUa_Handle               a_hContext,
+    const OpcUa_RequestHeader* a_pRequestHeader,
+    OpcUa_UInt32               a_nStartingRecordId,
+    OpcUa_UInt32               a_nMaxRecordsToReturn,
+    OpcUa_Int32                a_nNoOfServerCapabilityFilter,
+    const OpcUa_String*        a_pServerCapabilityFilter,
+    OpcUa_ResponseHeader*      a_pResponseHeader,
+    OpcUa_DateTime*            a_pLastCounterResetTime,
+    OpcUa_Int32*               a_pNoOfServers,
+    OpcUa_ServerOnNetwork**    a_pServers)
 {
     OpcUa_InitializeStatus(OpcUa_Module_Server, "OpcUa_ServerApi_FindServersOnNetwork");
 
@@ -540,7 +246,7 @@ OpcUa_StatusCode OpcUa_ServerApi_FindServersOnNetwork(
 }
 
 /*============================================================================
- * Begins processing of a FindServers service request.
+ * Begins processing of a FindServersOnNetwork service request.
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_Server_BeginFindServersOnNetwork(
     OpcUa_Endpoint        a_hEndpoint,
@@ -742,9 +448,9 @@ OpcUa_StatusCode OpcUa_Server_BeginGetEndpoints(
         &pResponse->ResponseHeader,
         &pResponse->NoOfEndpoints,
         &pResponse->Endpoints);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -757,9 +463,9 @@ OpcUa_StatusCode OpcUa_Server_BeginGetEndpoints(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -877,9 +583,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRegisterServer(
         &pRequest->RequestHeader,
         &pRequest->Server,
         &pResponse->ResponseHeader);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -892,9 +598,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRegisterServer(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -1079,7 +785,7 @@ OpcUa_StatusCode OpcUa_Server_BeginRegisterServer2(
 }
 
 /*============================================================================
- * The service dispatch information RegisterServer service.
+ * The service dispatch information RegisterServer2 service.
  *===========================================================================*/
 struct _OpcUa_ServiceType OpcUa_RegisterServer2_ServiceType =
 {
@@ -1242,9 +948,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateSession(
         &pResponse->ServerSoftwareCertificates,
         &pResponse->ServerSignature,
         &pResponse->MaxRequestMessageSize);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -1257,9 +963,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateSession(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -1419,9 +1125,9 @@ OpcUa_StatusCode OpcUa_Server_BeginActivateSession(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -1434,9 +1140,9 @@ OpcUa_StatusCode OpcUa_Server_BeginActivateSession(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -1554,9 +1260,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCloseSession(
         &pRequest->RequestHeader,
         pRequest->DeleteSubscriptions,
         &pResponse->ResponseHeader);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -1569,9 +1275,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCloseSession(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -1693,9 +1399,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCancel(
         pRequest->RequestHandle,
         &pResponse->ResponseHeader,
         &pResponse->CancelCount);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -1708,9 +1414,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCancel(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -1847,9 +1553,9 @@ OpcUa_StatusCode OpcUa_Server_BeginAddNodes(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -1862,9 +1568,9 @@ OpcUa_StatusCode OpcUa_Server_BeginAddNodes(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2001,9 +1707,9 @@ OpcUa_StatusCode OpcUa_Server_BeginAddReferences(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2016,9 +1722,9 @@ OpcUa_StatusCode OpcUa_Server_BeginAddReferences(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2155,9 +1861,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteNodes(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2170,9 +1876,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteNodes(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2309,9 +2015,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteReferences(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2324,9 +2030,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteReferences(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2471,9 +2177,9 @@ OpcUa_StatusCode OpcUa_Server_BeginBrowse(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2486,9 +2192,9 @@ OpcUa_StatusCode OpcUa_Server_BeginBrowse(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2629,9 +2335,9 @@ OpcUa_StatusCode OpcUa_Server_BeginBrowseNext(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2644,9 +2350,9 @@ OpcUa_StatusCode OpcUa_Server_BeginBrowseNext(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2783,9 +2489,9 @@ OpcUa_StatusCode OpcUa_Server_BeginTranslateBrowsePathsToNodeIds(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2798,9 +2504,9 @@ OpcUa_StatusCode OpcUa_Server_BeginTranslateBrowsePathsToNodeIds(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -2929,9 +2635,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRegisterNodes(
         &pResponse->ResponseHeader,
         &pResponse->NoOfRegisteredNodeIds,
         &pResponse->RegisteredNodeIds);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -2944,9 +2650,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRegisterNodes(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3067,9 +2773,9 @@ OpcUa_StatusCode OpcUa_Server_BeginUnregisterNodes(
         pRequest->NoOfNodesToUnregister,
         pRequest->NodesToUnregister,
         &pResponse->ResponseHeader);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3082,9 +2788,9 @@ OpcUa_StatusCode OpcUa_Server_BeginUnregisterNodes(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3253,9 +2959,9 @@ OpcUa_StatusCode OpcUa_Server_BeginQueryFirst(
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos,
         &pResponse->FilterResult);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3268,9 +2974,9 @@ OpcUa_StatusCode OpcUa_Server_BeginQueryFirst(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3404,9 +3110,9 @@ OpcUa_StatusCode OpcUa_Server_BeginQueryNext(
         &pResponse->NoOfQueryDataSets,
         &pResponse->QueryDataSets,
         &pResponse->RevisedContinuationPoint);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3419,9 +3125,9 @@ OpcUa_StatusCode OpcUa_Server_BeginQueryNext(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3566,9 +3272,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRead(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3581,9 +3287,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRead(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3732,9 +3438,9 @@ OpcUa_StatusCode OpcUa_Server_BeginHistoryRead(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3747,9 +3453,9 @@ OpcUa_StatusCode OpcUa_Server_BeginHistoryRead(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -3886,9 +3592,9 @@ OpcUa_StatusCode OpcUa_Server_BeginWrite(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -3901,9 +3607,9 @@ OpcUa_StatusCode OpcUa_Server_BeginWrite(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4040,9 +3746,9 @@ OpcUa_StatusCode OpcUa_Server_BeginHistoryUpdate(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4055,9 +3761,9 @@ OpcUa_StatusCode OpcUa_Server_BeginHistoryUpdate(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4194,9 +3900,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCall(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4209,9 +3915,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCall(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4356,9 +4062,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateMonitoredItems(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4371,9 +4077,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateMonitoredItems(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4518,9 +4224,9 @@ OpcUa_StatusCode OpcUa_Server_BeginModifyMonitoredItems(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4533,9 +4239,9 @@ OpcUa_StatusCode OpcUa_Server_BeginModifyMonitoredItems(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4680,9 +4386,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetMonitoringMode(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4695,9 +4401,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetMonitoringMode(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -4865,9 +4571,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetTriggering(
         &pResponse->RemoveResults,
         &pResponse->NoOfRemoveDiagnosticInfos,
         &pResponse->RemoveDiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -4880,9 +4586,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetTriggering(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5023,9 +4729,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteMonitoredItems(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5038,9 +4744,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteMonitoredItems(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5194,9 +4900,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateSubscription(
         &pResponse->RevisedPublishingInterval,
         &pResponse->RevisedLifetimeCount,
         &pResponse->RevisedMaxKeepAliveCount);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5209,9 +4915,9 @@ OpcUa_StatusCode OpcUa_Server_BeginCreateSubscription(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5361,9 +5067,9 @@ OpcUa_StatusCode OpcUa_Server_BeginModifySubscription(
         &pResponse->RevisedPublishingInterval,
         &pResponse->RevisedLifetimeCount,
         &pResponse->RevisedMaxKeepAliveCount);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5376,9 +5082,9 @@ OpcUa_StatusCode OpcUa_Server_BeginModifySubscription(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5519,9 +5225,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetPublishingMode(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5534,9 +5240,9 @@ OpcUa_StatusCode OpcUa_Server_BeginSetPublishingMode(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5693,9 +5399,9 @@ OpcUa_StatusCode OpcUa_Server_BeginPublish(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5708,9 +5414,9 @@ OpcUa_StatusCode OpcUa_Server_BeginPublish(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5836,9 +5542,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRepublish(
         pRequest->RetransmitSequenceNumber,
         &pResponse->ResponseHeader,
         &pResponse->NotificationMessage);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -5851,9 +5557,9 @@ OpcUa_StatusCode OpcUa_Server_BeginRepublish(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -5994,9 +5700,9 @@ OpcUa_StatusCode OpcUa_Server_BeginTransferSubscriptions(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -6009,9 +5715,9 @@ OpcUa_StatusCode OpcUa_Server_BeginTransferSubscriptions(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -6148,9 +5854,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteSubscriptions(
         &pResponse->Results,
         &pResponse->NoOfDiagnosticInfos,
         &pResponse->DiagnosticInfos);
-    
+
     if (OpcUa_IsBad(uStatus))
-    {        
+    {
         OpcUa_Void* pFault = OpcUa_Null;
         OpcUa_EncodeableType* pFaultType = OpcUa_Null;
 
@@ -6163,9 +5869,9 @@ OpcUa_StatusCode OpcUa_Server_BeginDeleteSubscriptions(
             &pResponse->ResponseHeader.StringTable,
             &pFault,
             &pFaultType);
-    
+
         OpcUa_GotoErrorIfBad(uStatus);
-        
+
         /* free the response */
         OpcUa_EncodeableObject_Delete(pResponseType, (OpcUa_Void**)&pResponse);
 
@@ -6206,14 +5912,8 @@ struct _OpcUa_ServiceType OpcUa_DeleteSubscriptions_ServiceType =
 /*============================================================================
  * Table of standard services.
  *===========================================================================*/
-OpcUa_ServiceType* OpcUa_SupportedServiceTypes[] = 
+OpcUa_ServiceType* OpcUa_SupportedServiceTypes[] =
 {
-    #ifndef OPCUA_EXCLUDE_TestStack
-    &OpcUa_TestStack_ServiceType,
-    #endif
-    #ifndef OPCUA_EXCLUDE_TestStackEx
-    &OpcUa_TestStackEx_ServiceType,
-    #endif
     #ifndef OPCUA_EXCLUDE_FindServers
     &OpcUa_FindServers_ServiceType,
     #endif

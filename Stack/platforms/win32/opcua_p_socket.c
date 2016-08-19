@@ -38,7 +38,7 @@
 OpcUa_StatusCode OpcUa_P_RawSocket_InitializeNetwork(OpcUa_Void)
 {
     WSADATA wsaData;
-    int     apiResult   = 0;
+    int     apiResult;
 
     /* The return value is zero if the operation was successful.
        Otherwise, the value SOCKET_ERROR is returned, and a specific
@@ -280,7 +280,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Connect( OpcUa_RawSocket a_RawSocket,
                                             OpcUa_Int16     a_nPort,
                                             OpcUa_StringA   a_sHost)
 {
-    int                 intSize   = 0;
+    socklen_t           intSize;
     SOCKET              winSocket = (SOCKET)OPCUA_P_SOCKET_INVALID;
     struct sockaddr     *pName;
     struct sockaddr_in  srv;
@@ -336,12 +336,93 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
+ * Connect IPv6 Socket for Client.
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_RawSocket_ConnectV6( OpcUa_RawSocket a_RawSocket,
+                                              OpcUa_Int16     a_nPort,
+                                              OpcUa_StringA   a_sHost)
+{
+    socklen_t           intSize;
+    SOCKET              winSocket = (SOCKET)OPCUA_P_SOCKET_INVALID;
+    struct sockaddr     *pName;
+    struct sockaddr_in6 srv;
+    struct in6_addr     localhost = IN6ADDR_LOOPBACK_INIT;
+    char                *pScopeId;
+    int                 apiResult;
+
+OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ConnectV6");
+
+    OpcUa_GotoErrorIfArgumentNull(a_RawSocket);
+    winSocket = (SOCKET)a_RawSocket;
+
+    intSize = sizeof(struct sockaddr_in6);
+    OpcUa_MemSet(&srv, 0, intSize);
+
+    if(!strcmp("localhost", a_sHost))
+    {
+        srv.sin6_addr = localhost;
+    }
+    else
+    {
+        pScopeId = strchr(a_sHost, '%');
+        if(pScopeId != NULL)
+        {
+            srv.sin6_scope_id = OpcUa_P_CharAToInt(pScopeId+1);
+        }
+        apiResult = OpcUa_SScanfA(a_sHost,
+                                  "%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
+                                  &srv.sin6_addr.s6_words[0],
+                                  &srv.sin6_addr.s6_words[1],
+                                  &srv.sin6_addr.s6_words[2],
+                                  &srv.sin6_addr.s6_words[3],
+                                  &srv.sin6_addr.s6_words[4],
+                                  &srv.sin6_addr.s6_words[5],
+                                  &srv.sin6_addr.s6_words[6],
+                                  &srv.sin6_addr.s6_words[7]);
+        if(apiResult != 8)
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+        }
+        while(apiResult --> 0)
+        {
+            srv.sin6_addr.s6_words[apiResult] = OpcUa_P_RawSocket_HToNS(srv.sin6_addr.s6_words[apiResult]);
+        }
+    }
+
+    srv.sin6_port       = htons(a_nPort);
+    srv.sin6_family     = AF_INET6;
+    pName               = (struct sockaddr*)&srv;
+
+    if(connect(winSocket, pName, intSize) == OPCUA_P_SOCKET_SOCKETERROR)
+    {
+        int result = OpcUa_P_RawSocket_GetLastError((OpcUa_RawSocket)winSocket);
+
+        /* a connect takes some time and this "error" is common with nonblocking sockets */
+        if(result == WSAEWOULDBLOCK || result == WSAEINPROGRESS)
+        {
+            uStatus = OpcUa_BadWouldBlock;
+        }
+        else
+        {
+            uStatus = OpcUa_BadCommunicationError;
+        }
+        goto Error;
+    }
+
+    uStatus = OpcUa_Good;
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * Bind to Socket
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_RawSocket_Bind(    OpcUa_RawSocket a_RawSocket,
                                             OpcUa_Int16     a_nPort)
 {
-    OpcUa_Int32         intSize    = 0;
+    socklen_t           intSize;
     SOCKET              winSocket  = (SOCKET)OPCUA_P_SOCKET_INVALID;
     struct sockaddr_in  srv;
     struct sockaddr     *pName;
@@ -378,13 +459,13 @@ OpcUa_StatusCode OpcUa_P_RawSocket_BindEx(  OpcUa_RawSocket a_RawSocket,
                                             OpcUa_StringA   a_IpAddress,
                                             OpcUa_Int16     a_nPort)
 {
-    OpcUa_Int32         intSize    = 0;
+    socklen_t           intSize;
     SOCKET              winSocket  = (SOCKET)OPCUA_P_SOCKET_INVALID;
     struct sockaddr_in  srv;
     struct sockaddr     *pName;
     unsigned long       uIp = INADDR_ANY;
 
-OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_Bind");
+OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_BindEx");
 
     OpcUa_GotoErrorIfArgumentNull(a_RawSocket);
     winSocket = (SOCKET)a_RawSocket;
@@ -463,6 +544,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Listen(OpcUa_RawSocket a_RawSocket)
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_Listen");
 
+    OpcUa_GotoErrorIfArgumentNull(a_RawSocket);
     winSocket = (SOCKET)a_RawSocket;
 
     if(listen(winSocket, SOMAXCONN) == OPCUA_P_SOCKET_SOCKETERROR)
@@ -711,7 +793,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "GetPeerInfo");
 #if OPCUA_USE_SAFE_FUNCTIONS
                             a_uiPeerInfoBufferSize,
 #endif /* OPCUA_USE_SAFE_FUNCTIONS */
-                            "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x%%%u:%u",
+                            "%x:%x:%x:%x:%x:%x:%x:%x%%%u:%u",
                             OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[0]),
                             OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[1]),
                             OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[2]),
@@ -721,7 +803,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "GetPeerInfo");
                             OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[6]),
                             OpcUa_P_RawSocket_NToHS(pAddr->sin6_addr.s6_words[7]),
                             pAddr->sin6_scope_id, usPort);
-         }
+        }
     }
     else if(sockAddrIn.ss_family == AF_INET)
     {
