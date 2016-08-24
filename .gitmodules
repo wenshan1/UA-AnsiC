@@ -1,3 +1,6 @@
 [submodule "openssl"]
 	path = third-party/src/openssl
 	url = https://github.com/openssl/openssl.git
+[submodule "azure-uamqp-c"]
+	path = third-party/src/azure-uamqp-c
+	url = https://github.com/SparhawkSoftware/azure-uamqp-c.git
