@@ -7,7 +7,7 @@ REM ****************************************************************************
 SETLOCAL
 
 set CMAKEEXE=cmake
-set SRCDIR=.\src\azure-uamqp-c
+set SRCDIR=%~dp0\src\azure-uamqp-c
 set INSTALLDIR=%~dp0
 
 IF NOT EXIST %SRCDIR% GOTO noSource
@@ -15,6 +15,7 @@ cd %SRCDIR%
 
 IF "%1"=="no-clean" GOTO noClean
 ECHO STEP 1) Deleting old projects.
+IF EXIST %INSTALLDIR%\azure-uamqp-c rmdir /s /q %INSTALLDIR%\azure-uamqp-c
 IF EXIST .\build rmdir /s /q .\build
 :noClean
 
