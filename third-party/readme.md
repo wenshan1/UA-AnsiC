@@ -1,4 +1,4 @@
-# UA-ANSIC Third Party Libreay Readme #
+# UA-ANSIC Third Party Library Readme #
 ## Overview ##
 This directory contains references to other GitHub projects which the samples depend on.
 For each project there is BATCH file which builds and installes the headers and libs in the third-party directory.
