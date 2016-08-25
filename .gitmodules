@@ -7,3 +7,6 @@
 [submodule "json-c"]
 	path = third-party/src/json-c
 	url = https://github.com/SparhawkSoftware/json-c.git
+[submodule "curl"]
+	path = third-party/src/curl
+	url = https://github.com/curl/curl.git

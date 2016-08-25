@@ -42,3 +42,19 @@ git checkout tags/OpenSSL_1_0_2h
 ```
 
 As new versions are published the tag reference in the command above should be adjusted accordingly.
+
+## curl ##
+A library for using HTTPS
+The respository is here: https://github.com/curl/curl
+
+The command to clone is:
+
+```
+cd src
+git clone https://github.com/curl/curl
+cd openssl
+git checkout tags/curl-7_48_0
+```
+
+Versions >curl-7_48_0 will produce compile errors with test programs.
+When this issue is fixed this readme will be updated.
