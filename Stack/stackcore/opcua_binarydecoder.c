@@ -2865,7 +2865,7 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadVariant(
         if (uEncodingByte & OpcUa_Variant_ArrayDimensionsMask)
         {
             OpcUa_Int32 ii = 0;
-            OpcUa_Int32 iExpectedLength = 1;
+            OpcUa_Int32 iExpectedLength = a_pValue->Value.Array.Length;
             OpcUa_Int32 iNoOfDimensions = 0;
             OpcUa_Int32* pDimensions = OpcUa_Null;
             OpcUa_Void* pArray = OpcUa_Null;
@@ -2881,11 +2881,16 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadVariant(
 
             for (ii = 0; ii < iNoOfDimensions; ii++)
             {
-                iExpectedLength *= pDimensions[ii];
+                if (pDimensions[ii] <= 0 || iExpectedLength % pDimensions[ii] != 0)
+                {
+                    OpcUa_Free(pDimensions);
+                    OpcUa_GotoErrorWithStatus(OpcUa_BadDecodingError);
+                }
+                iExpectedLength /= pDimensions[ii];
             }
 
             /* the matrix is stored as one dimensional array which will be freed on error */
-            if (iExpectedLength != a_pValue->Value.Array.Length)
+            if (iNoOfDimensions <= 0 || iExpectedLength != 1)
             {
                 OpcUa_Free(pDimensions);
                 OpcUa_GotoErrorWithStatus(OpcUa_BadDecodingError);
