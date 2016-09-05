@@ -1558,6 +1558,7 @@ int main(void)
 	CloseSession.ResponseType					= &OpcUa_CloseSessionResponse_EncodeableType;
   	my_BrowseNext_ServiceType.ResponseType		= &OpcUa_BrowseNextResponse_EncodeableType;
 	my_FindServers_ServiceType.ResponseType		= &OpcUa_FindServersResponse_EncodeableType;
+	dummy_CreatSubscription.ResponseType            = &OpcUa_CreateSubscriptionResponse_EncodeableType;
 
 	
 	
