@@ -1629,7 +1629,7 @@ OpcUa_StatusCode OpcUa_TcpListener_EventCallback(
     OpcUa_TcpListener*              pTcpListener    = (OpcUa_TcpListener*)listener->Handle;
     OpcUa_TcpListener_EventHandler  fEventHandler   = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "SocketEventCallback");
+OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "EventCallback");
 
     OpcUa_ReferenceParameter(a_bIsSSL);
     OpcUa_ReferenceParameter(a_uPortNumber);

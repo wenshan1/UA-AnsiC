@@ -1186,7 +1186,7 @@ OpcUa_StatusCode check_password(const OpcUa_ExtensionObject* p_UserIdentityToken
 
 OpcUa_StatusCode check_useridentitytoken(const OpcUa_ExtensionObject* p_UserIdentityToken)
 {
-	OpcUa_StatusCode        uStatus     = OpcUa_Good;
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "check_useridentitytoken");
 
 	OpcUa_ReturnErrorIfArgumentNull(p_UserIdentityToken)
 	
@@ -1259,6 +1259,7 @@ OpcUa_StatusCode check_useridentitytoken(const OpcUa_ExtensionObject* p_UserIden
 
 	
 	return uStatus;
+	OpcUa_BeginErrorHandling;
     
     
 	OpcUa_FinishErrorHandling;
@@ -1266,15 +1267,17 @@ OpcUa_StatusCode check_useridentitytoken(const OpcUa_ExtensionObject* p_UserIden
 
 OpcUa_StatusCode check_securechannelId( OpcUa_Endpoint a_hEndpoint,  OpcUa_Handle a_hContext)
 {
-	OpcUa_StatusCode        uStatus     = OpcUa_Bad;
+	OpcUa_UInt32* p_securechannelId;
 
-	OpcUa_UInt32* p_securechannelId=OpcUa_Alloc(sizeof(OpcUa_UInt32));
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "check_securechannelId");
 
 	if(a_hEndpoint==OpcUa_Null || a_hContext==OpcUa_Null)
 	{
 		uStatus=OpcUa_Bad;
 		OpcUa_GotoError
 	}
+	p_securechannelId=OpcUa_Alloc(sizeof(OpcUa_UInt32));
+	OpcUa_GotoErrorIfAllocFailed(p_securechannelId);
 	uStatus=OpcUa_Endpoint_GetMessageSecureChannelId(  a_hEndpoint,a_hContext,p_securechannelId);
 	if(OpcUa_IsBad(uStatus))
 	{
@@ -1301,7 +1304,7 @@ OpcUa_StatusCode check_securechannelId( OpcUa_Endpoint a_hEndpoint,  OpcUa_Handl
 
 OpcUa_StatusCode check_authentication_token (const OpcUa_RequestHeader* a_pRequestHeader)
 {
-	OpcUa_StatusCode        uStatus     = OpcUa_Bad;
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "check_authentication_token");
 
 	if(a_pRequestHeader==OpcUa_Null)
 	{

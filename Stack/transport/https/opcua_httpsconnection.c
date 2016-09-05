@@ -345,7 +345,7 @@ OpcUa_StatusCode OpcUa_HttpsConnection_GetRequestByStream(  OpcUa_HttpsConnectio
     OpcUa_HttpsConnection_Request*  pRequest    = OpcUa_Null;
     OpcUa_UInt32                    uIndex      = 0;
 
-OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetFreeRequest");
+OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetRequestByStream");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pHttpConnection);
     OpcUa_ReturnErrorIfArgumentNull(a_pOutputStream);
@@ -390,7 +390,7 @@ OpcUa_StatusCode OpcUa_HttpsConnection_GetRequestInState(   OpcUa_HttpsConnectio
     OpcUa_HttpsConnection_Request*  pRequest    = OpcUa_Null;
     OpcUa_UInt32                    uIndex      = 0;
 
-OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetFreeRequest");
+OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetRequestInState");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pHttpConnection);
     OpcUa_ReturnErrorIfArgumentNull(a_ppRequest);
@@ -856,7 +856,7 @@ static OpcUa_StatusCode OpcUa_HttpsConnectionRequest_AddToSendQueue(OpcUa_HttpsC
 {
     OpcUa_HttpsConnection* pHttpsConnection = (OpcUa_HttpsConnection*)a_pRequest->pConnection->Handle;
 
-OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueueInternal");
+OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueue");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pRequest);
 

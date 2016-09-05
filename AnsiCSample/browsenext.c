@@ -31,6 +31,7 @@
 #include <opcua_serverstub.h>
 #include <opcua_string.h>
 #include <opcua_memory.h>
+#include <opcua_trace.h>
 #include "addressspace.h"
 #include "browseservice.h"
 #include "mytrace.h"

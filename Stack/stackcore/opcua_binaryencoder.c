@@ -933,7 +933,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteGuid(
 }
 
 /*============================================================================
- * OpcUa_BinaryEncoder_WriteByteString
+ * OpcUa_ByteString_BinaryEncode
  *===========================================================================*/
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ByteString_BinaryEncode(
     OpcUa_ByteString*   a_pValue,
@@ -941,7 +941,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_ByteString_BinaryEncode(
 {
     OpcUa_Int32 nLength = -1;
 
-OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_String_BinaryEncode");
+OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_ByteString_BinaryEncode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pOstrm);

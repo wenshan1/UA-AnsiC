@@ -184,7 +184,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_FindIndex(
     OpcUa_UInt32 ii = 0;
     OpcUa_UInt32 uLength = 0;
     
-    OpcUa_InitializeStatus(OpcUa_Module_String, "OpcUa_StringTable_AddStrings");
+    OpcUa_InitializeStatus(OpcUa_Module_String, "OpcUa_StringTable_FindIndex");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);
     OpcUa_ReturnErrorIfArgumentNull(a_pString);

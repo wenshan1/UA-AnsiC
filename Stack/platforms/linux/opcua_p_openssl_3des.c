@@ -48,7 +48,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_3DES_Encrypt(  OpcUa_CryptoProvider*   a_pProvi
     
     DES_cblock*         desKey              = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "");
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Encrypt");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pPlainText);
     OpcUa_ReturnErrorIfArgumentNull(a_key.Key.Data);

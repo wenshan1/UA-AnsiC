@@ -440,8 +440,8 @@ OpcUa_StatusCode my_Read(
 OpcUa_StatusCode  fill_Variant_for_value_attribute(_VariableKnoten_*  p_Node, OpcUa_String* p_Index, OpcUa_DataValue* p_Results)
 {
 	OpcUa_Int					i;
-	OpcUa_StatusCode			uStatus     = OpcUa_Good;
 	extern my_Variant			all_ValueAttribute_of_VariableTypeNodes_VariableNodes[];
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "fill_Variant_for_value_attribute");
 
 	OpcUa_ReturnErrorIfArgumentNull(p_Node);
 	/*OpcUa_ReturnErrorIfArgumentNull(p_Index);*/

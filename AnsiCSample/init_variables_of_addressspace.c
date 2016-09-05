@@ -41,13 +41,13 @@
 
 OpcUa_StatusCode initialize_value_attribute_of_variablenodes_variabletypenodes(OpcUa_Void)
 {
-	OpcUa_StatusCode			 uStatus					= OpcUa_Good;
 	extern OpcUa_Int			Continuation_Point_Identifier;
 	extern OpcUa_Int			Cont_Point_Counter;
 	extern OpcUa_UInt32			session_flag;
 	extern OpcUa_String*		p_user_name;
 	extern OpcUa_Double			session_timeout;
 	extern my_Variant			all_ValueAttribute_of_VariableTypeNodes_VariableNodes[];
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "initialize_value_attribute_of_variablenodes_variabletypenodes");
 
 /*initializing session relevant variables*/
 	Continuation_Point_Identifier=0;
@@ -159,6 +159,7 @@ OpcUa_StatusCode initialize_value_attribute_of_variablenodes_variabletypenodes(O
 //-------------------------
 	
 	OpcUa_ReturnStatusCode;
+	OpcUa_BeginErrorHandling;
 
 	OpcUa_FinishErrorHandling;
 }

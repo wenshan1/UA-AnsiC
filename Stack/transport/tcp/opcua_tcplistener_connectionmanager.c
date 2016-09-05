@@ -425,7 +425,7 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_GetConnectionCount(
     OpcUa_TcpListener_ConnectionManager*    a_pConnectionManager,
     OpcUa_UInt32*                           a_pNoOfConnections)
 {
-OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "GetConnectionCout");
+OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "GetConnectionCount");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pConnectionManager);
     OpcUa_ReturnErrorIfArgumentNull(a_pNoOfConnections);

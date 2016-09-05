@@ -31,6 +31,7 @@
 #include <opcua_serverstub.h>
 #include <opcua_string.h>
 #include <opcua_memory.h>
+#include <opcua_trace.h>
 #include "addressspace.h"
 #include "browseservice.h"
 #include "addressspace_init.h"
@@ -200,7 +201,7 @@ OpcUa_StatusCode browse(OpcUa_BrowseDescription* a_pNodesToBrowse,OpcUa_BrowseRe
 	_BaseAttribute_*			pointer_to_node;
 	_BaseAttribute_*			pointer_to_targetnode;
 	extern OpcUa_UInt32			max_ref_per_node;
-	OpcUa_StatusCode    uStatus	= OpcUa_Good;
+	OpcUa_InitializeStatus(OpcUa_Module_Server, "browse");
 
 	if(continuation_point==occupied)
 	{

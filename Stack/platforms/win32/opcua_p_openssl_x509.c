@@ -46,14 +46,14 @@
 
   @param pNameEntry    [in]   The passed Name Entry Object.
 */
-OpcUa_Int OpcUa_P_OpenSSL_X509_Name_AddEntry(
+OpcUa_StatusCode OpcUa_P_OpenSSL_X509_Name_AddEntry(
     X509_NAME               **ppX509Name,
     OpcUa_Crypto_NameEntry *pNameEntry);
 
 /*============================================================================
  * OpcUa_P_OpenSSL_X509_Name_AddEntry
  *===========================================================================*/
-OpcUa_Int OpcUa_P_OpenSSL_X509_Name_AddEntry(
+OpcUa_StatusCode OpcUa_P_OpenSSL_X509_Name_AddEntry(
     X509_NAME**               a_ppX509Name,
     OpcUa_Crypto_NameEntry*   a_pNameEntry)
 {
@@ -78,12 +78,13 @@ OpcUa_Int OpcUa_P_OpenSSL_X509_Name_AddEntry(
     }
 
     if(X509_NAME_add_entry(*a_ppX509Name, pEntry,-1,0) != 1)
+    {
         uStatus =  OpcUa_Bad;
+    }
 
     if(pEntry != OpcUa_Null)
     {
         X509_NAME_ENTRY_free(pEntry);
-        pEntry = OpcUa_Null;
     }
 
 OpcUa_ReturnStatusCode;
@@ -95,7 +96,7 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_P_OpenSSL_X509_AddCustomExtension
  *===========================================================================*/
-OpcUa_Int OpcUa_P_OpenSSL_X509_AddCustomExtension(
+OpcUa_StatusCode OpcUa_P_OpenSSL_X509_AddCustomExtension(
     X509**                   a_ppCertificate,
     OpcUa_Crypto_Extension*  a_pExtension,
     X509V3_CTX*              a_pX509V3Context)
@@ -133,7 +134,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_AddCustomExtension");
 
     /* free the extension. */
     X509_EXTENSION_free(pExtension);
-    pExtension = OpcUa_Null;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -141,7 +141,6 @@ OpcUa_BeginErrorHandling;
     if(pExtension != OpcUa_Null)
     {
         X509_EXTENSION_free(pExtension);
-        pExtension = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -285,11 +284,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     /* create and add entries to subject name */
     for(i=0; i<a_nameEntriesCount; i++)
     {
-        if(OpcUa_P_OpenSSL_X509_Name_AddEntry(&pSubj, a_pNameEntries + i) <0)
-        {
-            uStatus =  OpcUa_Bad;
-            OpcUa_GotoErrorIfBad(uStatus);
-        }
+        uStatus = OpcUa_P_OpenSSL_X509_Name_AddEntry(&pSubj, a_pNameEntries + i);
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     /* set subject name in request */
@@ -324,11 +320,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
 
     for(i=0; i<a_extensionsCount; i++)
     {
-        if(OpcUa_P_OpenSSL_X509_AddCustomExtension(&pCert, a_pExtensions+i, &ctx) <0)
-        {
-            uStatus =  OpcUa_Bad;
-            OpcUa_GotoErrorIfBad(uStatus);
-        }
+        uStatus = OpcUa_P_OpenSSL_X509_AddCustomExtension(&pCert, a_pExtensions+i, &ctx);
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     /* sign certificate with the CA private key */
