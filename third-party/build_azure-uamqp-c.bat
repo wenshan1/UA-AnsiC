@@ -24,7 +24,7 @@ IF NOT EXIST .\build MKDIR .\build
 ECHO STEP 2) Running CMAKE...
 set OpenSSLDir=%INSTALLDIR%\openssl
 cd .\build
-%CMAKEEXE% -Duse_schannel:BOOL=OFF -Duse_openssl:BOOL=ON ..
+%CMAKEEXE% -Duse_schannel:BOOL=OFF -Duse_openssl:BOOL=ON -Dmemory_trace:bool=OFF ..
 
 ECHO STEP 3) Building project...
 msbuild ALL_BUILD.vcxproj /p:Configuration=Debug 

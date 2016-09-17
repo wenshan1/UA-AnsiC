@@ -169,7 +169,7 @@ OpcUa_StatusCode OpcUa_SecureChannel_DeriveKeys(    OpcUa_MessageSecurityMode   
     OpcUa_SecurityKeyset*               pClientKeyset               = OpcUa_Null;
     OpcUa_SecurityKeyset*               pServerKeyset               = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "GetOpenSecurechannelInputHeaderInformation");
+OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "DeriveKeys");
 
     /* allocate memory for the session key structures */
     pClientKeyset = (OpcUa_SecurityKeyset*)OpcUa_Alloc(sizeof(OpcUa_SecurityKeyset));

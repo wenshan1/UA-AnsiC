@@ -169,7 +169,7 @@ OpcUa_FinishErrorHandling;
 OpcUa_StatusCode OpcUa_TcpSecureChannel_ReleaseSecuritySet( OpcUa_SecureChannel*    a_pSecureChannel,
                                                             OpcUa_UInt32            a_uTokenId)
 {
-OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "ReleaseSecurityKeyset");
+OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "ReleaseSecuritySet");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pSecureChannel);
 

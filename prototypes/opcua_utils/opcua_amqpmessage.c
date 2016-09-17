@@ -237,6 +237,7 @@ error:
 
     return result;
 }
+
 int OpcUa_Message_SetMessageId(MESSAGE_HANDLE message, const char* messageId, uint32_t sequenceNumber)
 {
     int result = 0;

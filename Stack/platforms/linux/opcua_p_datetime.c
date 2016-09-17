@@ -183,7 +183,7 @@ OpcUa_StatusCode OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_StringA   a_pchDat
 
         /* parse date and time */
         tmTime.tm_year = strtol(years, 0, 10) - 1900;
-        if(tmTime.tm_year < 1601-1900 || tmTime.tm_mon > 9999-1900)
+        if(tmTime.tm_year < 1601-1900 || tmTime.tm_year > 9999-1900)
         {
             return OpcUa_BadOutOfRange;
         }

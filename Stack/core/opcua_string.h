@@ -221,7 +221,7 @@ OpcUa_StatusCode OpcUa_String_AttachReadOnly(OpcUa_String* pDst, const OpcUa_Str
  */
 OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_String_AttachCopy(   OpcUa_String*       pDst, 
-                                            const OpcUa_StringA pSrc);
+                                            const OpcUa_CharA*  pSrc);
 
 /** 
  * @brief Attaches a string to a string object.
@@ -237,6 +237,11 @@ OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_String_AttachWithOwnership(  OpcUa_String* pDst, 
                                                     OpcUa_StringA pSrc);
 
+/*============================================================================
+ * String extensions
+ *===========================================================================*/
+#define OpcUa_String_Compare(xValue1, xValue2) OpcUa_String_StrnCmp((xValue1), (xValue2), OPCUA_STRING_LENDONTCARE, OpcUa_False)
+#define OpcUa_String_CopyTo(xSource, xDestination) OpcUa_String_StrnCpy((xDestination), (xSource), OPCUA_STRING_LENDONTCARE)
 
 OPCUA_END_EXTERN_C
 

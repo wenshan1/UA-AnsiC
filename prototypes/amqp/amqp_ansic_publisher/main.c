@@ -77,6 +77,16 @@ static int verify_remote_certificate(X509_STORE_CTX *x509_store_ctx, void *arg)
 }
 #endif
 
+void on_connection_state_changed(void* context, CONNECTION_STATE new_connection_state, CONNECTION_STATE previous_connection_state)
+{
+	printf("Connection State Changed: %u to %u\r\n", previous_connection_state, new_connection_state);
+}
+
+void on_io_error(void* context)
+{
+	int x = 0;
+}
+
 int main(int argc, char** argv)
 {
 	int result;
@@ -140,7 +150,7 @@ int main(int argc, char** argv)
 		sasl_io = xio_create(saslclientio_get_interface_description(), &sasl_io_config);
 
 		/* create the connection, session and link */
-		connection = connection_create(sasl_io, settings.BrokerAddress, "some", NULL, NULL);
+		connection = connection_create2(sasl_io, settings.BrokerAddress, "some", NULL, NULL, on_connection_state_changed, NULL, on_io_error, NULL);
 		session = session_create(connection, NULL, NULL);
 		session_set_incoming_window(session, 2147483647);
 		session_set_outgoing_window(session, 65536);
@@ -181,6 +191,7 @@ int main(int argc, char** argv)
 #if _WIN32
 			unsigned long startTime = (unsigned long)GetTickCount64();
 #endif
+
 			for (ii = 0; ii < settings.Iterations; ii++)
 			{
 				time_t rawtime;

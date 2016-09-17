@@ -715,10 +715,10 @@ OpcUa_StatusCode OpcUa_String_AttachReadOnly(OpcUa_String* a_pDst, const OpcUa_S
 /*============================================================================
  * OpcUa_String_AttachCopy
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_String_AttachCopy(OpcUa_String* a_pDst, const OpcUa_StringA a_pSrc)
+OpcUa_StatusCode OpcUa_String_AttachCopy(OpcUa_String* a_pDst, const OpcUa_CharA* a_pSrc)
 {
     OpcUa_StatusCode uStatus = OpcUa_String_AttachToString(
-        a_pSrc,
+        (OpcUa_StringA)a_pSrc,
         OPCUA_STRINGLENZEROTERMINATED, 
         0,
         OpcUa_True, /* copy the given string */
