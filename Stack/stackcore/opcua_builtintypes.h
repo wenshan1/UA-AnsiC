@@ -200,6 +200,8 @@ OpcUa_BuiltInType;
 
 #define OpcUa_Guid_Clear(xValue) do { *(xValue) = OpcUa_Guid_Null; } while(0)
 
+#define OpcUa_Guid_CopyTo(xSource, xDestination) OpcUa_MemCpy(xDestination, sizeof(OpcUa_Guid), xSource, sizeof(OpcUa_Guid))
+
 /*============================================================================
  * The ByteString type
  *===========================================================================*/
@@ -207,6 +209,8 @@ OpcUa_BuiltInType;
 OPCUA_EXPORT OpcUa_Void OpcUa_ByteString_Initialize(OpcUa_ByteString* value);
 
 OPCUA_EXPORT OpcUa_Void OpcUa_ByteString_Clear(OpcUa_ByteString* value);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ByteString_CopyTo(const OpcUa_ByteString* source, OpcUa_ByteString* destination);
 
 /*============================================================================
  * The XmlElement type
@@ -253,6 +257,8 @@ OPCUA_EXPORT OpcUa_Void OpcUa_NodeId_Initialize(OpcUa_NodeId* pValue);
 OPCUA_EXPORT OpcUa_Void OpcUa_NodeId_Clear(OpcUa_NodeId* pValue);
 
 OPCUA_EXPORT OpcUa_Boolean OpcUa_NodeId_IsNull(OpcUa_NodeId* pValue);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_NodeId_CopyTo(const OpcUa_NodeId* pSource, OpcUa_NodeId* pDestination);
 
 /*============================================================================
  * The ExpandedNodeId type
