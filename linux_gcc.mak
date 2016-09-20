@@ -23,11 +23,14 @@
 all:
 	$(MAKE) -C Stack -f linux_gcc.mak all
 	$(MAKE) -C AnsiCSample -f linux_gcc.mak all
+	$(MAKE) -C AnsiCSamplePublisher -f linux_gcc.mak all
 	
 clean:
 	$(MAKE) -C Stack -f linux_gcc.mak clean
 	$(MAKE) -C AnsiCSample -f linux_gcc.mak clean
+	$(MAKE) -C AnsiCSamplePublisher -f linux_gcc.mak clean
 
 strip:
 	$(MAKE) -C Stack -f linux_gcc.mak strip
 	$(MAKE) -C AnsiCSample -f linux_gcc.mak strip
+	$(MAKE) -C AnsiCSamplePublisher -f linux_gcc.mak strip

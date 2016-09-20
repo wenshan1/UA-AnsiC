@@ -27,12 +27,23 @@ Please consult the OpenSSL documentation for help building the library.
 
 ### Windows
 
-Open the Visual Studio Command Shell .
-Make sure that perl installed on the build machine and the path executable is available in the path.  Any perl will do, even cygwin.
-Download and extract the latest openssl-1.0.1/1.0.2 source tar ball to the besides the stack root folder.
+Open the Visual Studio Command Shell.
+Make sure that perl is in the path. Any perl will do, even cygwin.
+
+Download and extract the latest openssl-1.0.1/1.0.2 source tar ball to the root folder.
+
+Clone the Azure IoT SDKs from https://github.com/Azure/azure-iot-sdks one directory level up from the root folder, i.e. if your root is C:\UA-AnsiC then the Azure IoT SDK should be cloned to C:\azure-iot-sdks.
+
+Then follow the instructions below and build the libraries for Windows: https://github.com/Azure/azure-iot-sdks/blob/master/c/doc/devbox_setup.md.
+
+Then copy the build output of the Azure IoT C SDK to the root folder in a directory called "azure".
+
 Then cd to the root folder and execute build_win32.bat or build_win64.bat depending on your target architecture.
-This will automatically build openssl, the OPC UA Stack and the sample server.
+This will automatically build openssl, the OPC UA Stack, the sample server and the sample Publisher.
 Dependencies are not supported, it will always be a full build.
+
+You also need to replace the string "[TODO: Add your connection string here!]" with your device-specific connection string for Azure IoT Hub in ANSICSamplePublisher\main.h.
+
 
 Visual studio 2013 projects for the stack and example server are available as well. 
 Note: the OpenSSL libraries must be compiled using the above mentioned steps before building the project using Visual Studio.
@@ -49,8 +60,8 @@ To force a full build use: ./build_linux.sh clean all
 
 ## Examples
 
-An OPC UA Nano Embedded server example implementation is provided by the stack.
-Note: there is a sample AnsiCServer but it is included as-is and not fully supported, the community is welcome to extend this example application.
+There is a sample AnsiC Publisher (for sending Pub/Sub telemetry data to the cloud) available. It is also an OPC UA client.
+There is also a sample AnsiC Server but it is included as-is and not fully supported, the community is welcome to extend this example application.
 
 ## Notes for developers
 

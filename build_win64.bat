@@ -55,6 +55,15 @@ if errorlevel 1 goto error
 nmake -f win32_msc.mak
 if errorlevel 1 goto error
 
+cd ..\AnsiCSamplePublisher
+if errorlevel 1 goto error
+
+nmake -f win32_msc.mak clean
+if errorlevel 1 goto error
+
+nmake -f win32_msc.mak
+if errorlevel 1 goto error
+
 cd ..
 goto done
 

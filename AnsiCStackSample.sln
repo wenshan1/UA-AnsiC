@@ -11,6 +11,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnsiCStack", "Stack\AnsiCStack_VS2013.vcxproj", "{6568CB26-97E7-43D1-A434-B68F6C9ADAC6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnsiCSamplePublisher", "AnsiCSamplePublisher\Publisher.vcxproj", "{08F6BF8E-0EF9-4C81-AD8D-73E0FE4EF8F2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6568CB26-97E7-43D1-A434-B68F6C9ADAC6} = {6568CB26-97E7-43D1-A434-B68F6C9ADAC6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
