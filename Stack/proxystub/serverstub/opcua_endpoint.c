@@ -504,6 +504,29 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
                                                 &pEndpointInt->SecureListener);
         OpcUa_GotoErrorIfBad(uStatus);
     }
+	else if (!OpcUa_String_StrnCmp(&(pEndpointInt->Url),
+		OpcUa_String_FromCString("opc.tls:"),
+		(OpcUa_UInt32)8,
+		OpcUa_True))
+	{
+		uStatus = OpcUa_TcpListener_Create(&pEndpointInt->TransportListener);
+		OpcUa_GotoErrorIfBad(uStatus);
+
+		uStatus = OpcUa_SecureListener_Create(pEndpointInt->TransportListener,
+			pEndpointInt->Decoder,
+			pEndpointInt->Encoder,
+			&OpcUa_ProxyStub_g_NamespaceUris,
+			&OpcUa_ProxyStub_g_EncodeableTypes,
+			a_pServerCertificate,
+			a_pServerPrivateKey,
+			a_pPKIConfig,
+			a_nNoOfSecurityPolicies,
+			(OpcUa_SecureListener_SecurityPolicyConfiguration*)a_pSecurityPolicies,
+			OpcUa_Endpoint_OnSecureChannelEvent,
+			(OpcUa_Void*)pEndpointInt,
+			&pEndpointInt->SecureListener);
+		OpcUa_GotoErrorIfBad(uStatus);
+	}
 #ifdef OPCUA_HAVE_HTTPS
     else if(!OpcUa_String_StrnCmp(  &(pEndpointInt->Url),
                                     OpcUa_String_FromCString("https:"),
