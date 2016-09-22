@@ -92,6 +92,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>
       </ImportLibrary>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -130,6 +131,7 @@
       </DataExecutionPrevention>
       <ImportLibrary>
       </ImportLibrary>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>
