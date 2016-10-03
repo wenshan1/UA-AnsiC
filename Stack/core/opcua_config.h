@@ -210,6 +210,9 @@
 /** @brief The standard port for the opc.tcp protocol, defined in part 6. */
 #define OPCUA_TCP_DEFAULT_PORT                      4840
 
+/** @brief The standard port for the opc.tls protocol, defined in part 6. */
+#define OPCUA_TLS_DEFAULT_PORT                      4843
+
 /** @brief The standard port for the http protocol. */
 #define OPCUA_HTTP_DEFAULT_PORT                     80
 

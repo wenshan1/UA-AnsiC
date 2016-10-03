@@ -486,7 +486,12 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
                                 (OpcUa_UInt32)8,
                                 OpcUa_True))
     {
-        uStatus = OpcUa_TcpListener_Create(     &pEndpointInt->TransportListener);
+        uStatus = OpcUa_TcpListener_Create(
+            a_pServerCertificate,
+            a_pServerPrivateKey,
+            a_pPKIConfig, 
+            &pEndpointInt->TransportListener);
+
         OpcUa_GotoErrorIfBad(uStatus);
 
         uStatus = OpcUa_SecureListener_Create(  pEndpointInt->TransportListener,
@@ -509,7 +514,12 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
 		(OpcUa_UInt32)8,
 		OpcUa_True))
 	{
-		uStatus = OpcUa_TcpListener_Create(&pEndpointInt->TransportListener);
+		uStatus = OpcUa_TcpListener_Create(
+            a_pServerCertificate,
+            a_pServerPrivateKey,
+            a_pPKIConfig,
+            &pEndpointInt->TransportListener);
+
 		OpcUa_GotoErrorIfBad(uStatus);
 
 		uStatus = OpcUa_SecureListener_Create(pEndpointInt->TransportListener,

@@ -37,6 +37,8 @@ struct _OpcUa_TcpListener_Connection
     OpcUa_DateTime      ConnectTime;
     /** @brief The time when the client disconnected. */
     OpcUa_DateTime      DisconnectTime;
+    /** @brief The last time data was received. */
+    OpcUa_UInt32        uLastReceiveTime;
     /** @brief True, as long as the connection is established. */
     OpcUa_Boolean       bConnected;
     /** @brief The size of the incoming buffer. */
@@ -69,6 +71,14 @@ struct _OpcUa_TcpListener_Connection
     OpcUa_Boolean       bNoRcvUntilDone;
     /** @brief Tells wether data has been delayed because of bNoRcvUntilDone. */
     OpcUa_Boolean       bRcvDataPending;
+    /** @brief ValidationCallback has been received. */
+    OpcUa_Boolean               bCallbackPending;
+    /** @brief hResult from ValidationCallback. */
+    OpcUa_StatusCode            hValidationResult;
+    /** @brief ClientCertificate from ValidationCallback. */
+    OpcUa_ByteString            bsClientCertificate;
+    /** @brief Counts number of variables pointing to this object. */
+    OpcUa_Int32                 iReferenceCount;
 };
 
 typedef struct _OpcUa_TcpListener_Connection OpcUa_TcpListener_Connection;
@@ -137,6 +147,11 @@ OpcUa_StatusCode        OpcUa_TcpListener_ConnectionManager_GetConnectionBySocke
 OpcUa_StatusCode        OpcUa_TcpListener_ConnectionManager_RemoveConnection(
     OpcUa_TcpListener_ConnectionManager*    ConnectionManager,
     OpcUa_TcpListener_Connection*           pConnection);
+
+/* @brief Release a connection identified by the connection object itself (if no id was assigned ie. pre validation) */
+OpcUa_StatusCode        OpcUa_TcpListener_ConnectionManager_ReleaseConnection(
+    OpcUa_TcpListener_ConnectionManager* pConnectionManager,
+    OpcUa_TcpListener_Connection**       ppConnection);
 
 /* @brief Remove all connections managed by the listener and call the given function for everyone. */
 OpcUa_StatusCode        OpcUa_TcpListener_ConnectionManager_RemoveConnections(

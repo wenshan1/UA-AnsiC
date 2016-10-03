@@ -469,6 +469,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_SocketManager_CreateServer(  OpcUa_Socket
     OpcUa_InternalSocketManager*    pInternalSocketManager  = OpcUa_Null;
     OpcUa_UInt16                    uPort                   = 0;
     OpcUa_StringA                   sRemoteAdress           = OpcUa_Null;
+    OpcUa_Boolean                   bUseTls                 = OpcUa_False;
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateServer");
 
@@ -487,7 +488,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateServer");
     /* parse address */
     uStatus = OpcUa_P_ParseUrl( a_sAddress,
                                 &sRemoteAdress,
-                                &uPort);
+                                &uPort,
+                                &bUseTls);
 
     OpcUa_ReturnErrorIfBad(uStatus);
     if(a_bListenOnAllInterfaces)
@@ -542,6 +544,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_SocketManager_CreateClient(  OpcUa_Socket
     OpcUa_InternalSocketManager* pInternalSocketManager = OpcUa_Null;
     OpcUa_UInt16                 uPort                  = 0;
     OpcUa_StringA                sRemoteAdress          = OpcUa_Null;
+    OpcUa_Boolean                bUseTls                = OpcUa_False;
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateClient");
 
@@ -559,7 +562,9 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateClient");
     /* parse address */
     uStatus = OpcUa_P_ParseUrl( a_sRemoteAddress,
                                 &sRemoteAdress,
-                                &uPort);
+                                &uPort,
+                                &bUseTls);
+
     OpcUa_ReturnErrorIfBad(uStatus);
 
     pInternalSocketManager = (OpcUa_InternalSocketManager*)a_hSocketManager;

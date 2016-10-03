@@ -169,6 +169,12 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_GetConnectionBySocket(
         tmpConnection = (OpcUa_TcpListener_Connection *)OpcUa_List_GetNextElement(a_pConnectionManager->Connections);
     }
 
+    if (tmpConnection != OpcUa_Null)
+    {
+        tmpConnection->iReferenceCount++;
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ConnectionManager_GetConnectionBySocket: 0x%08X increasing RefCount %u\n", tmpConnection, tmpConnection->iReferenceCount);
+    }
+
     OpcUa_List_Leave(a_pConnectionManager->Connections);
 
     return uStatus;
@@ -340,12 +346,13 @@ OpcUa_StatusCode OpcUa_TcpListener_Connection_Initialize(OpcUa_TcpListener_Conne
     uStatus = OPCUA_P_MUTEX_CREATE(&(a_pConnection->Mutex));
     OpcUa_ReturnErrorIfBad(uStatus);
 
-    a_pConnection->ReceiveBufferSize        = 0;
-    a_pConnection->SendBufferSize           = 0;
+    a_pConnection->ReceiveBufferSize        = OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize;
+    a_pConnection->SendBufferSize           = OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize;
     a_pConnection->pSendQueue               = OpcUa_Null;
     a_pConnection->bCloseWhenDone           = OpcUa_False;
     a_pConnection->bNoRcvUntilDone          = OpcUa_False;
     a_pConnection->bRcvDataPending          = OpcUa_False;
+    a_pConnection->iReferenceCount          = 0;
 
     return OpcUa_Good;
 }
@@ -438,6 +445,45 @@ OpcUa_BeginErrorHandling;
     /* nothing */
 
 OpcUa_FinishErrorHandling;
+}
+
+/*==============================================================================*/
+/*                                                                              */
+/*==============================================================================*/
+/**
+* @brief Release reference to given connection
+*
+* @return: Status Code;
+*/
+OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_ReleaseConnection(
+    OpcUa_TcpListener_ConnectionManager*    a_pConnectionManager,
+    OpcUa_TcpListener_Connection**          a_ppConnection)
+{
+    /* OpcUa_GoodCallAgain indicates that connection still exists. */
+    OpcUa_StatusCode uStatus = OpcUa_GoodCallAgain;
+
+    OpcUa_List_Enter(a_pConnectionManager->Connections);
+
+    (*a_ppConnection)->iReferenceCount--;
+
+    if ((*a_ppConnection)->iReferenceCount <= 0)
+    {
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ConnectionManager_ReleaseConnection: Deleting 0x%08X -- RefCount %u\n", (*a_ppConnection), (*a_ppConnection)->iReferenceCount);
+
+        OpcUa_List_DeleteElement(a_pConnectionManager->Connections, (*a_ppConnection));
+
+        OpcUa_TcpListener_Connection_Delete(a_ppConnection);
+
+        uStatus = OpcUa_Good;
+    }
+    else
+    {
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ConnectionManager_ReleaseConnection: 0x%08X -- RefCount %u\n", (*a_ppConnection), (*a_ppConnection)->iReferenceCount);
+    }
+
+    OpcUa_List_Leave(a_pConnectionManager->Connections);
+
+    return uStatus;
 }
 
 #endif /* OPCUA_HAVE_SERVERAPI */

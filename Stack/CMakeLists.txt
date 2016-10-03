@@ -41,8 +41,8 @@ add_library(uastack
 	${CORE_H}
 	${PLATFORMS_H}
 	${STACKCORE_H}
-	${TCP_H}
 	${HTTPS_H}
+	${TLS_H}
 	${SECURECHANNEL_H}
 	${CLIENTPROXY_H}
 	${SERVERSTUB_H}

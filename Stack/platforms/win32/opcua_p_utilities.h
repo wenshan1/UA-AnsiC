@@ -58,7 +58,16 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_CharAToInt(   OpcUa_StringA sValue);
  */
 OpcUa_StatusCode OpcUa_P_ParseUrl(  OpcUa_StringA   psUrl,
                                     OpcUa_StringA*  psIpAdress,
-                                    OpcUa_UInt16*   puPort);
+                                    OpcUa_UInt16*   puPort,
+                                    OpcUa_Boolean*  pbTLS);
+
+OpcUa_Void OpcUa_P_ByteString_Initialize(OpcUa_ByteString* pValue);
+OpcUa_Void OpcUa_P_ByteString_Clear(OpcUa_ByteString* pValue);
+OpcUa_Void OpcUa_P_Key_Clear(OpcUa_Key* pKey);
+OpcUa_StatusCode OpcUa_P_ByteString_Copy(OpcUa_ByteString* pSrc,
+    OpcUa_ByteString* pDst);
+OpcUa_StatusCode OpcUa_Key_Copy(OpcUa_Key* a_pSrc,
+    OpcUa_Key* a_pDst);
 
 OPCUA_END_EXTERN_C
 

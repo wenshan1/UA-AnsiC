@@ -147,6 +147,13 @@ struct _OpcUa_TcpListener
     OpcUa_List*                 PendingMessages;
     /** @brief Holds the information about connected clients and helps verifying requests. */
     OpcUa_TcpListener_ConnectionManager* ConnectionManager;
+
+    /** @brief Certificate used for SSL/TLS connections. */
+    OpcUa_ByteString* pCertificate;
+    /** @brief Private key used for SSL/TLS connections.*/
+    OpcUa_Key* pPrivateKey;
+    /** @brief PKI configuration for SSL/TLS connections. */
+    OpcUa_Void* pPKIConfig;
 };
 
 
@@ -198,7 +205,11 @@ OpcUa_Void OpcUa_TcpListener_Delete(OpcUa_Listener** a_ppListener)
 /*============================================================================
  * OpcUa_TcpListener_Create
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_TcpListener_Create(OpcUa_Listener** a_pListener)
+OpcUa_StatusCode OpcUa_TcpListener_Create(
+    OpcUa_ByteString* a_pServerCertificate,
+    OpcUa_Key* a_pServerPrivateKey,
+    OpcUa_Void* a_pPKIConfig,
+    OpcUa_Listener** a_pListener)
 {
     OpcUa_TcpListener*  pTcpListener = OpcUa_Null;
 
@@ -225,6 +236,11 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "Create");
     uStatus = OpcUa_TcpListener_ConnectionManager_Create(&(pTcpListener->ConnectionManager));
     OpcUa_GotoErrorIfBad(uStatus);
     pTcpListener->ConnectionManager->Listener = *a_pListener;
+
+    /* security credentials */
+    pTcpListener->pCertificate = a_pServerCertificate;
+    pTcpListener->pPrivateKey = a_pServerPrivateKey;
+    pTcpListener->pPKIConfig = a_pPKIConfig;
 
     /* HINT: socket and socket list get managed in open/close */
 
@@ -985,53 +1001,6 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
     /* if no connection exists create a new one */
     if(pConnection == OpcUa_Null)
     {
-        /* create and add a new connection object for the accepted connection  */
-        uStatus = OpcUa_TcpListener_Connection_Create(&pConnection);
-        OpcUa_GotoErrorIfBad(uStatus);
-
-        pConnection->Socket          = pTcpInputStream->Socket;
-        pConnection->pListenerHandle = (OpcUa_Listener*)a_pListener;
-
-
-#if OPCUA_P_SOCKETGETPEERINFO_V2
-        uStatus = OPCUA_P_SOCKET_GETPEERINFO(pConnection->Socket, pConnection->achPeerInfo, OPCUA_P_PEERINFO_MIN_SIZE);
-        if(OpcUa_IsGood(uStatus))
-        {
-            /* Give some debug information. */
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
-                        "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %s accepted on socket %p!\n",
-                        pConnection->achPeerInfo,
-                        pConnection->Socket);
-        }
-        else
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
-        }
-#else /* OPCUA_P_SOCKETGETPEERINFO_V2 */
-        uStatus = OPCUA_P_SOCKET_GETPEERINFO(pTcpInputStream->Socket, &(pConnection->PeerIp), &(pConnection->PeerPort));
-        if(OpcUa_IsGood(uStatus))
-        {
-            /* Give some debug information. */
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
-                        "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %d.%d.%d.%d:%d accepted on socket %p!\n",
-                        (OpcUa_Int)(pConnection->PeerIp>>24)&0xFF,
-                        (OpcUa_Int)(pConnection->PeerIp>>16)&0xFF,
-                        (OpcUa_Int)(pConnection->PeerIp>>8) &0xFF,
-                        (OpcUa_Int) pConnection->PeerIp     &0xFF,
-                        pConnection->PeerPort,
-                        pConnection->Socket);
-        }
-        else
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
-        }
-#endif /* OPCUA_P_SOCKETGETPEERINFO_V2 */
-
-        uStatus = OpcUa_TcpListener_ConnectionManager_AddConnection(pTcpListener->ConnectionManager, pConnection);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-    else
-    {
         return(OpcUa_BadUnexpectedError);
     }
 
@@ -1208,6 +1177,114 @@ OpcUa_FinishErrorHandling;
 /** @brief Internal handler prototype. */
 typedef OpcUa_StatusCode (*OpcUa_TcpListener_EventHandler)(OpcUa_Listener*  a_pListener,
                                                            OpcUa_Socket     a_pSocket);
+
+/*============================================================================
+* OpcUa_TcpListener_AcceptEventHandler
+*===========================================================================*/
+/**
+* @brief Gets called if remote node has connected to this socket.
+*/
+OpcUa_StatusCode OpcUa_TcpListener_AcceptEventHandler(
+    OpcUa_Listener* a_pListener,
+    OpcUa_Socket    a_hSocket)
+{
+    OpcUa_TcpListener*             pTcpListener = OpcUa_Null;
+    OpcUa_TcpListener_Connection*  pListenerConnection = OpcUa_Null;
+
+    OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AcceptEventHandler");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_hSocket);
+    OpcUa_ReturnErrorIfArgumentNull(a_pListener);
+    OpcUa_ReturnErrorIfArgumentNull(a_pListener->Handle);
+
+    pTcpListener = (OpcUa_TcpListener *)a_pListener->Handle;
+
+#if OPCUA_HTTPLISTENER_USEEXTRAMAXCONNSOCKET
+    {
+        OpcUa_UInt32 uConnectionCount = 0;
+
+        uStatus = OpcUa_TcpListener_ConnectionManager_GetConnectionCount(pTcpListener->pConnectionManager,
+            &uConnectionCount);
+
+        OpcUa_GotoErrorIfTrue(uConnectionCount >= OPCUA_HTTPLISTENER_MAXCONNECTIONS, OpcUa_BadMaxConnectionsReached);
+    }
+#endif /* OPCUA_HTTPLISTENER_USEEXTRAMAXCONNSOCKET */
+
+    /* check, if there is already a connection with this object */
+    OpcUa_TcpListener_ConnectionManager_GetConnectionBySocket(pTcpListener->ConnectionManager,
+        a_hSocket,
+        &pListenerConnection);
+
+    /* if no connection exists create a new one */
+    if (pListenerConnection == OpcUa_Null)
+    {
+        /* create and add a new connection object for the accepted connection  */
+        uStatus = OpcUa_TcpListener_Connection_Create(&pListenerConnection);
+        OpcUa_GotoErrorIfBad(uStatus);
+
+        pListenerConnection->Socket = a_hSocket;
+        pListenerConnection->pListenerHandle = (OpcUa_Listener*)a_pListener;
+        pListenerConnection->uLastReceiveTime = OpcUa_GetTickCount();
+
+#if OPCUA_P_SOCKETGETPEERINFO_V2
+        uStatus = OPCUA_P_SOCKET_GETPEERINFO(a_hSocket, (OpcUa_CharA*)&(pListenerConnection->achPeerInfo), OPCUA_P_PEERINFO_MIN_SIZE);
+#else /* OPCUA_P_SOCKETGETPEERINFO_V2 */
+        {
+            OpcUa_UInt32        PeerIp;
+            OpcUa_UInt16        usPort;
+            uStatus = OPCUA_P_SOCKET_GETPEERINFO(a_hSocket, &PeerIp, &usPort);
+            OpcUa_SPrintfA((OpcUa_CharA*)&(pListenerConnection->achPeerInfo),
+#if OPCUA_USE_SAFE_FUNCTIONS
+                OPCUA_P_PEERINFO_MIN_SIZE,
+#endif /* OPCUA_USE_SAFE_FUNCTIONS */
+                "%u.%u.%u.%u:%u",
+                (PeerIp >> 24) & 0xFF,
+                (PeerIp >> 16) & 0xFF,
+                (PeerIp >> 8) & 0xFF,
+                PeerIp & 0xFF,
+                (int)usPort);
+        }
+#endif
+
+        if (OpcUa_IsGood(uStatus))
+        {
+            /* Give some debug information. */
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
+                "OpcUa_TcpListener_AcceptEventHandler: Transport connection %p from %s accepted on socket %p!\n",
+                pListenerConnection,
+                pListenerConnection->achPeerInfo,
+                pListenerConnection->Socket);
+        }
+        else
+        {
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_TcpListener_AcceptEventHandler: Could not retrieve connection information for socket %p!\n", pListenerConnection->Socket);
+        }
+
+        uStatus = OpcUa_TcpListener_ConnectionManager_AddConnection(pTcpListener->ConnectionManager, pListenerConnection);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    pListenerConnection->bConnected = OpcUa_True;
+
+    pTcpListener->Callback(
+        a_pListener,                            /* the source of the event       */
+        pTcpListener->CallbackData,             /* the callback data             */
+        OpcUa_ListenerEvent_ChannelOpened,      /* the event that occured        */
+        (OpcUa_Handle)pListenerConnection,      /* the handle for the connection */
+        OpcUa_Null,                             /* the non existing stream       */
+        OpcUa_Good);                            /* status                        */
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if (pListenerConnection != OpcUa_Null)
+    {
+        /* ignore result; it doesnt matter, if it was not yet registered */
+        OpcUa_TcpListener_Connection_Delete(&pListenerConnection);
+    }
+
+OpcUa_FinishErrorHandling;
+}
 
 /*============================================================================
  * OpcUa_TcpListener_ReadEventHandler
@@ -1743,9 +1820,13 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "EventCallback");
             fEventHandler = OpcUa_TcpListener_TimeoutEventHandler;
             break;
         }
+    case OPCUA_SOCKET_ACCEPT_EVENT:
+        {
+            fEventHandler = OpcUa_TcpListener_AcceptEventHandler;
+            break;
+        }
     case OPCUA_SOCKET_NO_EVENT:
     case OPCUA_SOCKET_SHUTDOWN_EVENT:
-    case OPCUA_SOCKET_ACCEPT_EVENT:
         {
             break;
         }
@@ -1891,6 +1972,62 @@ OpcUa_StatusCode OpcUa_TcpListener_Close(OpcUa_Listener* a_pListener)
 }
 
 /*============================================================================
+* OpcUa_TlsListener_SslEventHandler
+*===========================================================================*/
+OpcUa_StatusCode OpcUa_TlsListener_SslEventHandler(OpcUa_Socket        a_hSocket,
+    OpcUa_Void*         a_pUserData,
+    OpcUa_ByteString*   a_pCertificate,
+    OpcUa_StatusCode    a_uResult)
+{
+    OpcUa_TcpListener*            pTcpListener = OpcUa_Null;
+    OpcUa_TcpListener_Connection* pTcpConnection = OpcUa_Null;
+
+OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SslEventHandler");
+
+    OpcUa_ReferenceParameter(a_hSocket);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pUserData);
+    OpcUa_ReturnErrorIfArgumentNull(a_pCertificate);
+
+    pTcpListener = (OpcUa_TcpListener*)((OpcUa_Listener*)a_pUserData)->Handle;
+
+    uStatus = OpcUa_TcpListener_ConnectionManager_GetConnectionBySocket(
+        pTcpListener->ConnectionManager,
+        a_hSocket,
+        &pTcpConnection);
+    
+    OpcUa_ReturnErrorIfBad(uStatus);
+
+    OpcUa_GotoErrorIfTrue(pTcpConnection->bCallbackPending, OpcUa_BadInvalidState);
+
+    pTcpConnection->hValidationResult = a_uResult;
+    pTcpConnection->bsClientCertificate.Length = a_pCertificate->Length;
+    pTcpConnection->bsClientCertificate.Data = OpcUa_Memory_Alloc(a_pCertificate->Length);
+    OpcUa_GotoErrorIfAllocFailed(pTcpConnection->bsClientCertificate.Data);
+    
+    OpcUa_MemCpy(
+        pTcpConnection->bsClientCertificate.Data, 
+        pTcpConnection->bsClientCertificate.Length,
+        a_pCertificate->Data, 
+        a_pCertificate->Length);
+
+    pTcpConnection->bCallbackPending = OpcUa_True;
+
+    OpcUa_TcpListener_ConnectionManager_ReleaseConnection(
+        pTcpListener->ConnectionManager,
+        &pTcpConnection);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    OpcUa_TcpListener_ConnectionManager_ReleaseConnection(
+        pTcpListener->ConnectionManager,
+        &pTcpConnection);
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * OpcUa_TcpListener_Open
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_TcpListener_Open(
@@ -1949,12 +2086,31 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "Open");
                                             uSocketManagerFlags);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    uStatus = OPCUA_P_SOCKETMANAGER_CREATESERVER(   pTcpListener->SocketManager,
-                                                    OpcUa_String_GetRawString(a_sUrl),
-                                                    a_bListenOnAllInterfaces,
-                                                    OpcUa_TcpListener_EventCallback,
-                                                    (OpcUa_Void*)a_pListener,
-                                                    &(pTcpListener->Socket));
+
+    if (OpcUa_StrnCmpA(OpcUa_String_GetRawString(a_sUrl), "opc.tls:", 8) != 0)
+    {
+        uStatus = OPCUA_P_SOCKETMANAGER_CREATESERVER(
+            pTcpListener->SocketManager,
+            OpcUa_String_GetRawString(a_sUrl),
+            a_bListenOnAllInterfaces,
+            OpcUa_TcpListener_EventCallback,
+            (OpcUa_Void*)a_pListener,
+            &(pTcpListener->Socket));
+    }
+    else
+    {
+        uStatus = OPCUA_P_SOCKETMANAGER_CREATESSLSERVER(
+            pTcpListener->SocketManager,
+            OpcUa_String_GetRawString(a_sUrl),
+            a_bListenOnAllInterfaces,
+            pTcpListener->pCertificate,
+            pTcpListener->pPrivateKey,
+            pTcpListener->pPKIConfig,
+            OpcUa_TcpListener_EventCallback,
+            OpcUa_TlsListener_SslEventHandler,
+            (OpcUa_Void*)a_pListener,
+            &(pTcpListener->Socket));
+    }
 
 #else /* OPCUA_MULTITHREADED */
 
