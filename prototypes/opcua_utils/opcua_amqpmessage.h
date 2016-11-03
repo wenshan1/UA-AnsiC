@@ -1,5 +1,5 @@
-#ifndef OPCUA_UTILS_H
-#define OPCUA_UTILS_H
+#ifndef OPCUA_AMQPMESSAGE_H
+#define OPCUA_AMQPMESSAGE_H
 
 #include "azure_uamqp_c/message.h"
 
@@ -59,6 +59,6 @@ void OpcUa_ApplicationSettings_Initialize(OpcUa_ApplicationSettings* a_pSettings
 void OpcUa_ApplicationSettings_Clear(OpcUa_ApplicationSettings* a_pSettings);
 int OpcUa_GetApplicationSettings(int argc, char ** argv, OpcUa_ApplicationSettings* a_pSettings);
 
-#endif // OPCUA_UTILS_H
+#endif // OPCUA_AMQPMESSAGE_H
 
 

@@ -5,31 +5,20 @@
 #include <string.h>
 #include <memory.h>
 #include <json.h>
-#include "opcua_utils.h"
+#include "opcua_amqpmessage.h"
 #include "urldecode.h"
 
-#define OPCUA_PROPERTY_DATASET_CLASS_ID "ua-class-id"
-#define OPCUA_PROPERTY_METADATA_NODE_NAME "ua-metadata-node-name"
-
-char* OpcUa_StrnDup(const char* pSrc, int length)
-{
-    char* pDst = NULL;
-
-    if (pSrc == NULL)
-    {
-        return NULL;
-    }
-
-    pDst = malloc(length + 1);
-    memcpy(pDst, pSrc, length);
-    pDst[length] = 0;
-
-    return pDst;
-}
-
+char* OpcUa_StrnDup(const char* pSrc, int length);
 #define OpcUa_Alloc(x) malloc(x)
 #define OpcUa_Free(x) if (x != NULL) { free(x); x = NULL; }
 #define OpcUa_StrDup(x) OpcUa_StrnDup(x, strlen(x))
+#define OpcUa_Alloc(x) malloc(x)
+#define OpcUa_Free(x) if (x != NULL) { free(x); x = NULL; }
+#define OpcUa_StrDup(x) OpcUa_StrnDup(x, strlen(x))
+
+#define OPCUA_PROPERTY_PUBLISHER_ID "ua-pubid"
+#define OPCUA_PROPERTY_DATASET_CLASS_ID "ua-clsid"
+#define OPCUA_PROPERTY_METADATA_NODE_NAME "ua-mdata"
 
 void OpcUa_AmqpMessageHeader_Initialize(OpcUa_AmqpMessageHeader* pHeader)
 {
@@ -99,18 +88,6 @@ int OpcUa_Message_SetHeader(MESSAGE_HANDLE message, OpcUa_AmqpMessageHeader* pHe
         }
     }
 
-    if (pHeader->PublisherId != NULL)
-    {
-        amqp_binary value;
-        value.bytes = (const unsigned char*)pHeader->PublisherId;
-        value.length = strlen(pHeader->PublisherId);
-
-        if (properties_set_user_id(properties, value) != 0)
-        {
-            result = __LINE__; goto error;
-        }
-    }
-
     if (pHeader->ContentType != NULL)
     {
         if (properties_set_content_type(properties, pHeader->ContentType) != 0)
@@ -158,6 +135,32 @@ int OpcUa_Message_SetHeader(MESSAGE_HANDLE message, OpcUa_AmqpMessageHeader* pHe
             {
                 result = __LINE__; goto error;
             }
+        }
+
+        if (pHeader->PublisherId != NULL)
+        {
+            AMQP_VALUE name = amqpvalue_create_string(OPCUA_PROPERTY_PUBLISHER_ID);
+
+            if (name == NULL)
+            {
+                result = __LINE__; goto error;
+            }
+
+            AMQP_VALUE value = amqpvalue_create_string(pHeader->PublisherId);
+
+            if (value == NULL)
+            {
+                amqpvalue_destroy(name);
+                result = __LINE__; goto error;
+            }
+
+            if (amqpvalue_set_map_value(application_properties, name, value) != 0)
+            {
+                result = __LINE__; goto error;
+            }
+
+            amqpvalue_destroy(name);
+            amqpvalue_destroy(value);
         }
 
         if (pHeader->DataSetClassId != NULL)
@@ -349,13 +352,6 @@ int OpcUa_Message_GetHeader(MESSAGE_HANDLE message, OpcUa_AmqpMessageHeader* pHe
         pHeader->ContentType = OpcUa_StrDup(string);
     }
 
-    if (properties_get_user_id(properties, &bytes) == 0)
-    {
-        pHeader->PublisherId = malloc(bytes.length + 1);
-        memcpy(pHeader->PublisherId, bytes.bytes, bytes.length);
-        pHeader->PublisherId[bytes.length] = 0;
-    }
-
     if (properties_get_group_id(properties, &string) == 0)
     {
         pHeader->DataSetWriterId = OpcUa_StrDup(string);
@@ -372,7 +368,30 @@ int OpcUa_Message_GetHeader(MESSAGE_HANDLE message, OpcUa_AmqpMessageHeader* pHe
     if (message_get_application_properties(message, &application_properties) == 0)
     {
         AMQP_VALUE map = amqpvalue_get_inplace_described_value(application_properties);
-        AMQP_VALUE name = amqpvalue_create_string(OPCUA_PROPERTY_DATASET_CLASS_ID);
+
+        AMQP_VALUE name = amqpvalue_create_string(OPCUA_PROPERTY_PUBLISHER_ID);
+
+        if (name == NULL)
+        {
+            result = __LINE__; goto error;
+        }
+
+        value = amqpvalue_get_map_value(map, name);
+
+        if (value != NULL)
+        {
+            amqpvalue_destroy(name);
+
+            if (amqpvalue_get_string(value, &string) != 0)
+            {
+                result = __LINE__; goto error;
+            }
+
+            pHeader->PublisherId = OpcUa_StrDup(string);
+            amqpvalue_destroy(value);
+        }
+        
+        name = amqpvalue_create_string(OPCUA_PROPERTY_DATASET_CLASS_ID);
 
         if (name == NULL)
         {
@@ -393,7 +412,7 @@ int OpcUa_Message_GetHeader(MESSAGE_HANDLE message, OpcUa_AmqpMessageHeader* pHe
             pHeader->DataSetClassId = OpcUa_StrDup(string);
             amqpvalue_destroy(value);
         }
-
+        
         name = amqpvalue_create_string(OPCUA_PROPERTY_METADATA_NODE_NAME);
 
         if (name == NULL)
@@ -621,141 +640,3 @@ error:
     return result;
 }
 
-void OpcUa_ApplicationSettings_Initialize(OpcUa_ApplicationSettings* a_pSettings)
-{
-    memset(a_pSettings, 0, sizeof(OpcUa_ApplicationSettings));
-}
-
-void OpcUa_ApplicationSettings_Clear(OpcUa_ApplicationSettings* a_pSettings)
-{
-    if (a_pSettings != NULL)
-    {
-        OpcUa_Free(a_pSettings->UrlScheme);
-        OpcUa_Free(a_pSettings->BrokerAddress);
-        OpcUa_Free(a_pSettings->Username);
-        OpcUa_Free(a_pSettings->Password);
-        OpcUa_Free(a_pSettings->AmqpNodeName);
-
-        memset(a_pSettings, 0, sizeof(OpcUa_ApplicationSettings));
-    }
-}
-
-static void OpcUa_CheckArgument(int argc, int optPlace, char * option)
-{
-    if (optPlace + 1 == argc) //If the option is the last argument
-    {
-        printf("%s", option);
-        printf(" requires an argument. Call -h if you require help running this program.");
-        exit(0);
-    }
-}
-
-int OpcUa_GetApplicationSettings(int argc, char ** argv, OpcUa_ApplicationSettings* a_pSettings)
-{
-    int count = 1;
-    OpcUa_ApplicationSettings_Initialize(a_pSettings);
-
-    a_pSettings->Iterations = 10;
-
-    if (argc == 1)
-    {
-        fprintf(stderr, "c-amqp-subscriber requires arguments. Call -h if you require help running this program.");
-        exit(0);
-    }
-    else
-    {
-        while (count < argc)
-        {
-            if (strcmp(argv[count], "-h") == 0 || strcmp(argv[count], "-help") == 0)
-            {
-                printf("c-amqp-subscriber takes the following arguments to subscribe to a message broker \n");
-                printf("-b: Broker URL \n");
-                printf("-u: Username \n");
-                printf("-p: Password \n");
-                printf("-t: Terminus name \n");
-                printf("-c: Number of messages to read\n");
-                printf("All arguments must be URL encoded");
-                exit(0);
-            }
-            else if (strcmp(argv[count], "-b") == 0)
-            {
-                int ii = 0;
-                int start = 0;
-                char* arg = NULL;
-                OpcUa_CheckArgument(argc, count, "-b");
-                arg = argv[count + 1];
-
-                for (ii = 0; arg[ii] != 0; ii++)
-                {
-                    if (arg[ii] == ':')
-                    {
-                        a_pSettings->UrlScheme = OpcUa_StrnDup(arg, ii);
-                        start = ii + 3;
-                        break;
-                    }
-                }
-
-                for (ii = start; arg[ii] != 0; ii++)
-                {
-                    if (arg[ii] == ':')
-                    {
-                        a_pSettings->BrokerAddress = OpcUa_StrnDup(arg + start, ii - start);
-                        start = ii + 1;
-                        break;
-                    }
-                }
-
-                if (arg[ii] == 0)
-                {
-                    a_pSettings->BrokerAddress = OpcUa_StrnDup(arg + start, ii - start);
-                    a_pSettings->Port = 5671;
-
-                    if (a_pSettings->UrlScheme != NULL && strcmp(a_pSettings->UrlScheme, URI_SCHEME_WSS) == 0)
-                    {
-                        a_pSettings->Port = 443;
-                    }
-                }
-                else
-                {
-                    a_pSettings->Port = (uint16_t)atoi(arg + start);
-                }
-
-                count++;
-            }
-            else if (strcmp(argv[count], "-p") == 0)
-            {
-                OpcUa_CheckArgument(argc, count, "-p");
-                a_pSettings->Password = urlDecode(argv[count + 1]);
-                count++;
-            }
-            else if (strcmp(argv[count], "-u") == 0)
-            {
-                OpcUa_CheckArgument(argc, count, "-u");
-                a_pSettings->Username = urlDecode(argv[count + 1]);
-                count++;
-            }
-            else if (strcmp(argv[count], "-t") == 0)
-            {
-                OpcUa_CheckArgument(argc, count, "-t");
-                a_pSettings->AmqpNodeName = OpcUa_StrnDup(argv[count + 1], strlen(argv[count + 1]));
-                count++;
-            }
-            else if (strcmp(argv[count], "-c") == 0)
-            {
-                OpcUa_CheckArgument(argc, count, "-c");
-                a_pSettings->Iterations = atoi(argv[count + 1]);
-                count++;
-            }
-            else
-            {
-                printf("%s", argv[count]);
-                printf(" is not a valid option. Call -h if you require help running this program.");
-                exit(0);
-            }
-
-            count++;
-        }
-    }
-
-    return 0;
-}

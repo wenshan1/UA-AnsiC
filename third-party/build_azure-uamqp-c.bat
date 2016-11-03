@@ -24,7 +24,7 @@ IF NOT EXIST .\build MKDIR .\build
 ECHO STEP 2) Running CMAKE...
 set OpenSSLDir=%INSTALLDIR%\openssl
 cd .\build
-%CMAKEEXE% -Duse_schannel:BOOL=OFF -Duse_openssl:BOOL=ON -Dmemory_trace:bool=OFF ..
+%CMAKEEXE% -Duse_schannel:BOOL=ON -Duse_openssl:BOOL=OFF -Dmemory_trace:bool=OFF ..
 
 ECHO STEP 3) Building project...
 msbuild ALL_BUILD.vcxproj /p:Configuration=Debug 
@@ -38,9 +38,9 @@ IF NOT EXIST %INSTALLDIR%\azure-uamqp-c\include MKDIR %INSTALLDIR%\azure-uamqp-c
 IF NOT EXIST %INSTALLDIR%\azure-uamqp-c\lib MKDIR %INSTALLDIR%\azure-uamqp-c\lib
 
 XCOPY /Y /Q ".\build\Debug\*.*" "%INSTALLDIR%\azure-uamqp-c\lib"
-XCOPY /Y /Q ".\build\azure-c-shared-utility\Debug\*.*" "%INSTALLDIR%\azure-uamqp-c\lib"
+XCOPY /Y /Q ".\build\c-utility\Debug\*.*" "%INSTALLDIR%\azure-uamqp-c\lib"
 XCOPY /Y /Q /S ".\inc" "%INSTALLDIR%\azure-uamqp-c\include" 
-XCOPY /Y /Q /S ".\azure-c-shared-utility\inc" "%INSTALLDIR%\azure-uamqp-c\include" 
+XCOPY /Y /Q /S ".\c-utility\inc" "%INSTALLDIR%\azure-uamqp-c\include" 
 
 ECHO *** ALL DONE ***
 GOTO theEnd

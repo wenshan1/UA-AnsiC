@@ -9,7 +9,7 @@
 #endif
 #include <stdio.h>
 #include <stdbool.h>
-#include <opcua_utils.h>
+#include "opcua_amqpmessage.h"
 #include "azure_c_shared_utility/platform.h"
 #include "azure_c_shared_utility/tlsio.h"
 #include "azure_uamqp_c/message_sender.h"

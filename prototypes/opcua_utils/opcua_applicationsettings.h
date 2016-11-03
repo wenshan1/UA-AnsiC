@@ -1,5 +1,5 @@
-#ifndef OpcUa_ApplicationSettings_H
-#define OpcUa_ApplicationSettings_H
+#ifndef OPCUA_APPLICATIONSETTINGS_H
+#define OPCUA_APPLICATIONSETTINGS_H
 
 typedef struct _OpcUa_ApplicationSettings
 {
@@ -22,6 +22,6 @@ int OpcUa_GetApplicationSettings(int argc, char ** argv, OpcUa_ApplicationSettin
 #define URI_SCHEME_WSS   "wss"
 #define DEFAULT_PORT_WSS 443
 
-#endif // OPCUA_UTILS_H
+#endif // OPCUA_APPLICATIONSETTINGS_H
 
 

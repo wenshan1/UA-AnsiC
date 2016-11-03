@@ -3,11 +3,13 @@
 include_directories(.)
 
 set(amqp_ansic_subscriber_HEADERS
-    ${OPCUA_UTILS_DIR}/opcua_utils.h
+    ${OPCUA_UTILS_DIR}/opcua_amqpmessage.h
+    ${OPCUA_UTILS_DIR}/opcua_applicationsettings.h
 )
 
 set(amqp_ansic_subscriber_SOURCES
-    ${OPCUA_UTILS_DIR}/opcua_utils.c
+    ${OPCUA_UTILS_DIR}/opcua_amqpmessage.c
+    ${OPCUA_UTILS_DIR}/opcua_applicationsettings.c
     ${OPCUA_UTILS_DIR}/urldecode.c
 )
 
@@ -30,6 +32,7 @@ if (WIN32)
 	
 	target_link_libraries(
 		amqp_ansic_subscriber
+		crypt32
 		ws2_32
 		secur32)
 
