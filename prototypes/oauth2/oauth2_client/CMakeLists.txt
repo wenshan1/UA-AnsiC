@@ -1,5 +1,6 @@
 #Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
 include_directories(.)
 
 set(oauth2_client_HEADERS
@@ -26,6 +27,8 @@ add_executable(
 	oauth2_client
     ${oauth2_client_SOURCES}
     ${oauth2_client_HEADERS})
+	
+add_dependencies(oauth2_client uastack)
 
 target_link_libraries(
 	oauth2_client
@@ -33,7 +36,7 @@ target_link_libraries(
 	${JSONC_LIBRARIES}
 	${CURL_LIBRARIES}
 	${OPENSSL_LIBRARIES})
-	
+
 if (WIN32)
 
 	#windows needs this define
@@ -60,4 +63,3 @@ else()
 		crypto)
 		
 endif()
-

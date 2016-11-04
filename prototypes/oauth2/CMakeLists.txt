@@ -52,4 +52,3 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 
 add_subdirectory(${UASTACK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Stack)
 add_subdirectory(oauth2_client)
-add_subdirectory(uatestclient)
