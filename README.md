@@ -39,6 +39,8 @@ cd build
 cmake ..
 ```
 
+Each project has a batch file called 'build_<project name>' which does the above.
+
 A Visual Studio solution will appear in the build subdirectory.
 
 ### Package file structure description
