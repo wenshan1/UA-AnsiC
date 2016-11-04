@@ -18,6 +18,8 @@ add_executable(
     ${tlstestserver_SOURCES}
     ${tlstestserver_HEADERS})
 
+add_dependencies(tlstestserver uastack)
+
 target_link_libraries(
 	tlstestserver
 	${UASTACK_LIBRARIES}
