@@ -26,7 +26,11 @@ OPCUA_BEGIN_EXTERN_C
 
   @param listener [out] The new listener.
 */
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_TcpListener_Create(OpcUa_Listener** listener);
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_TcpListener_Create(
+    OpcUa_ByteString* pServerCertificate,
+    OpcUa_Key* pServerPrivateKey,
+    OpcUa_Void* pPKIConfig, 
+    OpcUa_Listener** ppListener);
 
 OPCUA_END_EXTERN_C
 

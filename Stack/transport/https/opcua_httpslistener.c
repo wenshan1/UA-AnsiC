@@ -1750,7 +1750,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_EventCallback(
     OpcUa_HttpsListener*             pHttpsListener = OpcUa_Null;
     OpcUa_HttpsListener_EventHandler fEventHandler  = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "SocketEventCallback");
+OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "EventCallback");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hSocket);
     OpcUa_ReturnErrorIfArgumentNull(a_pUserData);

@@ -297,7 +297,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     OpcUa_EncodeableTypeTableEntry* pIndex = OpcUa_Null;
     OpcUa_EncodeableTypeTableEntry* pIndexEntry = OpcUa_Null;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EncodeableTypeTable_AddTypes");
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EncodeableTypeTable_AddUnknownTypeMapping");
 
     /* check for nulls */
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);

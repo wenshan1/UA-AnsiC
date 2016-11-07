@@ -701,6 +701,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OnNotify");
             OpcUa_Listener_GetReceiveBufferSize(a_pTransportListener,
                                                 a_hTransportConnection,
                                                 &uReceiveBufferSize);
+
             pSecureChannel->nMaxBuffersPerMessage = OpcUa_ProxyStub_g_Configuration.iSerializer_MaxMessageSize/uReceiveBufferSize + 1;
 
             pSecureChannel->TransportConnection = a_hTransportConnection;

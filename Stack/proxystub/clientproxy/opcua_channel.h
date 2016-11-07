@@ -41,7 +41,11 @@ typedef enum eOpcUa_Channel_Event
     /** @brief A secure channel has been connected. (ignore for sync api) */
     eOpcUa_Channel_Event_Connected,
     /** @brief A secure channel has been disconnected. */
-    eOpcUa_Channel_Event_Disconnected
+    eOpcUa_Channel_Event_Disconnected,
+    /** @brief A secure channel has been renewed. */
+    eOpcUa_Channel_Event_Renewed,
+    /** @brief A certficate error has occured. */
+    eOpcUa_Channel_Event_VerifyCertificate
 } OpcUa_Channel_Event;
 
 /**

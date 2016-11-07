@@ -19,6 +19,7 @@
 #include <opcua_p_memory.h>
 #include <opcua_p_cryptofactory.h>
 #include <opcua_p_mutex.h>
+#include <opcua_p_utilities.h>
 
 #if OPCUA_REQUIRE_OPENSSL
 
@@ -34,34 +35,6 @@
 
 /* own headers */
 #include <opcua_p_openssl.h>
-
-/*============================================================================
- * OpcUa_P_ByteString_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_P_ByteString_Clear(OpcUa_ByteString* a_pValue)
-{
-    if (a_pValue == OpcUa_Null)
-    {
-        return;
-    }
-
-    a_pValue->Length = -1;
-
-    if(a_pValue->Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(a_pValue->Data);
-        a_pValue->Data = OpcUa_Null;
-    }
-}
-
-/*============================================================================
- * OpcUa_Key_Clear
- *===========================================================================*/
-OpcUa_Void OpcUa_P_Key_Clear(OpcUa_Key* a_pKey)
-{
-    OpcUa_P_ByteString_Clear(&a_pKey->Key);
-    a_pKey->Type = 0;
-}
 
 /*============================================================================
  * simple locking for OpenSSL

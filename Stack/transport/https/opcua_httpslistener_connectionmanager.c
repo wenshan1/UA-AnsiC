@@ -460,7 +460,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_GetConnectionCount(
     OpcUa_HttpsListener_ConnectionManager*    a_pConnectionManager,
     OpcUa_UInt32*                             a_pNoOfConnections)
 {
-OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "GetConnectionCout");
+OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "GetConnectionCount");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pConnectionManager);
     OpcUa_ReturnErrorIfArgumentNull(a_pNoOfConnections);

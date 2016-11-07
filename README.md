@@ -1,4 +1,4 @@
-# OPC Foundation UA ANSI C Stack
+# OPC Foundation UA ANSI C Stack - Prototyping Branch
 
 The OPC Foundation has formally released the OPC Unified Architecture ANSI C Stack and Sample Code to the community.
 
@@ -14,75 +14,34 @@ We strongly encourage community participation and contribution to this project. 
 You must agree to the contributor license agreement before we can accept your changes. The CLA and "I AGREE" button is automatically displayed when you perform the pull request. You can preview CLA [here](https://opcfoundation.org/license/cla/ContributorLicenseAgreementv1.0.pdf).
 
 OPC UA, empowering the Industrial Internet of Things (IIOT) and Industrie 4.0.
-
-## Runtime Dependencies
-
-OpenSSL v1.0.1t was used in development and testing of this stack and is required for the Crypto and PKI implementations, and must be separately installed on the build machine at specific locations. 
-If you need to use a different version (because of bug fixes or availability in your system) you may have to update the implementation particularly if the OpenSSL API has changed.
-
-OpenSSL has several algorithms which are patented and have import/export restrictions to some states, therefore please download a copy from the project website(http://www.openssl.org/source). 
-Please consult the OpenSSL documentation for help building the library.
-
-## Building the Stack
-
-### Windows
-
-Open the Visual Studio Command Shell.
-Make sure that perl is in the path. Any perl will do, even cygwin.
-
-Download and extract the latest openssl-1.0.1/1.0.2 source tar ball to the root folder.
-
-Clone the Azure IoT SDKs from https://github.com/Azure/azure-iot-sdks one directory level up from the root folder, i.e. if your root is C:\UA-AnsiC then the Azure IoT SDK should be cloned to C:\azure-iot-sdks.
-
-Then follow the instructions below and build the libraries for Windows: https://github.com/Azure/azure-iot-sdks/blob/master/c/doc/devbox_setup.md.
-
-Then copy the build output of the Azure IoT C SDK to the root folder in a directory called "azure".
-
-Then cd to the root folder and execute build_win32.bat or build_win64.bat depending on your target architecture.
-This will automatically build openssl, the OPC UA Stack, the sample server and the sample Publisher.
-Dependencies are not supported, it will always be a full build.
-
-You also need to replace the string "[TODO: Add your connection string here!]" with your device-specific connection string for Azure IoT Hub in ANSICSamplePublisher\main.h.
-
-
-Visual studio 2013 projects for the stack and example server are available as well. 
-Note: the OpenSSL libraries must be compiled using the above mentioned steps before building the project using Visual Studio.
-
-### Linux
-
-Open a terminal window.
-Make sure you have the libssl-dev package installed from your distribution.
-Then cd to the root folder and execute: ./build_linux.sh
-This builds both debug and release binaries.
-Dependencies and incremental builds are supported.
-To force a full build use: ./build_linux.sh clean all
  
+## Building the Projects
+Projects in the Prototyping branch are build with CMake.
+It can be downloaded here:
+https://cmake.org/download/
 
-## Examples
+After cloning the repository the subprojects in the third-party directory need to be fetched using this command:
+```
+cd third-party
+git submodule update --init --recursive
+```
 
-There is a sample AnsiC Publisher (for sending Pub/Sub telemetry data to the cloud) available. It is also an OPC UA client.
-There is also a sample AnsiC Server but it is included as-is and not fully supported, the community is welcome to extend this example application.
+The batch files in the third-party directory are used to build the different libraries.
+build_openssl.bat and build_json.bat must be run for all projects.
+build_curl.bat is needed for the oauth2 project.
+build_azure-uamqp-c.bat is needed for the amqp project. 
 
-## Notes for developers
+Once the third-party libraries are built each project can be built from a Visual Studio command prompt:
+```
+cd prototypes/<project name>
+mkdir build
+cd build
+cmake ..
+```
 
-The stack consists of two main components:
-	- the platform-independent core component
-	- the platform layer component.
-The core stack configuration is "core/opcua_configuration.h".
-The configuration of the platform layer depends on the implementation. The win32
-platform layer (included) is configured in "platforms/win32/opcua_p_interface.h"
-and "platforms/win32/opcua_platformdefs.h".
-Detailed information exists at the top of these files.
-All settings are described within the source code.
+Each project has a batch file called 'build_<project name>' which does the above.
 
-- windows and linux layers work with 32 and 64 bit O/S.
-- linux implements full IPv6 support, windows only on server side.
-- pki store implementation reworked to be more flexible.
-- conformant with strict aliasing rules.
-- enumeral values are checked on receive.
-- https protocol reworked and now basically stable.
-- negotiates tls1 to tls1_2, supports DHE protocols.
-- tested with gcc's sanitizer asan, tsan and ubsan.
+A Visual Studio solution will appear in the build subdirectory.
 
 ### Package file structure description
 
@@ -102,10 +61,11 @@ The following tree shows the directory layout as required by the included projec
 - |     |- transport
 - |        |- https                  HTTPS transport (optional)
 - |        |- tcp                    OPC TCP Binary transport
-- |- AnsiCSample						Simple example of an OPC UA nano embedded server
-- |- openssl-1.0.1t                  Required third-party libraries
+- |- prototypes   					 Root directory for all prototype projects.
+- |  |- amqp						 Sample subscribers and publishers that use AMQP.
+- |  |- oauth2						 Sample clients that use OAuth2 to request user identity tokens.
+- |  |- tls						 	 Sample client and server which implement the TLS transport. 
 
-Windows and linux build scripts, as well as Visual Studio 2013 solution can be found in the root folder.
 
 ## Known issues
 

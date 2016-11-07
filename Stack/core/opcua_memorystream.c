@@ -254,7 +254,7 @@ OpcUa_StatusCode OpcUa_MemoryStream_SetPosition(
 }
 
 /*============================================================================
- * OpcUa_MemoryStream_CreateWriteable
+ * OpcUa_MemoryStream_AttachBuffer
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_MemoryStream_AttachBuffer(   OpcUa_Stream*   a_pStrm,
                                                     OpcUa_Buffer*   a_pBuffer)
@@ -275,7 +275,7 @@ OpcUa_StatusCode OpcUa_MemoryStream_AttachBuffer(   OpcUa_Stream*   a_pStrm,
 }
 
 /*============================================================================
- * OpcUa_MemoryStream_CreateWriteable
+ * OpcUa_MemoryStream_DetachBuffer
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_MemoryStream_DetachBuffer(   OpcUa_Stream*   a_pStrm,
                                                     OpcUa_Buffer*   a_pBuffer)
@@ -294,7 +294,7 @@ OpcUa_StatusCode OpcUa_MemoryStream_DetachBuffer(   OpcUa_Stream*   a_pStrm,
 }
 
 /*============================================================================
- * OpcUa_MemoryStream_CreateWriteable
+ * OpcUa_MemoryStream_GetChunkLength
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_MemoryStream_GetChunkLength( OpcUa_Stream*   a_pStrm,
                                                     OpcUa_UInt32*   a_puLength)
@@ -383,7 +383,7 @@ OpcUa_StatusCode OpcUa_MemoryStream_CreateWriteable(
     OpcUa_Byte*         pbyData         = OpcUa_Null;
 #endif /* OPCUA_PREALLOC_MEMORYBLOCK */
 
-OpcUa_InitializeStatus(OpcUa_Module_MemoryStream, "CreateWritable");
+OpcUa_InitializeStatus(OpcUa_Module_MemoryStream, "CreateWriteable");
 
     OpcUa_ReturnErrorIfNull(a_ppOstrm, OpcUa_BadInvalidArgument);
     *a_ppOstrm = OpcUa_Null;

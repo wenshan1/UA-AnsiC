@@ -1,18 +1,31 @@
-/* Copyright (c) 1996-2016, OPC Foundation. All rights reserved.
-
-   The source code in this file is covered under a dual-license scenario:
-     - RCL: for OPC Foundation members in good-standing
-     - GPL V2: everybody else
-
-   RCL license terms accompanied with this source code. See http://opcfoundation.org/License/RCL/1.00/
-
-   GNU General Public License as published by the Free Software Foundation;
-   version 2 of the License are accompanied with this source code. See http://opcfoundation.org/License/GPLv2
-
-   This source code is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-*/
+/* ========================================================================
+ * Copyright (c) 2005-2016 The OPC Foundation, Inc. All rights reserved.
+ *
+ * OPC Foundation MIT License 1.00
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * The complete license agreement can be found here:
+ * http://opcfoundation.org/License/MIT/1.00/
+ * ======================================================================*/
 
 /* base */
 #include <opcua_platformdefs.h>
@@ -2173,6 +2186,132 @@ struct _OpcUa_EncodeableType OpcUa_EnumValueType_EncodeableType =
 };
 #endif
 
+#ifndef OPCUA_EXCLUDE_EnumField
+/*============================================================================
+ * OpcUa_EnumField_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_EnumField_Initialize(OpcUa_EnumField* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Initialize(Int64, Value);
+        OpcUa_Field_Initialize(LocalizedText, DisplayName);
+        OpcUa_Field_Initialize(LocalizedText, Description);
+        OpcUa_Field_Initialize(String, Name);
+    }
+}
+
+/*============================================================================
+ * OpcUa_EnumField_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_EnumField_Clear(OpcUa_EnumField* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_Clear(Int64, Value);
+        OpcUa_Field_Clear(LocalizedText, DisplayName);
+        OpcUa_Field_Clear(LocalizedText, Description);
+        OpcUa_Field_Clear(String, Name);
+    }
+}
+
+/*============================================================================
+ * OpcUa_EnumField_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EnumField_GetSize(OpcUa_EnumField* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EnumField_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSize(Int64, Value);
+    OpcUa_Field_GetSize(LocalizedText, DisplayName);
+    OpcUa_Field_GetSize(LocalizedText, Description);
+    OpcUa_Field_GetSize(String, Name);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EnumField_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EnumField_Encode(OpcUa_EnumField* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EnumField_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_Write(Int64, Value);
+    OpcUa_Field_Write(LocalizedText, DisplayName);
+    OpcUa_Field_Write(LocalizedText, Description);
+    OpcUa_Field_Write(String, Name);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EnumField_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_EnumField_Decode(OpcUa_EnumField* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EnumField_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_EnumField_Initialize(a_pValue);
+
+    OpcUa_Field_Read(Int64, Value);
+    OpcUa_Field_Read(LocalizedText, DisplayName);
+    OpcUa_Field_Read(LocalizedText, Description);
+    OpcUa_Field_Read(String, Name);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_EnumField_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_EnumField_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_EnumField_EncodeableType =
+{
+    "EnumField",
+    OpcUaId_EnumField,
+    OpcUaId_EnumField_Encoding_DefaultBinary,
+    OpcUaId_EnumField_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_EnumField),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_EnumField_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_EnumField_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_EnumField_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_EnumField_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_EnumField_Decode
+};
+#endif
+
 #ifndef OPCUA_EXCLUDE_OptionSet
 /*============================================================================
  * OpcUa_OptionSet_Initialize
@@ -2951,6 +3090,127 @@ struct _OpcUa_EncodeableType OpcUa_ServiceFault_EncodeableType =
     (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_ServiceFault_GetSize,
     (OpcUa_EncodeableObject_PfnEncode*)OpcUa_ServiceFault_Encode,
     (OpcUa_EncodeableObject_PfnDecode*)OpcUa_ServiceFault_Decode
+};
+#endif
+
+#ifndef OPCUA_EXCLUDE_SessionLessServiceMessageType
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_Initialize
+ *===========================================================================*/
+OpcUa_Void OpcUa_SessionLessServiceMessageType_Initialize(OpcUa_SessionLessServiceMessageType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_InitializeArray(String, NamespaceUris);
+        OpcUa_Field_InitializeArray(String, ServerUris);
+        OpcUa_Field_Initialize(UInt32, ServiceId);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_Clear
+ *===========================================================================*/
+OpcUa_Void OpcUa_SessionLessServiceMessageType_Clear(OpcUa_SessionLessServiceMessageType* a_pValue)
+{
+    if (a_pValue != OpcUa_Null)
+    {
+        OpcUa_Field_ClearArray(String, NamespaceUris);
+        OpcUa_Field_ClearArray(String, ServerUris);
+        OpcUa_Field_Clear(UInt32, ServiceId);
+    }
+}
+
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_GetSize
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SessionLessServiceMessageType_GetSize(OpcUa_SessionLessServiceMessageType* a_pValue, OpcUa_Encoder* a_pEncoder, OpcUa_Int32* a_pSize)
+{
+    OpcUa_Int32 iSize = 0;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SessionLessServiceMessageType_GetSize");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSize);
+
+    *a_pSize = -1;
+
+    OpcUa_Field_GetSizeArray(String, NamespaceUris);
+    OpcUa_Field_GetSizeArray(String, ServerUris);
+    OpcUa_Field_GetSize(UInt32, ServiceId);
+
+    *a_pSize = iSize;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    *a_pSize = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_Encode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SessionLessServiceMessageType_Encode(OpcUa_SessionLessServiceMessageType* a_pValue, OpcUa_Encoder* a_pEncoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SessionLessServiceMessageType_Encode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
+
+    OpcUa_Field_WriteArray(String, NamespaceUris);
+    OpcUa_Field_WriteArray(String, ServerUris);
+    OpcUa_Field_Write(UInt32, ServiceId);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    /* nothing to do */
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_Decode
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_SessionLessServiceMessageType_Decode(OpcUa_SessionLessServiceMessageType* a_pValue, OpcUa_Decoder* a_pDecoder)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_Serializer, "SessionLessServiceMessageType_Decode");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDecoder);
+
+    OpcUa_SessionLessServiceMessageType_Initialize(a_pValue);
+
+    OpcUa_Field_ReadArray(String, NamespaceUris);
+    OpcUa_Field_ReadArray(String, ServerUris);
+    OpcUa_Field_Read(UInt32, ServiceId);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    OpcUa_SessionLessServiceMessageType_Clear(a_pValue);
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_SessionLessServiceMessageType_EncodeableType
+ *===========================================================================*/
+struct _OpcUa_EncodeableType OpcUa_SessionLessServiceMessageType_EncodeableType =
+{
+    "SessionLessServiceMessageType",
+    OpcUaId_SessionLessServiceMessageType,
+    OpcUaId_SessionLessServiceMessageType_Encoding_DefaultBinary,
+    OpcUaId_SessionLessServiceMessageType_Encoding_DefaultXml,
+    OpcUa_Null,
+    sizeof(OpcUa_SessionLessServiceMessageType),
+    (OpcUa_EncodeableObject_PfnInitialize*)OpcUa_SessionLessServiceMessageType_Initialize,
+    (OpcUa_EncodeableObject_PfnClear*)OpcUa_SessionLessServiceMessageType_Clear,
+    (OpcUa_EncodeableObject_PfnGetSize*)OpcUa_SessionLessServiceMessageType_GetSize,
+    (OpcUa_EncodeableObject_PfnEncode*)OpcUa_SessionLessServiceMessageType_Encode,
+    (OpcUa_EncodeableObject_PfnDecode*)OpcUa_SessionLessServiceMessageType_Decode
 };
 #endif
 
@@ -27626,6 +27886,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #ifndef OPCUA_EXCLUDE_EnumValueType
     &OpcUa_EnumValueType_EncodeableType,
     #endif
+    #ifndef OPCUA_EXCLUDE_EnumField
+    &OpcUa_EnumField_EncodeableType,
+    #endif
     #ifndef OPCUA_EXCLUDE_OptionSet
     &OpcUa_OptionSet_EncodeableType,
     #endif
@@ -27643,6 +27906,9 @@ static OpcUa_EncodeableType* g_OpcUa_KnownEncodeableTypes[] =
     #endif
     #ifndef OPCUA_EXCLUDE_ServiceFault
     &OpcUa_ServiceFault_EncodeableType,
+    #endif
+    #ifndef OPCUA_EXCLUDE_SessionLessServiceMessageType
+    &OpcUa_SessionLessServiceMessageType_EncodeableType,
     #endif
     #ifndef OPCUA_EXCLUDE_FindServers
     &OpcUa_FindServersRequest_EncodeableType,

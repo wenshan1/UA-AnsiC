@@ -116,6 +116,48 @@ OpcUa_StatusCode OpcUa_ByteString_CopyTo(const OpcUa_ByteString* a_pSource, OpcU
 }
 
 /*============================================================================
+* OpcUa_ByteString_Concatenate
+*===========================================================================*/
+OpcUa_StatusCode OpcUa_ByteString_Concatenate(const OpcUa_ByteString* a_pSource, OpcUa_ByteString* a_pDestination, OpcUa_Int a_iLen)
+{
+	OpcUa_Int   iBytesToCopy = a_iLen;
+	OpcUa_Int   iNewLength = 0;
+	OpcUa_Byte* pTemp = OpcUa_Null;
+
+	OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "OpcUa_ByteString_Concatenate");
+
+	OpcUa_ReturnErrorIfArgumentNull(a_pSource);
+	OpcUa_ReturnErrorIfArgumentNull(a_pDestination);
+	OpcUa_ReturnErrorIfTrue((a_pDestination->Length <= 0), OpcUa_BadInvalidArgument);
+	OpcUa_ReturnErrorIfTrue((a_pDestination == a_pSource), OpcUa_BadInvalidArgument);
+
+	if (iBytesToCopy <= 0)
+	{
+		iBytesToCopy = a_pSource->Length;
+	}
+
+	OpcUa_ReturnErrorIfTrue(iBytesToCopy <= 0, OpcUa_BadInvalidArgument);
+
+	iNewLength = a_pDestination->Length + iBytesToCopy;
+
+	pTemp = (OpcUa_Byte*)OpcUa_ReAlloc(a_pDestination->Data, iNewLength);
+	OpcUa_ReturnErrorIfAllocFailed(pTemp);
+
+	a_pDestination->Data = pTemp;
+
+	OpcUa_MemCpy(&a_pDestination->Data[a_pDestination->Length],
+		iBytesToCopy,
+		a_pSource->Data,
+		iBytesToCopy);
+
+	a_pDestination->Length += iBytesToCopy;
+
+	OpcUa_ReturnStatusCode;
+	OpcUa_BeginErrorHandling;
+	OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * OpcUa_NodeId_Initialize
  *===========================================================================*/
 OpcUa_Void OpcUa_NodeId_Initialize(OpcUa_NodeId* a_pValue)

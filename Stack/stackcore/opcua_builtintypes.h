@@ -45,19 +45,6 @@ do { \
 } while(0)
 
 /*============================================================================
- * OpcUa_ClearArray
- *===========================================================================*/
-#define OpcUa_ClearArray(xArray, xLength, xType) \
-do { \
-    int ii; \
-    \
-    for (ii = 0; ii < xLength; ii++) \
-    { \
-        OpcUa_##xType##_Clear(&((xArray)[ii])); \
-    } \
-} while(0)
-
-/*============================================================================
  * The OpcUa_BuiltInType enumeration
  *===========================================================================*/
 typedef enum _OpcUa_BuiltInType
@@ -200,6 +187,8 @@ OpcUa_BuiltInType;
 
 #define OpcUa_Guid_Clear(xValue) do { *(xValue) = OpcUa_Guid_Null; } while(0)
 
+#define OpcUa_Guid_Compare(xValue1, xValue2) (OpcUa_MemCmp((xValue1), (xValue2), sizeof(OpcUa_Guid)))
+
 #define OpcUa_Guid_CopyTo(xSource, xDestination) OpcUa_MemCpy(xDestination, sizeof(OpcUa_Guid), xSource, sizeof(OpcUa_Guid))
 
 /*============================================================================
@@ -211,6 +200,8 @@ OPCUA_EXPORT OpcUa_Void OpcUa_ByteString_Initialize(OpcUa_ByteString* value);
 OPCUA_EXPORT OpcUa_Void OpcUa_ByteString_Clear(OpcUa_ByteString* value);
 
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_ByteString_CopyTo(const OpcUa_ByteString* source, OpcUa_ByteString* destination);
+
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_ByteString_Concatenate(const OpcUa_ByteString* source, OpcUa_ByteString* destination, OpcUa_Int len);
 
 /*============================================================================
  * The XmlElement type
@@ -257,6 +248,8 @@ OPCUA_EXPORT OpcUa_Void OpcUa_NodeId_Initialize(OpcUa_NodeId* pValue);
 OPCUA_EXPORT OpcUa_Void OpcUa_NodeId_Clear(OpcUa_NodeId* pValue);
 
 OPCUA_EXPORT OpcUa_Boolean OpcUa_NodeId_IsNull(OpcUa_NodeId* pValue);
+
+OPCUA_EXPORT OpcUa_Int OpcUa_NodeId_Compare(const OpcUa_NodeId* pValue1, const OpcUa_NodeId* pValue2);
 
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_NodeId_CopyTo(const OpcUa_NodeId* pSource, OpcUa_NodeId* pDestination);
 

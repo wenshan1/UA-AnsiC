@@ -21,6 +21,12 @@
 
 OPCUA_BEGIN_EXTERN_C
 
+#define OPCUA_EXTENSIONOBJECT_GET_ENCODEABLE(xExpectedType, xExtensionObject) \
+    (OpcUa_##xExpectedType*)((((xExtensionObject)->Encoding == OpcUa_ExtensionObjectEncoding_EncodeableObject && \
+    (xExtensionObject)->Body.EncodeableObject.Type != OpcUa_Null && \
+    (xExtensionObject)->Body.EncodeableObject.Type->TypeId == OpcUaId_##xExpectedType && \
+    (xExtensionObject)->Body.EncodeableObject.Object != OpcUa_Null))?((xExtensionObject)->Body.EncodeableObject.Object):OpcUa_Null)
+
 OPCUA_END_EXTERN_C
 
 #endif /* _OpcUa_ExtensionObject_H_ */

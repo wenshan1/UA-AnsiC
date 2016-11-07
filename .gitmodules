@@ -1,0 +1,12 @@
+[submodule "openssl"]
+	path = third-party/src/openssl
+	url = https://github.com/openssl/openssl.git
+[submodule "azure-uamqp-c"]
+	path = third-party/src/azure-uamqp-c
+	url = https://github.com/Azure/azure-uamqp-c.git
+[submodule "json-c"]
+	path = third-party/src/json-c
+	url = https://github.com/json-c/json-c.git
+[submodule "curl"]
+	path = third-party/src/curl
+	url = https://github.com/curl/curl.git

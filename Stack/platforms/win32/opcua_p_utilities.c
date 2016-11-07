@@ -169,7 +169,8 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_CharAToInt(OpcUa_StringA sValue)
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_ParseUrl(  OpcUa_StringA   a_psUrl,
                                     OpcUa_StringA*  a_psIpAddress,
-                                    OpcUa_UInt16*   a_puPort)
+                                    OpcUa_UInt16*   a_puPort,
+									OpcUa_Boolean*  a_pbTLS)
 {
     OpcUa_StringA       sHostName         = OpcUa_Null;
     OpcUa_UInt32        uHostNameLength   = 0;
@@ -188,9 +189,18 @@ OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
     OpcUa_ReturnErrorIfArgumentNull(a_psUrl);
     OpcUa_ReturnErrorIfArgumentNull(a_psIpAddress);
     OpcUa_ReturnErrorIfArgumentNull(a_puPort);
-
+	OpcUa_ReturnErrorIfArgumentNull(a_pbTLS);
 
     *a_psIpAddress = OpcUa_Null;
+
+	if (strncmp(a_psUrl, "https:", 6) == 0 || strncmp(a_psUrl, "opc.tls:", 8) == 0)
+	{
+		*a_pbTLS = OpcUa_True;
+	}
+	else
+	{
+		*a_pbTLS = OpcUa_False;
+	}
 
     /* check for // (end of protocol header) */
     pcCursor = strstr(a_psUrl, "//");
@@ -341,4 +351,101 @@ OpcUa_BeginErrorHandling;
     }
 
 OpcUa_FinishErrorHandling;
+}
+
+
+/*============================================================================
+* OpcUa_P_ByteString_Initialize
+*===========================================================================*/
+OpcUa_Void OpcUa_P_ByteString_Initialize(OpcUa_ByteString* a_pValue)
+{
+    if (a_pValue == OpcUa_Null)
+    {
+        return;
+    }
+
+    a_pValue->Length = -1;
+    a_pValue->Data = OpcUa_Null;
+}
+
+/*============================================================================
+* OpcUa_P_ByteString_Clear
+*===========================================================================*/
+OpcUa_Void OpcUa_P_ByteString_Clear(OpcUa_ByteString* a_pValue)
+{
+    if (a_pValue == OpcUa_Null)
+    {
+        return;
+    }
+
+    a_pValue->Length = -1;
+
+    if (a_pValue->Data != OpcUa_Null)
+    {
+        free(a_pValue->Data);
+        a_pValue->Data = OpcUa_Null;
+    }
+}
+
+/*============================================================================
+* OpcUa_P_ByteString_Copy
+*===========================================================================*/
+OpcUa_StatusCode OpcUa_P_ByteString_Copy(OpcUa_ByteString* a_pSrc,
+    OpcUa_ByteString* a_pDst)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_P_Win32, "OpcUa_P_ByteString_Copy");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSrc);
+    OpcUa_ReturnErrorIfArgumentNull(a_pDst);
+
+    a_pDst->Length = a_pSrc->Length;
+
+    if (a_pSrc->Data != OpcUa_Null && a_pSrc->Length > 0)
+    {
+        a_pDst->Data = OpcUa_P_Memory_Alloc(a_pDst->Length);
+        OpcUa_GotoErrorIfAllocFailed(a_pDst->Data);
+        OpcUa_P_Memory_MemCpy(a_pDst->Data, a_pDst->Length, a_pSrc->Data, a_pSrc->Length);
+    }
+    else
+    {
+        a_pDst->Data = OpcUa_Null;
+    }
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    a_pDst->Length = -1;
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+* OpcUa_Key_Copy
+*===========================================================================*/
+OpcUa_StatusCode OpcUa_Key_Copy(OpcUa_Key* a_pSrc,
+    OpcUa_Key* a_pDst)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_P_Win32, "OpcUa_Key_Copy");
+
+    OpcUa_GotoErrorIfTrue((OPCUA_CRYPTO_KEY_ISHANDLE(a_pSrc)), OpcUa_BadInvalidArgument);
+
+    a_pDst->fpClearHandle = 0;
+    a_pDst->Type = a_pSrc->Type;
+
+    uStatus = OpcUa_P_ByteString_Copy(&a_pSrc->Key,
+        &a_pDst->Key);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+* OpcUa_Key_Clear
+*===========================================================================*/
+OpcUa_Void OpcUa_P_Key_Clear(OpcUa_Key* a_pKey)
+{
+    OpcUa_P_ByteString_Clear(&a_pKey->Key);
+    a_pKey->Type = 0;
 }
