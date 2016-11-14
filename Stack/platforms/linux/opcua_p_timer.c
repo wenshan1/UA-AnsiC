@@ -327,21 +327,16 @@ OpcUa_StatusCode OpcUa_P_Socket_TimeredSelect(  OpcUa_RawSocket         a_MaxFds
                                                 OpcUa_P_Socket_Array*   a_pFdSetRead,
                                                 OpcUa_P_Socket_Array*   a_pFdSetWrite,
                                                 OpcUa_P_Socket_Array*   a_pFdSetException,
-                                                OpcUa_TimeVal*          a_pTimeout)
+                                                OpcUa_UInt32            a_uTimeout)
 {
-    OpcUa_UInt32    uTimeout    = 0; /* ms */
     OpcUa_UInt32    uNearest    = 0;
     OpcUa_Timer     pTimer      = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_Select");
 
-    /* map given timeval to UInt32 */
-    uTimeout = a_pTimeout->uintMicroSeconds / 1000;
-    uTimeout = uTimeout + (a_pTimeout->uintSeconds * 1000);
-
     /* Set a timer as timeout for the following select. */
     uStatus = OpcUa_P_Timer_Create( &pTimer,
-                                    uTimeout,
+                                    a_uTimeout,
                                     OpcUa_P_SocketTimerCallback,    /* ignores event; just for debug */
                                     OpcUa_P_SocketKillTimerCallback,/* ignores event; just for debug */
                                     OpcUa_Null);
@@ -354,15 +349,11 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_Select");
     {
         uNearest = OpcUa_P_Timer_ProcessTimers();
 
-        /* map nearest timeout to TimeVal */
-        a_pTimeout->uintSeconds      = uNearest / 1000;
-        a_pTimeout->uintMicroSeconds = ((uNearest % 1000) * 1000);
-
         uStatus = OpcUa_P_RawSocket_Select( a_MaxFds,
                                             a_pFdSetRead,
                                             a_pFdSetWrite,
                                             a_pFdSetException,
-                                            a_pTimeout);
+                                            uNearest);
 
         /* Kill the timer used for the last timeout. */
         OpcUa_P_Timer_Delete(&pTimer);

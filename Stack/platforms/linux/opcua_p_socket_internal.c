@@ -1042,7 +1042,6 @@ OpcUa_StatusCode OpcUa_P_SocketManager_ServeLoopInternal(   OpcUa_SocketManager 
     OpcUa_P_Socket_Array            writeFdSet;
     OpcUa_P_Socket_Array            exceptFdSet;
 
-    OpcUa_TimeVal                   tmLocalTimeout;
     int                             max;
     OpcUa_InternalSocketManager*    pInternalSocketManager  = OpcUa_Null;
 
@@ -1077,10 +1076,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ServeLoop");
         OpcUa_P_Mutex_Unlock(pInternalSocketManager->pMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
-        /* map msec timeout to timeval */
-        tmLocalTimeout.uintSeconds      =  (a_msecTimeout / 1000);
-        tmLocalTimeout.uintMicroSeconds = ((a_msecTimeout % 1000) * 1000);
-
         /****************************************************************/
         /* This is the only point in the whole engine, where blocking   */
         /* of the current thread is allowed. Else, processing of        */
@@ -1090,7 +1085,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ServeLoop");
                                                     &readFdSet,
                                                     &writeFdSet,
                                                     &exceptFdSet,
-                                                    &tmLocalTimeout);
+                                                    a_msecTimeout);
 #else
         /* if we're here, the processing socketmanager should better be the global one...! */
         /* maybe test this state here */
@@ -1100,7 +1095,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ServeLoop");
                                                     &readFdSet,
                                                     &writeFdSet,
                                                     &exceptFdSet,
-                                                    &tmLocalTimeout);
+                                                    a_msecTimeout);
 #endif
         /*                                                              */
         /****************************************************************/

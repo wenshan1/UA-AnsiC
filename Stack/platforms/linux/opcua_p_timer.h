@@ -81,7 +81,7 @@ OpcUa_StatusCode OpcUa_P_Socket_TimeredSelect(          OpcUa_RawSocket         
                                                         OpcUa_P_Socket_Array*   pFdSetRead,
                                                         OpcUa_P_Socket_Array*   pFdSetWrite,
                                                         OpcUa_P_Socket_Array*   pFdSetException,
-                                                        OpcUa_TimeVal*          pTimeout);
+                                                        OpcUa_UInt32            uTimeout);
 #endif /* OPCUA_MULTITHREADED */
 
 OPCUA_END_EXTERN_C

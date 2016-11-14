@@ -293,7 +293,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Select(  OpcUa_RawSocket         RawSocket,
                                             OpcUa_P_Socket_Array*   FdSetRead,
                                             OpcUa_P_Socket_Array*   FdSetWrite,
                                             OpcUa_P_Socket_Array*   FdSetException,
-                                            OpcUa_TimeVal*          Timeout);
+                                            OpcUa_UInt32            Timeout);
 
 /*!
  * @brief Get address information for the peer connected to the given socket socket handle.

@@ -924,7 +924,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Select(  OpcUa_RawSocket         a_MaxFds,
                                             OpcUa_P_Socket_Array*   a_pFdSetRead,
                                             OpcUa_P_Socket_Array*   a_pFdSetWrite,
                                             OpcUa_P_Socket_Array*   a_pFdSetException,
-                                            OpcUa_TimeVal*          a_pTimeout)
+                                            OpcUa_UInt32            a_uTimeout)
 {
     int                 apiResult;
     struct timeval      timeout;
@@ -933,8 +933,8 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Select(  OpcUa_RawSocket         a_MaxFds,
     OpcUa_GotoErrorIfArgumentNull(a_pFdSetRead);
     OpcUa_GotoErrorIfArgumentNull(a_pFdSetWrite);
     OpcUa_GotoErrorIfArgumentNull(a_pFdSetException);
-    timeout.tv_sec  = a_pTimeout->uintSeconds;
-    timeout.tv_usec = a_pTimeout->uintMicroSeconds;
+    timeout.tv_sec  = a_uTimeout / 1000;
+    timeout.tv_usec = (a_uTimeout % 1000) * 1000;
 
 
     do
