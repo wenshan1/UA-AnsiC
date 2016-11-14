@@ -1070,14 +1070,14 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
     pConnection->SendBufferSize     = (pConnection->SendBufferSize    > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->SendBufferSize;
     pConnection->ReceiveBufferSize  = (pConnection->ReceiveBufferSize > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->ReceiveBufferSize;
 
-    /* This value shall be greater than 8 192 bytes */
-    if(pConnection->SendBufferSize <= 8192)
+    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
+    if(pConnection->SendBufferSize < 8192)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
     }
 
-    /* This value shall be greater than 8 192 bytes */
-    if(pConnection->ReceiveBufferSize <= 8192)
+    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
+    if(pConnection->ReceiveBufferSize < 8192)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
     }

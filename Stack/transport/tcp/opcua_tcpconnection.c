@@ -375,9 +375,9 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ProcessAcknowledgeMessage");
 
     /* check the revised buffer sizes */
     /* This value shall not be larger than what the Client requested in the Hello Message */
-    /* This value shall be greater than 8 192 bytes */
+    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
     if(uRevisedRecvBufSize > pTcpConnection->ReceiveBufferSize ||
-       uRevisedRecvBufSize <= 8192)
+       uRevisedRecvBufSize < 8192)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
     }
@@ -389,9 +389,9 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ProcessAcknowledgeMessage");
 
     /* check the revised buffer sizes */
     /* This value shall not be larger than what the Client requested in the Hello Message */
-    /* This value shall be greater than 8 192 bytes */
+    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
     if(uRevisedSendBufSize > pTcpConnection->SendBufferSize ||
-       uRevisedSendBufSize <= 8192)
+       uRevisedSendBufSize < 8192)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
     }
