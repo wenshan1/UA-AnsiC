@@ -190,7 +190,7 @@ typedef struct _OpcUa_TimeVal OpcUa_TimeVal;
 struct _OpcUa_TimeVal
 {
     /** @brief The number of full seconds since 1970. */
-    OpcUa_UInt32 uintSeconds;
+    OpcUa_Int64 uintSeconds;
     /** @brief The fraction of the last second. */
     OpcUa_UInt32 uintMicroSeconds;
 };
