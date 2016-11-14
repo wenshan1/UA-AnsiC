@@ -144,11 +144,7 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
 {
     sem_t*          pInternalSemaphore = (sem_t*)RawSemaphore;
     struct timespec Timeout;
-    OpcUa_TimeVal   now;
     int err;
-
-    /* convert the given timeout into a format pthreadlib understands */
-    OpcUa_P_DateTime_GetTimeOfDay(&now);
 
     if (msecTimeout == OpcUa_Infinite)
     {
