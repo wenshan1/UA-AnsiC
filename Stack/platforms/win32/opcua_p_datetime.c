@@ -23,46 +23,40 @@
 /* System Headers */
 #include <windows.h>
 #include <time.h>
-#ifdef _WIN32_WCE
-#include <altcecrt.h>
-#define mktime _mktime64
-#endif
-
 
 /* UA platform definitions */
 #include <opcua_p_internal.h>
 
-/* additional UA dependencies */
-/* reference to stack; string is needed for conversion */
-#include <opcua_string.h>
-
 /* own headers */
 #include <opcua_datetime.h>
 #include <opcua_p_datetime.h>
+
+static const OpcUa_Int64 SECS_BETWEEN_EPOCHS = 11644473600LL;
+static const OpcUa_Int64 SECS_TO_100NS = 10000000LL; /* 10^7 */
+static const OpcUa_Int64 MSECS_TO_100NS = 10000LL; /* 10^4 */
+static const OpcUa_Int64 MICROSECS_TO_100NS = 10LL; /* 10 */
+static int daysInMonth[2][12] = {
+    {31,28,31,30,31,30,31,31,30,31,30,31},
+    {31,29,31,30,31,30,31,31,30,31,30,31}
+};
+#define IS_LEAP(n)      ((!((n) % 400) || (!((n) % 4) && ((n) % 100))) != 0)
+#define LEAP_YEARS_SINCE_1601(year) (((year)-1601) / 4) - (((year)-1601) / 100) + (((year)-1601) / 400)
 
 /*============================================================================
  * The OpcUa_GetTimeOfDay function (returns the time in OpcUa_TimeVal format)
  *===========================================================================*/
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_DateTime_GetTimeOfDay(OpcUa_TimeVal* a_pTimeVal)
 {
-  SYSTEMTIME    SystemTime;
-  time_t        TimeType;  /* may be int64 */
-  struct tm     structTM;
+    OpcUa_DateTime dateTime = OpcUa_P_DateTime_UtcNow();
+    OpcUa_Int64 unixtime = dateTime.dwHighDateTime;
 
-  GetLocalTime(&SystemTime);
-
-  structTM.tm_sec   = SystemTime.wSecond;
-  structTM.tm_min   = SystemTime.wMinute;
-  structTM.tm_hour  = SystemTime.wHour;
-  structTM.tm_mday  = SystemTime.wDay;
-  structTM.tm_mon   = SystemTime.wMonth - 1;
-  structTM.tm_year  = SystemTime.wYear - 1900;
-  structTM.tm_isdst = -1;
-
-  TimeType = mktime(&structTM);
-
-  a_pTimeVal->uintSeconds = (OpcUa_UInt32)TimeType;
-  a_pTimeVal->uintMicroSeconds = SystemTime.wMilliseconds * 1000;
+    unixtime <<= 32;
+    unixtime += dateTime.dwLowDateTime;
+    unixtime /= MICROSECS_TO_100NS;
+    a_pTimeVal->uintMicroSeconds = (OpcUa_UInt32)(unixtime % 1000000);
+    unixtime /= 1000000;
+    unixtime -= SECS_BETWEEN_EPOCHS;
+    a_pTimeVal->uintSeconds = unixtime;
 }
 
 /*============================================================================
@@ -92,31 +86,85 @@ OpcUa_DateTime OPCUA_DLLCALL OpcUa_P_DateTime_UtcNow()
 /*============================================================================
  * Convert DateTime into String
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_DateTime a_DateTime, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_DateTime a_DateTime,
                                                                         OpcUa_StringA  a_pBuffer,
                                                                         OpcUa_UInt32   a_uLength)
 {
-    OpcUa_Int           apiResult    = 0;
     const char*         formatString = "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ";
-    FILETIME            FileTime;
-    SYSTEMTIME          SystemTime;
+    OpcUa_UInt64 unixtime = a_DateTime.dwHighDateTime;
+    int ms;
+    int tm_sec, tm_min, tm_hour;
+    int tm_year, tm_mon, tm_mday;
+    int apiResult;
+    int leapYears;
 
-    FileTime.dwLowDateTime  = (DWORD)(a_DateTime.dwLowDateTime);
-    FileTime.dwHighDateTime = (DWORD)(a_DateTime.dwHighDateTime);
+    unixtime <<= 32;
+    unixtime += a_DateTime.dwLowDateTime;
+    unixtime /= MSECS_TO_100NS;
+    ms = (int)(unixtime % 1000);
+    unixtime /= 1000;
+    tm_sec = (int)(unixtime % 60);
+    unixtime /= 60;
+    tm_min = (int)(unixtime % 60);
+    unixtime /= 60;
+    tm_hour = (int)(unixtime % 24);
+    unixtime /= 24;
+    tm_mday = (int)unixtime; /* days never cause overflow */
 
-    FileTimeToSystemTime(&FileTime, &SystemTime);
+    /* calculate years and remaining days in year according to leap years */
+    /* first assumption, assume every year has 365 days */
+    tm_year = 1601 + tm_mday / 365;
+    tm_mday = tm_mday % 365;
+
+    leapYears = LEAP_YEARS_SINCE_1601(tm_year);
+    /* correct remaining days according to "used" leap days */
+    tm_mday -= leapYears;
+    /* handle possible remaining days underflow
+      A loop can be implemented here since the correction has to be executed maximal 5 times */
+    while(tm_mday < 0)
+    {
+        tm_year--;
+        if(IS_LEAP(tm_year))
+        {
+            tm_mday += 366;
+        }
+        else
+        {
+            tm_mday += 365;
+        }
+    }
+
+    if(tm_year > 9999)
+    {
+        return OpcUa_Bad;
+    }
+
+    tm_mon = 0;
+    while(tm_mon < 11)
+    {
+        if(tm_mday < daysInMonth[IS_LEAP(tm_year)][tm_mon])
+        {
+            break;
+        }
+        tm_mday -= daysInMonth[IS_LEAP(tm_year)][tm_mon];
+        tm_mon++;
+    }
 
 #if OPCUA_USE_SAFE_FUNCTIONS
-    apiResult = OpcUa_SPrintfA(a_pBuffer, a_uLength, formatString, SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute, SystemTime.wSecond, SystemTime.wMilliseconds);
+    apiResult = OpcUa_SPrintfA(a_pBuffer, a_uLength, formatString,
+        tm_year, tm_mon+1, tm_mday+1,
+        tm_hour, tm_min, tm_sec, ms);
 #else /* OPCUA_USE_SAFE_FUNCTIONS */
     OpcUa_ReferenceParameter(a_uLength);
     if(a_uLength < 25)
     {
         return OpcUa_BadInvalidArgument;
     }
-    apiResult = OpcUa_SPrintfA(a_pBuffer, formatString, SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute, SystemTime.wSecond, SystemTime.wMilliseconds);
+    apiResult = OpcUa_SPrintfA(a_pBuffer, formatString,
+        tm_year, tm_mon+1, tm_mday+1,
+        tm_hour, tm_min, tm_sec, ms);
 #endif /* OPCUA_USE_SAFE_FUNCTIONS */
-    
+
     if(apiResult < 20)
     {
         return OpcUa_Bad;
@@ -131,11 +179,10 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_Da
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_StringA   a_pchDateTimeString,
                                                                 OpcUa_DateTime* a_pDateTime)
 {
-    BOOL        bResult         = FALSE;
-    BOOL        milliSet        = FALSE;
-    BOOL        leapYear        = FALSE;
-    FILETIME    FileTime;
-    SYSTEMTIME  SystemTime;
+    int         milliSet    = 0;
+    int         tm_sec, tm_min, tm_hour;
+    int         tm_year, tm_mon, tm_mday;
+    int         ms          = 0;
     size_t      stringLength;
     size_t      maxStringLength;
     char        years[5]    = "YYYY";
@@ -149,14 +196,13 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
     int         zoneValue   = 0;
     int         signPosition;
     int         tmpVar;
-    int         dayChange   = 0;
-    int         monthChange = 0;
+    OpcUa_Int64 unixtime;
 
     /***************************************************************
-     *  ToDo: 
-     *  Timezone can have values from -12 to +14 
+     *  ToDo:
+     *  Timezone can have values from -12 to +14
      *  At the moment only timezones from -12 to +12 are expected
-     *  timezones can also have minutes 
+     *  timezones can also have minutes
      *  at the moment minutes are ignored
      ***************************************************************/
 
@@ -199,47 +245,44 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
         strncpy(seconds, a_pchDateTimeString+17, 2);
 #endif /* OPCUA_USE_SAFE_FUNCTIONS */
 
-        /* initialize */
-        OpcUa_MemSet(&SystemTime, 0, sizeof(SYSTEMTIME));
-
         /* parse date and time */
-        SystemTime.wYear = (WORD)strtol(years, 0, 10);
-        if(SystemTime.wYear < 1601 || SystemTime.wYear > 9999)
+        tm_year = strtol(years, 0, 10);
+        if(tm_year < 1601 || tm_year > 9999)
         {
             return OpcUa_BadOutOfRange;
         }
-        SystemTime.wMonth = (WORD)strtol(months, 0, 10);
-        if(SystemTime.wMonth == 0 || SystemTime.wMonth > 12)
+        tm_mon = strtol(months, 0, 10) - 1;
+        if(tm_mon < 0 || tm_mon > 11)
         {
             return OpcUa_BadOutOfRange;
         }
-        SystemTime.wDay = (WORD)strtol(days, 0, 10);
-        if(SystemTime.wDay == 0 || SystemTime.wDay > 31)
+        tm_mday = strtol(days, 0, 10) - 1;
+        if(tm_mday < 0 || tm_mday >= daysInMonth[IS_LEAP(tm_year)][tm_mon])
         {
             return OpcUa_BadOutOfRange;
         }
-        SystemTime.wHour = (WORD)strtol(hours, 0, 10);
-        if(SystemTime.wHour > 23)
+        tm_hour = strtol(hours, 0, 10);
+        if(tm_hour < 0 || tm_hour > 23)
         {
             return OpcUa_BadOutOfRange;
         }
-        SystemTime.wMinute = (WORD)strtol(minutes, 0, 10);
-        if(SystemTime.wMinute > 59)
+        tm_min = strtol(minutes, 0, 10);
+        if(tm_min < 0 || tm_min > 59)
         {
             return OpcUa_BadOutOfRange;
         }
-        SystemTime.wSecond = (WORD)strtol(seconds, 0, 10);
-        if(SystemTime.wSecond > 59)
+        tm_sec = strtol(seconds, 0, 10);
+        if(tm_sec < 0 || tm_sec > 59)
         {
             return OpcUa_BadOutOfRange;
         }
 
         signPosition = 19;
-        
+
         /* check if ms are set */
         if(a_pchDateTimeString[signPosition] == '.')
         {
-            milliSet = TRUE;
+            milliSet = 1;
         }
 
         /* find sign for timezone or Z (we accept 'z' and 'Z' here) */
@@ -266,7 +309,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
                 strncpy(millis, a_pchDateTimeString+20, tmpVar);
 #endif /* OPCUA_USE_SAFE_FUNCTIONS */
 
-                SystemTime.wMilliseconds =  (WORD)strtol(millis, 0, 10);
+                ms = strtol(millis, 0, 10);
             }
         }
         else if(a_pchDateTimeString[signPosition] == '+' || a_pchDateTimeString[signPosition] == '-')
@@ -301,8 +344,8 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
 #else /* OPCUA_USE_SAFE_FUNCTIONS */
                 strncpy(millis, a_pchDateTimeString+20, tmpVar);
 #endif /* OPCUA_USE_SAFE_FUNCTIONS */
-                
-                SystemTime.wMilliseconds =  (WORD)strtol(millis, 0, 10);
+
+                ms = strtol(millis, 0, 10);
             }
         }
         else
@@ -314,248 +357,50 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
         }
 
         /* correct time to UTC */
-        tmpVar = SystemTime.wHour - zoneValue;
+        tmpVar = tm_hour - zoneValue;
         if(tmpVar > 23)
         {
-            SystemTime.wHour = (WORD)(tmpVar - 24);
-            dayChange = 1;     /* add one day to date */
+            tm_hour = tmpVar - 24;
+            tm_mday++;     /* add one day to date */
         }
         else if(tmpVar < 0)
         {
-            SystemTime.wHour = (WORD)(tmpVar + 24);
-            dayChange = -1;    /* substract one day from date */
+            tm_hour = tmpVar + 24;
+            tm_mday--;    /* substract one day from date */
         }
         else
         {
-            SystemTime.wHour = (WORD)(SystemTime.wHour - zoneValue);
-            dayChange = 0; 
-        }
-
-        /* day will change */
-        if(dayChange != 0)
-        {
-            /* set day */
-            tmpVar = SystemTime.wDay + dayChange;
-
-            /* month will decrease */
-            if(tmpVar == 0)
-            {
-                /* check which month */
-                switch(SystemTime.wMonth)
-                {
-                    /* prior month has 31 days */
-                    case 1:
-                    case 2:
-                    case 4:
-                    case 6:
-                    case 8:
-                    case 9:
-                    case 11:
-                        monthChange = -1;
-                        SystemTime.wDay = 31;
-                        break;
-
-                    /* prior month has 30 days */
-                    case 5:
-                    case 7:
-                    case 10:
-                    case 12:
-                        monthChange = -1;
-                        SystemTime.wDay = 30;
-                        break;
-
-                    /* prior month has 28/29 days */
-                    case 3: 
-
-                        /* check if it's a leap year */
-                        if(SystemTime.wYear % 4 == 0)
-                        {
-                            if(SystemTime.wYear % 100 == 0)
-                            {
-                                /* no leapyear */
-                                if(SystemTime.wYear % 400 == 0)
-                                {
-                                    leapYear = TRUE;
-                                }
-                                else
-                                {
-                                    leapYear = FALSE;
-                                }
-                            }
-                            else
-                            {
-                                leapYear = TRUE;
-                            }
-                        }
-                        else
-                        {
-                            leapYear = FALSE;
-                        }
-
-                        if(leapYear == TRUE)
-                        {
-                            monthChange = -1;
-                            SystemTime.wDay = 29;
-                        }
-                        else
-                        {
-                            monthChange = -1;
-                            SystemTime.wDay = 28;
-                        }
-
-                        break;
-                }                   
-            }
-            /* month might increase */
-            else if(tmpVar > 27)
-            {
-                switch(SystemTime.wMonth)
-                {
-                    /* month has 31 days */
-                    case 1:
-                    case 3:
-                    case 5:
-                    case 7:
-                    case 8:
-                    case 10:
-                    case 12:
-                        if(SystemTime.wDay == 31)
-                        {
-                            /* increase month */
-                            monthChange = 1;
-                            SystemTime.wDay = 1;
-                        }
-                        else
-                        {
-                            SystemTime.wDay++;
-                            monthChange = 0;
-                        }                        
-                        break;  
-
-                    /* month has 30 days */
-                    case 4:
-                    case 6:
-                    case 9:
-                    case 11:
-                        if(SystemTime.wDay == 30)
-                        {
-                            /* increase month */
-                            monthChange = 1;
-                            SystemTime.wDay = 1;
-                        }
-                        else
-                        {
-                            SystemTime.wDay++;
-                            monthChange = 0;
-                        } 
-                        break;
-
-                    /* month has 27/28 days */
-                    case 2:
-                        /* check if it's a leap year */
-                        if(SystemTime.wYear % 4 == 0)
-                        {
-                            if(SystemTime.wYear % 100 == 0)
-                            {
-                                /* no leapyear */
-                                if(SystemTime.wYear % 400 == 0)
-                                {
-                                    leapYear = TRUE;
-                                }
-                                else
-                                {
-                                    leapYear = FALSE;
-                                }
-                            }
-                            else
-                            {
-                                leapYear = TRUE;
-                            }
-                        }
-                        else
-                        {
-                            leapYear = FALSE;
-                        }
-
-                        if(leapYear == TRUE)
-                        {
-                            if(SystemTime.wDay == 29)
-                            {
-                                /* increase month */
-                                monthChange = 1;
-                                SystemTime.wDay = 1;
-                            }
-                            else
-                            {
-                                SystemTime.wDay++;
-                                monthChange = 0;
-                            }
-                        }
-                        else
-                        {
-                            if(SystemTime.wDay == 28)
-                            {
-                                /* increase month */
-                                monthChange = 1;
-                                SystemTime.wDay = 1;
-                            }
-                            else
-                            {
-                                SystemTime.wDay++;
-                                monthChange = 0;
-                            }
-                        }
-                        break;
-                }
-            }
-            /* month will not change */
-            else
-            {
-                SystemTime.wDay = (WORD)(SystemTime.wDay + dayChange);
-                monthChange = 0;
-            }
-
-            /* set month */
-            if(monthChange != 0)
-            {
-                tmpVar = SystemTime.wMonth + monthChange;
-                
-                /* decrease year */
-                if(tmpVar == 0)
-                {
-                    SystemTime.wMonth = 12;
-                    SystemTime.wYear--;
-                }
-                /* decrease year */
-                else if(tmpVar == 13)
-                {
-                    SystemTime.wMonth = 1;
-                    SystemTime.wYear++;
-                }
-                /* no year change */
-                else
-                {
-                    SystemTime.wMonth = (WORD)(SystemTime.wMonth + monthChange);
-                }
-            }
+            tm_hour = tm_hour - zoneValue;
         }
     }
     else /* if(strchr(a_pchDateTimeString, ':')) */
     {
-        /* other formats are not supported at the moment */ 
+        /* other formats are not supported at the moment */
         /* 20060606T06:48:48Z */
         /* 20060606T064848Z */
         return OpcUa_BadSyntaxError;
     }
 
-    bResult = SystemTimeToFileTime(&SystemTime, &FileTime);
-    if(bResult == FALSE)
+    /* compute days in year */
+    for(tmpVar = 0; tmpVar < tm_mon; tmpVar++)
     {
-        return OpcUa_Bad;
+        tm_mday += daysInMonth[IS_LEAP(tm_year)][tmpVar];
     }
 
-    a_pDateTime->dwHighDateTime = FileTime.dwHighDateTime;
-    a_pDateTime->dwLowDateTime  = FileTime.dwLowDateTime;
+    /* compute days since 1.1.1601, (including leap days) */
+    unixtime = 365*(tm_year-1601) + tm_mday + LEAP_YEARS_SINCE_1601(tm_year);
+
+    /* convert to seconds */
+    unixtime *= 24*3600;
+    /* add day time to 64 bit value */
+    unixtime += 3600*tm_hour + 60*tm_min + tm_sec;
+    /* convert to FILETIME */
+    unixtime *= SECS_TO_100NS;
+    /* add the milliseconds */
+    unixtime += ms * MSECS_TO_100NS;
+
+    a_pDateTime->dwHighDateTime = unixtime >> 32;
+    a_pDateTime->dwLowDateTime  = unixtime & 0xffffffff;
 
     return OpcUa_Good;
 }
