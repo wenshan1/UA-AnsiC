@@ -615,7 +615,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "InitializeSslContext");
                         OPCUA_P_SOCKETMANAGER_SSL_VERIFY_OPTION,
                         OpcUa_Null);
     SSL_CTX_set_options( pInternalSocket->pSslContext,
-                         SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+                         OPCUA_P_SOCKETMANAGER_SSL_PROTOCOL_OPTION);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
