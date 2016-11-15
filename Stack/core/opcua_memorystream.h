@@ -64,6 +64,123 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_MemoryStream_GetBuffer(
     OpcUa_Byte**        buffer,
     OpcUa_UInt32*       bufferSize);
 
+/**
+  @brief Declare OpcUa_##Type##_CopyTo function for whatever type you want.
+
+  Declare the generic OpcUa_##Type##_CopyTo function.
+  The first param is the input, the second param is the output.
+
+  @param Type       [in] Type name w/o "OpcUa_"
+*/
+#define OPCUA_DECLARE_GENERIC_COPY(Type) \
+OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *, OpcUa_##Type *);
+
+/**
+  @brief Implement OpcUa_##Type##_CopyTo function for scalar type.
+
+  @param Type       [in] Type name w/o "OpcUa_"
+  @param SizeHint   [in] Allocation size hint
+*/
+#define OPCUA_IMPLEMENT_SCALAR_COPY(Type, SizeHint) \
+OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutput) \
+{ \
+   extern OpcUa_EncodeableTypeTable OpcUa_ProxyStub_g_EncodeableTypes; \
+   extern OpcUa_StringTable OpcUa_ProxyStub_g_NamespaceUris; \
+   OpcUa_StatusCode uStatus; \
+   OpcUa_MessageContext cContext; \
+   OpcUa_Encoder* pEncoder; \
+   OpcUa_Decoder* pDecoder; \
+   OpcUa_Handle hContext; \
+   OpcUa_OutputStream* pOutputStream; \
+   OpcUa_InputStream* pInputStream; \
+   OpcUa_Byte* pBuffer; \
+   OpcUa_UInt32 uBufferSize; \
+   OpcUa_MessageContext_Initialize(&cContext); \
+   cContext.KnownTypes = &OpcUa_ProxyStub_g_EncodeableTypes; \
+   cContext.NamespaceUris = &OpcUa_ProxyStub_g_NamespaceUris; \
+   cContext.AlwaysCheckLengths = OpcUa_False; \
+   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_CreateWriteable(SizeHint, 0, &pOutputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hContext); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pEncoder->Write##Type((OpcUa_Encoder*)hContext, OpcUa_Null, pInput, OpcUa_Null); \
+   OpcUa_Encoder_Close(pEncoder, &hContext); \
+   OpcUa_Encoder_Delete(&pEncoder); \
+   pOutputStream->Close((OpcUa_Stream*)pOutputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream, &pBuffer, &uBufferSize); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_CreateReadable(pBuffer, uBufferSize, &pInputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_BinaryDecoder_Create(&pDecoder); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hContext); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pDecoder->Read##Type((OpcUa_Decoder*)hContext, OpcUa_Null, pOutput); \
+   pInputStream->Close((OpcUa_Stream*)pInputStream); \
+   pInputStream->Delete((OpcUa_Stream**)&pInputStream); \
+   pOutputStream->Delete((OpcUa_Stream**)&pOutputStream); \
+   OpcUa_Decoder_Close(pDecoder, &hContext); \
+   OpcUa_Decoder_Delete(&pDecoder); \
+   OpcUa_MessageContext_Clear(&cContext); \
+   return uStatus; \
+}
+
+/**
+  @brief Implement OpcUa_##Type##_CopyTo function for encodeable type.
+
+  @param Type       [in] Type name w/o "OpcUa_"
+  @param SizeHint   [in] Allocation size hint
+*/
+#define OPCUA_IMPLEMENT_ENCODEABLE_COPY(Type, SizeHint) \
+OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutput) \
+{ \
+   extern OpcUa_EncodeableTypeTable OpcUa_ProxyStub_g_EncodeableTypes; \
+   extern OpcUa_StringTable OpcUa_ProxyStub_g_NamespaceUris; \
+   OpcUa_StatusCode uStatus; \
+   OpcUa_MessageContext cContext; \
+   OpcUa_Encoder* pEncoder; \
+   OpcUa_Decoder* pDecoder; \
+   OpcUa_Handle hContext; \
+   OpcUa_OutputStream* pOutputStream; \
+   OpcUa_InputStream* pInputStream; \
+   OpcUa_Byte* pBuffer; \
+   OpcUa_UInt32 uBufferSize; \
+   OpcUa_MessageContext_Initialize(&cContext); \
+   cContext.KnownTypes = &OpcUa_ProxyStub_g_EncodeableTypes; \
+   cContext.NamespaceUris = &OpcUa_ProxyStub_g_NamespaceUris; \
+   cContext.AlwaysCheckLengths = OpcUa_False; \
+   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_CreateWriteable(SizeHint, 0, &pOutputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hContext); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_##Type##_Encode(pInput, (OpcUa_Encoder*)hContext); \
+   OpcUa_Encoder_Close(pEncoder, &hContext); \
+   OpcUa_Encoder_Delete(&pEncoder); \
+   pOutputStream->Close((OpcUa_Stream*)pOutputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream, &pBuffer, &uBufferSize); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_MemoryStream_CreateReadable(pBuffer, uBufferSize, &pInputStream); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_BinaryDecoder_Create(&pDecoder); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hContext); \
+   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   uStatus = OpcUa_##Type##_Decode(pOutput, (OpcUa_Decoder*)hContext); \
+   pInputStream->Close((OpcUa_Stream*)pInputStream); \
+   pInputStream->Delete((OpcUa_Stream**)&pInputStream); \
+   pOutputStream->Delete((OpcUa_Stream**)&pOutputStream); \
+   OpcUa_Decoder_Close(pDecoder, &hContext); \
+   OpcUa_Decoder_Delete(&pDecoder); \
+   OpcUa_MessageContext_Clear(&cContext); \
+   return uStatus; \
+}
+
 OPCUA_END_EXTERN_C
 
 #endif /* OPCUA_HAVE_MEMORYSTREAM */
