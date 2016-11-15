@@ -291,7 +291,7 @@ OpcUa_StatusCode OpcUa_TcpListener_GetPeerInfo(OpcUa_Listener*     a_pListener,
     OpcUa_TcpListener_Connection* pTcpListenerConnection = (OpcUa_TcpListener_Connection*)a_hConnection;
     /* return peer information in format "opc.tcp://xxx.xxx.xxx.xxx:ppppp\0" => max length == 32 */
     /* return peer information in format "opc.tcp://1234:5678:1234:5678:1234:5678:1234:5678:ppppp\0" => max length == 56 */
-    OpcUa_CharA pRawString[64];
+    OpcUa_CharA pRawString[74];
 
 OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "GetPeerInfo");
 
