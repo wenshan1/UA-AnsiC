@@ -90,7 +90,7 @@ typedef OpcUa_Void (OPCUA_DLLCALL *OpcUa_P_TraceHook)(OpcUa_CharA* sMessage);
 #define OPCUA_P_SOCKETMANAGER_SSL_VERIFY_OPTION     (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
 
 /** @brief How SSL negotiates the tls protocol. */
-#define OPCUA_P_SOCKETMANAGER_SSL_PROTOCOL_OPTION   (SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3)
+#define OPCUA_P_SOCKETMANAGER_SSL_PROTOCOL_OPTION   (SSL_OP_NO_SSLv2|SSL_OP_NO_SSLv3|SSL_OP_NO_TICKET)
 
 /*============================================================================
  * The Socket Event Callback
