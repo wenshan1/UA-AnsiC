@@ -42,10 +42,7 @@ OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_ReAlloc(OpcUa_Void* pBuffer, OpcUa_UInt
  *===========================================================================*/
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_Memory_Free(OpcUa_Void* pBuffer)
 {
-    if (pBuffer != NULL)
-    {
-        free(pBuffer);
-    }
+    free(pBuffer);
 }
 
 /*============================================================================
