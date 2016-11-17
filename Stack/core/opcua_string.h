@@ -38,7 +38,7 @@ OPCUA_BEGIN_EXTERN_C
 *
 * @param strCString [in]    Pointer to the C string.
 *
-* @return Status code; @see opcua_statuscodes.h
+* @return Pointer to a OpcUa_String
 */
 #if OPCUA_PREFERINLINE
     #define OpcUa_String_FromCString(x) ((OpcUa_String*)((x)==OpcUa_Null||(x)[0]=='\0'?OpcUa_Null:(x)))
@@ -48,11 +48,11 @@ OPCUA_BEGIN_EXTERN_C
 #endif /* OPCUA_PREFERINLINE */
 
 /** 
-* @brief Initializes a string Structure.
+* @brief Initializes a string structure.
 *
 * @param pString [out] Pointer to the new string.
 *
-* @return Pointer to a OpcUa_String
+* @return Status code; @see opcua_statuscodes.h
 */
 OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_String_Initialize( /*  bi */ OpcUa_String* pString);
