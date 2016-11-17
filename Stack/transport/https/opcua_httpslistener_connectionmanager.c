@@ -82,7 +82,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_Create(
  * Connection Manager Initialize
  *===========================================================================*/
 /**
- * @brief Initialize a allocated connection manager.
+ * @brief Initialize an allocated connection manager.
  */
 OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_Initialize(
     OpcUa_HttpsListener_ConnectionManager*  a_pConnectionManager)
@@ -125,7 +125,7 @@ OpcUa_Void OpcUa_HttpsListener_ConnectionManager_Clear(
  * Connection Manager Delete
  *===========================================================================*/
 /**
- * @brief Delete an connection manager.
+ * @brief Delete a connection manager.
  */
 OpcUa_Void OpcUa_HttpsListener_ConnectionManager_Delete(
     OpcUa_HttpsListener_ConnectionManager** a_ppConnectionManager)

@@ -33,6 +33,13 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_STRINGLENZEROTERMINATED   0xffffffffL
 #define OPCUA_STRING_LENDONTCARE        OPCUA_STRINGLENZEROTERMINATED
 
+/**
+* @brief Cast a C string into a OpcUa_String.
+*
+* @param strCString [in]    Pointer to the C string.
+*
+* @return Status code; @see opcua_statuscodes.h
+*/
 #if OPCUA_PREFERINLINE
     #define OpcUa_String_FromCString(x) ((OpcUa_String*)((x)==OpcUa_Null||(x)[0]=='\0'?OpcUa_Null:(x)))
 #else /* OPCUA_PREFERINLINE */
@@ -45,7 +52,7 @@ OPCUA_BEGIN_EXTERN_C
 *
 * @param pString [out] Pointer to the new string.
 *
-* @return Status code; @see opcua_statuscodes.h
+* @return Pointer to a OpcUa_String
 */
 OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_String_Initialize( /*  bi */ OpcUa_String* pString);

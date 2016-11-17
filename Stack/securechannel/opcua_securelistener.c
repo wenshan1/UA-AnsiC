@@ -50,7 +50,7 @@
 /** @brief internal configuration - only for test */
 #define OPCUA_SECURELISTENER_ALLOW_NOPKI OPCUA_CONFIG_NO
 
-/** @brief Return OpcUa_BadDisconnect after a the service for closing the securechannel was called. Fixes an issue with clients that do nothing after sending the CSC. */
+/** @brief Return OpcUa_BadDisconnect after the service for closing the securechannel was called. Fixes an issue with clients that do nothing after sending the CSC. */
 #define OPCUA_SECURELISTENER_CLOSE_CONNECTION_ON_CLOSE_SECURECHANNEL OPCUA_CONFIG_YES
 
 /*============================================================================

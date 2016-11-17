@@ -48,7 +48,7 @@ OPCUA_EXPORT OpcUa_Void OpcUa_Encoder_Open(
     OpcUa_Handle*          phEncodeContext);
 
 /** 
-  @brief Closes a stream an releases all resources allocated to it.
+  @brief Closes a stream and releases all resources allocated to it.
  
   During normal operation all encoders must be closed. Deleting an encoder without
   closing it could have unexpected side effects.

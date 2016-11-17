@@ -103,7 +103,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_CleanupNetwork(OpcUa_Void);
  *
  * @param RawSocket [in] The system socket to be closed.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_Close(OpcUa_RawSocket RawSocket);
 
@@ -116,7 +116,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Close(OpcUa_RawSocket RawSocket);
  * @param Port      [in]    To which port should be connected.
  * @param Host      [in]    The server IP address in string representation.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  *         OpcUa_BadWouldBlock should not be handled as error, if non blocking sockets are used.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_Connect( OpcUa_RawSocket RawSocket,
@@ -130,7 +130,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Connect( OpcUa_RawSocket RawSocket,
  * @param Port      [in]    To which port should be connected.
  * @param Host      [in]    The server IP address in string representation.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  *         OpcUa_BadWouldBlock should not be handled as error, if non blocking sockets are used.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_ConnectV6( OpcUa_RawSocket RawSocket,
@@ -179,7 +179,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_BindV6(OpcUa_RawSocket RawSocket,
  *
  * @param RawSocket [in]    The server socket, which should accept connect requests.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_Listen(OpcUa_RawSocket RawSocket);
 
@@ -237,7 +237,7 @@ OpcUa_Int32 OpcUa_P_RawSocket_Write(OpcUa_RawSocket RawSocket,
  * @param RawSocket [in]    The system socket descriptor.
  * @param bBlocking [in]    Socket will be set to block, if true, nonblocking else.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_SetBlockMode(    OpcUa_RawSocket RawSocket,
                                                     OpcUa_Boolean   bBlocking);
@@ -279,15 +279,15 @@ OpcUa_UInt32 OpcUa_P_RawSocket_HToNL(OpcUa_UInt32 hstLong);
 OpcUa_UInt16 OpcUa_P_RawSocket_HToNS(OpcUa_UInt16 hstShort);
 
 /*!
- * @brief Set sockets in given file descriptor sets if a certain event occured.
+ * @brief Set sockets in given file descriptor sets if a certain event occurred.
  *
  * @param RawSocket         [in]        The maximum file descriptor. Ignored in win32.
- * @param FdSetRead         [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on read events. Holds all sockets where this event occured afterwards.
- * @param FdSetWrite        [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on write events. Holds all sockets where this event occured afterwards.
- * @param FdSetException    [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on exception events. Holds all sockets where this event occured afterwards.
+ * @param FdSetRead         [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on read events. Holds all sockets where this event occurred afterwards.
+ * @param FdSetWrite        [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on write events. Holds all sockets where this event occurred afterwards.
+ * @param FdSetException    [in/out]    OpcUa_Socket_FdSet with all sockets set, that wait on exception events. Holds all sockets where this event occurred afterwards.
  * @param Timeout           [in]        The maximume time to block at this call.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_Select(  OpcUa_RawSocket         RawSocket,
                                             OpcUa_P_Socket_Array*   FdSetRead,
@@ -302,7 +302,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Select(  OpcUa_RawSocket         RawSocket,
  * @param achPeerInfoBuffer     [in] Where the address information gets stored.
  * @param uiPeerInfoBufferSize  [in] The size of the given buffer.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_GetPeerInfo( OpcUa_RawSocket RawSocket,
                                                 OpcUa_CharA*    achPeerInfoBuffer,
@@ -314,7 +314,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_GetPeerInfo( OpcUa_RawSocket RawSocket,
  * @param RawSocket [in]    Identifier for the connection.
  * @param Port      [out]   Where the port gets stored.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_GetLocalInfo(OpcUa_RawSocket RawSocket,
                                                 OpcUa_UInt16*   Port);
@@ -338,7 +338,7 @@ OpcUa_Int32 OpcUa_P_RawSocket_GetLastError(OpcUa_RawSocket RawSocket);
  * @param NagleOff      [in]    Switch for Nagle algorithm.
  * @param KeepAliveOn   [in]    Switch for TCP keep alive packet.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_Create(  OpcUa_RawSocket* pRawSocket,
                                             OpcUa_Boolean    NagleOff,
@@ -352,7 +352,7 @@ OpcUa_StatusCode OpcUa_P_RawSocket_Create(  OpcUa_RawSocket* pRawSocket,
  * @param KeepAliveOn   [in]    Switch for TCP keep alive packet.
  * @param V6Only        [in]    Switch for V6 Only flag.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_RawSocket_CreateV6(  OpcUa_RawSocket* pRawSocket,
                                               OpcUa_Boolean    NagleOff,

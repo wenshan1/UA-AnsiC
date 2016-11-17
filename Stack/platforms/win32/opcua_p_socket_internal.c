@@ -195,7 +195,7 @@ static OpcUa_Int32 OpcUa_P_SocketService_Write( OpcUa_Socket    a_pSocket,
             pBuffer = pBuffer + result;
         }
     }
-    while((RemainingBufferSize > 0) && (result > 0)); /* loop until all data sent or error occured */
+    while((RemainingBufferSize > 0) && (result > 0)); /* loop until all data sent or error occurred */
 
     /* update size before returning */
     result = a_uBufferSize - RemainingBufferSize;

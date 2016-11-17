@@ -280,7 +280,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SocketManager_Create");
 #if OPCUA_MULTITHREADED
     if (pInternalSocketManager->Flags.bSpawnThreadOnAccept)
     {
-        /* create a semaphore with no free ressources for which a host can wait to be signalled. */
+        /* create a semaphore with no free resources for which a host can wait to be signalled. */
         uStatus = OpcUa_P_Semaphore_Create(&pInternalSocketManager->pStartupSemaphore, 0, 1);
         OpcUa_GotoErrorIfBad(uStatus);
 

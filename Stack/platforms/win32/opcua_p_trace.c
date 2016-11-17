@@ -73,7 +73,7 @@ int OpcUa_Unlink(const char* filename);
  * Trace Initialize
  *===========================================================================*/
 /**
-* Initialize all ressources needed for tracing.
+* Initialize all resources needed for tracing.
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Trace_Initialize(OpcUa_Void)
 {
@@ -88,7 +88,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Trace_Initialize(OpcUa_Void)
  * Trace Clear
  *===========================================================================*/
 /**
-* Clear all ressources needed for tracing.
+* Clear all resources needed for tracing.
 */
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_Trace_Clear(OpcUa_Void)
 {

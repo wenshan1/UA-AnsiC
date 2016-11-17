@@ -72,7 +72,7 @@ typedef OpcUa_Void (OPCUA_DLLCALL *OpcUa_P_TraceHook)(OpcUa_CharA* sMessage);
 /** @brief SocketManager behaviour control. */
 #define OPCUA_SOCKET_NO_FLAG                    0   /* standard behaviour */
 #define OPCUA_SOCKET_REJECT_ON_NO_THREAD        1   /* thread pooling; reject connection if no worker thread i available */
-#define OPCUA_SOCKET_DONT_CLOSE_ON_EXCEPT       2   /* don't close a socket if an except event occured */
+#define OPCUA_SOCKET_DONT_CLOSE_ON_EXCEPT       2   /* don't close a socket if an except event occurred */
 #define OPCUA_SOCKET_SPAWN_THREAD_ON_ACCEPT     4   /* assing each accepted socket a new thread */
 
 /** @brief PeerInfo settings */
@@ -525,7 +525,7 @@ struct S_OpcUa_Port_CallTable
     /** @brief Raise the given event for the given socket manager or all socket managers hosted by the platform layer.
      *         If pSocketManager is OpcUa_Null and bAllManager is OpcUa_False, the call is directed to the default socket
      *         manager in single thread configuration. The only event raised by the stack itself is the OPCUA_SOCKET_SHUTDOWN_EVENT
-     *         when the stack wants an socket manager to stop processing network events.
+     *         when the stack wants a socket manager to stop processing network events.
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* SocketManagerSignalEvent) ( OpcUa_SocketManager         pSocketManager,
@@ -620,7 +620,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* DeleteCryptoProvider)     ( OpcUa_CryptoProvider*       pProvider);
 
-    /** @brief Create an PKI Provider based on the given certificate store configuration.
+    /** @brief Create a PKI Provider based on the given certificate store configuration.
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* CreatePKIProvider)        ( OpcUa_Void*                 pCertificateStoreConfig,

@@ -42,9 +42,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnOpen)(
     OpcUa_Handle*           phDecodeContext);
 
 /** 
-  @brief Closes a stream an releases all resources allocated to it.
+  @brief Closes a stream and releases all resources allocated to it.
  
-  During normal operation all decoders must be closed. Deleting an decoder without
+  During normal operation all decoders must be closed. Deleting a decoder without
   closing it could have unexpected side effects.
 
   @param ppDecoder          [in] The decoder to close.

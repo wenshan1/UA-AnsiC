@@ -22,7 +22,7 @@
  * Trace Initialize
  *===========================================================================*/
 /**
- * Initialize all ressources needed for tracing.
+ * Initialize all resources needed for tracing.
  */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Trace_Initialize(void);
 
@@ -30,7 +30,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Trace_Initialize(void);
  * Trace Initialize
  *===========================================================================*/
 /**
- * Clear all ressources needed for tracing.
+ * Clear all resources needed for tracing.
  */
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_Trace_Clear(void);
 

@@ -57,11 +57,11 @@ typedef struct _OpcUa_SecureListener_SecurityPolicyConfiguration OpcUa_SecureLis
  * @brief Function, that needs to be implemented to receive notifications about secure channel events.
  *
  * @param uSecureChannelId      [in] The id assigned to the secure channel.
- * @param eEvent                [in] What type of event on the secure channel occured.
+ * @param eEvent                [in] What type of event on the secure channel occurred.
  * @param uStatus               [in] The result of the operation.
  * @param pbsClientCertificate  [in] The certificate of the client.
  * @param sSecurityPolicy       [in] The security policy in case of open or renew.
- * @param eMessageSecurityMode  [in] What type of event on the secure channel occured.
+ * @param eMessageSecurityMode  [in] What type of event on the secure channel occurred.
  * @param pCallbackData         [in] Data pointer received at creation.
  */
 typedef OpcUa_StatusCode (OpcUa_SecureListener_PfnSecureChannelCallback)(

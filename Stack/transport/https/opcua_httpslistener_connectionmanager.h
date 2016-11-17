@@ -86,7 +86,7 @@ OpcUa_Void              OpcUa_HttpsListener_Connection_Delete(              OpcU
 typedef struct _OpcUa_HttpsListener_ConnectionManager OpcUa_HttpsListener_ConnectionManager;
 
 /**
-* @brief Being part of a specific HttpListener, it manages the ressources for all clients connected to an enpoint.
+* @brief Being part of a specific HttpListener, it manages the resources for all clients connected to an endpoint.
 */
 struct _OpcUa_HttpsListener_ConnectionManager
 {

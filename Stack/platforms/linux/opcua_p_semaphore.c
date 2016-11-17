@@ -57,7 +57,7 @@ static int report_error(int code, const char *where, const char *what)
  * @param a_Semaphore Pointer to semaphore handle. This returns the newly created semaphore.
  * @param a_uInitalValue The initial value of the semaphore.
  * @param a_uMaxRange The maximum value of the semaphore. This has no effect on linux, because the system has no maximim limit. But the parameter is checked to make sense 0 &lt;= InitValue &lt; MaxRange.
- * @return OpcUa_Good if the semaphore could be created, OpcUa_BadInvalidArgument MaxRange is not plausible, or OpcUa_BadInternalError in case of an system call error.
+ * @return OpcUa_Good if the semaphore could be created, OpcUa_BadInvalidArgument MaxRange is not plausible, or OpcUa_BadInternalError in case of a system call error.
  */
 OpcUa_StatusCode    OpcUa_P_Semaphore_Create(OpcUa_Semaphore* a_Semaphore, 
                                              OpcUa_UInt32   a_uInitalValue,

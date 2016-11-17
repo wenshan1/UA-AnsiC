@@ -68,8 +68,8 @@ OpcUa_ConnectionEvent;
   closes (normally or unexpectedly).
 
   @param connection     [in] The connection.
-  @param callbackData   [in] The callback data specifed in the Connect call.
-  @param eEvent         [in] The type of event that occured.
+  @param callbackData   [in] The callback data specified in the Connect call.
+  @param eEvent         [in] The type of event that occurred.
   @param ppIstrm        [in] A stream that must be used to read the response.
   @param uStatus        [in] The uStatus associated with the connection.
 */
@@ -84,7 +84,7 @@ typedef OpcUa_StatusCode (OpcUa_Connection_PfnOnNotify)(
   @brief Called by the connection when a response arrives.
 
   @param pConnection    [in] The connection.
-  @param pCallbackData  [in] The callback data specifed in the EndSendRequest call.
+  @param pCallbackData  [in] The callback data specified in the EndSendRequest call.
   @param uRequestStatus [in] The uStatus associated with the request.
   @param ppIstrm        [in] A stream that must be used to read the response.
 */
@@ -122,7 +122,7 @@ typedef OpcUa_StatusCode (OpcUa_Connection_PfnConnect)(
     OpcUa_Void*                     pCallbackData);
 
 /**
-  @brief Closes a connection an releases all resources allocated to it.
+  @brief Closes a connection and releases all resources allocated to it.
 
   The callback passed to the connect method is called when the disconnect completes.
 

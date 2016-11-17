@@ -147,7 +147,7 @@ static OpcUa_StatusCode OpcUa_SecureStream_DecryptInputBuffer(  OpcUa_Buffer*   
 /**
   @brief INTERNAL FUNCTION: Verifies the signature of a given inputstream.
 
-         If the validation fails, then a the statuscode OpcUa_BadSignatureInvalid is returned.
+         If the validation fails, then the statuscode OpcUa_BadSignatureInvalid is returned.
 
   @param pStream                [in]  The stream containing the data to verify.
   @param pBuffer                [in]  The buffer containing the signed message (including the signature).

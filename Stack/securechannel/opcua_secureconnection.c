@@ -183,7 +183,7 @@ typedef enum _OpcUa_SecureConnectionState
     OpcUa_SecureConnectionState_DisconnectingSecure,
     /** @brief The secureconnection is currently not connected to a listener. */
     OpcUa_SecureConnectionState_Disconnected,
-    /** @brief The secureconnection has been newly created or an error occured and the current state is uncertain. */
+    /** @brief The secureconnection has been newly created or an error occurred and the current state is uncertain. */
     OpcUa_SecureConnectionState_Unknown
 }
 OpcUa_SecureConnectionState;
@@ -461,7 +461,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_SecureConnection_WatchdogTimerCallback(    
         {
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureConnection_WatchdogTimerCallback: Request %u timed out after %u msecs!\n", pSecureRequest->RequestId, (CurrentTime > pSecureRequest->StartTime)?(CurrentTime - pSecureRequest->StartTime):(CurrentTime + (OpcUa_UInt32_Max - pSecureRequest->StartTime)));
 
-            /* callback finished, delete the internal ressource */
+            /* callback finished, delete the internal resource */
             OpcUa_List_DeleteCurrentElement(pSecureConnection->PendingRequests);
 
             /* tell all waiting callbacks of the cancellation */
@@ -514,7 +514,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_SecureConnection_WatchdogTimerKillCallback(
 
     while(pSecureRequest != OpcUa_Null)
     {
-        /* callback finished, delete the internal ressource */
+        /* callback finished, delete the internal resource */
         OpcUa_List_DeleteCurrentElement(pSecureConnection->PendingRequests);
 
         /* tell all waiting callbacks of the cancellation */
@@ -1246,7 +1246,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "CancelOpenRequests");
                                             OpcUa_Null);                    /* the stream to read from  */
             }
 
-            /* callback finished, delete the internal ressource */
+            /* callback finished, delete the internal resource */
             OpcUa_List_DeleteCurrentElement(pSecureConnection->PendingRequests);
             OpcUa_SecureRequest_Delete(&pSecureRequest);
 
@@ -1560,7 +1560,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "OnNotify");
                 }
             }
 
-            /* notify the owner only if an error occured */
+            /* notify the owner only if an error occurred */
             if(OpcUa_IsBad(uStatus) && pSecureConnection->Callback != OpcUa_Null)
             {
                 OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_SecureConnection_OnNotify: Connect event: Notifying owner! 0x%08X\n", uStatus);
@@ -1608,7 +1608,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "OnNotify");
                     hTimerToDelete = pSecureConnection->hRenewTimer;
                     pSecureConnection->hRenewTimer = OpcUa_Null;
                     /* transport layer was disconnected while secure connection was waiting for the open secure channel response */
-                    /* handled like a open secure channel response with transport layer failure */
+                    /* handled like an open secure channel response with transport layer failure */
                     OpcUa_SecureConnection_ProcessOpenSecureChannelResponse(    pSecureConnectionInterface,
                                                                                 OpcUa_Null,
                                                                                 OpcUa_BadConnectionClosed,

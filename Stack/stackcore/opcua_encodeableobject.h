@@ -187,7 +187,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     OpcUa_EncodeableType*      pTemplate);
 
 /** 
-  @brief Finds a encodeable object type in a table.
+  @brief Finds an encodeable object type in a table.
 
   @param pTable        [in]  The table to search.
   @param nTypeId       [in]  The type identifier for the encodeable object.

@@ -691,7 +691,7 @@ OpcUa_FinishErrorHandling;
  * OpcUa_HttpsConnection_ExceptEventHandler
  *===========================================================================*/
 /**
- * @brief Called by the socket callback when a expcept event occured on the socket.
+ * @brief Called by the socket callback when an except event occurred on the socket.
  *
  * This may happen ie. if a connect fails because the server is not reachable.
  * The event needs to be messaged to the upper layers.
@@ -1049,7 +1049,7 @@ OpcUa_FinishErrorHandling;
  * OpcUa_HttpsConnection_ConnectEventHandler
  *===========================================================================*/
 /**
- * @brief Called by the socket callback when a connect event occured.
+ * @brief Called by the socket callback when a connect event occurred.
  */
 OpcUa_StatusCode OpcUa_HttpsConnection_ConnectEventHandler(
     OpcUa_HttpsConnection_Request*  a_pRequest,
@@ -1265,7 +1265,7 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_HttpsConnection_SocketCallback
  *===========================================================================*/
-/** @brief This function gets called if an network event occured. */
+/** @brief This function gets called if a network event occurred. */
 static OpcUa_StatusCode OpcUa_HttpsConnection_SocketCallback(
     OpcUa_Socket    a_hSocket,
     OpcUa_UInt32    a_uSocketEvent,
@@ -2081,7 +2081,7 @@ OpcUa_FinishErrorHandling;
  *===========================================================================*/
 /* INFO: null streams are allowed and say that the owner of the connection
          takes care about the stream itself. Only if non null the http transport
-         generates a abort message. this is not handled by the ua stack because
+         generates an abort message. this is not handled by the ua stack because
          abort messages are always secured. */
 OpcUa_StatusCode OpcUa_HttpsConnection_AbortSendRequest(
     OpcUa_Connection*       a_pConnection,

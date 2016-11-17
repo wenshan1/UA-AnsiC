@@ -35,7 +35,7 @@ OpcUa_DateTime  OpcUa_P_DateTime_UtcNow(void);
 OpcUa_Void      OpcUa_P_DateTime_GetTimeOfDay(OpcUa_TimeVal*  pValue);
 
 /**
-* @brief Converts the given OpcUa_DateTime into a ascii string.
+* @brief Converts the given OpcUa_DateTime into an ascii string.
 * 
 * @param DateTime   [in]        The DateTime value to convert.
 * @param Buffer     [in/out]    At least 20+1 bytes of buffer. 

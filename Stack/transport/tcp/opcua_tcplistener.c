@@ -823,7 +823,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessRequest");
     }
     else
     {
-        /* an error occured - inform the owner of this listener */
+        /* an error occurred - inform the owner of this listener */
 
         /* delete and close input stream immediately */
         OpcUa_TcpStream_Close((OpcUa_Stream*)(*a_ppInputStream));
@@ -1120,7 +1120,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
 
     pTcpListener->Callback( a_pListener,                        /* the source of the event          */
                             pTcpListener->CallbackData,         /* the callback data                */
-                            OpcUa_ListenerEvent_ChannelOpened,  /* the event that occured           */
+                            OpcUa_ListenerEvent_ChannelOpened,  /* the event that occurred          */
                             (OpcUa_Handle)pConnection,          /* the handle for the connection    */
                             OpcUa_Null,                         /* the non existing stream          */
                             OpcUa_Good);                        /* status                           */
@@ -1187,7 +1187,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessDisconnect");
         /* notify about successful closing of the listener */
         pTcpListener->Callback( a_pListener,                        /* the source of the event          */
                                 pTcpListener->CallbackData,         /* the callback data                */
-                                OpcUa_ListenerEvent_ChannelClosed,  /* the event that occured           */
+                                OpcUa_ListenerEvent_ChannelClosed,  /* the event that occurred          */
                                 (OpcUa_Handle)a_pTcpConnection,     /* the handle for the connection    */
                                 OpcUa_Null,                         /* the non existing stream          */
                                 OpcUa_Good);                        /* status                           */
@@ -1591,7 +1591,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "WriteEventHandler");
             pTcpListener->Callback(
                 a_pListener,                            /* the event source */
                 (OpcUa_Void*)pTcpListener->CallbackData,/* the callback data */
-                OpcUa_ListenerEvent_RefillSendQueue,    /* the event that occured */
+                OpcUa_ListenerEvent_RefillSendQueue,    /* the event that occurred */
                 pTcpListenerConnection,                 /* a connection handle */
                 OpcUa_Null,                             /* the input stream for the event (none in this case) */
                 uStatus);                               /* a status code for the event */
@@ -1755,7 +1755,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "EventCallback");
             pTcpListener->Callback(
                 listener,                               /* the event source */
                 (OpcUa_Void*)pTcpListener->CallbackData, /* the callback data */
-                OpcUa_ListenerEvent_UnexpectedError,    /* the event that occured */
+                OpcUa_ListenerEvent_UnexpectedError,    /* the event that occurred */
                 OpcUa_Null,                             /* a connection handle */
                 OpcUa_Null,                             /* the input stream for the event (none in this case) */
                 uStatus);                               /* a status code for the event */
@@ -1880,7 +1880,7 @@ OpcUa_StatusCode OpcUa_TcpListener_Close(OpcUa_Listener* a_pListener)
     /* notify about successful closing of the listener */
     pTcpListener->Callback( a_pListener,                /* the source of the event          */
                             pTcpListener->CallbackData, /* the callback data                */
-                            OpcUa_ListenerEvent_Close,  /* the event that occured           */
+                            OpcUa_ListenerEvent_Close,  /* the event that occurred          */
                             OpcUa_Null,                 /* the handle for the connection    */
                             OpcUa_Null,                 /* the non existing stream          */
                             OpcUa_Good);                /* status                           */
@@ -1973,8 +1973,8 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "Open");
 
     /* notify about successful opening of the listener */
     pTcpListener->Callback( a_pListener,                /* the source of the event          */
-                            pTcpListener->CallbackData,  /* the callback data                */
-                            OpcUa_ListenerEvent_Open,   /* the event that occured           */
+                            pTcpListener->CallbackData, /* the callback data                */
+                            OpcUa_ListenerEvent_Open,   /* the event that occurred          */
                             OpcUa_Null,                 /* the handle for the connection    */
                             OpcUa_Null,                 /* the non existing stream          */
                             OpcUa_Good);                /* status                           */

@@ -1168,7 +1168,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessDisconnect");
     /* notify about successful closing of the listener */
     pHttpsListener->pfListenerCallback( a_pListener,                            /* the source of the event       */
                                         pHttpsListener->pvListenerCallbackData, /* the callback data             */
-                                        OpcUa_ListenerEvent_ChannelClosed,      /* the event that occured        */
+                                        OpcUa_ListenerEvent_ChannelClosed,      /* the event that occurred       */
                                         (OpcUa_Handle)pListenerConnection,      /* the handle for the connection */
                                         OpcUa_Null,                             /* the non existing stream       */
                                         OpcUa_Good);                            /* status                        */
@@ -1349,7 +1349,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "WriteEventHandler");
             pHttpsListener->pfListenerCallback(
                 a_pListener,                            /* the event source */
                 (OpcUa_Void*)pHttpsListener->pvListenerCallbackData,/* the callback data */
-                OpcUa_ListenerEvent_RefillSendQueue,    /* the event that occured */
+                OpcUa_ListenerEvent_RefillSendQueue,    /* the event that occurred */
                 pListenerConnection,                    /* a connection handle */
                 OpcUa_Null,                             /* the input stream for the event (none in this case) */
                 uStatus);                               /* a status code for the event */
@@ -1719,7 +1719,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AcceptEventHandler");
 
     pHttpsListener->pfListenerCallback( a_pListener,                            /* the source of the event       */
                                         pHttpsListener->pvListenerCallbackData, /* the callback data             */
-                                        OpcUa_ListenerEvent_ChannelOpened,      /* the event that occured        */
+                                        OpcUa_ListenerEvent_ChannelOpened,      /* the event that occurred       */
                                         (OpcUa_Handle)pListenerConnection,      /* the handle for the connection */
                                         OpcUa_Null,                             /* the non existing stream       */
                                         OpcUa_Good);                            /* status                        */
@@ -1869,7 +1869,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "EventCallback");
             /* unexpected error, report to upper layer. */
             pHttpsListener->pfListenerCallback( (OpcUa_Listener*)a_pUserData,                       /* the event source */
                                                 (OpcUa_Void*)pHttpsListener->pvListenerCallbackData,/* the callback data */
-                                                OpcUa_ListenerEvent_UnexpectedError,                /* the event that occured */
+                                                OpcUa_ListenerEvent_UnexpectedError,                /* the event that occurred */
                                                 OpcUa_Null,                                         /* a connection handle */
                                                 OpcUa_Null,                                         /* the input stream for the event (none in this case) */
                                                 uStatus);                                           /* a status code for the event */
@@ -1951,7 +1951,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_Close(OpcUa_Listener* a_pListener)
     /* notify about successful closing of the listener */
     pHttpsListener->pfListenerCallback( a_pListener,                            /* the source of the event       */
                                         pHttpsListener->pvListenerCallbackData, /* the callback data             */
-                                        OpcUa_ListenerEvent_Close,              /* the event that occured        */
+                                        OpcUa_ListenerEvent_Close,              /* the event that occurred       */
                                         OpcUa_Null,                             /* the handle for the connection */
                                         OpcUa_Null,                             /* the non existing stream       */
                                         OpcUa_Good);                            /* status                        */
@@ -2101,7 +2101,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "Open");
     /* notify about successful opening of the listener */
     pHttpsListener->pfListenerCallback( a_pListener,                            /* source of the event       */
                                         pHttpsListener->pvListenerCallbackData, /* callback data             */
-                                        OpcUa_ListenerEvent_Open,               /* event that occured        */
+                                        OpcUa_ListenerEvent_Open,               /* event that occurred       */
                                         OpcUa_Null,                             /* handle for the connection */
                                         OpcUa_Null,                             /* non existing stream       */
                                         OpcUa_Good);                            /* event status              */

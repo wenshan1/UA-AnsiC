@@ -43,7 +43,7 @@ typedef struct _OpcUa_Endpoint_SecurityPolicyConfiguration OpcUa_Endpoint_Securi
 typedef OpcUa_Void* OpcUa_Endpoint;
 
 /** 
- * @brief Types of serializers supported by the enpoint.
+ * @brief Types of serializers supported by the endpoint.
  *
  * @see OpcUa_Endpoint_Create
  */
@@ -172,7 +172,7 @@ typedef enum eOpcUa_Endpoint_Event
  *
  * @param hEndpoint                 [in] The to which the secure channel was opened.
  * @param pvEndpointCallbackData    [in] Data given at Endpoint_Open is given back.
- * @param eEvent                    [in] What type of event occured at the endpoint.
+ * @param eEvent                    [in] What type of event occurred at the endpoint.
  * @param uStatus                   [in] The status of the event.
  * @param uSecureChannelId          [in] The id assigned to the secure channel, if the event type refers to one.
  * @param pbsClientCertificate      [in] Pointer to the certificate provided by the client.

@@ -443,7 +443,7 @@ typedef struct _OpcUa_VariantMatrixValue
     /* The data stored in the array. 
     
        The higher rank dimensions appear in the array first.
-       e.g. a array with dimensions [2,2,2] is written in this order: 
+       e.g. an array with dimensions [2,2,2] is written in this order: 
        [0,0,0], [0,0,1], [0,1,0], [0,1,1], [1,0,0], [1,0,1], [1,1,0], [1,1,1]
 
        Using [3] to access the pointer stored in this field would return element [0,1,1] */

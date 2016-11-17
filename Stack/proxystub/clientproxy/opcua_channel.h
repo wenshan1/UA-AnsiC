@@ -32,7 +32,7 @@ OPCUA_BEGIN_EXTERN_C
 typedef OpcUa_Void* OpcUa_Channel;
 
 /**
- * @brief Types of events that can occur at an channel and get reported to the application.
+ * @brief Types of events that can occur at a channel and get reported to the application.
  */
 typedef enum eOpcUa_Channel_Event
 {
@@ -45,7 +45,7 @@ typedef enum eOpcUa_Channel_Event
 } OpcUa_Channel_Event;
 
 /**
- * @brief Types of serializers supported by the enpoint.
+ * @brief Types of serializers supported by the endpoint.
  *
  * @see OpcUa_Channel_Create
  */
@@ -61,8 +61,8 @@ typedef enum _OpcUa_Channel_SerializerType OpcUa_Channel_SerializerType;
  * @brief Called by the stack to report an asynchronous connection event.
  *
  * @param pChannel         [in] The channel used to send the request.
- * @param pCallbackData    [in] The callback data specifed when the request was sent.
- * @param eEvent           [in] The event that occured.
+ * @param pCallbackData    [in] The callback data specified when the request was sent.
+ * @param eEvent           [in] The event that occurred.
  * @param uStatus          [in] The status code, with which the operation completed.
  */
 typedef OpcUa_StatusCode (OpcUa_Channel_PfnConnectionStateChanged)(
@@ -99,7 +99,7 @@ OPCUA_EXPORT OpcUa_Void OpcUa_Channel_Delete(
  * @param pClientCertificate            [in] The clients certificate.
  * @param pClientPrivateKey             [in] The clients private key matching the public key in the certificate.
  * @param pServerCertificate            [in] The certificate of the server.
- * @param pPKIConfig                    [in] Implementation dependend configuration for the PKI.
+ * @param pPKIConfig                    [in] Implementation dependent configuration for the PKI.
  * @param pRequestedSecurityPolicyUri   [in] URI defining the security parameter set applied to the connection.
  * @param nRequestedLifetime            [in] The requested lifetime for the security token.
  * @param messageSecurityMode           [in] The message security mode requested for the communication.
@@ -127,7 +127,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Channel_Connect(
  * @param pClientCertificate            [in] The certificate of the client.
  * @param pClientPrivateKey             [in] The private key for the certificate.
  * @param pServerCertificate            [in] The certificate of the server.
- * @param pPKIConfig                    [in] The platform dependend pki configuration.
+ * @param pPKIConfig                    [in] The platform dependent pki configuration.
  * @param pRequestedSecurityPolicyUri   [in] The URI of the OPC UA security policy to use for this connection.
  * @param nRequestedLifetime            [in] The Lifetime of the connection.
  * @param messageSecurityMode           [in] The constant for None, Sign or SignAndEncrypt mode.
@@ -157,7 +157,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Channel_BeginConnect(
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Channel_Disconnect(OpcUa_Channel pChannel);
 
 /**
- * @brief Closes the network connection with the server asnchronously.
+ * @brief Closes the network connection with the server asynchronously.
  *
  * @param pChannel      [in] The session to disconnect.
  * @param pfCallback    [in] Function to call when connection is closed.
@@ -173,7 +173,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Channel_BeginDisconnect(
  *
  * @param pChannel         [in] The session used to send the request.
  * @param hAsyncState      [in] The async call state object.
- * @param pCallbackData    [in] The callback data specifed when the request was sent.
+ * @param pCallbackData    [in] The callback data specified when the request was sent.
  */
 typedef OpcUa_StatusCode (OpcUa_Channel_PfnRequestComplete)(
     OpcUa_Channel         hChannel,

@@ -65,16 +65,16 @@ typedef enum _OpcUa_ListenerEvent
 OpcUa_ListenerEvent;
 
 /**
-  @brief Called by the listener to report an listener event.
+  @brief Called by the listener to report a listener event.
 
   A listener may have many active connections which each have a unique handle. If a connection
   is closed, the listener calls this function and passes a bad status indicating why the
   connection was closed. If the listener itself encounters problems that prevent it from
-  receiving incoming connections the the listener calls this function with the connection
+  receiving incoming connections the listener calls this function with the connection
   handle set to NULL and a status indicating what the problem.
 
   @param pListener        [in] The listener.
-  @param pCallbackData    [in] The callback data specifed when the server created the listener.
+  @param pCallbackData    [in] The callback data specified when the server created the listener.
   @param eEvent           [in] The event that occurred.
   @param hConnection      [in] An opaque handle that identifies the source of the message.
   @param ppIstrm          [in] The input stream that must be used to read the request.
@@ -297,7 +297,7 @@ typedef struct _OpcUa_Listener
     /*! @brief Finishes writing an outgoing response. */
     OpcUa_Listener_PfnEndSendResponse* EndSendResponse;
 
-    /*! @brief Aborts an response. */
+    /*! @brief Aborts a response. */
     OpcUa_Listener_PfnAbortSendResponse* AbortSendResponse;
 
     /*! @brief Retrive the recieve buffer size of a particular connection. */

@@ -55,7 +55,7 @@ struct _OpcUa_TcpListener_Connection
     OpcUa_UInt32        MaxMessageSize;
     /** @brief The maximum number of chunks per message accepted by this connection. */
     OpcUa_UInt32        MaxChunkCount;
-    /** @brief The current number of chunks in an message. If 0, the connection is waiting for the next message. */
+    /** @brief The current number of chunks in a message. If 0, the connection is waiting for the next message. */
     OpcUa_UInt32        uCurrentChunk;
     /** @brief URL supplied by the client during transport handshake. */
     OpcUa_String        sURL;
@@ -73,23 +73,23 @@ struct _OpcUa_TcpListener_Connection
 
 typedef struct _OpcUa_TcpListener_Connection OpcUa_TcpListener_Connection;
 
-/** @brief Allocate and initialize an TcpListener_Connection */
+/** @brief Allocate and initialize a TcpListener_Connection */
 OpcUa_StatusCode        OpcUa_TcpListener_Connection_Create(              OpcUa_TcpListener_Connection**   ppConnection);
 
-/** @brief Initialize an TcpListener_Connection */
+/** @brief Initialize a TcpListener_Connection */
 OpcUa_StatusCode        OpcUa_TcpListener_Connection_Initialize(          OpcUa_TcpListener_Connection*    pValue);
 
-/** @brief Clear and free an TcpListener_Connection */
+/** @brief Clear and free a TcpListener_Connection */
 OpcUa_Void              OpcUa_TcpListener_Connection_Delete(              OpcUa_TcpListener_Connection**   pValue);
 
-/** @brief Clear an TcpListener_Connection */
+/** @brief Clear a TcpListener_Connection */
 OpcUa_Void              OpcUa_TcpListener_Connection_Clear(               OpcUa_TcpListener_Connection*    pValue);
 
 /*==============================================================================*/
 /* OpcUa_TcpListener_ConnectionManager                                              */
 /*==============================================================================*/
 /**
-* @brief Being part of a specific TcpListener, it manages the ressources for all clients connected to an enpoint.
+* @brief Being part of a specific TcpListener, it manages the resources for all clients connected to an endpoint.
 */
 struct _OpcUa_TcpListener_ConnectionManager
 {

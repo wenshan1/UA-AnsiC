@@ -252,7 +252,7 @@ OpcUa_StatusCode OpcUa_TcpStream_Close(OpcUa_Stream* strm);
 /*============================================================================
  * OpcUa_Stream_Delete
  *===========================================================================*/
-/** @brief Delete the stream and all associated ressources. */
+/** @brief Delete the stream and all associated resources. */
 OpcUa_Void OpcUa_TcpStream_Delete(OpcUa_Stream** strm);
 
 /*============================================================================

@@ -98,7 +98,7 @@ typedef OpcUa_StatusCode (OpcUa_Stream_PfnFlush)(
     OpcUa_Boolean       lastCall);
 
 /**
-  @brief Closes a stream an releases all resources allocated to it.
+  @brief Closes a stream and releases all resources allocated to it.
 
   During normal operation all streams must be closed. Deleting a stream without
   closing it could have unexpected side effects.

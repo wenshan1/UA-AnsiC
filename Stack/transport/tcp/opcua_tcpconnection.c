@@ -95,7 +95,7 @@ typedef struct _OpcUa_TcpConnection
     OpcUa_UInt32                    MaxMessageSize;
     /** @brief The maximum number of chunks per message accepted by this connection. */
     OpcUa_UInt32                    MaxChunkCount;
-    /** @brief The current number of chunks in an message. If 0, the connection is waiting for the next message. */
+    /** @brief The current number of chunks in a message. If 0, the connection is waiting for the next message. */
     OpcUa_UInt32                    uCurrentChunk;
     OpcUa_String                    sURL;
 #if OPCUA_MULTITHREADED
@@ -332,7 +332,7 @@ OpcUa_FinishErrorHandling;
  * Process Acknowledge Message
  *===========================================================================*/
 /**
- * @brief Reads and parses a acknowledge message and passes the result up.
+ * @brief Reads and parses an acknowledge message and passes the result up.
  */
 static OpcUa_StatusCode OpcUa_TcpConnection_ProcessAcknowledgeMessage(  OpcUa_Connection*   a_pConnection,
                                                                         OpcUa_InputStream*  a_pInputStream)
@@ -637,7 +637,7 @@ OpcUa_FinishErrorHandling;
  * OpcUa_TcpConnection_ExceptEventHandler
  *===========================================================================*/
 /**
- * @brief Called by the socket callback when a expcept event occured on the socket.
+ * @brief Called by the socket callback when an except event occurred on the socket.
  *
  * This may happen ie. if a connect fails because the server is not reachable.
  * The event needs to be messaged to the upper layers.
@@ -686,7 +686,7 @@ OpcUa_FinishErrorHandling;
  * OpcUa_TcpConnection_ConnectEventHandler
  *===========================================================================*/
 /**
- * @brief Called by the socket callback when a connect event occured.
+ * @brief Called by the socket callback when a connect event occurred.
  */
 OpcUa_StatusCode OpcUa_TcpConnection_ConnectEventHandler(       OpcUa_Connection*   a_pConnection,
                                                                 OpcUa_Socket        a_pSocket)
@@ -915,7 +915,7 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_TcpConnection_SocketCallback
  *===========================================================================*/
-/** @brief This function gets called if an network event occured. */
+/** @brief This function gets called if a network event occurred. */
 static OpcUa_StatusCode OpcUa_TcpConnection_SocketCallback( OpcUa_Socket    a_pSocket,
                                                             OpcUa_UInt32    a_SocketEvent,
                                                             OpcUa_Void*     a_pUserData,
@@ -1271,7 +1271,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "BeginSendRequest");
         OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionClosed);
     }
 
-    /* create an tcp output stream based on the tcpConnection */
+    /* create a tcp output stream based on the tcpConnection */
     uStatus = OpcUa_TcpStream_CreateOutput( pTcpConnection->Socket,
                                             OpcUa_TcpStream_MessageType_SecureChannel,
                                             OpcUa_Null,
@@ -1303,7 +1303,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "BeginSendRequest");
             OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
         }
 
-        /* create an tcp output stream based on the tcpConnection */
+        /* create a tcp output stream based on the tcpConnection */
         uStatus = OpcUa_TcpStream_CreateOutput( pTcpConnection->Socket,
                                                 OpcUa_TcpStream_MessageType_SecureChannel,
                                                 OpcUa_Null,
@@ -1452,7 +1452,7 @@ OpcUa_FinishErrorHandling;
  *===========================================================================*/
 /* INFO: null streams are allowed and say that the owner of the connection
          takes care about the stream itself. Only if non null the tcp transport
-         generates a abort message. this is not handled by the ua stack because
+         generates an abort message. this is not handled by the ua stack because
          abort messages are always secured. */
 OpcUa_StatusCode OpcUa_TcpConnection_AbortSendRequest(  OpcUa_Connection*    a_pConnection,
                                                         OpcUa_StatusCode     a_uStatus,
@@ -1677,7 +1677,7 @@ OpcUa_Void OpcUa_TcpConnection_Delete(OpcUa_Connection** a_ppConnection)
     }
 
     /*** Free ***/
-    /* clean internal ressources */
+    /* clean internal resources */
 #if OPCUA_USE_SYNCHRONISATION
     OPCUA_P_MUTEX_UNLOCK(tcpConnection->ReadMutex);
     OPCUA_P_MUTEX_DELETE(&(tcpConnection->ReadMutex));

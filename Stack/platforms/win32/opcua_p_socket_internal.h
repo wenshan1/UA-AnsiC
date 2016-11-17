@@ -85,7 +85,7 @@ struct _OpcUa_InternalSocketManager
     OpcUa_InternalSocket* pSockets;                 /* the sockets */
     OpcUa_UInt32          uintMaxSockets;           /* how many socket entries can this list hold at maximum. Mind the signal socket!  */
     OpcUa_Void*           pCookie;                  /* pointer to internal data */
-    OpcUa_UInt32          uintLastExternalEvent;    /* the last occured event */
+    OpcUa_UInt32          uintLastExternalEvent;    /* the last occurred event */
 #if OPCUA_MULTITHREADED
     OpcUa_InternalSocketManager** pSocketManagers;  /* the spawned socket managers go there */
     OpcUa_RawThread       pSpawnedThread;           /* the spawned accept thread */
@@ -196,7 +196,7 @@ OpcUa_StatusCode    OpcUa_Socket_HandleEvent(   OpcUa_Socket        pSocket,
  * @param pSocketArray  [out]   The sockets in this array get set based on the socket list.
  * @param Event         [in]    Only set sockets with this event set.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_Socket_FillFdSet(OpcUa_SocketManager   SocketManager,
                                           OpcUa_P_Socket_Array* pSocketArray,
@@ -220,7 +220,7 @@ OpcUa_Void OpcUa_P_Socket_HandleFdSet(OpcUa_SocketManager   SocketManager,
  *
  * @param pSocketManager   [in]    The current socket list.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_Socket_HandleExternalEvent(OpcUa_SocketManager SocketManager);
 
@@ -258,7 +258,7 @@ OpcUa_RawSocket OpcUa_P_Socket_CreateClient(OpcUa_UInt16                    Port
  * @param msecTimeout    [in]    The maximum number of milliseconds, this function blocks the calling thread.
  * @param bRunOnce       [in]    Run the event loop only once.
  *
- * @return A "Good" status code if no error occured, a "Bad" status code otherwise.
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
  */
 OpcUa_StatusCode OpcUa_P_SocketManager_ServeLoopInternal(   OpcUa_SocketManager   SocketManager,
                                                             OpcUa_UInt32          msecTimeout,

@@ -50,7 +50,7 @@ OpcUa_Mutex OpcUa_Trace_s_pLock = OpcUa_Null;
  * Trace Initialize
  *===========================================================================*/
 /**
-* Initialize all ressources needed for tracing.
+* Initialize all resources needed for tracing.
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Trace_Initialize(OpcUa_Void)
 {
@@ -70,7 +70,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Trace_Initialize(OpcUa_Void)
  * Trace Clear
  *===========================================================================*/
 /**
-* Clear all ressources needed for tracing.
+* Clear all resources needed for tracing.
 */
 OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Clear(OpcUa_Void)
 {

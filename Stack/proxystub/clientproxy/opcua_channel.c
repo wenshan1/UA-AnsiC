@@ -241,7 +241,7 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_Channel_ResponseAvailable
  *===========================================================================*/
-/* This callback gets called by the connection if an event occured. */
+/* This callback gets called by the connection if an event occurred. */
 static OpcUa_StatusCode OpcUa_Channel_ResponseAvailable(
     OpcUa_Connection*   a_pConnection,
     OpcUa_Void*         a_pCallbackData,
@@ -536,11 +536,11 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "InvokeService");
 
     /* lock request mutex */
     /* OPCUA_P_MUTEX_LOCK(pAsyncState->WaitMutex); */
-    /* On rare occasions, deadlocks occured when the secure layers watchdog thread called  */
-    /* ResponseAvailable while holding its list and tried to get access to the AsyncState  */
-    /* and an error occured in the following call between adding the request object to the */
-    /* list and trying to remove it again.                                                 */
-    /* Since the AsyncState does not get deleted by ResponseAvailable it should be safe to */
+    /* On rare occasions, deadlocks occurred when the secure layers watchdog thread called  */
+    /* ResponseAvailable while holding its list and tried to get access to the AsyncState   */
+    /* and an error occurred in the following call between adding the request object to the */
+    /* list and trying to remove it again.                                                  */
+    /* Since the AsyncState does not get deleted by ResponseAvailable it should be safe to  */
     /* make the following call without locking the AsyncState. */
 
     /*** send request to the server. ***/

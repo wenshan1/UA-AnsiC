@@ -379,7 +379,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_SecureStream_DecryptInput(  OpcUa_InputStrea
                                                                 OpcUa_Key*              pInitialVector);
 
 /**
-  @brief Verifies the signature of a given inputstream. If the validation fails, then a the statuscode OpcUa_BadSignatureInvalid is returned.
+  @brief Verifies the signature of a given inputstream. If the validation fails, then the statuscode OpcUa_BadSignatureInvalid is returned.
 
   @param pIstrm                 [in]  The signed inputstream.
                                       If this pointer is NULL then an error will be returned.

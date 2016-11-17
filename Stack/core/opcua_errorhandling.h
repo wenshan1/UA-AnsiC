@@ -404,7 +404,7 @@ typedef struct _OpcUa_StatusCodeString
  * OpcUa_InitializeStatus
  *===========================================================================*/
 /** 
- * @brief Marks the beginning of a error handling block.
+ * @brief Marks the beginning of an error handling block.
  */
 #if !OPCUA_ERRORHANDLING_OMIT_METHODNAME
     #if OPCUA_TRACE_ERROR_MACROS
