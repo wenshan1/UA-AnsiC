@@ -25,7 +25,7 @@ OPCUA_BEGIN_EXTERN_C
 
 typedef struct _OpcUa_ListElement OpcUa_ListElement;
 
-/** 
+/**
  * @brief A list element (control structure) in a double linked list. (rear- and forward linked elements)
  */
 struct _OpcUa_ListElement
@@ -92,8 +92,8 @@ OpcUa_Void          OpcUa_ListElement_Delete(       OpcUa_ListElement** ppElemen
  * List
  *===========================================================================*/
 
-/** 
- * @brief The main handle for a list. 
+/**
+ * @brief The main handle for a list.
  */
 struct _OpcUa_List
 {
@@ -126,8 +126,8 @@ OPCUA_EXPORT
 OpcUa_StatusCode   OpcUa_List_Create(               OpcUa_List** ppList);
 
 /**
-  @brief Initializes all internal variables of the list. 
-  
+  @brief Initializes all internal variables of the list.
+
   Do not call this function twice. Memory leaks will be created.
 
   @return OpcUa_BadInvalidArgument if a_pList is null
@@ -140,7 +140,7 @@ OpcUa_StatusCode    OpcUa_List_Initialize(          OpcUa_List*     pList);
 
 /**
   @brief Removes all elements from the list.
-  
+
   User data is not deallocated and must be delete manually
   Takes no action if a_pList is null
 
@@ -193,8 +193,8 @@ OpcUa_Void          OpcUa_List_Leave(               OpcUa_List*     pList);
  *===========================================================================*/
 /**
   @brief Adds a new element with the given data into the List. The element is inserted as
-  the first element. 
- 
+  the first element.
+
   @return OpcUa_Good on success
   @return OpcUa_BadOutOfMemory if the allocation of the new element fails
   @return OpcUa_BadInvalidArgument if a_pList is null
@@ -204,7 +204,7 @@ OpcUa_Void          OpcUa_List_Leave(               OpcUa_List*     pList);
   @param a_pElementData     [in]    Location of user data
 */
 OPCUA_EXPORT
-OpcUa_StatusCode    OpcUa_List_AddElement(          OpcUa_List*     pList, 
+OpcUa_StatusCode    OpcUa_List_AddElement(          OpcUa_List*     pList,
                                                     OpcUa_Void*     pElementData);
 
 /**
@@ -220,7 +220,7 @@ OpcUa_StatusCode    OpcUa_List_AddElement(          OpcUa_List*     pList,
   @param a_pElementData     [in]    Location of user data to add to the list
 */
 OPCUA_EXPORT
-OpcUa_StatusCode    OpcUa_List_AddElementToEnd(     OpcUa_List*     pList, 
+OpcUa_StatusCode    OpcUa_List_AddElementToEnd(     OpcUa_List*     pList,
                                                     OpcUa_Void*     pElementData);
 
 /**
@@ -236,7 +236,7 @@ OpcUa_StatusCode    OpcUa_List_ResetCurrent(        OpcUa_List*     pList);
 
 /**
   @brief Moves the cursor to the next element if existing and returns the userdata.
- 
+
   @return OpcUa_Null if the cursor was pointing to the last element
   @return OpcUa_Null if a_pList is null
   @return OpcUa_Null if a_pList->currtElement is null
@@ -249,7 +249,7 @@ OpcUa_Void*         OpcUa_List_GetNextElement(      OpcUa_List*     pList);
 
 /**
   @brief Get the user data from the current element.
- 
+
   @return OpcUa_Null if a_pList is null
   @return OpcUa_Null if the cursor is pointing to null
   @return the user data of the current element otherwise
@@ -261,7 +261,7 @@ OpcUa_Void*         OpcUa_List_GetCurrentElement(OpcUa_List*     pList);
 
 /**
   @brief Moves the cursor to the previous element if existing and returns the userdata.
- 
+
   @return OpcUa_Null if the cursor was pointing to the first element
   @return OpcUa_Null if a_pList is null
   @return OpcUa_Null if a_pList->currtElement is null
@@ -274,7 +274,7 @@ OpcUa_Void*         OpcUa_List_GetPrevElement(      OpcUa_List*     pList);
 
 /**
   @brief Set the cursor to the element with the given data
- 
+
   @return OpcUa_Null if no element is found
   @return OpcUa_Null if a_pList is null
   @return OpcUa_Null if a_pElementData is null
@@ -287,7 +287,7 @@ OpcUa_Void*         OpcUa_List_GetPrevElement(      OpcUa_List*     pList);
   @param a_pElementData     [in]    Data to find
 */
 OPCUA_EXPORT
-OpcUa_Void*         OpcUa_List_GetElement(          OpcUa_List*     pList, 
+OpcUa_Void*         OpcUa_List_GetElement(          OpcUa_List*     pList,
                                                     OpcUa_Void*     pElementData);
 /**
   @brief Deletes the current element performing all necessary list management
@@ -304,7 +304,7 @@ OpcUa_Void          OpcUa_List_DeleteCurrentElement(OpcUa_List*     pList);
 /**
   @brief Removes the element containing the specified user data from the list.
   The data itself is not deleted.
- 
+
   @return OpcUa_BadInternalError if a_pList is null
   @return OpcUa_BadInternalError if a_pElementData is null
   @return OpcUa_Good on success;
@@ -313,7 +313,7 @@ OpcUa_Void          OpcUa_List_DeleteCurrentElement(OpcUa_List*     pList);
   @param a_pElementData     [in]    Location of the data to remove from the list
 */
 OPCUA_EXPORT
-OpcUa_StatusCode    OpcUa_List_DeleteElement(       OpcUa_List*     pList, 
+OpcUa_StatusCode    OpcUa_List_DeleteElement(       OpcUa_List*     pList,
                                                     OpcUa_Void*     pElementData);
 
 /**
@@ -327,14 +327,14 @@ OpcUa_StatusCode    OpcUa_List_DeleteElement(       OpcUa_List*     pList,
   @param a_uintElementCount [out]   Location of an OpcUa_UInt32 to store the size of the list
 */
 OPCUA_EXPORT
-OpcUa_StatusCode    OpcUa_List_GetNumberOfElements( OpcUa_List*     pList, 
+OpcUa_StatusCode    OpcUa_List_GetNumberOfElements( OpcUa_List*     pList,
                                                     OpcUa_UInt32*   uintElementCount);
 
 /**
   @brief Remove the first element, return its data, and reset the cursor
   This function is used along with OpcUa_List_AddElementToEnd to make the list
   behave like a queue
-  
+
   @return OpcUa_Null if a_pList is null
   @return OpcUa_Null if the list is empty
   @return the user data from the first element otherwise
