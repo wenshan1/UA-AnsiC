@@ -710,3 +710,73 @@ OpcUa_StatusCode OpcUa_List_GetNumberOfElements(OpcUa_List* a_pList, OpcUa_UInt3
 }
 
 /*===========================================================================*/
+/**
+  @brief Deletes the current element performing all necessary list management
+  However, the list element is added to a temporary list and must be removed manually
+
+  QueueFirst and QueueLast have to be initialzed to null before first use
+
+  Takes no action if a_pList is null
+  Takes no action if a_pList->currtElement is null
+
+  @param a_pList        [in]    Location of the list
+  @param a_ppQueueFirst [in]    First Element of the queue
+  @param a_ppQueueLast  [in]    Last Element of the queue
+*/
+OPCUA_EXPORT
+OpcUa_Void          OpcUa_List_EnQueueCurrentElement(OpcUa_List*         a_pList,
+                                                     OpcUa_ListElement** a_ppQueueFirst,
+                                                     OpcUa_ListElement** a_ppQueueLast)
+
+{
+    OpcUa_StatusCode    uStatus         = OpcUa_Good;
+    OpcUa_ListElement*  deleteElement   = OpcUa_Null;
+
+    OpcUa_DeclareErrorTraceModule(OpcUa_Module_List);
+
+    OpcUa_GotoErrorIfArgumentNull(a_pList);
+    OpcUa_GotoErrorIfArgumentNull(a_pList->currtElement);
+    OpcUa_GotoErrorIfArgumentNull(a_ppQueueFirst);
+    OpcUa_GotoErrorIfArgumentNull(a_ppQueueLast);
+
+    deleteElement = a_pList->currtElement;
+
+    if(deleteElement->prevElement)
+    {
+        deleteElement->prevElement->nextElement = deleteElement->nextElement;
+    }
+
+    if(deleteElement->nextElement)
+    {
+        deleteElement->nextElement->prevElement = deleteElement->prevElement;
+    }
+
+    a_pList->currtElement = deleteElement->nextElement;
+
+    if(deleteElement == a_pList->firstElement)
+    {
+        a_pList->firstElement = deleteElement->nextElement;
+    }
+
+    if(deleteElement == a_pList->lastElement)
+    {
+        a_pList->lastElement = deleteElement->prevElement;
+    }
+
+    a_pList->uintNbElements--;
+
+    deleteElement->prevElement = *a_ppQueueLast;
+    deleteElement->nextElement = OpcUa_Null;
+
+    if(*a_ppQueueFirst == OpcUa_Null)
+    {
+        *a_ppQueueFirst = deleteElement;
+    }
+
+    *a_ppQueueLast = deleteElement;
+
+Error:
+    return;
+}
+
+/*===========================================================================*/

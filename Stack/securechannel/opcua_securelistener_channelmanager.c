@@ -63,15 +63,13 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_SecureListener_ChannelManager_TimerCallback
     OpcUa_SecureListener_ChannelManager*    pChannelManager     = (OpcUa_SecureListener_ChannelManager*)a_pvCallbackData;
     OpcUa_SecureChannel*                    pTmpSecureChannel   = OpcUa_Null;
     OpcUa_UInt32                            nToDelete           = 0;
-    OpcUa_List                              TmpList;
+    OpcUa_ListElement*                      pTmpListFirst       = OpcUa_Null;
+    OpcUa_ListElement*                      pTmpListLast        = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_TimerCallback");
 
     OpcUa_ReferenceParameter(a_hTimer);
     OpcUa_ReferenceParameter(a_msecElapsed);
-
-    uStatus = OpcUa_List_Initialize(&TmpList);
-    OpcUa_ReturnErrorIfBad(uStatus);
 
     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ChannelManager_TimerCallback: Checking Channels for lifetime expiration!\n");
 
@@ -118,8 +116,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_TimerCallbac
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OpcUa_SecureListener_ChannelManager_TimerCallback: removing SecureChannel %u after lifetime expired!\n", pTmpSecureChannel->SecureChannelId);
 
                     /* remove from channel manager and put into temp list for later notification */
-                    OpcUa_List_DeleteCurrentElement(pChannelManager->SecureChannels);
-                    OpcUa_List_AddElementToEnd(&TmpList, (OpcUa_Void*)pTmpSecureChannel);
+                    OpcUa_List_EnQueueCurrentElement(pChannelManager->SecureChannels, &pTmpListFirst, &pTmpListLast);
                     OPCUA_SECURECHANNEL_UNLOCK(pTmpSecureChannel);
                     nToDelete++;
 
@@ -147,10 +144,8 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_TimerCallbac
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OpcUa_SecureListener_ChannelManager_TimerCallback: removing inactive SecureChannel!\n");
 
                     /* remove from channel manager and put into temp list for later notification */
-                    OpcUa_List_DeleteCurrentElement(pChannelManager->SecureChannels);
-                    OpcUa_List_AddElementToEnd(&TmpList, (OpcUa_Void*)pTmpSecureChannel);
+                    OpcUa_List_EnQueueCurrentElement(pChannelManager->SecureChannels, &pTmpListFirst, &pTmpListLast);
                     OPCUA_SECURECHANNEL_UNLOCK(pTmpSecureChannel);
-                    pTmpSecureChannel = OpcUa_Null;
                     nToDelete++;
 
                     pTmpSecureChannel = (OpcUa_SecureChannel*)OpcUa_List_GetCurrentElement(pChannelManager->SecureChannels);
@@ -170,21 +165,19 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_TimerCallbac
     if(nToDelete != 0)
     {
         OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ChannelManager_TimerCallback: deleting %u SecureChannel!\n", nToDelete);
-        OpcUa_List_ResetCurrent(&TmpList);
-        pTmpSecureChannel = (OpcUa_SecureChannel*)OpcUa_List_GetCurrentElement(&TmpList);
-        while(pTmpSecureChannel != OpcUa_Null)
+        while(pTmpListFirst != OpcUa_Null)
         {
+            OpcUa_ListElement* pTmpListElement = pTmpListFirst;
+            pTmpSecureChannel = (OpcUa_SecureChannel*)pTmpListElement->data;
+
             pChannelManager->pfCallback(pTmpSecureChannel,
                                         pChannelManager->pvCallbackData);
 
-            OpcUa_List_DeleteCurrentElement(&TmpList);
+            pTmpListFirst = pTmpListFirst->nextElement;
+            OpcUa_ListElement_Delete(&pTmpListElement);
             OpcUa_TcpSecureChannel_Delete(&pTmpSecureChannel);
-
-            pTmpSecureChannel = (OpcUa_SecureChannel*)OpcUa_List_GetCurrentElement(&TmpList);
         }
     }
-
-    OpcUa_List_Clear(&TmpList);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
