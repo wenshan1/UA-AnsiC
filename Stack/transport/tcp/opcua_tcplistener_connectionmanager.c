@@ -42,6 +42,7 @@
 OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_Create(
     OpcUa_TcpListener_ConnectionManager** a_ppConnectionManager)
 {
+    OpcUa_StatusCode uStatus    = OpcUa_Good;
     OpcUa_TcpListener_ConnectionManager *pConnMngr  = OpcUa_Null;
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_TcpListener);
 
@@ -52,15 +53,14 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_Create(
     pConnMngr = (OpcUa_TcpListener_ConnectionManager*)OpcUa_Alloc(sizeof(OpcUa_TcpListener_ConnectionManager));
     OpcUa_ReturnErrorIfAllocFailed(pConnMngr);
 
-    OpcUa_TcpListener_ConnectionManager_Initialize(pConnMngr);
-
-    if(pConnMngr->Connections == OpcUa_Null)
+    uStatus = OpcUa_TcpListener_ConnectionManager_Initialize(pConnMngr);
+    if(OpcUa_IsBad(uStatus))
     {
         OpcUa_TcpListener_ConnectionManager_Delete(&pConnMngr);
     }
 
     *a_ppConnectionManager = pConnMngr;
-    return OpcUa_Good;
+    return uStatus;
 }
 
 
@@ -84,8 +84,6 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_Initialize(
     OpcUa_MemSet(a_pConnectionManager, 0, sizeof(OpcUa_TcpListener_ConnectionManager));
 
     uStatus = OpcUa_List_Create(    &(a_pConnectionManager->Connections));
-    OpcUa_ReturnErrorIfBad(uStatus);
-
     OpcUa_ReturnErrorIfBad(uStatus);
 
     return uStatus;

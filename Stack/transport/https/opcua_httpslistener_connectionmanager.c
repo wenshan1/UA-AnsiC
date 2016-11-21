@@ -56,6 +56,7 @@ OpcUa_StatusCode        OpcUa_HttpsListener_Connection_Initialize(          OpcU
 OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_Create(
     OpcUa_HttpsListener_ConnectionManager**     a_ppConnectionManager)
 {
+    OpcUa_StatusCode uStatus    = OpcUa_Good;
     OpcUa_HttpsListener_ConnectionManager *pConnMngr  = OpcUa_Null;
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_HttpListener);
 
@@ -66,15 +67,14 @@ OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_Create(
     pConnMngr = (OpcUa_HttpsListener_ConnectionManager*)OpcUa_Alloc(sizeof(OpcUa_HttpsListener_ConnectionManager));
     OpcUa_ReturnErrorIfAllocFailed(pConnMngr);
 
-    OpcUa_HttpsListener_ConnectionManager_Initialize(pConnMngr);
-
-    if(pConnMngr->Connections == OpcUa_Null)
+    uStatus = OpcUa_HttpsListener_ConnectionManager_Initialize(pConnMngr);
+    if(OpcUa_IsBad(uStatus))
     {
         OpcUa_HttpsListener_ConnectionManager_Delete(&pConnMngr);
     }
 
     *a_ppConnectionManager = pConnMngr;
-    return OpcUa_Good;
+    return uStatus;
 }
 
 

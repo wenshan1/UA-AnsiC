@@ -217,6 +217,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "Create");
     OpcUa_GotoErrorIfBad(uStatus);
 
     uStatus = OpcUa_HttpsListener_ConnectionManager_Create( &(pHttpsListener->pConnectionManager));
+    OpcUa_GotoErrorIfBad(uStatus);
     pHttpsListener->pConnectionManager->Listener = *a_ppListener;
 
     /* HINT: socket and socket list get managed in open/close */
@@ -240,6 +241,7 @@ OpcUa_BeginErrorHandling;
 
     if (*a_ppListener != OpcUa_Null)
     {
+        OPCUA_P_MUTEX_DELETE(&(pHttpsListener->Mutex));
         OpcUa_Free(*a_ppListener);
         *a_ppListener = OpcUa_Null;
     }
