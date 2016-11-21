@@ -1279,14 +1279,14 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
             uStatus = OpcUa_TcpStream_CreateInput(  a_pSocket,
                                                     pTcpListenerConnection->ReceiveBufferSize,
                                                     &pInputStream);
-            OpcUa_ReturnErrorIfBad(uStatus);
+            OpcUa_GotoErrorIfBad(uStatus);
         }
         else
         {
             uStatus = OpcUa_TcpStream_CreateInput(  a_pSocket,
                                                     OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize,
                                                     &pInputStream);
-            OpcUa_ReturnErrorIfBad(uStatus);
+            OpcUa_GotoErrorIfBad(uStatus);
         }
     }
 
@@ -1314,6 +1314,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
             OpcUa_List_Enter(pTcpListener->PendingMessages);
             uStatus = OpcUa_List_AddElement(pTcpListener->PendingMessages, pInputStream);
             OpcUa_List_Leave(pTcpListener->PendingMessages);
+            OpcUa_GotoErrorIfBad(uStatus);
         }
     }
     else /* process message */
@@ -1355,17 +1356,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
 
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ReadEventHandler: socket %p; status 0x%08X (%s)\n", a_pSocket, uStatus, sError);
 
-            OPCUA_P_SOCKET_CLOSE(a_pSocket);
-
-            OpcUa_TcpStream_Close((OpcUa_Stream*)pInputStream);
-            OpcUa_TcpStream_Delete((OpcUa_Stream**)&pInputStream);
-
-            if(pTcpListenerConnection != OpcUa_Null)
-            {
-                /* Notify about connection loss. */
-                OpcUa_TcpListener_ProcessDisconnect(    a_pListener,
-                                                        pTcpListenerConnection);
-            }
+            OpcUa_GotoError;
         }
         else /* Message can be processed. */
         {
@@ -1423,8 +1414,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
             default:
                 {
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ReadEventHandler: Invalid MessageType (%d)\n", pTcpInputStream->MessageType);
-                    OpcUa_TcpStream_Close((OpcUa_Stream*)pInputStream);
-                    OpcUa_TcpStream_Delete((OpcUa_Stream**)&pInputStream);
+                    OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
                     break;
                 }
             }
@@ -1433,6 +1423,22 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    OPCUA_P_SOCKET_CLOSE(a_pSocket);
+
+    if(pInputStream != OpcUa_Null)
+    {
+        OpcUa_TcpStream_Close((OpcUa_Stream*)pInputStream);
+        OpcUa_TcpStream_Delete((OpcUa_Stream**)&pInputStream);
+    }
+
+    if(pTcpListenerConnection != OpcUa_Null)
+    {
+        /* Notify about connection loss. */
+        OpcUa_TcpListener_ProcessDisconnect(    a_pListener,
+                                                pTcpListenerConnection);
+    }
+
 OpcUa_FinishErrorHandling;
 }
 
