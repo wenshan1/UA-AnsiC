@@ -744,7 +744,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ReadEventHandler");
         uStatus = OpcUa_TcpStream_CreateInput(  a_pSocket,
                                                 OpcUa_ProxyStub_g_Configuration.iTcpConnection_DefaultChunkSize,
                                                 &(pTcpConnection->IncomingStream));
-        OpcUa_ReturnErrorIfBad(uStatus);
+        OpcUa_GotoErrorIfBad(uStatus);
 
         pTcpInputStream = (OpcUa_TcpInputStream *)pTcpConnection->IncomingStream->Handle;
     }
@@ -843,6 +843,9 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ReadEventHandler");
     }
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    OpcUa_TcpConnection_HandleDisconnect(a_pConnection);
+
 OpcUa_FinishErrorHandling;
 }
 
