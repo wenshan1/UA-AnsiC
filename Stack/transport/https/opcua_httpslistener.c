@@ -864,10 +864,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                 OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
                 OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
 
-                /* Release reference to stream */
-                OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                        &a_pListenerConnection);
-
                 break;
             }
 
@@ -917,10 +913,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                 OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
                 OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
                 OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-                /* Release reference to stream */
-                OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                        &a_pListenerConnection);
             }
 
             break;
@@ -941,10 +933,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
             OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
             OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
 
-            /* Release reference to stream */
-            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                    &a_pListenerConnection);
-
             break;
         }
     case OpcUa_HttpsStream_Method_Options:
@@ -961,10 +949,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
             OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
             OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
             OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-            /* Release reference to stream */
-            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                    &a_pListenerConnection);
 
             break;
         }
@@ -988,38 +972,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                                                                 (OpcUa_Handle)a_pListenerConnection,                /* handle for the connection */
                                                                 a_ppInputStream,                                    /* the ready input stream    */
                                                                 OpcUa_Good);                                        /* event status code         */
-
-                if(OpcUa_IsBad(uStatus))
-                {
-                    if(    uStatus != OpcUa_BadDisconnect
-                        && uStatus != OpcUa_BadConnectionClosed
-                        && uStatus != OpcUa_BadCommunicationError)
-                    {
-                        OpcUa_HttpsListener_SendImmediateResponse(  a_pListener,
-                                                                    (OpcUa_Handle)a_pListenerConnection,
-                                                                    OPCUA_HTTP_STATUS_NOT_FOUND,
-                                                                    OPCUA_HTTP_STATUS_NOT_FOUND_TEXT,
-                                                                    OpcUa_Null, /* no further headers */
-                                                                    OpcUa_Null, /* no content */
-                                                                    0);         /* no content */
-
-                        if(*a_ppInputStream != OpcUa_Null)
-                        {
-                            /* delete and close input stream */
-                            OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
-                            OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
-
-                            /* Release reference to stream */
-                            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                                    &a_pListenerConnection);
-                        }
-                    }
-
-                    OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-                    /* case handled */
-                    uStatus = OpcUa_Good;
-                }
             }
             else
             {
@@ -1027,10 +979,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                 OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
                 OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
                 OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-                /* Release reference to stream */
-                OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                        &a_pListenerConnection);
             }
 
 #else /* OPCUA_HTTPS_ALLOW_GET */
@@ -1047,10 +995,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
             OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
             OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
             OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-            /* Release reference to stream */
-            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                    &a_pListenerConnection);
 
 #endif /* OPCUA_HTTPS_ALLOW_GET */
             break;
@@ -1070,10 +1014,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
             OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
             OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
             OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-
-            /* Release reference to stream */
-            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                    &a_pListenerConnection);
 
             break;
         }
@@ -1126,6 +1066,9 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessDisconnect");
         uStatus = OpcUa_Good;
 
         OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+
+        OpcUa_HttpsListener_ConnectionManager_ReleaseConnection( pHttpsListener->pConnectionManager,
+                                                                 a_ppListenerConnection);
 
         OpcUa_ReturnStatusCode;
     }
@@ -1415,7 +1358,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ReadEventHandler");
     if(OpcUa_IsBad(uStatus))
     {
         OPCUA_P_SOCKET_CLOSE(a_hSocket);
-        OpcUa_GotoError;
+        OpcUa_ReturnStatusCode;
     }
 
     /* get last access timestamp */
@@ -1429,7 +1372,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ReadEventHandler");
     if(pInputStream == OpcUa_Null)
     {
         uStatus = OpcUa_HttpsStream_CreateInput(a_hSocket, OpcUa_HttpsStream_MessageType_Request, &pInputStream);
-        OpcUa_ReturnErrorIfBad(uStatus);
+        OpcUa_GotoErrorIfBad(uStatus);
     }
     /******************************************************************************************************/
 
@@ -1558,61 +1501,46 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ReadEventHandler");
             /* process message */
             if(eMessageType == OpcUa_HttpsStream_MessageType_Request)
             {
-                if(pListenerConnection != OpcUa_Null)
+                uStatus = OpcUa_HttpsListener_ProcessRequest(a_pListener, pListenerConnection, &pInputStream);
+
+                if(pInputStream != OpcUa_Null)
                 {
-                    uStatus = OpcUa_HttpsListener_ProcessRequest(a_pListener, pListenerConnection, &pInputStream);
-
-                    if(pInputStream != OpcUa_Null)
-                    {
-                        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsListener_ReadEventHandler: InputStream wasn't correctly released! Deleting it!\n");
-                        OpcUa_HttpsStream_Close((OpcUa_Stream*)pInputStream);
-                        OpcUa_HttpsStream_Delete((OpcUa_Stream**)&pInputStream);
-
-                        /* release reference between stream and connection */
-                        OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
-                                                                                &pListenerConnection);
-                    }
-
-                    if(OpcUa_IsBad(uStatus))
-                    {
-                        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Process Request returned an error (0x%08X)!\n", uStatus);
-
-                        if(pHttpsListener->bShutdown == OpcUa_False)
-                        {
-                            if(OpcUa_IsEqual(OpcUa_BadDisconnect))
-                            {
-                                OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket because handler returned OpcUa_BadDisconnect!\n");
-                            }
-                            else
-                            {
-                                /* send error message */
-                                OpcUa_HttpsListener_SendImmediateResponse(  a_pListener,
-                                                                            (OpcUa_Handle)pListenerConnection,
-                                                                            OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR,
-                                                                            OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR_TEXT,
-                                                                            "Server: OPC-ANSI-C-HTTPS-API/0.1\r\n"
-                                                                            "Content-Type: application/octet-stream\r\n",
-                                                                            OpcUa_Null,
-                                                                            0);
-
-                                OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket (0x%08X)!\n", uStatus);
-                            }
-
-                            OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &pListenerConnection);
-                        }
-                    }
-                }
-                else /* no connection object for this socket */
-                {
-                    OpcUa_Socket hSocket = OpcUa_Null;
-
-                    OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Received request for nonexisting connection!\n");
-
-                    OpcUa_HttpsStream_GetSocket((OpcUa_Stream*)pInputStream, &hSocket);
-                    OPCUA_P_SOCKET_CLOSE(hSocket);
-
+                    OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsListener_ReadEventHandler: InputStream wasn't correctly released! Deleting it!\n");
                     OpcUa_HttpsStream_Close((OpcUa_Stream*)pInputStream);
                     OpcUa_HttpsStream_Delete((OpcUa_Stream**)&pInputStream);
+
+                    /* release reference between stream and connection */
+                    OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager,
+                                                                            &pListenerConnection);
+                }
+
+                if(OpcUa_IsBad(uStatus))
+                {
+                    OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Process Request returned an error (0x%08X)!\n", uStatus);
+
+                    if(pHttpsListener->bShutdown == OpcUa_False)
+                    {
+                        if(OpcUa_IsEqual(OpcUa_BadDisconnect))
+                        {
+                            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket because handler returned OpcUa_BadDisconnect!\n");
+                        }
+                        else
+                        {
+                            /* send error message */
+                            OpcUa_HttpsListener_SendImmediateResponse(  a_pListener,
+                                                                        (OpcUa_Handle)pListenerConnection,
+                                                                        OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR,
+                                                                        OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR_TEXT,
+                                                                        "Server: OPC-ANSI-C-HTTPS-API/0.1\r\n"
+                                                                        "Content-Type: application/octet-stream\r\n",
+                                                                        OpcUa_Null,
+                                                                        0);
+
+                            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket (0x%08X)!\n", uStatus);
+                        }
+
+                        OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &pListenerConnection);
+                    }
                 }
             }
             else
@@ -1628,6 +1556,9 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ReadEventHandler");
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &pListenerConnection);
+
 OpcUa_FinishErrorHandling;
 }
 
