@@ -284,6 +284,11 @@ OpcUa_Void OpcUa_SecureListener_ChannelManager_Clear(
 {
     OpcUa_SecureChannel* pTmpSecureChannel = OpcUa_Null;
 
+    if(OpcUa_Null != a_pChannelManager->hLifeTimeWatchDog)
+    {
+        OpcUa_Timer_Delete(&(a_pChannelManager->hLifeTimeWatchDog));
+    }
+
     if(OpcUa_Null != a_pChannelManager->SecureChannels)
     {
         /* remove all channels and delete list */
@@ -302,11 +307,6 @@ OpcUa_Void OpcUa_SecureListener_ChannelManager_Clear(
 
         OpcUa_List_Leave(a_pChannelManager->SecureChannels);
         OpcUa_List_Delete(&(a_pChannelManager->SecureChannels));
-    }
-
-    if(OpcUa_Null != a_pChannelManager->hLifeTimeWatchDog)
-    {
-        OpcUa_Timer_Delete(&(a_pChannelManager->hLifeTimeWatchDog));
     }
 }
 
