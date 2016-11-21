@@ -230,11 +230,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_Create");
 
     OpcUa_GotoErrorIfBad(uStatus);
 
-    if(pSecureChannelMngr->SecureChannels == OpcUa_Null)
-    {
-        OpcUa_SecureListener_ChannelManager_Delete(&pSecureChannelMngr);
-    }
-
     *a_ppChannelManager = pSecureChannelMngr;
 
 OpcUa_ReturnStatusCode;
@@ -257,6 +252,8 @@ OpcUa_StatusCode OpcUa_SecureListener_ChannelManager_Initialize(
 OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_Initialize");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pChannelManager);
+
+    OpcUa_MemSet(a_pChannelManager, 0, sizeof(OpcUa_SecureListener_ChannelManager));
 
     uStatus = OpcUa_List_Create(&(a_pChannelManager->SecureChannels));
     OpcUa_GotoErrorIfBad(uStatus);
