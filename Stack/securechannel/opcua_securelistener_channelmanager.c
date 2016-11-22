@@ -389,6 +389,13 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_AddChannel")
 
     OpcUa_List_GetNumberOfElements(a_pChannelManager->SecureChannels, &nChannelCount);
 
+#if OPCUA_SECURELISTENER_MAXCONNECTIONS != 0
+    if(nChannelCount >= OPCUA_SECURELISTENER_MAXCONNECTIONS)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadMaxConnectionsReached);
+    }
+#endif
+
     a_pChannel->uRefCount = 0;
     a_pChannel->ReleaseMethod = OpcUa_SecureListener_ChannelManager_ReleaseChannel;
     a_pChannel->ReleaseParam  = a_pChannelManager;
@@ -401,7 +408,9 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_AddChannel")
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
     OpcUa_List_Leave(a_pChannelManager->SecureChannels);
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -439,7 +448,9 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ChannelManager_ReleaseChann
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
     OpcUa_List_Leave(a_pChannelManager->SecureChannels);
+
 OpcUa_FinishErrorHandling;
 }
 
