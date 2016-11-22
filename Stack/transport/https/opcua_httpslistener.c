@@ -442,10 +442,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "BeginSendResponse");
                                            &eMethod);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    /* close and delete the incoming stream - double close is ignored (uncritical) */
-    OpcUa_Stream_Close((OpcUa_Stream*)(*a_ppInputStream));
-    OpcUa_Stream_Delete((OpcUa_Stream**)a_ppInputStream);
-
     if(eMethod != OpcUa_HttpsStream_Method_Get)
     {
         /* create buffer for writing */
@@ -474,14 +470,19 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "BeginSendResponse");
                                                     a_hConnection,
                                                     a_ppOutputStream);
     }
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    /* close and delete the incoming stream - double close is ignored (uncritical) */
+    OpcUa_Stream_Close((OpcUa_Stream*)(*a_ppInputStream));
+    OpcUa_Stream_Delete((OpcUa_Stream**)a_ppInputStream);
 
 #if !OPCUA_HTTPSLISTENER_CLOSE_SOCKET_AFTER_RESPONSE
     /* set keep-alive header if requested */
     if(pListenerConnection->bKeepAlive != OpcUa_False)
     {
-        uStatus = OpcUa_HttpsStream_SetHeader(  (OpcUa_Stream*)(*a_ppOutputStream),
-                                                OpcUa_String_FromCString("Connection"),
-                                                OpcUa_String_FromCString("keep-alive"));
+        OpcUa_HttpsStream_SetHeader(  (OpcUa_Stream*)(*a_ppOutputStream),
+                                      OpcUa_String_FromCString("Connection"),
+                                      OpcUa_String_FromCString("keep-alive"));
     }
 #endif
 
@@ -779,15 +780,23 @@ OpcUa_StatusCode OpcUa_HttpsListener_AbortSendResponse(
     OpcUa_String*           a_sReason,
     OpcUa_OutputStream**    a_ppOutputStream)
 {
+    OpcUa_HttpsListener*             pHttpsListener         = OpcUa_Null;
+    OpcUa_HttpsListener_Connection*  pListenerConnection    = OpcUa_Null;
+
 OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "OpcUa_HttpsListener_AbortSendResponse");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pListener);
     OpcUa_ReturnErrorIfArgumentNull(a_pListener->AbortSendResponse);
 
+    pHttpsListener = (OpcUa_HttpsListener*)a_pListener->Handle;
+
     if(a_ppOutputStream != OpcUa_Null)
     {
         /* clean up */
+        OpcUa_HttpsStream_GetConnection(*a_ppOutputStream, (OpcUa_Handle*)&pListenerConnection);
         OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppOutputStream);
+        OpcUa_HttpsListener_ConnectionManager_ReleaseConnection( pHttpsListener->pConnectionManager,
+                                                                &pListenerConnection);
     }
     else
     {
@@ -1077,6 +1086,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessDisconnect");
     pListenerConnection->uDisconnectTime = OpcUa_GetTickCount();
 
     OpcUa_List_Enter(pHttpsListener->pConnectionManager->Connections);
+    pListenerConnection->iReferenceCount--;
     if(pListenerConnection->Socket != OpcUa_Null)
     {
         pSocket = pListenerConnection->Socket;
@@ -1517,30 +1527,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ReadEventHandler");
                 if(OpcUa_IsBad(uStatus))
                 {
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Process Request returned an error (0x%08X)!\n", uStatus);
-
-                    if(pHttpsListener->bShutdown == OpcUa_False)
-                    {
-                        if(OpcUa_IsEqual(OpcUa_BadDisconnect))
-                        {
-                            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket because handler returned OpcUa_BadDisconnect!\n");
-                        }
-                        else
-                        {
-                            /* send error message */
-                            OpcUa_HttpsListener_SendImmediateResponse(  a_pListener,
-                                                                        (OpcUa_Handle)pListenerConnection,
-                                                                        OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR,
-                                                                        OPCUA_HTTP_STATUS_INTERNAL_SERVER_ERROR_TEXT,
-                                                                        "Server: OPC-ANSI-C-HTTPS-API/0.1\r\n"
-                                                                        "Content-Type: application/octet-stream\r\n",
-                                                                        OpcUa_Null,
-                                                                        0);
-
-                            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsListener_ReadEventHandler: Closing socket (0x%08X)!\n", uStatus);
-                        }
-
-                        OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &pListenerConnection);
-                    }
                 }
             }
             else
@@ -1606,6 +1592,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AcceptEventHandler");
         uStatus = OpcUa_HttpsListener_Connection_Create(&pListenerConnection);
         OpcUa_GotoErrorIfBad(uStatus);
 
+        pListenerConnection->iReferenceCount  = 1;
         pListenerConnection->Socket           = a_hSocket;
         pListenerConnection->pListenerHandle  = (OpcUa_Listener*)a_pListener;
         pListenerConnection->uLastReceiveTime = OpcUa_GetTickCount();
@@ -1852,9 +1839,9 @@ OpcUa_StatusCode OpcUa_HttpsListener_Close(OpcUa_Listener* a_pListener)
         pHttpsListener->Socket = OpcUa_Null;
     }
 
-#if OPCUA_MULTITHREADED
-
     OPCUA_P_MUTEX_UNLOCK(pHttpsListener->Mutex);
+
+#if OPCUA_MULTITHREADED
 
     /* check if socket list handle is valid */
     if(pHttpsListener->SocketManager != OpcUa_Null)
@@ -1863,15 +1850,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_Close(OpcUa_Listener* a_pListener)
         OPCUA_P_SOCKETMANAGER_DELETE(&(pHttpsListener->SocketManager));
     }
 
-    /* lock connection and close the socket. */
-    OPCUA_P_MUTEX_LOCK(pHttpsListener->Mutex);
-
 #endif /* OPCUA_MULTITHREADED */
-
-    /* cleanup all connections */
-    OpcUa_HttpsListener_ConnectionManager_RemoveConnections(pHttpsListener->pConnectionManager);
-
-    OPCUA_P_MUTEX_UNLOCK(pHttpsListener->Mutex);
 
     pHttpsListener->pfSecureChannelCallback(    0,                                           /* channel id - this should be a reserved one */
                                                 eOpcUa_SecureListener_SecureChannelClose,    /* event type */

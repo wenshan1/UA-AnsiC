@@ -263,43 +263,6 @@ Error:
     return OpcUa_Bad;
 }
 
-/*==============================================================================*/
-/* Delete all connections                                                       */
-/*==============================================================================*/
-/* Iterates over all connections, closes and deletes each. The given callback is called everytime. */
-OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_RemoveConnections(
-    OpcUa_HttpsListener_ConnectionManager* a_pConnectionManager)
-{
-    OpcUa_StatusCode                  uStatus         = OpcUa_Good;
-    OpcUa_HttpsListener_Connection*   httpConnection   = OpcUa_Null;
-
-    OpcUa_DeclareErrorTraceModule(OpcUa_Module_HttpListener);
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pConnectionManager);
-
-    /* obtain lock on the list */
-    OpcUa_List_Enter(a_pConnectionManager->Connections);
-
-    /* prepare cursor for iteration over all elements */
-    OpcUa_List_ResetCurrent(a_pConnectionManager->Connections);
-    httpConnection = (OpcUa_HttpsListener_Connection*)OpcUa_List_GetCurrentElement(a_pConnectionManager->Connections);
-
-    /* check every Connection for deletion */
-    while(httpConnection != OpcUa_Null)
-    {
-        OpcUa_HttpsListener_Connection_Delete((&httpConnection));
-        OpcUa_List_DeleteCurrentElement(a_pConnectionManager->Connections);
-        httpConnection = (OpcUa_HttpsListener_Connection*)OpcUa_List_GetCurrentElement(a_pConnectionManager->Connections);
-    }
-
-    /* list must be empty here */
-
-    /* leave it */
-    OpcUa_List_Leave(a_pConnectionManager->Connections);
-
-    return uStatus;
-}
-
 /***  HttpListener_Connection Class  ***/
 
 

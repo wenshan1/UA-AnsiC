@@ -96,19 +96,19 @@ struct _OpcUa_HttpsListener_ConnectionManager
     OpcUa_Listener*                         Listener;
 };
 
-/* @brief */
+/* @brief Create a new connection manager object. */
 OpcUa_StatusCode    OpcUa_HttpsListener_ConnectionManager_Create(
     OpcUa_HttpsListener_ConnectionManager** ppConnectionManager);
 
-/* @brief */
+/* @brief Initialize a new connection manager object. */
 OpcUa_StatusCode    OpcUa_HttpsListener_ConnectionManager_Initialize(
     OpcUa_HttpsListener_ConnectionManager*  ppConnectionManager);
 
-/* @brief */
+/* @brief Clear the connection manager object. */
 OpcUa_Void          OpcUa_HttpsListener_ConnectionManager_Clear(
     OpcUa_HttpsListener_ConnectionManager*  ConnectionManager);
 
-/* @brief */
+/* @brief Delete the connection manager object. */
 OpcUa_Void          OpcUa_HttpsListener_ConnectionManager_Delete(
     OpcUa_HttpsListener_ConnectionManager** ppConnectionManager);
 
@@ -129,11 +129,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(
     OpcUa_HttpsListener_ConnectionManager*    a_pConnectionManager,
     OpcUa_HttpsListener_Connection**          a_ppConnection);
 
-/* @brief Remove all connections managed by the listener and call the given function for everyone. */
-OpcUa_StatusCode    OpcUa_HttpsListener_ConnectionManager_RemoveConnections(
-    OpcUa_HttpsListener_ConnectionManager*  ConnectionManager);
-
-/* @brief . */
+/* @brief Get the current number of managed connections. */
 OpcUa_StatusCode    OpcUa_HttpsListener_ConnectionManager_GetConnectionCount(
     OpcUa_HttpsListener_ConnectionManager*  ConnectionManager,
     OpcUa_UInt32*                           pNoOfConnections);
