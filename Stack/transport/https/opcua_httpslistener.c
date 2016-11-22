@@ -501,7 +501,6 @@ OpcUa_StatusCode OpcUa_HttpsListener_SendImmediateResponse(
     OpcUa_Byte*         a_pResponseData,
     OpcUa_UInt32        a_uResponseLength)
 {
-    OpcUa_HttpsListener*             pHttpsListener         = OpcUa_Null;
     OpcUa_HttpsListener_Connection*  pListenerConnection    = OpcUa_Null;
     OpcUa_OutputStream*              pOutputStream          = OpcUa_Null;
 
@@ -514,7 +513,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "SendImmediateResponse");
                              && a_pResponseData == OpcUa_Null,
                             OpcUa_BadInvalidArgument);
 
-    pHttpsListener       = (OpcUa_HttpsListener*)a_pListener->Handle;
     pListenerConnection = (OpcUa_HttpsListener_Connection*)a_hConnection;
 
     OpcUa_ReturnErrorIfTrue(pListenerConnection->bConnected == OpcUa_False, 
