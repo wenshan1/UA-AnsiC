@@ -130,8 +130,6 @@ struct _OpcUa_HttpsListener
     OpcUa_Listener_PfnOnNotify*                         pfListenerCallback;
     /** @brief Data passed with the callback function. */
     OpcUa_Void*                                         pvListenerCallbackData;
-    /** @brief This Listener should shut down. */
-    OpcUa_Boolean                                       bShutdown;
     /** @brief Holds the information about connected clients and helps verifying requests. */
     OpcUa_HttpsListener_ConnectionManager*              pConnectionManager;
     /** @brief Certificate used for SSL/TLS connections. */
@@ -519,11 +517,8 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "SendImmediateResponse");
     pHttpsListener       = (OpcUa_HttpsListener*)a_pListener->Handle;
     pListenerConnection = (OpcUa_HttpsListener_Connection*)a_hConnection;
 
-    if(    (pHttpsListener->bShutdown != OpcUa_False)
-        && (pListenerConnection->bConnected != OpcUa_False))
-    {
-        OpcUa_ReturnStatusCode;
-    }
+    OpcUa_ReturnErrorIfTrue(pListenerConnection->bConnected == OpcUa_False, 
+                            OpcUa_BadInvalidState);
 
     OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
                 "OpcUa_HttpsListener_SendImmediateResponse: to %s (socket %p) with StatusCode %d!\n",
@@ -1828,9 +1823,6 @@ OpcUa_StatusCode OpcUa_HttpsListener_Close(OpcUa_Listener* a_pListener)
     /* lock connection and close the socket. */
     OPCUA_P_MUTEX_LOCK(pHttpsListener->Mutex);
 
-    /* mark listener as being in shutdown mode; certain calls are no longer accepted. */
-    pHttpsListener->bShutdown = OpcUa_True;
-
     /* check if already stopped */
     if(pHttpsListener->Socket != OpcUa_Null)
     {
@@ -1946,8 +1938,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "Open");
     {
         uSocketManagerFlags |= OPCUA_SOCKET_SPAWN_THREAD_ON_ACCEPT | OPCUA_SOCKET_REJECT_ON_NO_THREAD;
     }
-
-    pHttpsListener->bShutdown = OpcUa_False;
 
     /********************************************************************/
 
