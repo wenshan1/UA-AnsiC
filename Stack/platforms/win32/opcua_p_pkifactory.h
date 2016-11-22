@@ -18,13 +18,13 @@
 #define _OpcUa_P_PKIFactory_H_ 1
 
 OPCUA_BEGIN_EXTERN_C
-/** 
+/**
   @brief Create the PKI Factory object
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_PKIFactory_CreatePKIProvider(    OpcUa_Void*         pCertificateStoreConfig,
                                                                         OpcUa_PKIProvider*  pProvider);
 
-/** 
+/**
   @brief Delete the PKI Factory object
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_PKIFactory_DeletePKIProvider(    OpcUa_PKIProvider*  pProvider);

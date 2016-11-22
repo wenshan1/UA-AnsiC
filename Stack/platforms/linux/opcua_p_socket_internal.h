@@ -229,7 +229,7 @@ OpcUa_StatusCode OpcUa_P_Socket_HandleExternalEvent(OpcUa_SocketManager SocketMa
  *
  * @return The created system socket. An invalid socket in case of error.
  */
-OpcUa_RawSocket OpcUa_P_Socket_CreateServer(OpcUa_StringA     IpAddress, 
+OpcUa_RawSocket OpcUa_P_Socket_CreateServer(OpcUa_StringA     IpAddress,
                                             OpcUa_Int16       Port,
                                             OpcUa_StatusCode* Status);
 
@@ -275,11 +275,11 @@ OpcUa_UInt16 OpcUa_Socket_HToNS(OpcUa_UInt16 a_hstShort);
 /*============================================================================
  * Set socket to nonblocking mode
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_SocketManager_InternalCreateServer(  OpcUa_SocketManager         a_pSocketManager, 
-                                                            OpcUa_StringA               a_sIpAddress, 
-                                                            OpcUa_UInt16                a_uPort, 
-                                                            OpcUa_Socket_EventCallback  a_pfnSocketCallBack, 
-                                                            OpcUa_Void*                 a_pCallbackData, 
+OpcUa_StatusCode OpcUa_SocketManager_InternalCreateServer(  OpcUa_SocketManager         a_pSocketManager,
+                                                            OpcUa_StringA               a_sIpAddress,
+                                                            OpcUa_UInt16                a_uPort,
+                                                            OpcUa_Socket_EventCallback  a_pfnSocketCallBack,
+                                                            OpcUa_Void*                 a_pCallbackData,
                                                             OpcUa_Socket*               a_ppSocket);
 
 

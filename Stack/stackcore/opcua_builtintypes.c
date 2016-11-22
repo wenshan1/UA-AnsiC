@@ -66,7 +66,7 @@ OpcUa_Void OpcUa_ByteString_Initialize(OpcUa_ByteString* a_pValue)
     {
         return;
     }
-        
+
     a_pValue->Data = OpcUa_Null;
     a_pValue->Length = -1;
 }
@@ -179,12 +179,12 @@ OpcUa_Boolean OpcUa_NodeId_IsNull(OpcUa_NodeId* a_pValue)
 
             break;
         }
-        
+
         case OpcUa_IdentifierType_Guid:
         {
             return OpcUa_Guid_IsNull(a_pValue->Identifier.Guid);
         }
-        
+
         case OpcUa_IdentifierType_Opaque:
         {
             if (a_pValue->Identifier.ByteString.Length > 0)
@@ -195,7 +195,7 @@ OpcUa_Boolean OpcUa_NodeId_IsNull(OpcUa_NodeId* a_pValue)
             break;
         }
     }
-        
+
     return OpcUa_True;
 }
 
@@ -203,7 +203,7 @@ OpcUa_Boolean OpcUa_NodeId_IsNull(OpcUa_NodeId* a_pValue)
  * OpcUa_ExpandedNodeId_Initialize
  *===========================================================================*/
 OpcUa_Void OpcUa_ExpandedNodeId_Initialize(OpcUa_ExpandedNodeId* a_pValue)
-{   
+{
     if (a_pValue == OpcUa_Null)
     {
         return;
@@ -217,7 +217,7 @@ OpcUa_Void OpcUa_ExpandedNodeId_Initialize(OpcUa_ExpandedNodeId* a_pValue)
  * OpcUa_ExpandedNodeId_Clear
  *===========================================================================*/
 OpcUa_Void OpcUa_ExpandedNodeId_Clear(OpcUa_ExpandedNodeId* a_pValue)
-{   
+{
     if (a_pValue == OpcUa_Null)
     {
         return;
@@ -250,7 +250,7 @@ OpcUa_Boolean OpcUa_ExpandedNodeId_IsNull(OpcUa_ExpandedNodeId* a_pValue)
  * OpcUa_DiagnosticInfo_Initialize
  *===========================================================================*/
 OpcUa_Void OpcUa_DiagnosticInfo_Initialize(OpcUa_DiagnosticInfo* a_pValue)
-{   
+{
     if (a_pValue == OpcUa_Null)
     {
         return;
@@ -268,7 +268,7 @@ OpcUa_Void OpcUa_DiagnosticInfo_Initialize(OpcUa_DiagnosticInfo* a_pValue)
  * OpcUa_DiagnosticInfo_Clear
  *===========================================================================*/
 OpcUa_Void OpcUa_DiagnosticInfo_Clear(OpcUa_DiagnosticInfo* a_pValue)
-{   
+{
     if (a_pValue == OpcUa_Null)
     {
         return;
@@ -294,7 +294,7 @@ void OpcUa_LocalizedText_Initialize(OpcUa_LocalizedText* a_pValue)
     {
         OpcUa_Field_Initialize(String, Locale);
         OpcUa_Field_Initialize(String, Text);
-    }   
+    }
 }
 
 /*============================================================================
@@ -306,7 +306,7 @@ void OpcUa_LocalizedText_Clear(OpcUa_LocalizedText* a_pValue)
     {
         OpcUa_Field_Clear(String, Locale);
         OpcUa_Field_Clear(String, Text);
-    }   
+    }
 }
 
 /*============================================================================
@@ -318,7 +318,7 @@ void OpcUa_QualifiedName_Initialize(OpcUa_QualifiedName* a_pValue)
     {
         OpcUa_Field_Initialize(Int32, NamespaceIndex);
         OpcUa_Field_Initialize(String, Name);
-    }   
+    }
 }
 
 /*============================================================================
@@ -330,7 +330,7 @@ void OpcUa_QualifiedName_Clear(OpcUa_QualifiedName* a_pValue)
     {
         OpcUa_Field_Clear(Int32, NamespaceIndex);
         OpcUa_Field_Clear(String, Name);
-    }   
+    }
 }
 
 /*============================================================================
@@ -467,15 +467,15 @@ OpcUa_Void OpcUa_Variant_Clear(OpcUa_Variant* a_pValue)
     else if (a_pValue->ArrayType == OpcUa_VariantArrayType_Array)
     {
         OpcUa_VariantArrayValue_Clear(
-            a_pValue->Datatype, 
-            a_pValue->Value.Array.Length, 
+            a_pValue->Datatype,
+            a_pValue->Value.Array.Length,
             &a_pValue->Value.Array.Value);
     }
     else if (a_pValue->ArrayType == OpcUa_VariantArrayType_Matrix)
     {
         OpcUa_VariantArrayValue_Clear(
-            a_pValue->Datatype, 
-            OpcUa_VariantMatrix_GetElementCount(&a_pValue->Value.Matrix), 
+            a_pValue->Datatype,
+            OpcUa_VariantMatrix_GetElementCount(&a_pValue->Value.Matrix),
             &a_pValue->Value.Matrix.Value);
 
         if (a_pValue->Value.Matrix.Dimensions != OpcUa_Null)
@@ -497,8 +497,8 @@ OpcUa_Void OpcUa_Variant_Clear(OpcUa_Variant* a_pValue)
  * OpcUa_VariantArrayValue_Clear
  *===========================================================================*/
 static OpcUa_Void OpcUa_VariantArrayValue_Clear(
-    OpcUa_UInt16             a_uDatatype, 
-    OpcUa_Int32              a_iLength, 
+    OpcUa_UInt16             a_uDatatype,
+    OpcUa_Int32              a_iLength,
     OpcUa_VariantArrayUnion* a_pValue)
 {
     OpcUa_Int32 ii = 0;
@@ -512,7 +512,7 @@ static OpcUa_Void OpcUa_VariantArrayValue_Clear(
     for (ii = 0; ii < a_iLength; ii++)
     {
         switch (a_uDatatype)
-        {   
+        {
             case OpcUaType_Null:
             case OpcUaType_Boolean:
             case OpcUaType_SByte:
@@ -610,7 +610,7 @@ static OpcUa_Void OpcUa_VariantUnion_Clear(OpcUa_UInt16 datatype, OpcUa_VariantU
     }
 
     switch (datatype)
-    {   
+    {
         case OpcUaType_Null:
         case OpcUaType_Boolean:
         case OpcUaType_SByte:

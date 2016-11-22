@@ -51,7 +51,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_GetDateTimeDiff( OpcUa_DateTime  a_Value1
     ullResult = ullValue2 - ullValue1;
 
     a_pResult->dwLowDateTime = (OpcUa_UInt32)(ullResult & 0x00000000FFFFFFFFll);
-    a_pResult->dwHighDateTime = (OpcUa_UInt32)((ullResult & 0xFFFFFFFF00000000ll) >> 32);    
+    a_pResult->dwHighDateTime = (OpcUa_UInt32)((ullResult & 0xFFFFFFFF00000000ll) >> 32);
 
     return OpcUa_Good;
 }

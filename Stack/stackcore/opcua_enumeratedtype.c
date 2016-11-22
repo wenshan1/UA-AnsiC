@@ -24,7 +24,7 @@ OpcUa_StatusCode OpcUa_EnumeratedType_FindName(
     OpcUa_EnumeratedType* a_pType,
     OpcUa_Int32           a_nValue,
     OpcUa_StringA*        a_pName)
-{    
+{
     OpcUa_UInt32 ii = 0;
 
     OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EnumeratedType_FindName");

@@ -81,11 +81,11 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Clear(OpcUa_Void)
 }
 
 /*============================================================================
- * Activate/Deactivate Trace 
+ * Activate/Deactivate Trace
  *===========================================================================*/
-/** 
+/**
  * Activate or deactivate trace output during runtime.
- * @param a_bActive Description 
+ * @param a_bActive Description
  */
 OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Toggle(OpcUa_Boolean a_bActive)
 {
@@ -110,7 +110,7 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Toggle(OpcUa_Boolean a_bActive)
 /*============================================================================
  * Change Trace Level
  *===========================================================================*/
-/** 
+/**
  * Activate or deactivate trace output during runtime.
  * @param a_uNewTraceLevel Description
  */
@@ -155,7 +155,7 @@ OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Nop(OpcUa_UInt32     a_uTraceLevel,
  * Tracefunction
  *===========================================================================*/
 /**
-* Writes the given string and the parameters to the trace device, if the given 
+* Writes the given string and the parameters to the trace device, if the given
 * trace level is activated.
 */
 OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Imp(OpcUa_UInt32    a_uTraceLevel,
@@ -194,7 +194,7 @@ OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Imp(OpcUa_UInt32    a_uTraceLevel,
 
         OPCUA_P_STRINGA_VSNPRINTF(OpcUa_Trace_g_aTraceBuffer,
                                   OPCUA_TRACE_MAXLENGTH,
-                                  a_sFormat, 
+                                  a_sFormat,
                                   argumentList);
 
         /* send trace buffer to platform trace device */

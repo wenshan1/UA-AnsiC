@@ -92,7 +92,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Mutex_Initialize(OpcUa_Mutex hMutex)
         return OpcUa_Bad;
     }
 
-    result = pthread_mutexattr_settype(&att, PTHREAD_MUTEX_RECURSIVE); 
+    result = pthread_mutexattr_settype(&att, PTHREAD_MUTEX_RECURSIVE);
     if(result != 0)
     {
         pthread_mutexattr_destroy(&att);
@@ -128,7 +128,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Mutex_Create(OpcUa_Mutex* phMutex)
     {
         return OpcUa_BadInvalidArgument;
     }
-    
+
     pPosixMutex = OpcUa_P_Memory_Alloc(sizeof(pthread_mutex_t));
     OpcUa_ReturnErrorIfAllocFailed(pPosixMutex);
 
@@ -188,7 +188,7 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Mutex_Lock(OpcUa_Mutex hMutex)
     OpcUa_StatusCode    uStatus      = OpcUa_Good;
     int                 apiResult   = 0;
     pthread_mutex_t*    pPosixMutex = (pthread_mutex_t*)(hMutex);
-    
+
     if(hMutex == OpcUa_Null)
     {
         printf("Error: OpcUa_P_Mutex_Lock!\n");
@@ -197,7 +197,7 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Mutex_Lock(OpcUa_Mutex hMutex)
     }
 
     apiResult = pthread_mutex_lock(pPosixMutex);
-    
+
     if(apiResult != 0)
     {
         /* debug; makes no sense, i know */
@@ -427,7 +427,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Mutex_CreateImp(OpcUa_Mutex* a_phMutex)
     }
 
 #if OPCUA_MUTEX_USE_SPINCOUNT
-    bRet = InitializeCriticalSectionAndSpinCount(   lpCriticalSection, 
+    bRet = InitializeCriticalSectionAndSpinCount(   lpCriticalSection,
                                                     0x00000400) ;
     if (bRet == 0)
     {
@@ -478,9 +478,9 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Mutex_LockImp(OpcUa_Mutex hMutex)
         /* printf("Error: OpcUa_P_Mutex_Lock!\n"); */
         return;
     }
-    
+
     EnterCriticalSection((CRITICAL_SECTION*)hMutex);
-    
+
     return;
 }
 

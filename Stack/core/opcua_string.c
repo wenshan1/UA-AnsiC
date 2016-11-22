@@ -231,9 +231,9 @@ OpcUa_ReturnErrorIfArgumentNull(a_ppNewString);
 
             if(a_uLength != 0)
             {
-                retVal = OpcUa_P_String_StrnCpy(    pStringInt->strContent, 
-                                                    a_uLength, 
-                                                    a_strSource, 
+                retVal = OpcUa_P_String_StrnCpy(    pStringInt->strContent,
+                                                    a_uLength,
+                                                    a_strSource,
                                                     a_uLength);
             }
         }
@@ -257,7 +257,7 @@ OpcUa_ReturnErrorIfArgumentNull(a_ppNewString);
 
 
 /*============================================================================
-* 
+*
 *===========================================================================*/
 OpcUa_StatusCode OpcUa_String_AttachToString(  /* in */ OpcUa_StringA              a_strSource,
                                                /* in */ OpcUa_UInt32               a_uLength,
@@ -294,9 +294,9 @@ OpcUa_StatusCode OpcUa_String_AttachToString(  /* in */ OpcUa_StringA           
 
         OpcUa_ReturnErrorIfAllocFailed(pStringInt->strContent);
 
-        OpcUa_MemCpy(    pStringInt->strContent, 
-                                a_uLength, 
-                                a_strSource, 
+        OpcUa_MemCpy(    pStringInt->strContent,
+                                a_uLength,
+                                a_strSource,
                                 a_uLength);
 
         pStringInt->strContent[a_uLength]   = '\0';
@@ -350,7 +350,7 @@ OpcUa_Void OpcUa_String_Delete(OpcUa_String** a_ppString)
 
 
 /*============================================================================
-* 
+*
 *===========================================================================*/
 OpcUa_Void OpcUa_String_Clear(OpcUa_String* a_pString)
 {
@@ -518,7 +518,7 @@ OpcUa_UInt32 OpcUa_String_StrLen(const OpcUa_String*  a_pString)
 *===========================================================================*/
 OpcUa_StatusCode OpcUa_String_StrnCpy( OpcUa_String*       a_pDestString,
                                        const OpcUa_String* a_pSrcString,
-                                       OpcUa_UInt32        a_uLength) 
+                                       OpcUa_UInt32        a_uLength)
 {
     OpcUa_StringA           strRawSrc   = OpcUa_Null;
     OpcUa_UInt32            uiSrcLen    = 0;
@@ -543,7 +543,7 @@ OpcUa_StatusCode OpcUa_String_StrnCpy( OpcUa_String*       a_pDestString,
     if(OpcUa_String_IsNull(a_pSrcString))
     {
         return OpcUa_Good;
-    }   
+    }
 
     strRawSrc  = _OpcUa_String_GetRawString(a_pSrcString);
 
@@ -558,10 +558,10 @@ OpcUa_StatusCode OpcUa_String_StrnCpy( OpcUa_String*       a_pDestString,
         uiSrcLen  = (a_uLength < pStringInt->uLength)?a_uLength:pStringInt->uLength;
     }
 
-    uStatus = OpcUa_String_AttachToString(  strRawSrc, 
-                                            uiSrcLen, 
-                                            0, 
-                                            OpcUa_True, 
+    uStatus = OpcUa_String_AttachToString(  strRawSrc,
+                                            uiSrcLen,
+                                            0,
+                                            OpcUa_True,
                                             OpcUa_True, /* since we copy, this is irrelevant... */
                                             a_pDestString);
     return uStatus;
@@ -604,7 +604,7 @@ OpcUa_StatusCode OpcUa_String_StrnCat(  OpcUa_String*       a_pDestString,
     {
         a_uLength = uiSrcLen;
     }
- 
+
     OpcUa_ReturnErrorIfBad( _OpcUa_ExpandString(    a_pDestString,             /* string to expand */
                                                     a_uLength + uiDestLen + 1, /* new len = dest len + length of bytes to append */
                                                     &uiTempLen,                /* limit len and new buffer len */
@@ -627,7 +627,7 @@ OpcUa_StatusCode OpcUa_String_StrnCat(  OpcUa_String*       a_pDestString,
 /*============================================================================
  * Compare two OpcUa_Strings
  *===========================================================================*/
-OpcUa_Int32 OpcUa_String_StrnCmp(   const OpcUa_String* a_pLeftString, 
+OpcUa_Int32 OpcUa_String_StrnCmp(   const OpcUa_String* a_pLeftString,
                                     const OpcUa_String* a_pRightString,
                                     OpcUa_UInt32        a_uLength,
                                     OpcUa_Boolean       a_bIgnoreCase )
@@ -703,7 +703,7 @@ OpcUa_StatusCode OpcUa_String_AttachReadOnly(OpcUa_String* a_pDst, const OpcUa_S
 {
     OpcUa_StatusCode uStatus = OpcUa_String_AttachToString(
         a_pSrc,
-        OPCUA_STRINGLENZEROTERMINATED, 
+        OPCUA_STRINGLENZEROTERMINATED,
         0,
         OpcUa_False,  /* attach the source without copying */
         OpcUa_False,  /* do not free the attached value */
@@ -719,7 +719,7 @@ OpcUa_StatusCode OpcUa_String_AttachCopy(OpcUa_String* a_pDst, const OpcUa_Strin
 {
     OpcUa_StatusCode uStatus = OpcUa_String_AttachToString(
         a_pSrc,
-        OPCUA_STRINGLENZEROTERMINATED, 
+        OPCUA_STRINGLENZEROTERMINATED,
         0,
         OpcUa_True, /* copy the given string */
         OpcUa_True, /* irrelevant due to copy; could be OpcUa_False as well */
@@ -735,7 +735,7 @@ OpcUa_StatusCode OpcUa_String_AttachWithOwnership(OpcUa_String* a_pDst, OpcUa_St
 {
     OpcUa_StatusCode uStatus = OpcUa_String_AttachToString(
         a_pSrc,
-        OPCUA_STRINGLENZEROTERMINATED, 
+        OPCUA_STRINGLENZEROTERMINATED,
         0,
         OpcUa_False, /* attach the source without copying */
         OpcUa_True,  /* and free the attached string on clearing */

@@ -20,34 +20,34 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @brief Allocates a new block of memory.
  *
  * @param nSize [in] The size of the block to allocate.
 */
 OPCUA_EXPORT OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_Alloc(OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @brief Reallocates a block of memory
  *
  * @param pBuffer [in] The existing memory block.
  * @param nSize   [in] The size of the block to allocate.
 */
-OPCUA_EXPORT OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_ReAlloc(OpcUa_Void*  pBuffer, 
+OPCUA_EXPORT OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_ReAlloc(OpcUa_Void*  pBuffer,
                                                             OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @brief Frees a block of memory.
  *
  * @param pvBuffer [in] The existing memory block.
 */
 OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Memory_Free(OpcUa_Void* pvBuffer);
 
-/** 
+/**
  * @brief Copies a block of memory.
  *
  * @param pBuffer      [in] The destination memory block.
- * @param nSizeInBytes [in] The size of the destination memory block. 
+ * @param nSizeInBytes [in] The size of the destination memory block.
  * @param pSource      [in] The memory block being copied.
  * @param nCount       [in] The number of bytes to copy.
  *

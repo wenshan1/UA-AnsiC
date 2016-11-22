@@ -22,7 +22,7 @@ struct _OpcUa_Stream;
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @brief Associates a supported security policy with message security modes.
  */
 struct _OpcUa_Endpoint_SecurityPolicyConfiguration
@@ -30,19 +30,19 @@ struct _OpcUa_Endpoint_SecurityPolicyConfiguration
     /** @brief The URI of a supported security policy. */
     OpcUa_String        sSecurityPolicy;
     /** @brief The message security modes allowed for the security policy. (bitmask) */
-    OpcUa_UInt16        uMessageSecurityModes;   
+    OpcUa_UInt16        uMessageSecurityModes;
     /** @brief The client certificate, if provided. */
     OpcUa_ByteString*   pbsClientCertificate;
 };
 
 typedef struct _OpcUa_Endpoint_SecurityPolicyConfiguration OpcUa_Endpoint_SecurityPolicyConfiguration;
 
-/** 
+/**
  * @brief Manages an endpoint for a server.
  */
 typedef OpcUa_Void* OpcUa_Endpoint;
 
-/** 
+/**
  * @brief Types of serializers supported by the endpoint.
  *
  * @see OpcUa_Endpoint_Create
@@ -64,7 +64,7 @@ typedef enum _OpcUa_Endpoint_SerializerType
 #define OPCUA_ENDPOINT_MESSAGESECURITYMODE_SIGN            0x02
 #define OPCUA_ENDPOINT_MESSAGESECURITYMODE_SIGNANDENCRYPT  0x04
 
-/** 
+/**
  * @brief Used to complete processing of a service request.
  *
  * @param hEndpoint [in] The endpoint that received the request.
@@ -76,14 +76,14 @@ typedef OpcUa_StatusCode (OpcUa_PfnEndInvokeService)(
     struct _OpcUa_Stream*       pOstrm,
     OpcUa_Void*                 pResponse,
     OpcUa_EncodeableType*       pResponseType);
-   
-/** 
+
+/**
  * @brief Used to start processing of a service request.
  *
- * This method may block or it may return immediately and process the request 
+ * This method may block or it may return immediately and process the request
  * asynchronously. In both cases, the implementer must end the request by invoking
  * the callback.
- * 
+ *
  * This method takes ownership of the stream and response objects and may complete
  * asynchronously. A success code returned from this message does not mean the response
  * reached its destination.
@@ -97,8 +97,8 @@ typedef OpcUa_StatusCode (OpcUa_PfnBeginInvokeService)(
     OpcUa_Handle            hContext,
     OpcUa_Void**            ppRequest,
     OpcUa_EncodeableType*   pRequestType);
-    
-/** 
+
+/**
  * @brief A function that implements a service.
  *
  * The exact set of arguments depends on the service type.
@@ -107,7 +107,7 @@ typedef OpcUa_StatusCode (OpcUa_PfnBeginInvokeService)(
  */
 typedef OpcUa_StatusCode (OpcUa_PfnInvokeService)(OpcUa_Endpoint hEndpoint, ...);
 
-/** 
+/**
  * @brief Describes a service supported by an endpoint.
  */
 struct _OpcUa_ServiceType
@@ -117,16 +117,16 @@ struct _OpcUa_ServiceType
 
     /*! @brief The type object for the service response */
     OpcUa_EncodeableType* ResponseType;
-    
+
     /*! @brief The function used to start request processing. */
     OpcUa_PfnBeginInvokeService* BeginInvoke;
-    
+
     /*! @brief The function used to invoke the service. */
     OpcUa_PfnInvokeService* Invoke;
 };
 typedef struct _OpcUa_ServiceType OpcUa_ServiceType;
 
-/** 
+/**
  * @brief Creates a new endpoint.
  *
  * @param phEndpoint            [out] The new endpoint.
@@ -138,7 +138,7 @@ OpcUa_StatusCode OpcUa_Endpoint_Create( OpcUa_Endpoint*                     phEn
                                         OpcUa_Endpoint_SerializerType       eSerializerType,
                                         OpcUa_ServiceType**                 pSupportedServices);
 
-/** 
+/**
  * @brief Deletes an endpoint.
  *
  * @param phEndpoint [in/out] The endpoint to delete.
@@ -146,7 +146,7 @@ OpcUa_StatusCode OpcUa_Endpoint_Create( OpcUa_Endpoint*                     phEn
 OPCUA_EXPORT
 OpcUa_Void OpcUa_Endpoint_Delete(OpcUa_Endpoint* phEndpoint);
 
-/** 
+/**
  * @brief Types of events that can occur at an endpoint and get reported to the application.
  */
 typedef enum eOpcUa_Endpoint_Event
@@ -165,7 +165,7 @@ typedef enum eOpcUa_Endpoint_Event
     eOpcUa_Endpoint_Event_DecoderError
 } OpcUa_Endpoint_Event;
 
-/** 
+/**
  * @brief Describes the function that gets called by the endpoint on certain events. (@see OpcUa_Endpoint_Event)
  *
  * The type of function gets called by the endpoint
@@ -179,7 +179,7 @@ typedef enum eOpcUa_Endpoint_Event
  * @param pSecurityPolicy           [in] The security policy, if the event type refers to a secure channel.
  * @param uSecurityMode             [in] The security mode, if the event type refers to a secure channel.
  */
-typedef OpcUa_StatusCode (OpcUa_Endpoint_PfnEndpointCallback)( 
+typedef OpcUa_StatusCode (OpcUa_Endpoint_PfnEndpointCallback)(
     OpcUa_Endpoint          hEndpoint,
     OpcUa_Void*             pvCallbackData,
     OpcUa_Endpoint_Event    eEvent,
@@ -189,7 +189,7 @@ typedef OpcUa_StatusCode (OpcUa_Endpoint_PfnEndpointCallback)(
     OpcUa_String*           pSecurityPolicy,
     OpcUa_UInt16            uSecurityMode);
 
-/** 
+/**
  * @brief Obtain the id of the secure channel over which a certain message was transported.
  *
  * @param hEndpoint         [in] The endpoint.
@@ -197,12 +197,12 @@ typedef OpcUa_StatusCode (OpcUa_Endpoint_PfnEndpointCallback)(
  * @param pSecureChannelId [out] Contains the id of the secure channel if call succeeds.
  */
 OPCUA_EXPORT
-OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelId(  
+OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelId(
     OpcUa_Endpoint  hEndpoint,
     OpcUa_Handle    hContext,
     OpcUa_UInt32*   pSecureChannelId);
 
-/** 
+/**
  * @brief Obtain the security policy used for the secure channel over which a certain message was transported.
  *
  * @param hEndpoint         [in]    The endpoint.
@@ -210,13 +210,13 @@ OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelId(
  * @param pSecurityPolicy  [out]   Contains the security policy of the secure channel if call succeeds. Must not(!) be deleted by caller.
  */
 OPCUA_EXPORT
-OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy(      
+OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy(
     OpcUa_Endpoint                              hEndpoint,
     OpcUa_Handle                                hContext,
     OpcUa_Endpoint_SecurityPolicyConfiguration* pSecurityPolicy);
 
 
-/** 
+/**
  * @brief Starts accepting connections for the endpoint on the given URL.
  *
  * @param hEndpoint                 [in] The endpoint to open.
@@ -231,7 +231,7 @@ OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy(
  * @param pSecurityPolicies         [in] Array with security policies supported by the endpoint.
  */
 OPCUA_EXPORT
-OpcUa_StatusCode OpcUa_Endpoint_Open(   
+OpcUa_StatusCode OpcUa_Endpoint_Open(
     OpcUa_Endpoint                              hEndpoint,
     OpcUa_StringA                               sUrl,
     OpcUa_Boolean                               bListenOnAllInterfaces,
@@ -243,7 +243,7 @@ OpcUa_StatusCode OpcUa_Endpoint_Open(
     OpcUa_UInt32                                nNoOfSecurityPolicies,
     OpcUa_Endpoint_SecurityPolicyConfiguration* pSecurityPolicies);
 
-/** 
+/**
  * @brief Stops accepting connections for the endpoint.
  *
  * @param hEndpoint [in] The endpoint to close.
@@ -251,8 +251,8 @@ OpcUa_StatusCode OpcUa_Endpoint_Open(
 OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_Endpoint_Close(OpcUa_Endpoint hEndpoint);
 
-    
-/** 
+
+/**
  * @brief Creates a response object to use for a request.
  *
  * @param hEndpoint  [in]  The endpoint which received the request.
@@ -266,7 +266,7 @@ OpcUa_StatusCode OpcUa_Endpoint_BeginSendResponse(
     OpcUa_Void**           ppResponse,
     OpcUa_EncodeableType** ppResponseType);
 
-/** 
+/**
  * @brief Sends the response for a request.
  *
  * If the status code is Bad the response object must be null. (HINT: is ignored)
@@ -289,7 +289,7 @@ OpcUa_StatusCode OpcUa_Endpoint_EndSendResponse(
     OpcUa_Void*           pResponse,
     OpcUa_EncodeableType* pResponseType);
 
-/** 
+/**
  * @brief Cancels the response for a request.
  *
  * Cleans up resources allocated by OpcUa_Endpoint_BeginSendResponse
@@ -307,10 +307,10 @@ OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_Endpoint_CancelSendResponse(
     OpcUa_Endpoint        hEndpoint,
     OpcUa_StatusCode      uStatus,
-    OpcUa_String*         psReason,            
+    OpcUa_String*         psReason,
     OpcUa_Handle*         hContext);
 
-/** 
+/**
  * @brief Sends an error response for a request.
  *
  * @param hEndpoint [in] The endpoint which received the request.
@@ -324,7 +324,7 @@ OpcUa_Void OpcUa_Endpoint_SendErrorResponse(
     OpcUa_StatusCode  uStatus);
 
 
-/** 
+/**
  * @brief Returns a pointer to the function that implements the service.
  *
  * @param hEndpoint [in]  The endpoint which received the request.
@@ -337,14 +337,14 @@ OpcUa_StatusCode OpcUa_Endpoint_GetServiceFunction(
     OpcUa_Handle             hContext,
     OpcUa_PfnInvokeService** ppInvoke);
 
-/** 
+/**
  * @brief Updates the functions called when a message arrives.
  *
  * The default BeginInvoke function will call the Invoke function. If the BeginInvoke
- * function is changed then the Invoke function will never be called unless the 
+ * function is changed then the Invoke function will never be called unless the
  * new implementation calls it directly. Passing null for any of the function pointers
  * will leave the function table unchanged.
- * 
+ *
  * @param hEndpoint      [in] The endpoint which received the request.
  * @param uRequestTypeId [in] The type id for the service request.
  * @param pBeginInvoke   [in] A pointer to the begin invoke function.
@@ -357,9 +357,9 @@ OpcUa_StatusCode OpcUa_Endpoint_UpdateServiceFunctions(
     OpcUa_PfnBeginInvokeService* pBeginInvoke,
     OpcUa_PfnInvokeService*      pInvoke);
 
-/** 
+/**
  * @brief  Returns the callback data given in Endpoint_Open.
- * 
+ *
  * @param hEndpoint      [in] The endpoint handle.
  * @param ppTypes       [out] Set to the value of callback data if function returns a good status. Else undefinied.
  */
@@ -368,9 +368,9 @@ OpcUa_StatusCode OpcUa_Endpoint_GetCallbackData(
     OpcUa_Endpoint  a_hEndpoint,
     OpcUa_Void**    a_ppvCallbackData);
 
-/** 
+/**
  * @brief  Returns the peer info of the secure channel.
- * 
+ *
  * @param hEndpoint      [in] The endpoint handle.
  * @param pPeerInfo      [out] Returns the peer information as string in format "<protocol>://<ip>:<port>".
  */

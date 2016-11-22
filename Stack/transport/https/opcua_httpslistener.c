@@ -515,7 +515,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "SendImmediateResponse");
 
     pListenerConnection = (OpcUa_HttpsListener_Connection*)a_hConnection;
 
-    OpcUa_ReturnErrorIfTrue(pListenerConnection->bConnected == OpcUa_False, 
+    OpcUa_ReturnErrorIfTrue(pListenerConnection->bConnected == OpcUa_False,
                             OpcUa_BadInvalidState);
 
     OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,

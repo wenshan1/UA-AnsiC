@@ -116,8 +116,8 @@ OpcUa_Void OpcUa_P_Thread_Delete(OpcUa_RawThread* pRawThread)
 /*============================================================================
  * Create Thread
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_Thread_Start(  OpcUa_RawThread             pThread, 
-                                        OpcUa_PfnInternalThreadMain pfnStartFunction, 
+OpcUa_StatusCode OpcUa_P_Thread_Start(  OpcUa_RawThread             pThread,
+                                        OpcUa_PfnInternalThreadMain pfnStartFunction,
                                         OpcUa_Void*                 pArguments)
 {
     OpcUa_Int32         apiResult;

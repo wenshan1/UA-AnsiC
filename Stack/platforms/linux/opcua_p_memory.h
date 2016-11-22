@@ -21,26 +21,26 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @see OpcUa_Memory_Alloc
  */
 OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_Alloc(         OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @brief Reallocates a new block of memory
  *
  * @param pBuffer [in] The existing memory block.
  * @param nSize   [in] The size of the block to allocate.
  */
-OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_ReAlloc(       OpcUa_Void*  pBuffer, 
+OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_ReAlloc(       OpcUa_Void*  pBuffer,
                                                         OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @see OpcUa_Memory_Free
  */
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_Memory_Free(           OpcUa_Void* pvBuffer);
 
-/** 
+/**
  * @see OpcUa_Memory_MemCpy
  */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Memory_MemCpy(   OpcUa_Void*  pBuffer,

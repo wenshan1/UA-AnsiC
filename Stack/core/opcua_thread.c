@@ -68,7 +68,7 @@ OpcUa_Void InternalThreadMain(OpcUa_Void* a_Thread)
     Thread->ThreadMain(Thread->ThreadData);
 
     OPCUA_P_MUTEX_LOCK(Thread->Mutex);
-    Thread->IsRunning = OpcUa_False;  
+    Thread->IsRunning = OpcUa_False;
     OPCUA_P_SEMAPHORE_POST(Thread->ShutdownEvent, 1);
     OPCUA_P_MUTEX_UNLOCK(Thread->Mutex);
 }
@@ -91,7 +91,7 @@ OpcUa_StatusCode OpcUa_Thread_Create(   OpcUa_Thread*           a_pThread,
     pThread = (OpcUa_ThreadInternal*)OpcUa_Alloc(sizeof(OpcUa_ThreadInternal));
 
     OpcUa_ReturnErrorIfAllocFailed(pThread);
-    
+
     OpcUa_MemSet(pThread, 0, sizeof(OpcUa_ThreadInternal));
 
     pThread->IsRunning      = OpcUa_False;
@@ -103,7 +103,7 @@ OpcUa_StatusCode OpcUa_Thread_Create(   OpcUa_Thread*           a_pThread,
     uStatus = OpcUa_P_Thread_Create(&(pThread->RawThread));
     OpcUa_GotoErrorIfBad(uStatus);
 
-    uStatus = OPCUA_P_SEMAPHORE_CREATE( &(pThread->ShutdownEvent), 
+    uStatus = OPCUA_P_SEMAPHORE_CREATE( &(pThread->ShutdownEvent),
                                         1,  /* the initial value is 1 (signalled, 1 free resource) */
                                         1); /* the maximum value is 1 */
     OpcUa_GotoErrorIfBad(uStatus);
@@ -193,8 +193,8 @@ OpcUa_StatusCode OpcUa_Thread_Start(OpcUa_Thread a_Thread)
 
     pThread->IsRunning = OpcUa_True;
 
-    intThreadId = OpcUa_P_Thread_Start( pThread->RawThread, 
-                                        InternalThreadMain, 
+    intThreadId = OpcUa_P_Thread_Start( pThread->RawThread,
+                                        InternalThreadMain,
                                         (OpcUa_Void*)pThread);
 
     if(intThreadId != 0)
@@ -219,7 +219,7 @@ Error:
  * Wait for a thread to shutdown.
  *===========================================================================*/
 /* conversion is done internally, the parameter must be filled with a value representing milliseconds */
-OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread a_Thread, 
+OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread a_Thread,
                                                 OpcUa_UInt32 a_msecTimeout)
 {
     OpcUa_StatusCode        uStatus = OpcUa_Good;
@@ -249,7 +249,7 @@ OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread a_Thread,
     if(Thread->IsRunning == OpcUa_False)
     {
         /* Release the semaphore again to enable other threads waiting on it to get unlocked. */
-        uStatus = OPCUA_P_SEMAPHORE_POST(   Thread->ShutdownEvent,  
+        uStatus = OPCUA_P_SEMAPHORE_POST(   Thread->ShutdownEvent,
                                             1);
         /*printf("wait for shutdown: thread stopped\n");*/
         OPCUA_P_MUTEX_UNLOCK(Thread->Mutex);
@@ -286,7 +286,7 @@ OpcUa_Boolean OpcUa_Thread_IsRunning(OpcUa_Thread a_hThread)
 {
     OpcUa_ThreadInternal* pThread = (OpcUa_ThreadInternal*)a_hThread;
     OpcUa_Boolean bTemp = OpcUa_False;
-    
+
     if(OpcUa_Null == pThread)
     {
         return OpcUa_False;

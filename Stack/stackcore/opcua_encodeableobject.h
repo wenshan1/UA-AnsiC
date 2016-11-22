@@ -26,51 +26,51 @@ struct _OpcUa_Decoder;
 /*============================================================================
  * The EncodeableObject type
  *===========================================================================*/
-/** 
+/**
   @brief Initializes an encodeable object.
 
   This function should set the object to a known state. It should not allocate memory.
- 
+
   @param pValue [in] The encodeable object to initialize.
 */
 typedef OpcUa_Void (OpcUa_EncodeableObject_PfnInitialize)(OpcUa_Void* pValue);
 
-/** 
+/**
   @brief Clear an encodeable object.
 
   This function must free all memory referenced by the object and set it to a known state.
- 
+
   @param pValue [in] The encodeable object to clear.
 */
 typedef OpcUa_Void (OpcUa_EncodeableObject_PfnClear)(OpcUa_Void* pValue);
 
-/** 
+/**
   @brief Calculates the size the serialized form an encodeable object.
 
   Returns Bad_NotSupported if it is not possible to calculate the size.
- 
+
   @param pValue   [in]  The object to encode.
   @param pEncoder [in]  The encoder used to serialize the object.
   @param pSize    [out] The size of the encoded object in bytes.
 */
 typedef OpcUa_StatusCode (OpcUa_EncodeableObject_PfnGetSize)(
     OpcUa_Void*            pValue,
-    struct _OpcUa_Encoder* pEncoder, 
+    struct _OpcUa_Encoder* pEncoder,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Encodes an encodeable object.
- 
+
   @param pEncoder [in] The encoder used to serialize the object.
   @param pValue   [in] The object to encode.
 */
-typedef OpcUa_StatusCode (OpcUa_EncodeableObject_PfnEncode)( 
+typedef OpcUa_StatusCode (OpcUa_EncodeableObject_PfnEncode)(
     OpcUa_Void*            pValue,
     struct _OpcUa_Encoder* pEncoder);
 
-/** 
+/**
   @brief Decodes an encodeable object.
- 
+
   @param pDecoder [in] The decoder used to deserialize the object.
   @param pValue   [in] The object to decode.
 */
@@ -78,7 +78,7 @@ typedef OpcUa_StatusCode (OpcUa_EncodeableObject_PfnDecode)(
     OpcUa_Void*            pValue,
     struct _OpcUa_Decoder* pDecoder);
 
-/** 
+/**
   @brief Describes an encodeable object.
 */
 typedef struct _OpcUa_EncodeableType
@@ -120,14 +120,14 @@ OpcUa_EncodeableType;
 
 struct _OpcUa_EncodeableTypeTableEntry;
 
-/** 
+/**
   @brief A table of encodeable object types.
 */
 typedef struct _OpcUa_EncodeableTypeTable
 {
     /*! @brief The number of entries in the table. */
     OpcUa_Int32 Count;
-    
+
     /*! @brief The table of known types. */
     OpcUa_EncodeableType* Entries;
 
@@ -142,27 +142,27 @@ typedef struct _OpcUa_EncodeableTypeTable
 }
 OpcUa_EncodeableTypeTable;
 
-/** 
+/**
   @brief Initializes an encodeable object type table.
- 
+
   @param pTable [in] The table to clear.
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_EncodeableTypeTable_Create(
     OpcUa_EncodeableTypeTable* pTable);
 
-/** 
+/**
   @brief Clears an encodeable object type table.
- 
+
   @param pTable [in] The table to clear.
 */
 OPCUA_EXPORT OpcUa_Void OpcUa_EncodeableTypeTable_Delete(
     OpcUa_EncodeableTypeTable* pTable);
 
-/** 
+/**
   @brief Populates and sorts an encodeable object type table.
 
   The new types are added to the table if it has already contains types.
- 
+
   @param pTable  [in] The table to update.
   @param ppTypes [in] A null terminated list of encodeable object types.
 */
@@ -170,11 +170,11 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
     OpcUa_EncodeableTypeTable* pTable,
     OpcUa_EncodeableType**     ppTypes);
 
-/** 
+/**
   @brief Adds a mapping between an unknown type and a known type.
 
   The new types are added to the table if it has already contains types.
- 
+
   @param pTable                 [in] The table to update.
   @param uTypeId                [in] The identifier for the data type node.
   @param pNamespaceUri          [in] The namespace that qualifies the identifier.
@@ -186,7 +186,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     OpcUa_StringA              pNamespaceUri,
     OpcUa_EncodeableType*      pTemplate);
 
-/** 
+/**
   @brief Finds an encodeable object type in a table.
 
   @param pTable        [in]  The table to search.
@@ -200,20 +200,20 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_EncodeableTypeTable_Find(
     OpcUa_StringA               sNamespaceUri,
     OpcUa_EncodeableType**      ppType);
 
-/** 
+/**
   @brief Creates and initializes an encodeable object.
 
-  @param pType        [in]  The type of the object to create. 
+  @param pType        [in]  The type of the object to create.
   @param ppEncodeable [out] The new encodeable object.
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_EncodeableObject_Create(
     OpcUa_EncodeableType* pType,
     OpcUa_Void**          ppEncodeable);
 
-/** 
+/**
   @brief Deletes an encodeable object.
 
-  @param pType        [in]     The type of the object. 
+  @param pType        [in]     The type of the object.
   @param ppEncodeable [in/out] The encodeable object.
 */
 OPCUA_EXPORT OpcUa_Void OpcUa_EncodeableObject_Delete(
@@ -221,10 +221,10 @@ OPCUA_EXPORT OpcUa_Void OpcUa_EncodeableObject_Delete(
     OpcUa_Void**          ppEncodeable);
 
 
-/** 
+/**
   @brief Creates an Encodeable Object at the given ExtensionObject.
 
-  @param pType              [in]     The type of the object. 
+  @param pType              [in]     The type of the object.
   @param pExtension         [in/out] The extension object to which the encodeable object gets attached.
   @param ppEncodeableObject [in/out] Pointer to the encodeable object.
 */
@@ -236,12 +236,12 @@ OpcUa_StatusCode OpcUa_EncodeableObject_CreateExtension(
 
 struct _OpcUa_MessageContext;
 
-/** 
+/**
   @brief Extracts an encodeable object from an extension object.
 
   @param pExtension         [in]     The extension object to parse.
   @param pContext           [in]     The message context to use during parsing.
-  @param pType              [in]     The type of object to extract. 
+  @param pType              [in]     The type of object to extract.
   @param ppEncodeableObject [in/out] Pointer to the encodeable object.
 */
 OPCUA_EXPORT

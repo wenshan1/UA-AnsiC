@@ -25,7 +25,7 @@ OPCUA_BEGIN_EXTERN_C
  * A username/password credential.
  *
  * Name     - the name of the user.
- * Password - the password (could be hashed). 
+ * Password - the password (could be hashed).
  *===========================================================================*/
 typedef struct _OpcUa_UserNameCredential
 {
@@ -95,7 +95,7 @@ OpcUa_CredentialType;
 typedef struct _OpcUa_ClientCredential
 {
     OpcUa_CredentialType     Type;
-    
+
     union
     {
     OpcUa_UserNameCredential UserName;

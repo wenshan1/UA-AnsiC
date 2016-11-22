@@ -22,7 +22,7 @@
 #else /* OPCUA_MUTEX_ERROR_CHECKING */
 #if OPCUA_USE_SYNCHRONISATION
     #define OPCUA_P_MUTEX_CREATE OpcUa_ProxyStub_g_PlatformLayerCalltable->MutexCreate
-    #define OPCUA_P_MUTEX_DELETE OpcUa_ProxyStub_g_PlatformLayerCalltable->MutexDelete    
+    #define OPCUA_P_MUTEX_DELETE OpcUa_ProxyStub_g_PlatformLayerCalltable->MutexDelete
     #define OPCUA_P_MUTEX_LOCK   OpcUa_ProxyStub_g_PlatformLayerCalltable->MutexLock
     #define OPCUA_P_MUTEX_UNLOCK OpcUa_ProxyStub_g_PlatformLayerCalltable->MutexUnlock
 #else /* OPCUA_USE_SYNCHRONISATION */

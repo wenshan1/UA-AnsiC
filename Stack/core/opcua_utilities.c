@@ -26,10 +26,10 @@
 /*============================================================================
  * Quick Sort
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       a_pElements, 
-                                OpcUa_UInt32      a_nElementCount, 
-                                OpcUa_UInt32      a_nElementSize, 
-                                OpcUa_PfnCompare* a_pfnCompare, 
+OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       a_pElements,
+                                OpcUa_UInt32      a_nElementCount,
+                                OpcUa_UInt32      a_nElementSize,
+                                OpcUa_PfnCompare* a_pfnCompare,
                                 OpcUa_Void*       a_pContext)
 {
     if(     a_pElements     == OpcUa_Null
@@ -40,10 +40,10 @@ OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       a_pElements,
         return OpcUa_BadInvalidArgument;
     }
 
-    OPCUA_P_QSORT(    a_pElements, 
-                      a_nElementCount, 
-                      a_nElementSize, 
-                      a_pfnCompare, 
+    OPCUA_P_QSORT(    a_pElements,
+                      a_nElementCount,
+                      a_nElementSize,
+                      a_pfnCompare,
                       a_pContext);
 
     return OpcUa_Good;
@@ -52,11 +52,11 @@ OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       a_pElements,
 /*============================================================================
  * Binary Search on sorted array
  *===========================================================================*/
-OpcUa_Void* OpcUa_BSearch(  OpcUa_Void*       a_pKey, 
-                            OpcUa_Void*       a_pElements, 
-                            OpcUa_UInt32      a_nElementCount, 
-                            OpcUa_UInt32      a_nElementSize, 
-                            OpcUa_PfnCompare* a_pfnCompare, 
+OpcUa_Void* OpcUa_BSearch(  OpcUa_Void*       a_pKey,
+                            OpcUa_Void*       a_pElements,
+                            OpcUa_UInt32      a_nElementCount,
+                            OpcUa_UInt32      a_nElementSize,
+                            OpcUa_PfnCompare* a_pfnCompare,
                             OpcUa_Void*       a_pContext)
 {
     if(     a_pElements     == OpcUa_Null
@@ -68,11 +68,11 @@ OpcUa_Void* OpcUa_BSearch(  OpcUa_Void*       a_pKey,
         return OpcUa_Null;
     }
 
-    return OPCUA_P_BSEARCH( a_pKey, 
-                            a_pElements, 
-                            a_nElementCount, 
-                            a_nElementSize, 
-                            a_pfnCompare, 
+    return OPCUA_P_BSEARCH( a_pKey,
+                            a_pElements,
+                            a_nElementCount,
+                            a_nElementSize,
+                            a_pfnCompare,
                             a_pContext);
 }
 

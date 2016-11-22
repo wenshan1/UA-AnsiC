@@ -40,11 +40,11 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA1_Generate(
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "SHA1_Generate");
 
     OpcUa_ReferenceParameter(a_pProvider);
-    
+
     OpcUa_ReturnErrorIfArgumentNull(a_pData);
-    
+
     SHA1(a_pData, a_dataLen, a_pMessageDigest);
-    
+
     OpcUa_ReturnErrorIfNull(a_pMessageDigest,OpcUa_Bad);
 
 OpcUa_ReturnStatusCode;
@@ -68,7 +68,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA1_160_Generate(
     OpcUa_ReferenceParameter(a_pProvider);
 
     OpcUa_ReturnErrorIfArgumentNull(a_pData);
-    
+
     SHA1(a_pData, a_dataLen, a_pMessageDigest);
 
     OpcUa_ReturnErrorIfNull(a_pMessageDigest,OpcUa_Bad);
@@ -144,7 +144,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_384_Generate(
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "SHA2_384_Generate");
 
     OpcUa_ReferenceParameter(a_pProvider);
-    
+
     OpcUa_ReturnErrorIfArgumentNull(a_pData);
 
     SHA384(a_pData, a_dataLen, a_pMessageDigest);
@@ -171,7 +171,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_512_Generate(
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "SHA2_512_Generate");
 
     OpcUa_ReferenceParameter(a_pProvider);
-    
+
     OpcUa_ReturnErrorIfArgumentNull(a_pData);
 
     SHA512(a_pData, a_dataLen, a_pMessageDigest);

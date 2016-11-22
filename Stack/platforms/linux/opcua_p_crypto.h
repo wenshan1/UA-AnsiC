@@ -73,10 +73,10 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_RSA_PKCS1_V15_SHA1_Id               6
 
 #define OpcUa_P_RSA_PKCS1_V15_SHA256_Name           "RSA-PKCS-#1-V1.5-SHA256"
-#define OpcUa_P_RSA_PKCS1_V15_SHA256_Id             7 
+#define OpcUa_P_RSA_PKCS1_V15_SHA256_Id             7
 
 #define OpcUa_P_HMAC_SHA1_Name                      "HMAC-SHA1"
-#define OpcUa_P_HMAC_SHA1_Id                        8 
+#define OpcUa_P_HMAC_SHA1_Id                        8
 
 #define OpcUa_P_HMAC_SHA256_Name                    "HMAC-SHA256"
 #define OpcUa_P_HMAC_SHA256_Id                      9
@@ -85,7 +85,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_RSA_PKCS1_OAEP_SHA1_Id              10
 
 #define OpcUa_P_RSA_PKCS1_OAEP_SHA256_Name          "RSA-PKCS-#1-OAEP-SHA256"
-#define OpcUa_P_RSA_PKCS1_OAEP_SHA256_Id            11 
+#define OpcUa_P_RSA_PKCS1_OAEP_SHA256_Id            11
 
 #define OpcUa_P_SignatureMethodsCount               6
 

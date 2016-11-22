@@ -55,7 +55,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_DateTime_GetDateTimeFromString( OpcUa_CharA*
   @param pchBuffer  [bi] Byte buffer to store the result (at last 25 bytes long).
   @param uLength    [in] Length of the given buffer in bytes (at least 25).
 */
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_DateTime_GetStringFromDateTime( OpcUa_DateTime  DateTime, 
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_DateTime_GetStringFromDateTime( OpcUa_DateTime  DateTime,
                                                                     OpcUa_CharA*    pchBuffer,
                                                                     OpcUa_UInt32    uLength);
 

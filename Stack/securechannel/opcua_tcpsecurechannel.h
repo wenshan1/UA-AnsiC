@@ -18,7 +18,7 @@
 #define _OpcUa_TcpSecureChannel_H_ 1
 
 OPCUA_BEGIN_EXTERN_C
-/** 
+/**
   @brief The Tcp SecureChannel.
   */
 struct _OpcUa_TcpSecureChannel
@@ -29,20 +29,20 @@ struct _OpcUa_TcpSecureChannel
 
 typedef struct _OpcUa_TcpSecureChannel OpcUa_TcpSecureChannel;
 
-/** 
+/**
   @brief Creates a new securechannel object.
 
   A secure connection is always layed on top of a regular connection.
-  
+
   @param ppSecureChannel           [out] The new securechannel.
 */
 OpcUa_StatusCode OpcUa_TcpSecureChannel_Create(OpcUa_SecureChannel**   ppSecureChannel);
 
-/** 
+/**
   @brief Deletes a securechannel object.
 
   A secure connection is always layed on top of a regular connection.
- 
+
   @param ppSecureChannel [in]  The securechannel to delete.
 */
 OpcUa_StatusCode OpcUa_TcpSecureChannel_Delete(OpcUa_SecureChannel**   ppSecureChannel);

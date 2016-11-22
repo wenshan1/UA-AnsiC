@@ -36,13 +36,13 @@ OpcUa_Void OpcUa_StringTable_Clear(OpcUa_StringTable* a_pTable)
     if (a_pTable != OpcUa_Null)
     {
         OpcUa_UInt32 ii = 0;
-        
+
         for (ii = 0; ii < a_pTable->Count; ii++)
         {
             OpcUa_String_Clear(&(a_pTable->Values[ii]));
         }
 
-        OpcUa_Free(a_pTable->Values);       
+        OpcUa_Free(a_pTable->Values);
         OpcUa_MemSet(a_pTable, 0, sizeof(OpcUa_StringTable));
     }
 }
@@ -101,7 +101,7 @@ OpcUa_StatusCode OpcUa_StringTable_AddStringList(
 
     /* add the strings */
     for (ii = 0; a_pStrings[ii] != OpcUa_Null; ii++)
-    {    
+    {
         uStatus = OpcUa_String_AttachReadOnly(&(a_pTable->Values[a_pTable->Count+ii]), a_pStrings[ii]);
         OpcUa_GotoErrorIfBad(uStatus);
     }
@@ -150,8 +150,8 @@ OpcUa_StatusCode OpcUa_StringTable_AddStrings(
     {
         OpcUa_String_Initialize(&(a_pTable->Values[a_pTable->Count+ii]));
 
-        uStatus = OpcUa_String_StrnCpy(  
-            &(a_pTable->Values[a_pTable->Count+ii]), 
+        uStatus = OpcUa_String_StrnCpy(
+            &(a_pTable->Values[a_pTable->Count+ii]),
             &(a_pStrings[ii]),
             OpcUa_String_StrSize(&(a_pStrings[ii])));
 
@@ -183,7 +183,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_FindIndex(
 {
     OpcUa_UInt32 ii = 0;
     OpcUa_UInt32 uLength = 0;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_String, "OpcUa_StringTable_FindIndex");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);
@@ -235,7 +235,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_FindString(
         OpcUa_ReturnStatusCode;
     }
 
-    /* return a readonly reference to the string */    
+    /* return a readonly reference to the string */
     uStatus = OpcUa_String_AttachReadOnly(a_pString, OpcUa_String_GetRawString(&(a_pTable->Values[a_nIndex])));
     OpcUa_GotoErrorIfBad(uStatus);
 

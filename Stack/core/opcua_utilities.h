@@ -30,7 +30,7 @@ enum _OpcUa_ProtocolType
 typedef enum _OpcUa_ProtocolType OpcUa_ProtocolType;
 
 
-/** 
+/**
  * @brief Sorts an array.
  *
  * @param pElements     [in] The array of elements to sort.
@@ -39,14 +39,14 @@ typedef enum _OpcUa_ProtocolType OpcUa_ProtocolType;
  * @param pfnCompare    [in] The function used to compare elements.
  * @param pContext      [in] A context that is passed to the compare function.
  */
-OPCUA_EXPORT 
-OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       pElements, 
-                                OpcUa_UInt32      nElementCount, 
-                                OpcUa_UInt32      nElementSize, 
-                                OpcUa_PfnCompare* pfnCompare, 
+OPCUA_EXPORT
+OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       pElements,
+                                OpcUa_UInt32      nElementCount,
+                                OpcUa_UInt32      nElementSize,
+                                OpcUa_PfnCompare* pfnCompare,
                                 OpcUa_Void*       pContext);
 
-/** 
+/**
  * @brief Searches a sorted array.
  *
  * @param pKey          [in] The element to find.
@@ -56,27 +56,27 @@ OpcUa_StatusCode OpcUa_QSort(   OpcUa_Void*       pElements,
  * @param pfnCompare    [in] The function used to compare elements.
  * @param pContext      [in] A context that is passed to the compare function.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_Void* OpcUa_BSearch(  OpcUa_Void*       pKey,
-                            OpcUa_Void*       pElements, 
-                            OpcUa_UInt32      nElementCount, 
-                            OpcUa_UInt32      nElementSize, 
-                            OpcUa_PfnCompare* pfnCompare, 
+                            OpcUa_Void*       pElements,
+                            OpcUa_UInt32      nElementCount,
+                            OpcUa_UInt32      nElementSize,
+                            OpcUa_PfnCompare* pfnCompare,
                             OpcUa_Void*       pContext);
 
-/** 
+/**
  * @brief Returns the CRT errno constant.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_UInt32 OpcUa_GetLastError();
 
-/** 
+/**
  * @brief Returns the number of milliseconds since the system or process was started.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_UInt32 OpcUa_GetTickCount();
 
-/** 
+/**
  * @brief Convert string to integer.
  */
 #define OpcUa_CharAToInt(xChar) OpcUa_ProxyStub_g_PlatformLayerCalltable->CharToInt(xChar)

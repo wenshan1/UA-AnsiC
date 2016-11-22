@@ -126,7 +126,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnOpen)(
 
 /**
  * @brief Opens a securechannel object.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel that should be opened
  * @param hTransportConnection  [in] A handle to the associated transport connection
  * @param channelSecurityToken  [in] A previously created ChannelSecurityToken
@@ -162,7 +162,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnRenew)(
 
 /**
  * @brief Closes a securechannel object.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel to close.
  */
 OpcUa_StatusCode OpcUa_SecureChannel_Close(
@@ -173,7 +173,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnClose)(
 
 /**
  * @brief Generates a channelSecurityToken.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  * @param uTokenLifeTime        [in] The lifetime of the token.
  * @param ppSecurityToken      [out] The created token.
@@ -190,7 +190,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnGenerateSecurityToken)(
 
 /**
  * @brief Renews a channelSecurityToken.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel at which the security token was created.
  * @param pSecurityToken        [in] The security that shall be renewed.
  * @param uTokenLifeTime        [in] The next intervals lifetime in milliseconds.
@@ -210,7 +210,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnRenewSecurityToken)(
 
 /**
  * @brief Creates a reference to a security set identified by the token id and consisting of keysets and crypto provider.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  * @param uTokenId              [in] .
  * @param ppReceivingKeyset    [out] .
@@ -233,7 +233,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnGetSecuritySet)(
 
 /**
  * @brief Creates a reference to the current security set consisting of keysets and crypto provider.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  * @param puTokenId             [in] .
  * @param ppReceivingKeyset    [out] .
@@ -256,7 +256,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnGetCurrentSecuritySet)(
 
 /**
  * @brief Release a reference to a security keyset created by GetSecuritySet.
- * 
+ *
  * @param pSecureChannel  [in] The securechannel which holds the security set.
  * @param uTokenId        [in] The token id of the security set, that should be released.
  */
@@ -270,7 +270,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnReleaseSecuritySet)(
 
 /**
  * @brief Get (and create) a new sequence number for this channel.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  *
  * @return The new sequence number.
@@ -283,7 +283,7 @@ typedef OpcUa_UInt32 (OpcUa_SecureChannel_PfnGetSequenceNumber)(
 
 /**
  * @brief Check a new sequence number for this channel.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  *                              [in] SequenceNumber
  *
@@ -301,7 +301,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnLockFunction)(
     struct _OpcUa_SecureChannel*    pSecureChannel);
 /**
  * @brief Check if the secure channel is open or not.
- * 
+ *
  * @param pSecureChannel        [in] The securechannel.
  *
  * @return OpcUa_False if the Channel is closed, OpcUa_True else.
@@ -319,7 +319,7 @@ typedef OpcUa_StatusCode (OpcUa_SecureChannel_PfnRelease)(
 
 /**
  * @brief Derive the keysets from the given nonces based on the crypto configuration.
- * 
+ *
  * @param eSecurityMode         [in] The security mode used for the connection.
  * @param pCryptoProvider       [in] The used crypto provider.
  * @param pClientNonce          [in] The nonce created by the client.

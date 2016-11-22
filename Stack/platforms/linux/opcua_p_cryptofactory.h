@@ -19,18 +19,18 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief OpcUa_CryptoFactory_CreateCryptoProvider.
-  
+
   @param securityPolicy     [in]  The security policy.
   @param pProvider          [out] The resulting CryptoProvider.
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_CreateCryptoProvider(  OpcUa_StringA           Uri,
                                                                             OpcUa_CryptoProvider*   pProvider);
 
-/** 
+/**
   @brief OpcUa_CryptoFactory_DeleteCryptoProvider.
-  
+
   @param pProvider         [out] The resulting CryptoProvider.
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_DeleteCryptoProvider(  OpcUa_CryptoProvider* pProvider);

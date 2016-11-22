@@ -44,9 +44,9 @@ int _vsnprintf(char* DstBuf, size_t MaxCount, const char* Format, va_list ArgLis
 /*============================================================================
  * Copy uintCount Characters from a OpcUa_StringA to another OpcUa_StringA
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_String_strncpy(    OpcUa_StringA   a_strDestination, 
-                                                    OpcUa_UInt32    a_uiDestSize, 
-                                                    OpcUa_StringA   a_strSource, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_String_strncpy(    OpcUa_StringA   a_strDestination,
+                                                    OpcUa_UInt32    a_uiDestSize,
+                                                    OpcUa_StringA   a_strSource,
                                                     OpcUa_UInt32    a_uiLength)
 {
 #if OPCUA_USE_SAFE_FUNCTIONS
@@ -68,9 +68,9 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_String_strncpy(    OpcUa_StringA   a_strD
 /*============================================================================
  * Append uintCount Characters from a OpcUa_String to another OpcUa_String.
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_String_strncat( OpcUa_StringA   a_strDestination, 
-                                                       OpcUa_UInt32    a_uiDestSize, 
-                                                       OpcUa_StringA   a_strSource, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_String_strncat( OpcUa_StringA   a_strDestination,
+                                                       OpcUa_UInt32    a_uiDestSize,
+                                                       OpcUa_StringA   a_strSource,
                                                        OpcUa_UInt32    a_uiLength)
 {
     #if OPCUA_USE_SAFE_FUNCTIONS
@@ -101,8 +101,8 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strlen(      OpcUa_StringA       a_a_pC
 /*============================================================================
  * Compare two OpcUa_Strings Case Sensitive
  *===========================================================================*/
-OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strncmp(     OpcUa_StringA       a_string1, 
-                                                OpcUa_StringA       a_string2, 
+OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strncmp(     OpcUa_StringA       a_string1,
+                                                OpcUa_StringA       a_string2,
                                                 OpcUa_UInt32        a_uiLength)
 {
     return (OpcUa_Int32)strncmp(a_string1, a_string2, a_uiLength);
@@ -111,8 +111,8 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strncmp(     OpcUa_StringA       a_stri
 /*============================================================================
 * Compare two OpcUa_Strings NOT Case Sensitive
 *===========================================================================*/
-OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strnicmp(    OpcUa_StringA       a_string1, 
-                                                OpcUa_StringA       a_string2, 
+OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strnicmp(    OpcUa_StringA       a_string1,
+                                                OpcUa_StringA       a_string2,
                                                 OpcUa_UInt32        a_uiLength)
 {
     return (OpcUa_Int32)_strnicmp(a_string1, a_string2, a_uiLength);
@@ -121,9 +121,9 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_strnicmp(    OpcUa_StringA       a_stri
 /*============================================================================
  * Write Values to a OpcUa_String
  *===========================================================================*/
-OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_vsnprintf(   OpcUa_StringA       a_sDest, 
-                                                OpcUa_UInt32        a_nCount, 
-                                                const OpcUa_StringA a_sFormat, 
+OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_vsnprintf(   OpcUa_StringA       a_sDest,
+                                                OpcUa_UInt32        a_nCount,
+                                                const OpcUa_StringA a_sFormat,
                                                 varg_list           a_vaList)
 {
     return (OpcUa_Int32) _vsnprintf(a_sDest, a_nCount, a_sFormat, a_vaList);

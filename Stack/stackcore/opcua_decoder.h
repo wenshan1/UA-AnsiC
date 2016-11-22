@@ -25,9 +25,9 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief Opens a decoder and attaches it to the stream.
- 
+
   The caller must ensure the context and stream are valid until the decoder is closed.
 
   @param pDecoder           [in] The decoder to open.
@@ -41,9 +41,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnOpen)(
     OpcUa_MessageContext*   pContext,
     OpcUa_Handle*           phDecodeContext);
 
-/** 
+/**
   @brief Closes a stream and releases all resources allocated to it.
- 
+
   During normal operation all decoders must be closed. Deleting a decoder without
   closing it could have unexpected side effects.
 
@@ -58,12 +58,12 @@ OPCUA_EXPORT OpcUa_Void OpcUa_Decoder_Close(
     struct _OpcUa_Decoder*  pDecoder,
     OpcUa_Handle*           phDecodeContext);
 
-/** 
+/**
   @brief Frees the decoder structure.
 
   This function aborts all I/O operations and frees all memory. It should be
   used only to clean up when the decoder is not needed.
- 
+
   @param ppDecoder [in/out] The decoder to free.
 */
 typedef OpcUa_Void (OpcUa_Decoder_PfnDelete)(
@@ -72,25 +72,25 @@ typedef OpcUa_Void (OpcUa_Decoder_PfnDelete)(
 OPCUA_EXPORT OpcUa_Void OpcUa_Decoder_Delete(
     struct _OpcUa_Decoder** ppDecoder);
 
-/** 
+/**
   @brief Sets the default namespace for subsequent operations.
- 
+
   @param pDecoder      [in]  The decoder.
   @param namespaceUri [in]  The namespace to push onto the stack.
 */
 typedef OpcUa_StatusCode (OpcUa_Decoder_PfnPushNamespace)(
-    struct _OpcUa_Decoder* pDecoder, 
+    struct _OpcUa_Decoder* pDecoder,
     OpcUa_String*          namespaceUri);
 
-/** 
+/**
   @brief Restores the previous default namespace.
- 
+
   @param pDecoder [in]  The decoder.
 */
 typedef OpcUa_StatusCode (OpcUa_Decoder_PfnPopNamespace)(
     struct _OpcUa_Decoder* pDecoder);
 
-/** 
+/**
   @brief Reads a Boolean value.
 
   @param pDecoder   [in]  The decoder.
@@ -102,9 +102,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadBoolean)(
     OpcUa_StringA          sFieldName,
     OpcUa_Boolean*         pValue);
 
-/** 
+/**
   @brief Reads a SByte value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -114,9 +114,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadSByte)(
     OpcUa_StringA          sFieldName,
     OpcUa_SByte*           pValue);
 
-/** 
+/**
   @brief Reads a Byte value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -126,9 +126,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadByte)(
     OpcUa_StringA          sFieldName,
     OpcUa_Byte*            pValue);
 
-/** 
+/**
   @brief Reads a Int16 value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -138,9 +138,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt16)(
     OpcUa_StringA          sFieldName,
     OpcUa_Int16*           pValue);
 
-/** 
+/**
   @brief Reads a UInt16 value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -150,9 +150,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt16)(
     OpcUa_StringA          sFieldName,
     OpcUa_UInt16*          pValue);
 
-/** 
+/**
   @brief Reads a Int32 value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -162,7 +162,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt32)(
     OpcUa_StringA          sFieldName,
     OpcUa_Int32*           pValue);
 
-/** 
+/**
   @brief Reads a UInt32 value.
 
   @param pDecoder   [in]  The decoder.
@@ -174,9 +174,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt32)(
     OpcUa_StringA          sFieldName,
     OpcUa_UInt32*          pValue);
 
-/** 
+/**
   @brief Reads a Int64 value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -186,9 +186,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt64)(
     OpcUa_StringA          sFieldName,
     OpcUa_Int64*           pValue);
 
-/** 
+/**
   @brief Reads a UInt64 value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -198,9 +198,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt64)(
     OpcUa_StringA          sFieldName,
     OpcUa_UInt64*          pValue);
 
-/** 
+/**
   @brief Reads a Float value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -210,9 +210,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadFloat)(
     OpcUa_StringA          sFieldName,
     OpcUa_Float*           pValue);
 
-/** 
+/**
   @brief Reads a Double value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -222,9 +222,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDouble)(
     OpcUa_StringA          sFieldName,
     OpcUa_Double*          pValue);
 
-/** 
+/**
   @brief Reads a String value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -234,9 +234,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadString)(
     OpcUa_StringA          sFieldName,
     OpcUa_String*          pValue);
 
-/** 
+/**
   @brief Reads a DateTime value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -246,9 +246,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDateTime)(
     OpcUa_StringA          sFieldName,
     OpcUa_DateTime*        pValue);
 
-/** 
+/**
   @brief Reads a Guid value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -258,9 +258,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadGuid)(
     OpcUa_StringA          sFieldName,
     OpcUa_Guid*            pValue);
 
-/** 
+/**
   @brief Reads a ByteString value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -270,9 +270,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadByteString)(
     OpcUa_StringA          sFieldName,
     OpcUa_ByteString*      pValue);
 
-/** 
+/**
   @brief Reads a XmlElement value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param pValue     [out] The decoded value.
@@ -282,7 +282,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadXmlElement)(
     OpcUa_StringA          sFieldName,
     OpcUa_XmlElement*      pValue);
 
-/** 
+/**
   @brief Reads a NodeId value.
 
   @param pDecoder   [in]  The decoder.
@@ -294,7 +294,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadNodeId)(
     OpcUa_StringA          sFieldName,
     OpcUa_NodeId*          pValue);
 
-/** 
+/**
   @brief Reads a ExpandedNodeId value.
 
   @param pDecoder   [in]  The decoder.
@@ -306,7 +306,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadExpandedNodeId)(
     OpcUa_StringA          sFieldName,
     OpcUa_ExpandedNodeId*  pValue);
 
-/** 
+/**
   @brief Reads a StatusCode value.
 
   @param pDecoder   [in]  The decoder.
@@ -318,7 +318,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadStatusCode)(
     OpcUa_StringA          sFieldName,
     OpcUa_StatusCode*      pValue);
 
-/** 
+/**
   @brief Reads a DiagnosticInfo value.
 
   @param pDecoder   [in]  The decoder.
@@ -330,7 +330,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDiagnosticInfo)(
     OpcUa_StringA          sFieldName,
     OpcUa_DiagnosticInfo*  pValue);
 
-/** 
+/**
   @brief Reads a LocalizedText value.
 
   @param pDecoder   [in]  The decoder.
@@ -342,7 +342,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadLocalizedText)(
     OpcUa_StringA          sFieldName,
     OpcUa_LocalizedText*   pValue);
 
-/** 
+/**
   @brief Reads a QualifiedName value.
 
   @param pDecoder   [in]  The decoder.
@@ -354,7 +354,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadQualifiedName)(
     OpcUa_StringA          sFieldName,
     OpcUa_QualifiedName*   pValue);
 
-/** 
+/**
   @brief Reads a ExtensionObject value.
 
   @param pDecoder   [in]  The decoder.
@@ -366,7 +366,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadExtensionObject)(
     OpcUa_StringA          sFieldName,
     OpcUa_ExtensionObject* pValue);
 
-/** 
+/**
   @brief Reads a DataValue value.
 
   @param pDecoder   [in]  The decoder.
@@ -378,7 +378,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDataValue)(
     OpcUa_StringA          sFieldName,
     OpcUa_DataValue*       pValue);
 
-/** 
+/**
   @brief Reads a Variant value.
 
   @param pDecoder   [in]  The decoder.
@@ -389,8 +389,8 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadVariant)(
     struct _OpcUa_Decoder* pDecoder,
     OpcUa_StringA          sFieldName,
     OpcUa_Variant*         pValue);
-    
-/** 
+
+/**
   @brief Reads an Encodeable value.
 
   @param pDecoder   [in]  The decoder.
@@ -403,8 +403,8 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadEncodeable)(
     OpcUa_StringA          sFieldName,
     OpcUa_EncodeableType*  pType,
     OpcUa_Void*            pValue);
-    
-/** 
+
+/**
   @brief Reads a enumerated value.
 
   @param pDecoder   [in]  The decoder.
@@ -418,9 +418,9 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadEnumerated)(
     OpcUa_EnumeratedType*  pType,
     OpcUa_Int32*           pValue);
 
-/** 
+/**
   @brief Reads a Boolean array value.
- 
+
   @param pDecoder   [in]  The decoder.
   @param sFieldName [in]  The name of the field being decoded.
   @param ppArray    [out] The array to decode.
@@ -432,7 +432,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadBooleanArray)(
     OpcUa_Boolean**        ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a SByte array value.
 
   @param pDecoder   [in]  The decoder.
@@ -446,7 +446,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadSByteArray)(
     OpcUa_SByte**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Byte array value.
 
   @param pDecoder   [in]  The decoder.
@@ -460,7 +460,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadByteArray)(
     OpcUa_Byte**           ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Int16 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -474,7 +474,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt16Array)(
     OpcUa_Int16**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a UInt16 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -488,7 +488,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt16Array)(
     OpcUa_UInt16**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Int32 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -502,7 +502,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt32Array)(
     OpcUa_Int32**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a UInt32 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -516,7 +516,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt32Array)(
     OpcUa_UInt32**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Int64 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -530,7 +530,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadInt64Array)(
     OpcUa_Int64**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a UInt64 array value.
 
   @param pDecoder   [in]  The decoder.
@@ -544,7 +544,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadUInt64Array)(
     OpcUa_UInt64**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Float array value.
 
   @param pDecoder   [in]  The decoder.
@@ -558,7 +558,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadFloatArray)(
     OpcUa_Float**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Double array value.
 
   @param pDecoder   [in]  The decoder.
@@ -572,7 +572,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDoubleArray)(
     OpcUa_Double**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a String array value.
 
   @param pDecoder   [in]  The decoder.
@@ -586,7 +586,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadStringArray)(
     OpcUa_String**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a DateTime array value.
 
   @param pDecoder   [in]  The decoder.
@@ -600,7 +600,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDateTimeArray)(
     OpcUa_DateTime**       ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Guid array value.
 
   @param pDecoder   [in]  The decoder.
@@ -614,7 +614,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadGuidArray)(
     OpcUa_Guid**           ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a ByteString array value.
 
   @param pDecoder   [in]  The decoder.
@@ -628,7 +628,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadByteStringArray)(
     OpcUa_ByteString**     ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a XmlElement array value.
 
   @param pDecoder   [in]  The decoder.
@@ -642,7 +642,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadXmlElementArray)(
     OpcUa_XmlElement**     ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a NodeId array value.
 
   @param pDecoder   [in]  The decoder.
@@ -656,7 +656,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadNodeIdArray)(
     OpcUa_NodeId**         ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a ExpandedNodeId array value.
 
   @param pDecoder   [in]  The decoder.
@@ -670,7 +670,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadExpandedNodeIdArray)(
     OpcUa_ExpandedNodeId** ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a StatusCode array value.
 
   @param pDecoder   [in]  The decoder.
@@ -684,7 +684,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadStatusCodeArray)(
     OpcUa_StatusCode**     ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a DiagnosticInfo array value.
 
   @param pDecoder   [in]  The decoder.
@@ -698,7 +698,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDiagnosticInfoArray)(
     OpcUa_DiagnosticInfo** ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a LocalizedText array value.
 
   @param pDecoder   [in]  The decoder.
@@ -712,7 +712,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadLocalizedTextArray)(
     OpcUa_LocalizedText**  ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a QualifiedName array value.
 
   @param pDecoder   [in]  The decoder.
@@ -725,7 +725,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadQualifiedNameArray)(
     OpcUa_StringA          sFieldName,
     OpcUa_QualifiedName**  ppArray,
     OpcUa_Int32*           pCount);
-/** 
+/**
   @brief Reads a ExtensionObject array value.
 
   @param pDecoder   [in]  The decoder.
@@ -739,7 +739,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadExtensionObjectArray)(
     OpcUa_ExtensionObject** ppArray,
     OpcUa_Int32*            pCount);
 
-/** 
+/**
   @brief Reads a DataValue array value.
 
   @param pDecoder   [in]  The decoder.
@@ -754,7 +754,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadDataValueArray)(
     OpcUa_DataValue**      ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Reads a Variant array value.
 
   @param pDecoder   [in]  The decoder.
@@ -767,8 +767,8 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadVariantArray)(
     OpcUa_StringA          sFieldName,
     OpcUa_Variant**        ppArray,
     OpcUa_Int32*           pCount);
-    
-/** 
+
+/**
   @brief Reads an Encodeable array value.
 
   @param pDecoder   [in]  The decoder.
@@ -783,8 +783,8 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadEncodeableArray)(
     OpcUa_EncodeableType*  pType,
     OpcUa_Void**           ppArray,
     OpcUa_Int32*           pCount);
-    
-/** 
+
+/**
   @brief Reads a enumerated array value.
 
   @param pDecoder   [in]  The decoder.
@@ -800,14 +800,14 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadEnumeratedArray)(
     OpcUa_Int32**          ppArray,
     OpcUa_Int32*           pCount);
 
-/** 
+/**
   @brief Writes a message.
-  
+
   If the expected message type is not specified or the stream contains a different
   message type then the function will look up the actual message type and attempt to
   decode it. The caller must check the returned message type before using the returned
   message object.
-   
+
   @param pDecoder     [in]     The encoder.
   @param pMessageType [in/out] The type of message being expected.
   @param ppMessage    [out]    The decoded message.
@@ -817,7 +817,7 @@ typedef OpcUa_StatusCode (OpcUa_Decoder_PfnReadMessage)(
     OpcUa_EncodeableType** pMessageType,
     OpcUa_Void**           ppMessage);
 
-/** 
+/**
   @brief A generic decoder.
 */
 typedef struct _OpcUa_Decoder
@@ -830,10 +830,10 @@ typedef struct _OpcUa_Decoder
 
     /*! @brief Initializes the decoder for use. */
     OpcUa_Decoder_PfnOpen* Open;
-    
+
     /*! @brief Closes the decoder. */
     OpcUa_Decoder_PfnClose* Close;
-    
+
     /*! @brief Frees the structure. */
     OpcUa_Decoder_PfnDelete* Delete;
 

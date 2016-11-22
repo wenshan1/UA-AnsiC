@@ -49,35 +49,35 @@ struct OpcUa_P_OpenSSL_PSHA1_Ctx_
 
 typedef struct OpcUa_P_OpenSSL_PSHA1_Ctx_ OpcUa_P_OpenSSL_PSHA1_Ctx;
 
-/** 
+/**
   @brief Initializes the pseudo-random function.
 
   -  returns a PRF context.
 
   internal!
- 
+
   @param pSecret          [in]  The secret information for the PRF to create a PRF context.
   @param secretLen        [in]  The length of the secret information for the PRF to create a PRF context.
   @param pSeed            [in]  The seed to create the PRF context.
   @param secretLen        [in]  The length seed to create the PRF context.
 */
 OpcUa_P_OpenSSL_PSHA1_Ctx* OpcUa_P_OpenSSL_PSHA1_Context_Create(
-    OpcUa_Byte*         pSecret, 
-    OpcUa_UInt32        secretLen, 
-    OpcUa_Byte*         pSeed, 
+    OpcUa_Byte*         pSecret,
+    OpcUa_UInt32        secretLen,
+    OpcUa_Byte*         pSeed,
     OpcUa_Int32         seedLen);
 
-/** 
+/**
   @brief Add bytes of random data to the destination buffer.
 
   internal!
 
   @param pPsha1Context     [in]  The PRF context.
-  
+
   @param pHash             [out] The destination buffer.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA1_Hash_Generate(
-    OpcUa_P_OpenSSL_PSHA1_Ctx* pPsha1Context, 
+    OpcUa_P_OpenSSL_PSHA1_Ctx* pPsha1Context,
     OpcUa_Byte*              pHash);
 
 /* offset macros */

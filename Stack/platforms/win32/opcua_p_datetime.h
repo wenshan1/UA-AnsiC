@@ -32,14 +32,14 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_DateTime_GetTimeOfDay(OpcUa_TimeVal*  pValue);
 
 /**
  * @brief Converts the given OpcUa_DateTime into an ascii string.
- * 
+ *
  * @param DateTime   [in]        The DateTime value to convert.
- * @param Buffer     [in/out]    At least 25 bytes of buffer. 
+ * @param Buffer     [in/out]    At least 25 bytes of buffer.
  * @param DateTime   [in]        The length of the given buffer.
  *
  * @return Error Code
  */
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_DateTime datetime, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_DateTime datetime,
                                                                         OpcUa_StringA  buffer,
                                                                         OpcUa_UInt32   length);
 
@@ -51,5 +51,5 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetStringFromDateTime(  OpcUa_Da
  *
  * @return Status Code.
  */
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(  OpcUa_StringA   DateTimeString, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(  OpcUa_StringA   DateTimeString,
                                                                         OpcUa_DateTime* DateTime);

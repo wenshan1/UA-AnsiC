@@ -19,7 +19,7 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief Describes an enumerated valie.
 */
 typedef struct _OpcUa_EnumeratedValue
@@ -32,7 +32,7 @@ typedef struct _OpcUa_EnumeratedValue
 }
 OpcUa_EnumeratedValue;
 
-/** 
+/**
   @brief Describes an enumerated type.
 */
 typedef struct _OpcUa_EnumeratedType
@@ -45,7 +45,7 @@ typedef struct _OpcUa_EnumeratedType
 }
 OpcUa_EnumeratedType;
 
-/** 
+/**
   @brief Finds the name associated with a value of an enumerated type.
 
   @param pType  [in]  The enumerated type to search.
@@ -57,7 +57,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_EnumeratedType_FindName(
     OpcUa_Int32           nValue,
     OpcUa_StringA*        pName);
 
-/** 
+/**
   @brief Finds the value associated with a name for an enumerated type.
 
   @param pType  [in]  The enumerated type to search.

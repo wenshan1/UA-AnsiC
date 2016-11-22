@@ -178,7 +178,7 @@ struct S_OpcUa_Port_CallTable
     OpcUa_Void*         (OPCUA_DLLCALL* MemSet)                   ( OpcUa_Void*                 pMemory,
                                                                     OpcUa_Byte                  uValue,
                                                                     OpcUa_UInt32                uMemorySize);
-                                                       
+
     /**@} Memory Functions */
     /**@name Date and Time Functions */
     /**@{*/
@@ -207,7 +207,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* GetDateTimeFromString)    ( OpcUa_StringA               DateTimeString,
                                                                     OpcUa_DateTime*             DateTime);
-                                                     
+
     /**@} Date and Time Functions */
     /**@name Mutex Functions */
     /**@{*/
@@ -266,7 +266,7 @@ struct S_OpcUa_Port_CallTable
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_Guid*         (OPCUA_DLLCALL* GuidCreate)               ( OpcUa_Guid*                 pGuid);
-                                                        
+
     /**@} Guid Functions */
     /**@name Semaphore Functions */
     /**@{*/
@@ -288,7 +288,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* SemaphoreWait)            ( OpcUa_Semaphore             HSemaphore);
 
-    /** @brief Same as @see SemaphoreWait but with a maximum waiting time of msecTimeout milliseconds before 
+    /** @brief Same as @see SemaphoreWait but with a maximum waiting time of msecTimeout milliseconds before
      *         OpcUa_GoodNonCriticalTimeout is returned.
      *  @ingroup opcua_platformlayer_interface
      */
@@ -300,7 +300,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* SemaphorePost)            ( OpcUa_Semaphore             hSemaphore,
                                                                     OpcUa_UInt32                uReleaseCount);
-                                                        
+
     /**@} Semaphore Functions */
     /**@name Thread Functions */
     /**@{*/
@@ -313,9 +313,9 @@ struct S_OpcUa_Port_CallTable
     /** @brief Free the resources reserved for the system thread object.
      *  @ingroup opcua_platformlayer_interface
      */
-    OpcUa_Void          (OPCUA_DLLCALL* ThreadDelete)             ( OpcUa_RawThread*            pRawThread);   
+    OpcUa_Void          (OPCUA_DLLCALL* ThreadDelete)             ( OpcUa_RawThread*            pRawThread);
 
-    /** @brief Start the system thread and let it execute the given function with pArguments. 
+    /** @brief Start the system thread and let it execute the given function with pArguments.
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* ThreadStart)              ( OpcUa_RawThread             pThread,
@@ -352,7 +352,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* TraceInitialize)          ();
 
-    /** @brief Clean up the tracing functionality after stack clean up after the last call to Trace was made. 
+    /** @brief Clean up the tracing functionality after stack clean up after the last call to Trace was made.
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_Void          (OPCUA_DLLCALL* TraceClear)               ();
@@ -374,7 +374,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* StrnCat)                  ( OpcUa_StringA               strDestination,
                                                                     OpcUa_UInt32                uiDestSize,
-                                                                    OpcUa_StringA               strSource, 
+                                                                    OpcUa_StringA               strSource,
                                                                     OpcUa_UInt32                uiLength);
 
     /** @brief Standard strlen functionality.
@@ -385,16 +385,16 @@ struct S_OpcUa_Port_CallTable
     /** @brief Standard strncmp functionality.
      *  @ingroup opcua_platformlayer_interface
      */
-    OpcUa_Int32         (OPCUA_DLLCALL* StrnCmp)                  ( OpcUa_StringA               string1, 
+    OpcUa_Int32         (OPCUA_DLLCALL* StrnCmp)                  ( OpcUa_StringA               string1,
                                                                     OpcUa_StringA               string2,
                                                                     OpcUa_UInt32                uiLength);
 
     /** @brief Standard strnicmp functionality.
      *  @ingroup opcua_platformlayer_interface
      */
-    OpcUa_Int32         (OPCUA_DLLCALL* StrniCmp)                 ( OpcUa_StringA               string1, 
-                                                                    OpcUa_StringA               string2, 
-                                                                    OpcUa_UInt32                uiLength); 
+    OpcUa_Int32         (OPCUA_DLLCALL* StrniCmp)                 ( OpcUa_StringA               string1,
+                                                                    OpcUa_StringA               string2,
+                                                                    OpcUa_UInt32                uiLength);
 
     /** @brief Standard strvsnprintf functionality.
      *  @ingroup opcua_platformlayer_interface
@@ -403,7 +403,7 @@ struct S_OpcUa_Port_CallTable
                                                                     OpcUa_UInt32                uCount,
                                                                     const OpcUa_StringA         sFormat,
                                                                     varg_list                   argptr);
-                                                        
+
     /**@} String Functions */
     /**@name Utility Functions */
     /**@{*/
@@ -537,7 +537,7 @@ struct S_OpcUa_Port_CallTable
                                                                     OpcUa_Boolean               bAllManagers);
 
     /** @brief Invoke the communication message loop for the given socket manager and block for a maximum of msecTimout seconds.
-     *         Caller can decide whether the loop should be executed once or until the shutdown event is signalled to the loop by 
+     *         Caller can decide whether the loop should be executed once or until the shutdown event is signalled to the loop by
      *         setting bRunOnce approbriately. The implementation decides whether timer callbacks are also invoked during the call.
      *         This function is mainly intended to process network and timer events in a single threaded environment. In a multi
      *         threaded environment, this function is executed in loop by a dedicated thread and not by the application.
@@ -570,7 +570,7 @@ struct S_OpcUa_Port_CallTable
      */
     OpcUa_StatusCode    (OPCUA_DLLCALL* SocketClose)              ( OpcUa_Socket                hSocket);
 
-    /** @brief Get IPv4 address and port number for the peer connected to the given socket. 
+    /** @brief Get IPv4 address and port number for the peer connected to the given socket.
      *         (Ignore call for non IPv4 connections. May get changed in future revisions.)
      *  @ingroup opcua_platformlayer_interface
      */

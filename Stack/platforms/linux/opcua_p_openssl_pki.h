@@ -19,18 +19,18 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief Creates a certificate store object.
- 
+
   @param pProvider                  [in]  The crypto provider handle.
-  
+
   @param ppCertificateStore         [out] The handle to the certificate store. Type depends on store implementation.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_OpenCertificateStore(
     OpcUa_PKIProvider*          pProvider,
     OpcUa_Void**                ppCertificateStore);
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.
@@ -40,9 +40,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_CloseCertificateStore(
     OpcUa_PKIProvider*       pProvider,
     OpcUa_Void**             ppCertificateStore);
 
-/** 
+/**
   @brief Validates a given X509 certificate object.
- 
+
    Validation:
    - Subject/Issuer
    - Path
@@ -61,12 +61,12 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_ValidateCertificate(
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Int*                  pValidationCode);
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
- 
+
   @param pProvider                [in]  The crypto provider handle.
   @param pCertificateStore        [in]  The certificate store that should store the passed in certificate.
-  @param pCertificate             [in]  The certificate that should be stored in the certificate store. 
+  @param pCertificate             [in]  The certificate that should be stored in the certificate store.
   @param pSaveHandle              [out]  The handle that indicates the save location of the certificate within then certificate store.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_SaveCertificate(
@@ -75,9 +75,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_SaveCertificate(
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Void*                 pSaveHandle);
 
-/** 
+/**
   @brief exports a certain certificate from a given certificate store.
- 
+
   @param pProvider                [in]  The crypto provider handle.
   @param pLoadHandle              [in]  The handle that indicates the load location of the certificate within then certificate store.
   @param ppCertificateStore       [in]  The certificate store that contains the desired certificate.
@@ -117,18 +117,18 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_ExtractCertificateData(
 
 /* NoSecurity functions */
 
-/** 
+/**
   @brief Creates a certificate store object.
- 
+
   @param pProvider                  [in]  The crypto provider handle.
-  
+
   @param ppCertificateStore         [out] The handle to the certificate store. Type depends on store implementation.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_OpenCertificateStore(
     OpcUa_PKIProvider*          pProvider,
     OpcUa_Void**                ppCertificateStore);
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.
@@ -138,9 +138,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_CloseCertificateStore(
     OpcUa_PKIProvider*          pProvider,
     OpcUa_Void**                ppCertificateStore);
 
-/** 
+/**
   @brief Validates a given X509 certificate object.
- 
+
    Validation:
    - Subject/Issuer
    - Path
@@ -159,12 +159,12 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_ValidateCertificate(
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Int*                  pValidationCode /* Validation return codes from OpenSSL */);
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
- 
+
   @param pProvider                [in]  The crypto provider handle.
   @param pCertificateStore        [in]  The certificate store that should store the passed in certificate.
-  @param pCertificate             [in]  The certificate that should be stored in the certificate store. 
+  @param pCertificate             [in]  The certificate that should be stored in the certificate store.
   @param pSaveHandle              [out]  The handle that indicates the save location of the certificate within then certificate store.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_SaveCertificate(
@@ -173,9 +173,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_SaveCertificate(
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Void*                 pSaveHandle);
 
-/** 
+/**
   @brief exports a certain certificate from a given certificate store.
- 
+
   @param pProvider                [in]  The crypto provider handle.
   @param pLoadHandle              [in]  The handle that indicates the load location of the certificate within then certificate store.
   @param ppCertificateStore       [in]  The certificate store that contains the desired certificate.
@@ -188,9 +188,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_LoadCertificate(
     OpcUa_Void*                 pCertificateStore,
     OpcUa_ByteString*           pCertificate);
 
-/** 
+/**
   @brief exports a certain certificate from a given certificate store.
- 
+
   @param pProvider                [in]  Load handle of the key file (ie. path in directory based PKI's).
   @param pLoadHandle              [in]  The format in which the key is stored.
   @param ppCertificateStore       [in]  The password if the key file is password secured.

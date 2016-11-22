@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore*    phRawSemaphore, 
+OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore*    phRawSemaphore,
                                                             OpcUa_UInt32        uInitalValue,
                                                             OpcUa_UInt32        uMaxRange);
 
@@ -22,7 +22,7 @@ OpcUa_Void          OPCUA_DLLCALL OpcUa_P_Semaphore_Delete( OpcUa_Semaphore*    
 
 OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Wait(   OpcUa_Semaphore     hRawSemaphore);
 
-OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore   hRawSemaphore, 
+OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore   hRawSemaphore,
                                                             OpcUa_UInt32        msecTimeout);
 
 OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Post(   OpcUa_Semaphore     hRawSemaphore,

@@ -243,7 +243,7 @@ typedef struct _OpcUa_NodeId
         OpcUa_String     String;
         OpcUa_Guid*      Guid;
         OpcUa_ByteString ByteString;
-    } 
+    }
     Identifier;
 }
 OpcUa_NodeId;
@@ -345,7 +345,7 @@ typedef struct _OpcUa_ExtensionObject
 {
     /*! @brief The full data type identifier. */
     OpcUa_ExpandedNodeId TypeId;
-    
+
     /*! @brief The encoding used for the body. */
     OpcUa_ExtensionObjectEncoding Encoding;
 
@@ -359,10 +359,10 @@ typedef struct _OpcUa_ExtensionObject
         OpcUa_XmlElement Xml;
 
         struct _OpcUa_EncodeableObjectBody
-        {           
+        {
             /*! @brief The object contained in the extension object. */
             OpcUa_Void* Object;
-            
+
             /*! @brief Provides information necessary to encode/decode the object. */
             struct _OpcUa_EncodeableType* Type;
         }
@@ -370,7 +370,7 @@ typedef struct _OpcUa_ExtensionObject
     }
     Body;
 
-    /*! @brief The length of the encoded body in bytes (updated automatically when GetSize is called). */   
+    /*! @brief The length of the encoded body in bytes (updated automatically when GetSize is called). */
     OpcUa_Int32 BodySize;
 }
 OpcUa_ExtensionObject;
@@ -440,10 +440,10 @@ typedef struct _OpcUa_VariantMatrixValue
     /* The length of each dimension. */
     OpcUa_Int32* Dimensions;
 
-    /* The data stored in the array. 
-    
+    /* The data stored in the array.
+
        The higher rank dimensions appear in the array first.
-       e.g. an array with dimensions [2,2,2] is written in this order: 
+       e.g. an array with dimensions [2,2,2] is written in this order:
        [0,0,0], [0,0,1], [0,1,0], [0,1,1], [1,0,0], [1,0,1], [1,1,0], [1,1,1]
 
        Using [3] to access the pointer stored in this field would return element [0,1,1] */
@@ -634,7 +634,7 @@ do { \
 /*============================================================================
  * Flags that can be set for the EventNotifier attribute.
  *===========================================================================*/
-  
+
 /* The Object or View produces no event and has no event history. */
 #define OpcUa_EventNotifiers_None 0x0
 
@@ -681,7 +681,7 @@ do { \
 
 /* The variable may be a scalar or a one dimensional array. */
 #define OpcUa_ValueRanks_ScalarOrOneDimension -3
-        
+
 /* The variable may be a scalar or an array of any dimension. */
 #define OpcUa_ValueRanks_Any -2
 
@@ -696,7 +696,7 @@ do { \
 
 /* The variable is always an array with two or more dimensions. */
 #define OpcUa_ValueRanks_TwoDimensions 2
-    
+
 /*============================================================================
  *  The bit masks used to indicate the write access to the attributes for a node.
  *===========================================================================*/

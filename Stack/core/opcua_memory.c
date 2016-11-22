@@ -37,10 +37,10 @@ OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_Alloc(OpcUa_UInt32 nSize)
 /*============================================================================
  * OpcUa_Memory_ReAlloc
  *===========================================================================*/
-OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_ReAlloc(   OpcUa_Void*     a_pBuffer, 
+OpcUa_Void* OPCUA_DLLCALL OpcUa_Memory_ReAlloc(   OpcUa_Void*     a_pBuffer,
                                                   OpcUa_UInt32    a_nSize)
 {
-    return OPCUA_P_MEMORY_REALLOC(  a_pBuffer, 
+    return OPCUA_P_MEMORY_REALLOC(  a_pBuffer,
                                     a_nSize);
 }
 
@@ -58,15 +58,15 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_Memory_Free(OpcUa_Void* a_pBuffer)
 /*============================================================================
  * OpcUa_Memory_MemCpy
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Memory_MemCpy(   OpcUa_Void*     a_pBuffer, 
-                                        OpcUa_UInt32    a_nSizeInBytes, 
-                                        OpcUa_Void*     a_pSource, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Memory_MemCpy(   OpcUa_Void*     a_pBuffer,
+                                        OpcUa_UInt32    a_nSizeInBytes,
+                                        OpcUa_Void*     a_pSource,
                                         OpcUa_UInt32    a_nCount)
 {
 
-    return OPCUA_P_MEMORY_MEMCPY(   a_pBuffer, 
-                                    a_nSizeInBytes, 
-                                    a_pSource, 
+    return OPCUA_P_MEMORY_MEMCPY(   a_pBuffer,
+                                    a_nSizeInBytes,
+                                    a_pSource,
                                     a_nCount);
 }
 

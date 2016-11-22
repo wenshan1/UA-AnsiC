@@ -39,8 +39,8 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_TransportProfile_SoapHttpBinary "http://opcfoundation.org/UA-Profile/Transport/http-uasc-uabinary"
 #define OpcUa_TransportProfile_HttpsBinary    "http://opcfoundation.org/UA-Profile/Transport/https-uabinary"
 
-/** Holds the runtime configuration values for the proxy stub modules.  
-    There may be some interference with the endpoint configuration at this time. 
+/** Holds the runtime configuration values for the proxy stub modules.
+    There may be some interference with the endpoint configuration at this time.
     Negative numeric values mean to use default values. */
 typedef struct _OpcUa_ProxyStubConfiguration
 {

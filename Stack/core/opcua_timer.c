@@ -33,15 +33,15 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Timer_Delete(OpcUa_Timer* a_phTimer)
  * Create A Timer
  *===========================================================================*/
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Timer_Create(  OpcUa_Timer*            a_phTimer,
-                                                    OpcUa_UInt32            a_msecInterval, 
+                                                    OpcUa_UInt32            a_msecInterval,
                                                     OpcUa_Timer_Callback*   a_fpTimerCallback,
                                                     OpcUa_Timer_Callback*   a_fpKillCallback,
                                                     OpcUa_Void*             a_pvCallbackData)
 {
-    return OPCUA_P_TIMER_CREATE(    a_phTimer, 
-                                    a_msecInterval, 
-                                    a_fpTimerCallback, 
-                                    a_fpKillCallback, 
+    return OPCUA_P_TIMER_CREATE(    a_phTimer,
+                                    a_msecInterval,
+                                    a_fpTimerCallback,
+                                    a_fpKillCallback,
                                     a_pvCallbackData);
 }
 

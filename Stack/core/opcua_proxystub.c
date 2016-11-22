@@ -14,7 +14,7 @@
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-#include <opcua_platformdefs.h> 
+#include <opcua_platformdefs.h>
 #include <opcua_trace.h>
 #include <opcua_socket.h>
 #include <opcua_timer.h>
@@ -311,7 +311,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "Initialize");
         OpcUa_GotoErrorIfBad(uStatus);
 
         /* initialize tracer */
-#if OPCUA_TRACE_ENABLE 
+#if OPCUA_TRACE_ENABLE
         uStatus = OpcUa_Trace_Initialize();
         OpcUa_GotoErrorIfBad(uStatus);
         OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OpcUa_ProxyStub_Initialize: Tracer has been initialized!\n");
@@ -388,7 +388,7 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_ProxyStub_Clear(OpcUa_Void)
 #endif /* OPCUA_USE_SYNCHRONISATION */
             OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OpcUa_ProxyStub_Clear: Network Module done!\n");
 
-#if OPCUA_TRACE_ENABLE 
+#if OPCUA_TRACE_ENABLE
             /* internal resource */
             OpcUa_Trace_Clear();
 #endif /* OPCUA_TRACE_ENABLE */
@@ -410,7 +410,7 @@ OpcUa_Void OpcUa_ProxyStub_RegisterChannel(OpcUa_Void)
         OPCUA_P_MUTEX_LOCK(OpcUa_ProxyStub_g_hGlobalsMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
-    ++OpcUa_ProxyStub_g_uNoOfChannels;    
+    ++OpcUa_ProxyStub_g_uNoOfChannels;
 
 #if OPCUA_USE_SYNCHRONISATION
         OPCUA_P_MUTEX_UNLOCK(OpcUa_ProxyStub_g_hGlobalsMutex);
@@ -442,7 +442,7 @@ OpcUa_Void OpcUa_ProxyStub_DeRegisterChannel(OpcUa_Void)
         OPCUA_P_MUTEX_LOCK(OpcUa_ProxyStub_g_hGlobalsMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
-    --OpcUa_ProxyStub_g_uNoOfChannels;    
+    --OpcUa_ProxyStub_g_uNoOfChannels;
 
 #if OPCUA_USE_SYNCHRONISATION
         OPCUA_P_MUTEX_UNLOCK(OpcUa_ProxyStub_g_hGlobalsMutex);
@@ -471,8 +471,8 @@ OpcUa_Void OpcUa_ProxyStub_DeRegisterEndpoint(OpcUa_Void)
 OpcUa_StatusCode OpcUa_ProxyStub_AddTypes(OpcUa_EncodeableType** a_ppTypes)
 {
 OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "AddTypes");
-        
-    uStatus = OpcUa_EncodeableTypeTable_AddTypes(   &OpcUa_ProxyStub_g_EncodeableTypes, 
+
+    uStatus = OpcUa_EncodeableTypeTable_AddTypes(   &OpcUa_ProxyStub_g_EncodeableTypes,
                                                     a_ppTypes);
     OpcUa_GotoErrorIfBad(uStatus);
 
@@ -487,12 +487,12 @@ OpcUa_FinishErrorHandling;
 OpcUa_StatusCode OpcUa_ProxyStub_SetNamespaceUris(OpcUa_StringA* a_psNamespaceUris)
 {
 OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "SetNamespaceUris");
-    
+
     /* discard existing strings */
     OpcUa_StringTable_Clear(&OpcUa_ProxyStub_g_NamespaceUris);
-    
+
     /* update table */
-    uStatus = OpcUa_StringTable_AddStringList(  &OpcUa_ProxyStub_g_NamespaceUris, 
+    uStatus = OpcUa_StringTable_AddStringList(  &OpcUa_ProxyStub_g_NamespaceUris,
                                                 a_psNamespaceUris);
     OpcUa_GotoErrorIfBad(uStatus);
 

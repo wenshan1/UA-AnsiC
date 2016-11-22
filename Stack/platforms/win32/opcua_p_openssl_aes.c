@@ -42,7 +42,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_AES_CBC_Encrypt(
     OpcUa_UInt32*           a_pCipherTextLen)
 {
     AES_KEY         key;
-    
+
     OpcUa_Byte*     pInitalVector = OpcUa_Null;
     OpcUa_UInt32    keyLenInBits  = 0;
 
@@ -146,8 +146,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_AES_CBC_Decrypt(
     pInitalVector = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(16);
     OpcUa_ReturnErrorIfAllocFailed(pInitalVector);
     OpcUa_P_Memory_MemCpy(pInitalVector, 16, a_pInitalVector, 16);
-    
-    /* decrypt ciphertext */ 
+
+    /* decrypt ciphertext */
     AES_cbc_encrypt(    a_pCipherText,
                         a_pPlainText,
                         a_cipherTextLen,
@@ -157,13 +157,13 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_AES_CBC_Decrypt(
 
     /* get real message length */
     *a_pPlainTextLen = a_cipherTextLen;
-    
+
     OpcUa_P_Memory_Free(pInitalVector);
     pInitalVector = OpcUa_Null;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
-    
+
     OpcUa_P_Memory_Free(pInitalVector);
     pInitalVector = OpcUa_Null;
 

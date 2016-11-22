@@ -51,7 +51,7 @@ typedef struct _OpcUa_StatusCodeString
 #define OpcUa_Module_Stream             0x00000002L
 #define OpcUa_Module_Buffer             0x00000003L
 #define OpcUa_Module_Connection         0x00000004L
-#define OpcUa_Module_Crypto             0x00000005L 
+#define OpcUa_Module_Crypto             0x00000005L
 #define OpcUa_Module_Listener           0x00000006L
 #define OpcUa_Module_MemoryStream       0x00000007L
 #define OpcUa_Module_PkiProvider        0x00000008L
@@ -395,7 +395,7 @@ typedef struct _OpcUa_StatusCodeString
 /*============================================================================
  * OpcUa_ReturnErrorIfInvalidObject
  *===========================================================================*/
-/** 
+/**
  * @brief Jumps to the beginning of the error handling block.
  */
 #define OpcUa_GotoError goto Error;
@@ -403,7 +403,7 @@ typedef struct _OpcUa_StatusCodeString
 /*============================================================================
  * OpcUa_InitializeStatus
  *===========================================================================*/
-/** 
+/**
  * @brief Marks the beginning of an error handling block.
  */
 #if !OPCUA_ERRORHANDLING_OMIT_METHODNAME
@@ -439,32 +439,32 @@ typedef struct _OpcUa_StatusCodeString
 /*============================================================================
  * OpcUa_ReturnStatusCode
  *===========================================================================*/
-/** 
+/**
  * @brief Marks the beginning of an error handling block.
  */
 #if OPCUA_TRACE_ERROR_MACROS
     #define OpcUa_ReturnStatusCode \
     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "<-- \"%s\" = 0x%08X (%s).\n", uStatusMethod, uStatus, OpcUa_IsGood(uStatus)?"GOOD":"BAD");\
-    return uStatus&0xFFFF0000L; 
+    return uStatus&0xFFFF0000L;
 #else /* OPCUA_TRACE_ERROR_MACROS */
     #define OpcUa_ReturnStatusCode \
-    return uStatus&0xFFFF0000L; 
+    return uStatus&0xFFFF0000L;
 #endif /* OPCUA_TRACE_ERROR_MACROS */
 
 
 /*============================================================================
  * OpcUa_BeginErrorHandling
  *===========================================================================*/
-/** 
+/**
  * @brief Marks the beginning of an error handling block.
  */
-#define OpcUa_BeginErrorHandling Error:  
+#define OpcUa_BeginErrorHandling Error:
 
 
 /*============================================================================
  * OpcUa_FinishErrorHandling
  *===========================================================================*/
-/** 
+/**
  * @brief Marks the end of an error handling block.
  */
 #if OPCUA_TRACE_ERROR_MACROS
@@ -478,7 +478,7 @@ typedef struct _OpcUa_StatusCodeString
 /*============================================================================
  * OpcUa_SurpressError
  *===========================================================================*/
-/** 
+/**
  * @brief Writes a trace statement indicating that an error was intentionally ignored.
  */
 #if OPCUA_TRACE_ERROR_MACROS

@@ -22,7 +22,7 @@
 OPCUA_BEGIN_EXTERN_C
 
 struct _OpcUa_PKIProvider;
-/** 
+/**
   @brief Validates a given X509 certificate object.
 
    Validation:
@@ -37,15 +37,15 @@ struct _OpcUa_PKIProvider;
 
   @param pValidationCode          [out] The validation code, that gives information about the validation result.
 */
-typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnValidateCertificate)(  
+typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnValidateCertificate)(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_ByteString*           pCertificate,
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Int*                  pValidationCode); /* Validation return code. */
 
-/** 
+/**
   @brief Validates a given X509 certificate object.
- 
+
    Validation:
    - Subject/Issuer
    - Path
@@ -65,29 +65,29 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_ValidateCertificate(
     OpcUa_Int*                  pValidationCode); /* Validation return code. */
 
 
-/** 
+/**
   @brief Creates a certificate store object.
 
   @param pPKI                         [in]  The pki handle.
-  
+
   @param ppCertificateStore           [out] The handle to the certificate store.
 */
-typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnOpenCertificateStore)(  
+typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnOpenCertificateStore)(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_Void**                ppCertificateStore); /* type depends on store implementation */
 
-/** 
+/**
   @brief Creates a certificate store object.
 
   @param pPKI                         [in]  The PKI handle.
-  
+
   @param ppCertificateStore           [out] The handle to the certificate store.
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_OpenCertificateStore(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_Void**                ppCertificateStore); /* type depends on store implementation */
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
 
   @param pPKI                     [in]  The pki handle.
@@ -96,15 +96,15 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_OpenCertificateStore(
 
   @param pCertificateIndex        [int/out] The index that indicates the store location of the certificate within the certificate store.
 */
-typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnSaveCertificate)(  
+typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnSaveCertificate)(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_ByteString*           pCertificate,
     OpcUa_Void*                 pCertificateStore,
     OpcUa_Void*                 pSaveHandle);
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
- 
+
   @param pPKI                     [in]  The PKI handle.
   @param pCertificate             [in]  The certificate that should be imported.
   @param pCertificateStore        [in]  The certificate store that should store the passed in certificate.
@@ -119,24 +119,24 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_SaveCertificate(
 
 
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
- 
+
   @param pPKI                     [in]  The pki handle.
   @param pCertificate             [in]  The certificate that should be imported.
   @param pCertificateStore        [in]  The certificate store that should store the passed in certificate.
 
   @param pCertificateIndex        [out] The index that indicates the store location of the certificate within the certificate store.
 */
-typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnLoadCertificate)(  
+typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnLoadCertificate)(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_Void*                 pLoadHandle,
     OpcUa_Void*                 pCertificateStore,
     OpcUa_ByteString*           pCertificate);
 
-/** 
+/**
   @brief imports a given certificate into given certificate store.
- 
+
   @param pPKI                     [in]  The PKI handle.
   @param pCertificate             [in]  The certificate that should be imported.
   @param pCertificateStore        [in]  The certificate store that should store the passed in certificate.
@@ -150,19 +150,19 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_LoadCertificate(
     OpcUa_ByteString*           pCertificate);
 
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.
 
   @param pCertificateStore     [out] The certificate store object.
 */
-typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnCloseCertificateStore)(  
+typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnCloseCertificateStore)(
     struct _OpcUa_PKIProvider*  pPKI,
     OpcUa_Void**                ppCertificateStore); /* type depends on store implementation */
 
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.
@@ -174,7 +174,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_CloseCertificateStore(
     OpcUa_Void**                ppCertificateStore); /* type depends on store implementation */
 
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.
@@ -187,7 +187,7 @@ typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnLoadPrivateKeyFromFile)(
     OpcUa_StringA               password,
     OpcUa_ByteString*           pPrivateKey);
 
-/** 
+/**
   @brief frees a certificate store object.
 
   @param pProvider             [in]  The crypto provider handle.

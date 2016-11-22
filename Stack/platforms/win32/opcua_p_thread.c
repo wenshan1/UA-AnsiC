@@ -149,8 +149,8 @@ OpcUa_Void OpcUa_P_Thread_Delete(OpcUa_RawThread* pRawThread)
 /*============================================================================
  * Create Thread
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_Thread_Start(  OpcUa_RawThread             pThread, 
-                                        OpcUa_PfnInternalThreadMain pfnStartFunction, 
+OpcUa_StatusCode OpcUa_P_Thread_Start(  OpcUa_RawThread             pThread,
+                                        OpcUa_PfnInternalThreadMain pfnStartFunction,
                                         OpcUa_Void*                 pArguments)
 {
     OpcUa_Int32         apiResult = 0;
@@ -162,14 +162,14 @@ OpcUa_StatusCode OpcUa_P_Thread_Start(  OpcUa_RawThread             pThread,
     }
 
     pThreadArguments = OpcUa_Alloc(sizeof(OpcUa_P_ThreadArg));
-    memset(pThreadArguments, 0, sizeof(OpcUa_P_ThreadArg)); 
+    memset(pThreadArguments, 0, sizeof(OpcUa_P_ThreadArg));
 
     pThreadArguments->hThread               = pThread;
     pThreadArguments->pfnInternalThreadMain = pfnStartFunction;
     pThreadArguments->ThreadArgs            = pArguments;
 
-    apiResult = pthread_create((pthread_t*)(pThread), NULL, pthread_start, pThreadArguments); 
-    
+    apiResult = pthread_create((pthread_t*)(pThread), NULL, pthread_start, pThreadArguments);
+
 
     switch(apiResult)
     {
@@ -226,7 +226,7 @@ void* win32thread_start(void* args)
 {
     OpcUa_P_ThreadArg*  pThreadArgs         = OpcUa_Null;
     OpcUa_Void*         pArguments          = OpcUa_Null;
-    
+
     if(args == OpcUa_Null)
     {
         return OpcUa_Null;
@@ -303,8 +303,8 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Thread_Delete(OpcUa_RawThread* pRawThread)
 /*============================================================================
  * Create Thread
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Thread_Start(OpcUa_RawThread             pThread, 
-                                                    OpcUa_PfnInternalThreadMain pfnStartFunction, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Thread_Start(OpcUa_RawThread             pThread,
+                                                    OpcUa_PfnInternalThreadMain pfnStartFunction,
                                                     OpcUa_Void*                 pArguments)
 {
     HANDLE threadHandle = 0;
@@ -317,11 +317,11 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Thread_Start(OpcUa_RawThread             
     ((OpcUa_P_ThreadArg*)pThread)->pfnInternalThreadMain    = pfnStartFunction;
     ((OpcUa_P_ThreadArg*)pThread)->ThreadArgs               = pArguments;
 
-    threadHandle = CreateThread(    NULL, 
-                                    0, 
-                                    (LPTHREAD_START_ROUTINE)win32thread_start, 
-                                    pThread, 
-                                    0, 
+    threadHandle = CreateThread(    NULL,
+                                    0,
+                                    (LPTHREAD_START_ROUTINE)win32thread_start,
+                                    pThread,
+                                    0,
                                     NULL);
 
     if(threadHandle == NULL)

@@ -23,7 +23,7 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief Stores data used to construct a message context.
 */
 typedef struct _OpcUa_MessageContext
@@ -54,7 +54,7 @@ typedef struct _OpcUa_MessageContext
 }
 OpcUa_MessageContext;
 
-/** 
+/**
   @brief Puts the context into a known state.
 
   @param pContext [in] The context to initialize.
@@ -62,7 +62,7 @@ OpcUa_MessageContext;
 OPCUA_EXPORT OpcUa_Void OpcUa_MessageContext_Initialize(
     OpcUa_MessageContext* pContext);
 
-/** 
+/**
   @brief Frees all memory used by a string context.
 
   @param pContext [in] The context to clear.
@@ -70,7 +70,7 @@ OPCUA_EXPORT OpcUa_Void OpcUa_MessageContext_Initialize(
 OPCUA_EXPORT OpcUa_Void OpcUa_MessageContext_Clear(
     OpcUa_MessageContext* pContext);
 
-/** 
+/**
   @brief Adds a new encoded object position to the context.
 
   @param pContext [in] The context to update.
@@ -82,7 +82,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_MessageContext_SaveObjectPosition(
     OpcUa_UInt32          nStart,
     OpcUa_UInt32          nEnd);
 
-/** 
+/**
   @brief Gets the length of an object at the specified position.
 
   @param pContext [in] The context to search.

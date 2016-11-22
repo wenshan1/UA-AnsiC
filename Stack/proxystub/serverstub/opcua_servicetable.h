@@ -25,12 +25,12 @@
 OPCUA_BEGIN_EXTERN_C
 
 
-/** 
+/**
   @brief Describes a service supported by an endpoint.
 */
 /*typedef struct _OpcUa_ServiceType OpcUa_ServiceType;*/
 
-/** 
+/**
   @brief Stores a table of services supported by an endpoint.
 */
 typedef struct _OpcUa_ServiceTable
@@ -43,10 +43,10 @@ typedef struct _OpcUa_ServiceTable
 }
 OpcUa_ServiceTable;
 
-/** 
+/**
   @brief Populates a service table from a null terminated list of service types.
 
-  This functions sorts the entries in the service table to optimize look ups with 
+  This functions sorts the entries in the service table to optimize look ups with
   the FindService function.
 
   @param pTable [in] The table to initialize.
@@ -56,14 +56,14 @@ OpcUa_StatusCode OpcUa_ServiceTable_AddTypes(
     OpcUa_ServiceTable* pTable,
     OpcUa_ServiceType** pTypes);
 
-/** 
+/**
   @brief Frees all memory owned by a service table.
 
   @param pTable [in] The table to clear.
 */
 OpcUa_Void OpcUa_ServiceTable_Clear(OpcUa_ServiceTable* pTable);
 
-/** 
+/**
   @brief Finds a service type in a table.
 
   This table should have been sorted with a call to Initialize first.
@@ -77,7 +77,7 @@ OpcUa_StatusCode OpcUa_ServiceTable_FindService(
     OpcUa_UInt32        nTypeId,
     OpcUa_ServiceType*  pType);
 
-/** 
+/**
   @brief Creates a fault response for a service.
 
   The diagnostic and string information is stored in the fault object.
@@ -90,7 +90,7 @@ OpcUa_StatusCode OpcUa_ServiceTable_FindService(
   @param ppFault             [out]    The fault object.
   @param ppFaultType         [out]    The type of fault.
 */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_ServerApi_CreateFault(
     OpcUa_RequestHeader*   pRequestHeader,
     OpcUa_StatusCode       uServiceResult,

@@ -46,8 +46,8 @@ OpcUa_BinaryEncoder;
 /*============================================================================
  * OpcUa_BinaryEncoder_SanityCheck
  *
- * The sanity check reduces the likely hood of a fatal error caused by 
- * casting a bad handle to a OpcUa_BinaryEncoder structure. The value 
+ * The sanity check reduces the likely hood of a fatal error caused by
+ * casting a bad handle to a OpcUa_BinaryEncoder structure. The value
  * was created by generating a new guid and taking the first for bytes.
  *===========================================================================*/
 #define OpcUa_BinaryEncoder_SanityCheck 0x323278DA
@@ -85,7 +85,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_Write" #xTy
 OpcUa_ReturnErrorIfArgumentNull(a_pEncoder); \
 OpcUa_ReturnErrorIfArgumentNull(a_pValue); \
 OpcUa_ReferenceParameter(a_sFieldName); \
-OpcUa_BinaryEncoder_VerifyState(xType); 
+OpcUa_BinaryEncoder_VerifyState(xType);
 
 /*============================================================================
  * End_OpcUa_BinaryEncoder_Write
@@ -132,7 +132,7 @@ if (a_pSize != OpcUa_Null) \
     *a_pSize = iSize; \
  \
     OpcUa_ReturnStatusCode; \
-} 
+}
 
 /*============================================================================
  * OpcUa_GetSize_VariableLengthArrayType
@@ -160,7 +160,7 @@ if (a_pSize != OpcUa_Null) \
     *a_pSize = iSize; \
  \
     OpcUa_ReturnStatusCode; \
-} 
+}
 
 /*============================================================================
  * OpcUa_Encode_ArrayType
@@ -227,8 +227,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_Open");
     OpcUa_MemCpy(pEncodeContext, sizeof(struct _OpcUa_Encoder), a_pEncoder, sizeof(struct _OpcUa_Encoder));
 
     pEncodeContext->Handle = OpcUa_Alloc(sizeof(OpcUa_BinaryEncoder));
-    OpcUa_GotoErrorIfAllocFailed(pEncodeContext->Handle);    
-    
+    OpcUa_GotoErrorIfAllocFailed(pEncodeContext->Handle);
+
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->SanityCheck = ((OpcUa_BinaryEncoder*)a_pEncoder->Handle)->SanityCheck;
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Ostrm       = a_pOstrm;
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Context     = a_pContext;
@@ -300,7 +300,7 @@ OpcUa_Void OpcUa_BinaryEncoder_Delete(
         OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
 
         OpcUa_Free(pHandle);
-        
+
         OpcUa_Free(*a_ppEncoder);
         *a_ppEncoder = OpcUa_Null;
     }
@@ -310,14 +310,14 @@ OpcUa_Void OpcUa_BinaryEncoder_Delete(
  * OpcUa_BinaryEncoder_PushNamespace
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_BinaryEncoder_PushNamespace(
-    struct _OpcUa_Encoder* a_pEncoder, 
+    struct _OpcUa_Encoder* a_pEncoder,
     OpcUa_String*          a_sNamespaceUri)
 {
     OpcUa_ReferenceParameter(a_pEncoder);
     OpcUa_ReferenceParameter(a_sNamespaceUri);
-    
-    /* not used in the binary encoding */ 
-    
+
+    /* not used in the binary encoding */
+
     return OpcUa_Good;
 }
 
@@ -328,9 +328,9 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_PopNamespace(
     struct _OpcUa_Encoder* a_pEncoder)
 {
     OpcUa_ReferenceParameter(a_pEncoder);
-    
-    /* not used in the binary encoding */ 
-    
+
+    /* not used in the binary encoding */
+
     return OpcUa_Good;
 }
 
@@ -429,7 +429,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteByte(
     OpcUa_StringA          a_sFieldName,
     OpcUa_Byte*            a_pValue,
     OpcUa_Int32*           a_pSize)
-{    
+{
     Implement_OpcUa_BinaryEncoder_WriteFixedLengthType(SByte);
 }
 
@@ -462,7 +462,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteInt16(
     OpcUa_StringA          a_sFieldName,
     OpcUa_Int16*           a_pValue,
     OpcUa_Int32*           a_pSize)
-{   
+{
     Implement_OpcUa_BinaryEncoder_WriteFixedLengthType(Int16);
 }
 
@@ -710,7 +710,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_String_BinaryEncode");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pOstrm);
-    
+
     /* encode a length of -1 to indicate a null string. */
     if(OpcUa_String_IsNull(a_pValue))
     {
@@ -758,9 +758,9 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteString
 
     OpcUa_BinaryEncoder_VerifyState(String);
 
-   
+
     if(a_pSize != OpcUa_Null)
-    { 
+    {
         /* calculate encoded size of string */
         *a_pSize = sizeof(OpcUa_Int32_Wire);
 
@@ -870,7 +870,7 @@ OpcUa_StatusCode OpcUa_Guid_BinaryEncode(
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pOstrm);
-    
+
     uStatus = OpcUa_UInt32_BinaryEncode(a_pValue->Data1, a_pOstrm);
     OpcUa_GotoErrorIfBad(uStatus);
 
@@ -945,7 +945,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_ByteString_BinaryEncode")
 
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReturnErrorIfArgumentNull(a_pOstrm);
-   
+
     /* determine length of byte string */
     if (a_pValue->Length >= 0 && a_pValue->Data != OpcUa_Null)
     {
@@ -1040,7 +1040,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteXmlElement(
 
     uStatus = OpcUa_BinaryEncoder_WriteByteString(a_pEncoder, a_sFieldName, a_pValue, a_pSize);
     OpcUa_GotoErrorIfBad(uStatus);
-    
+
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
@@ -1094,14 +1094,14 @@ static OpcUa_NodeEncoding OpcUa_NodeId_GetEncodingType(OpcUa_NodeId* a_pNodeId)
  *===========================================================================*/
 static OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeIdBody(
     OpcUa_Encoder*      a_pEncoder,
-    OpcUa_NodeId*       a_pValue, 
+    OpcUa_NodeId*       a_pValue,
     OpcUa_NodeEncoding  a_eEncodingType)
 {
     OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteNodeIdBody");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pEncoder);
-    OpcUa_ReturnErrorIfArgumentNull(a_pValue); 
-    
+    OpcUa_ReturnErrorIfArgumentNull(a_pValue);
+
     switch (a_eEncodingType & OpcUa_NodeEncoding_TypeMask)
     {
         case OpcUa_NodeEncoding_TwoByte:
@@ -1162,7 +1162,7 @@ static OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeIdBody(
             OpcUa_GotoErrorIfBad(uStatus);
 
             uStatus = OpcUa_BinaryEncoder_WriteString(a_pEncoder, OpcUa_Null, &sIdentifier, OpcUa_Null);
-            OpcUa_GotoErrorIfBad(uStatus);          
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
 
@@ -1180,7 +1180,7 @@ static OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeIdBody(
             OpcUa_GotoErrorIfBad(uStatus);
 
             uStatus = OpcUa_BinaryEncoder_WriteGuid(a_pEncoder, OpcUa_Null, pIdentifier, OpcUa_Null);
-            OpcUa_GotoErrorIfBad(uStatus);  
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
 
@@ -1198,10 +1198,10 @@ static OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeIdBody(
             OpcUa_GotoErrorIfBad(uStatus);
 
             uStatus = OpcUa_BinaryEncoder_WriteByteString(a_pEncoder, OpcUa_Null, pIdentifier, OpcUa_Null);
-            OpcUa_GotoErrorIfBad(uStatus);          
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
-    }   
+    }
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
@@ -1216,7 +1216,7 @@ static OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeIdBody(
  *===========================================================================*/
  OpcUa_StatusCode OpcUa_BinaryEncoder_NodeIdGetSize(
     OpcUa_Encoder*     a_pEncoder,
-    OpcUa_NodeId*      a_pValue, 
+    OpcUa_NodeId*      a_pValue,
     OpcUa_NodeEncoding a_eEncodingType,
     OpcUa_Int32*       a_pSize)
 {
@@ -1321,7 +1321,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteNodeId(
         OpcUa_ReturnStatusCode;
     }
 
-    /* write the encoding byte */    
+    /* write the encoding byte */
     uStatus = OpcUa_BinaryEncoder_WriteByte(a_pEncoder, OpcUa_Null, &byEncodingType, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
 
@@ -1357,7 +1357,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteExpandedNodeId(
     OpcUa_BinaryEncoder_VerifyState(ExpandedNodeId);
 
     uEncodingType = (OpcUa_Byte)OpcUa_NodeId_GetEncodingType(&a_pValue->NodeId);
-            
+
     if((!OpcUa_String_IsNull(&(a_pValue->NamespaceUri))) && OpcUa_StrLen(&(a_pValue->NamespaceUri)) > 0)
     {
         /* set flag indicating uri is encoded. */
@@ -1397,7 +1397,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteExpandedNodeId(
         OpcUa_ReturnStatusCode;
     }
 
-    /* write the encoding byte */    
+    /* write the encoding byte */
     uStatus = OpcUa_BinaryEncoder_WriteByte(a_pEncoder, OpcUa_Null, &uEncodingType, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
 
@@ -1461,7 +1461,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteStatusCode(
 
     OpcUa_FinishErrorHandling;
 }
-    
+
 /*============================================================================
  * OpcUa_DiagnosticInfo_GetEncodingByte
  *===========================================================================*/
@@ -1526,7 +1526,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteDiagnosticInfo(
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_BinaryEncoder_DiagnosticInfoGetSize(
     OpcUa_Encoder*        a_pEncoder,
-    OpcUa_DiagnosticInfo* a_pValue, 
+    OpcUa_DiagnosticInfo* a_pValue,
     OpcUa_Byte            a_uEncodingByte,
     OpcUa_Int32*          a_pSize)
 {
@@ -1535,8 +1535,8 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_DiagnosticInfoGetSize(
 
     OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_DiagnosticInfoGetSize");
 
-    OpcUa_ReferenceParameter(a_pEncoder); 
-    OpcUa_ReferenceParameter(a_pValue); 
+    OpcUa_ReferenceParameter(a_pEncoder);
+    OpcUa_ReferenceParameter(a_pValue);
     OpcUa_ReferenceParameter(a_pSize);
 
     *a_pSize = -1;
@@ -1548,7 +1548,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_DiagnosticInfoGetSize(
     }
 
     iSize += sizeof(OpcUa_Byte);
-    
+
     if ((a_uEncodingByte & OpcUa_DiagnosticInfo_EncodingByte_SymbolicId) != 0)
     {
         iSize += sizeof(OpcUa_Int32);
@@ -1587,7 +1587,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_DiagnosticInfoGetSize(
         OpcUa_GotoErrorIfBad(uStatus);
         iSize += iFieldSize;
     }
-    
+
     *a_pSize = iSize;
 
     OpcUa_ReturnStatusCode;
@@ -1666,7 +1666,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteDiagnosticInfo(
 
     /* write inner status code */
     if ((uEncodingByte & OpcUa_DiagnosticInfo_EncodingByte_InnerStatusCode) != 0)
-    {        
+    {
         uStatus = OpcUa_BinaryEncoder_WriteStatusCode(a_pEncoder, OpcUa_Null, &a_pValue->InnerStatusCode, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
     }
@@ -1765,7 +1765,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteLocalizedText(
     OpcUa_StringA          a_sFieldName,
     OpcUa_LocalizedText*   a_pValue,
     OpcUa_Int32*           a_pSize)
-{   
+{
     OpcUa_BinaryEncoder* pHandle = OpcUa_Null;
     OpcUa_Byte uEncodingByte = OpcUa_LocalizedText_GetEncodingByte(a_pValue);
 
@@ -1830,12 +1830,12 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteQualifiedName(
     OpcUa_BinaryEncoder_VerifyState(QualifiedName);
 
     if (a_pSize != OpcUa_Null)
-    {        
+    {
         *a_pSize = -1;
 
         OpcUa_Field_GetSize(UInt16, NamespaceIndex);
         OpcUa_Field_GetSize(String, Name);
-        
+
         *a_pSize = iSize;
     }
     else
@@ -1938,13 +1938,13 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_ExtensionObjectGetSize(
 
         /* get size of encodeable object body */
         else if (a_pValue->Encoding == OpcUa_ExtensionObjectEncoding_EncodeableObject)
-        {   
+        {
             /* length of encoded object */
             uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-                a_pEncoder, 
-                OpcUa_Null, 
-                a_pValue->Body.EncodeableObject.Object, 
-                a_pValue->Body.EncodeableObject.Type, 
+                a_pEncoder,
+                OpcUa_Null,
+                a_pValue->Body.EncodeableObject.Object,
+                a_pValue->Body.EncodeableObject.Type,
                 &iBodySize);
 
             OpcUa_GotoErrorIfBad(uStatus);
@@ -1996,7 +1996,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteExtens
     if (a_pValue->Encoding == OpcUa_ExtensionObjectEncoding_EncodeableObject)
     {
         OpcUa_ReturnErrorIfArgumentNull(a_pValue->Body.EncodeableObject.Type);
-    }   
+    }
 
     /* make an updateable copy but don't duplicate the memory so clear does not need to be called */
     if (!OpcUa_ExpandedNodeId_IsNull(&a_pValue->TypeId))
@@ -2012,7 +2012,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteExtens
         cTypeId.NodeId.IdentifierType     = OpcUa_IdentifierType_Numeric;
         cTypeId.NodeId.Identifier.Numeric = pType->BinaryEncodingTypeId;
         cTypeId.NodeId.NamespaceIndex     = 0;
-        
+
         if (pType->NamespaceUri != OpcUa_Null)
         {
             uStatus = OpcUa_String_AttachReadOnly(&cTypeId.NamespaceUri, pType->NamespaceUri);
@@ -2042,7 +2042,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteExtens
     /* write type id */
     uStatus = OpcUa_BinaryEncoder_WriteNodeId(a_pEncoder, OpcUa_Null, &cTypeId.NodeId, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
-    
+
     /* write encoding byte */
     uEncodingByte = (OpcUa_Byte)a_pValue->Encoding;
 
@@ -2058,12 +2058,12 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteExtens
     {
         /* must pre-calculate size if stream does not support seeking */
         if (a_pValue->BodySize <= 0)
-        {   
+        {
             uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-                a_pEncoder, 
-                OpcUa_Null, 
-                a_pValue->Body.EncodeableObject.Object, 
-                a_pValue->Body.EncodeableObject.Type, 
+                a_pEncoder,
+                OpcUa_Null,
+                a_pValue->Body.EncodeableObject.Object,
+                a_pValue->Body.EncodeableObject.Type,
                 &a_pValue->BodySize);
 
             OpcUa_GotoErrorIfBad(uStatus);
@@ -2073,24 +2073,24 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteExtens
         uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &a_pValue->BodySize, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
 
-        /* write body */        
+        /* write body */
         uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-            a_pEncoder, 
-            OpcUa_Null, 
-            a_pValue->Body.EncodeableObject.Object, 
-            a_pValue->Body.EncodeableObject.Type, 
+            a_pEncoder,
+            OpcUa_Null,
+            a_pValue->Body.EncodeableObject.Object,
+            a_pValue->Body.EncodeableObject.Type,
             OpcUa_Null);
-        
+
         OpcUa_GotoErrorIfBad(uStatus);
     }
     else if (a_pValue->Encoding == OpcUa_ExtensionObjectEncoding_Binary)
-    {        
+    {
         /* write byte string body */
         uStatus = OpcUa_BinaryEncoder_WriteByteString(a_pEncoder, OpcUa_Null, &a_pValue->Body.Binary, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
     }
     else if (a_pValue->Encoding == OpcUa_ExtensionObjectEncoding_Xml)
-    {        
+    {
         /* write xml element body */
         uStatus = OpcUa_BinaryEncoder_WriteXmlElement(a_pEncoder, OpcUa_Null, &a_pValue->Body.Xml, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
@@ -2256,7 +2256,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteDataValue(
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
     OpcUa_ReferenceParameter(a_sFieldName);
     OpcUa_BinaryEncoder_VerifyState(DataValue);
-    
+
     /* calculate size */
     if (a_pSize != OpcUa_Null)
     {
@@ -2318,7 +2318,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteDataValue(
 
     OpcUa_FinishErrorHandling;
 }
-    
+
 /*============================================================================
  * OpcUa_BinaryEncoder_WriteEncodeable
  *===========================================================================*/
@@ -2343,7 +2343,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteEncode
     if (pHandle->Context->AlwaysCheckLengths || a_pSize != OpcUa_Null)
     {
         /* get the size of the encodeable object */
-        uStatus = a_pType->GetSize(a_pValue, a_pEncoder, &iSize);   
+        uStatus = a_pType->GetSize(a_pValue, a_pEncoder, &iSize);
         OpcUa_GotoErrorIfBad(uStatus);
 
         /* update size to return */
@@ -2356,7 +2356,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteEncode
     /* encode the object */
     if (a_pSize == OpcUa_Null)
     {
-        uStatus = a_pType->Encode(a_pValue, a_pEncoder);    
+        uStatus = a_pType->Encode(a_pValue, a_pEncoder);
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
@@ -2370,7 +2370,7 @@ OpcUa_BeginErrorHandling;
 
 OpcUa_FinishErrorHandling;
 }
-    
+
 /*============================================================================
  * OpcUa_BinaryEncoder_WriteEnumerated
  *===========================================================================*/
@@ -2712,7 +2712,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteDoubleArray(
 
     OpcUa_GetSize_FixedLengthArrayType(Double);
     OpcUa_Encode_ArrayType(Double);
-    
+
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
@@ -3126,7 +3126,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteVariantArray(
 
     OpcUa_FinishErrorHandling;
 }
-    
+
 /*============================================================================
  * OpcUa_BinaryEncoder_WriteEncodeableArray
  *===========================================================================*/
@@ -3150,60 +3150,60 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteEncodeableArray(
 
     /* calculate size */
     if (a_pSize != OpcUa_Null)
-    { 
-        OpcUa_Int32 iSize = 0; 
-     
+    {
+        OpcUa_Int32 iSize = 0;
+
         *a_pSize = -1;
         iSize += sizeof(OpcUa_Int32);
-     
+
         if (a_pArray != OpcUa_Null)
         {
             for (ii = 0; ii < a_nCount; ii++)
-            { 
+            {
                 OpcUa_Int32 iElementSize = 0;
                 OpcUa_UInt32 uPosition = ii*a_pType->AllocationSize;
 
                 uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-                    a_pEncoder, 
-                    OpcUa_Null, 
-                    &(((OpcUa_Byte*)a_pArray)[uPosition]), 
-                    a_pType, 
+                    a_pEncoder,
+                    OpcUa_Null,
+                    &(((OpcUa_Byte*)a_pArray)[uPosition]),
+                    a_pType,
                     &iElementSize);
 
                 OpcUa_GotoErrorIfBad(uStatus);
-                
+
                 iSize += iElementSize;
             }
         }
-    
-        *a_pSize = iSize; 
-     
+
+        *a_pSize = iSize;
+
         OpcUa_ReturnStatusCode;
     }
 
     /* write null array */
     if (a_pArray == OpcUa_Null)
-    { 
+    {
         OpcUa_Int32 iLength = -1;
         uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &iLength, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
-        OpcUa_ReturnStatusCode; 
-    } 
+        OpcUa_ReturnStatusCode;
+    }
 
     /* write length of array */
     uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &a_nCount, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
-    
+
     /* write elements of array */
     for (ii = 0; ii < a_nCount; ii++)
-    { 
+    {
         OpcUa_UInt32 uPosition = ii*a_pType->AllocationSize;
 
         uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-            a_pEncoder, 
-            OpcUa_Null, 
-            &(((OpcUa_Byte*)a_pArray)[uPosition]), 
-            a_pType, 
+            a_pEncoder,
+            OpcUa_Null,
+            &(((OpcUa_Byte*)a_pArray)[uPosition]),
+            a_pType,
             OpcUa_Null);
 
         OpcUa_GotoErrorIfBad(uStatus);
@@ -3216,7 +3216,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteEncodeableArray(
 
     OpcUa_FinishErrorHandling;
 }
-    
+
 /*============================================================================
  * OpcUa_BinaryEncoder_WriteEnumeratedArray
  *===========================================================================*/
@@ -3237,41 +3237,41 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteEnumeratedArray(
     OpcUa_ReturnErrorIfArgumentNull(a_pType);
     OpcUa_ReferenceParameter(a_sFieldName);
     OpcUa_BinaryEncoder_VerifyState(EnumeratedArray);
- 
+
     /* calculate size */
     if (a_pSize != OpcUa_Null)
-    { 
-        OpcUa_Int32 iSize = 0; 
-     
+    {
+        OpcUa_Int32 iSize = 0;
+
         *a_pSize = -1;
         iSize += sizeof(OpcUa_Int32);
-     
+
         if (a_pArray != OpcUa_Null)
         {
             iSize += sizeof(OpcUa_Int32)*a_nCount;
         }
-    
-        *a_pSize = iSize; 
-     
+
+        *a_pSize = iSize;
+
         OpcUa_ReturnStatusCode;
     }
 
     /* write null array */
     if (a_pArray == OpcUa_Null)
-    { 
+    {
         OpcUa_Int32 iLength = -1;
         uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &iLength, OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
-        OpcUa_ReturnStatusCode; 
-    } 
+        OpcUa_ReturnStatusCode;
+    }
 
     /* write length of array */
     uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &a_nCount, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
-    
+
     /* write elements of array */
     for (ii = 0; ii < a_nCount; ii++)
-    { 
+    {
         uStatus = OpcUa_BinaryEncoder_WriteInt32(a_pEncoder, OpcUa_Null, &(a_pArray[ii]), OpcUa_Null);
         OpcUa_GotoErrorIfBad(uStatus);
     }
@@ -3523,10 +3523,10 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteVariant(
         if (a_pValue->ArrayType == OpcUa_VariantArrayType_Matrix)
         {
             uStatus = OpcUa_BinaryEncoder_WriteInt32Array(
-                a_pEncoder, 
-                OpcUa_Null, 
-                a_pValue->Value.Matrix.Dimensions, 
-                a_pValue->Value.Matrix.NoOfDimensions, 
+                a_pEncoder,
+                OpcUa_Null,
+                a_pValue->Value.Matrix.Dimensions,
+                a_pValue->Value.Matrix.NoOfDimensions,
                 pSize);
 
             OpcUa_GotoErrorIfBad(uStatus);
@@ -3724,7 +3724,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteMessag
     cTypeId.IdentifierType     = OpcUa_IdentifierType_Numeric;
     cTypeId.Identifier.Numeric = a_pMessageType->BinaryEncodingTypeId;
     cTypeId.NamespaceIndex     = 0;
-    
+
     /* do not support non-UA messages */
     if (a_pMessageType->NamespaceUri != OpcUa_Null)
     {
@@ -3734,13 +3734,13 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_WriteMessag
     /* write type id */
     uStatus = a_pEncoder->WriteNodeId(a_pEncoder, OpcUa_Null, &cTypeId, OpcUa_Null);
     OpcUa_GotoErrorIfBad(uStatus);
-            
+
     /* write message */
     uStatus = OpcUa_BinaryEncoder_WriteEncodeable(
-        a_pEncoder, 
-        OpcUa_Null, 
-        a_pMessage, 
-        a_pMessageType, 
+        a_pEncoder,
+        OpcUa_Null,
+        a_pMessage,
+        a_pMessageType,
         OpcUa_Null);
 
     OpcUa_GotoErrorIfBad(uStatus);
@@ -3846,7 +3846,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_Create(
     (*a_ppEncoder)->WriteEncodeableArray      = OpcUa_BinaryEncoder_WriteEncodeableArray;
     (*a_ppEncoder)->WriteEnumeratedArray      = OpcUa_BinaryEncoder_WriteEnumeratedArray;
     (*a_ppEncoder)->WriteMessage              = OpcUa_BinaryEncoder_WriteMessage;
-    
+
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 

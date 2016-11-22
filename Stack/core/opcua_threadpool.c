@@ -31,7 +31,7 @@
 #define OPCUA_THREADPOOL_SILENT 1
 
 #ifdef OPCUA_THREADPOOL_SILENT
-  #define OPCUA_THREADPOOL_SILENCER(xTrace) 
+  #define OPCUA_THREADPOOL_SILENCER(xTrace)
 #else /* OPCUA_THREADPOOL_SILENT */
   #define OPCUA_THREADPOOL_SILENCER(xTrace) xTrace
 #endif /* OPCUA_THREADPOOL_SILENT */
@@ -146,7 +146,7 @@ static OpcUa_Void OpcUa_ThreadPool_ThreadMain(OpcUa_Void* a_pArguments)
 
             bRestlessWorker = OpcUa_False;
 
-            uStatus = OPCUA_P_SEMAPHORE_TIMEDWAIT(  pThreadPoolInternal->hJobAdded, 
+            uStatus = OPCUA_P_SEMAPHORE_TIMEDWAIT(  pThreadPoolInternal->hJobAdded,
                                                     OPCUA_THREADPOOL_RELOOPTIME);
         }
 
@@ -479,7 +479,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "Initialize");
                                         a_uMinThreads); /* max value     */
     OpcUa_GotoErrorIfBad(uStatus);
 
-    uStatus = OPCUA_P_SEMAPHORE_CREATE( &pThreadPoolInternal->hQueueOpenSemaphore, 
+    uStatus = OPCUA_P_SEMAPHORE_CREATE( &pThreadPoolInternal->hQueueOpenSemaphore,
                                         0,  /* initial value */
                                         1); /* max value */
     OpcUa_GotoErrorIfBad(uStatus);
@@ -570,7 +570,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "Create");
                                             a_bBlockIfFull,
                                             a_uTimeout);
     OpcUa_GotoErrorIfBad(uStatus);
-    
+
     *a_phThreadPool = pThreadPoolInternal;
 
 OpcUa_ReturnStatusCode;
@@ -597,11 +597,11 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "AddJob");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hThreadPool);
     OpcUa_ReturnErrorIfArgumentNull(a_pFunction);
-    
+
     pThreadPoolInternal = (OpcUa_ThreadPoolInternal*)a_hThreadPool;
 
 #if OPCUA_THREADPOOL_EXPANSION
-    
+
     /* try to clean up list of dynamic threads */
     OpcUa_List_Enter(pThreadPoolInternal->DynamicThreadList);
 
@@ -627,7 +627,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "AddJob");
         {
             pThreadPoolJob = (OpcUa_ThreadPool_Job*)OpcUa_List_GetNextElement(pThreadPoolInternal->DynamicThreadList);
         }
-    } 
+    }
 
     OpcUa_List_Leave(pThreadPoolInternal->DynamicThreadList);
 
@@ -695,7 +695,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "AddJob");
 
         uStatus = OpcUa_List_AddElementToEnd(pThreadPoolInternal->DynamicThreadList, (OpcUa_Void*)pThreadPoolJob);
         OpcUa_GotoErrorIfBad(uStatus);
-            
+
         pThreadPoolJob->bFinished = OpcUa_False;
 
         uStatus = OpcUa_Thread_Start(pThreadPoolJob->hThread);
@@ -721,7 +721,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "AddJob");
 
     /* Let the system wake one thread to fetch the job from the queue. */
     OPCUA_P_SEMAPHORE_POST(pThreadPoolInternal->hJobAdded, 1);
-    
+
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 

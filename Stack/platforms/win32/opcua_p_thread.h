@@ -31,8 +31,8 @@ OpcUa_Void          OPCUA_DLLCALL OpcUa_P_Thread_Delete(    OpcUa_RawThread* pRa
 /*============================================================================
  * Start Thread
  *===========================================================================*/
-OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Thread_Start(     OpcUa_RawThread             pThread, 
-                                                            OpcUa_PfnInternalThreadMain pfnStartFunction, 
+OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Thread_Start(     OpcUa_RawThread             pThread,
+                                                            OpcUa_PfnInternalThreadMain pfnStartFunction,
                                                             OpcUa_Void*                 pArguments);
 
 /*============================================================================

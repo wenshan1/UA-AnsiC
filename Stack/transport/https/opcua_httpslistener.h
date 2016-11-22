@@ -22,7 +22,7 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @brief Function, that needs to be implemented to receive notifications about secure channel events.
  *
  * @param uSecureChannelId      [in] The id assigned to the secure channel.

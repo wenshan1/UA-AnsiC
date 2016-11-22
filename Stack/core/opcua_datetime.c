@@ -29,12 +29,12 @@ OpcUa_StatusCode OpcUa_DateTime_GetTimeOfDay(OpcUa_TimeVal* a_pValue)
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
 
     OpcUa_P_DateTime_GetTimeOfDay(a_pValue);
-    
+
     return OpcUa_Good;
 }
 
 /*============================================================================*/
-OpcUa_StatusCode OpcUa_DateTime_GetDateTimeFromString(  OpcUa_StringA   a_pchDateTimeString, 
+OpcUa_StatusCode OpcUa_DateTime_GetDateTimeFromString(  OpcUa_StringA   a_pchDateTimeString,
                                                         OpcUa_DateTime* a_pDateTime)
 {
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_DateTime);
@@ -45,8 +45,8 @@ OpcUa_StatusCode OpcUa_DateTime_GetDateTimeFromString(  OpcUa_StringA   a_pchDat
 }
 
 /*============================================================================*/
-OpcUa_StatusCode OpcUa_DateTime_GetStringFromDateTime(  OpcUa_DateTime  a_dateTime, 
-                                                        OpcUa_StringA   a_pBuffer, 
+OpcUa_StatusCode OpcUa_DateTime_GetStringFromDateTime(  OpcUa_DateTime  a_dateTime,
+                                                        OpcUa_StringA   a_pBuffer,
                                                         OpcUa_UInt32    a_uLength)
 {
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_DateTime);

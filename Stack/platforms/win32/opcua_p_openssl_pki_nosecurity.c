@@ -94,7 +94,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_LoadCertificate(
     OpcUa_ReferenceParameter(a_pCertificateStore);
     OpcUa_ReferenceParameter(a_pCertificate);
     OpcUa_ReferenceParameter(a_pLoadHandle);
-    
+
     return OpcUa_BadNotSupported;
 }
 

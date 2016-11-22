@@ -50,12 +50,12 @@ static int OpcUa_ServiceType_Compare(const OpcUa_Void* a_pElement1, const OpcUa_
     {
         return +1;
     }
-    
+
     if (pType1->RequestTypeId < pType2->RequestTypeId)
     {
         return -1;
     }
-    
+
     if (pType1->RequestTypeId > pType2->RequestTypeId)
     {
         return +1;
@@ -92,7 +92,7 @@ OpcUa_StatusCode OpcUa_ServiceTable_AddTypes(   OpcUa_ServiceTable* a_pTable,
     /* reallocate the table */
     pEntries = (OpcUa_ServiceType *)OpcUa_ReAlloc(a_pTable->Entries, uCount*sizeof(OpcUa_ServiceType));
     OpcUa_ReturnErrorIfAllocFailed(pEntries);
-    
+
     /* copy new definitions */
     for (ii = a_pTable->Count; ii < (OpcUa_Int32)uCount; ii++)
     {
@@ -101,10 +101,10 @@ OpcUa_StatusCode OpcUa_ServiceTable_AddTypes(   OpcUa_ServiceTable* a_pTable,
 
     /* sort the table */
 
-    OpcUa_QSort(    pEntries, 
-                    uCount, 
-                    sizeof(OpcUa_ServiceType), 
-                    OpcUa_ServiceType_Compare, 
+    OpcUa_QSort(    pEntries,
+                    uCount,
+                    sizeof(OpcUa_ServiceType),
+                    OpcUa_ServiceType_Compare,
                     OpcUa_Null);
 
     /* save the new table */
@@ -134,12 +134,12 @@ OpcUa_StatusCode OpcUa_ServiceTable_FindService(
     OpcUa_ServiceTable* a_pTable,
     OpcUa_UInt32        a_uTypeId,
     OpcUa_ServiceType*  a_pType)
-{       
+{
     OpcUa_ServiceType   cKey;
     OpcUa_ServiceType*  pType   = OpcUa_Null;
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_ServiceTable);
 
-    /* check for nulls */   
+    /* check for nulls */
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);
     OpcUa_ReturnErrorIfArgumentNull(a_pType);
 
@@ -154,11 +154,11 @@ OpcUa_StatusCode OpcUa_ServiceTable_FindService(
     cKey.RequestTypeId = a_uTypeId;
 
     /* search for type id */
-    pType = (OpcUa_ServiceType *)OpcUa_BSearch(  &cKey, 
+    pType = (OpcUa_ServiceType *)OpcUa_BSearch(  &cKey,
                             a_pTable->Entries,
-                            a_pTable->Count, 
-                            sizeof(OpcUa_ServiceType), 
-                            OpcUa_ServiceType_Compare, 
+                            a_pTable->Count,
+                            sizeof(OpcUa_ServiceType),
+                            OpcUa_ServiceType_Compare,
                             OpcUa_Null);
 
     if (pType == OpcUa_Null)
@@ -186,7 +186,7 @@ OpcUa_StatusCode OpcUa_ServerApi_CreateFault(
 {
     /* create a fault object */
     OpcUa_ServiceFault* pFault = OpcUa_Null;
-    
+
     OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "OpcUa_ServerApi_CreateFault");
 
     /* check arguments */

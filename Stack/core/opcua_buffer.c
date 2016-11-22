@@ -103,7 +103,7 @@ OpcUa_StatusCode OpcUa_Buffer_Create(   OpcUa_Byte*    a_pbyData,
  * OpcUa_Buffer_Delete
  *===========================================================================*/
 OpcUa_Void OpcUa_Buffer_Delete(OpcUa_Buffer** handle)
-{   
+{
     if (handle != OpcUa_Null && *handle != OpcUa_Null)
     {
         OpcUa_Buffer* buffer = (OpcUa_Buffer*)*handle;
@@ -123,7 +123,7 @@ OpcUa_Void OpcUa_Buffer_Delete(OpcUa_Buffer** handle)
  * OpcUa_Buffer_Clear
  *===========================================================================*/
 OpcUa_Void OpcUa_Buffer_Clear(OpcUa_Buffer* a_pBuffer)
-{   
+{
     if(a_pBuffer != OpcUa_Null)
     {
         if(a_pBuffer->FreeBuffer)
@@ -143,7 +143,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Buffer_Read(
     OpcUa_Byte*   data,
     OpcUa_UInt32* count)
 {
-    OpcUa_UInt32 bytesToRead = 0;   
+    OpcUa_UInt32 bytesToRead = 0;
     OpcUa_Buffer* buffer = OpcUa_Null;
     OpcUa_StatusCode uStatus = OpcUa_Good;
 
@@ -190,7 +190,7 @@ OpcUa_StatusCode OpcUa_Buffer_Skip(
     OpcUa_Handle  a_Handle,
     OpcUa_UInt32  a_uLength)
 {
-    OpcUa_UInt32    uBytesAvailable = 0;   
+    OpcUa_UInt32    uBytesAvailable = 0;
     OpcUa_Buffer*   pBuffer         = OpcUa_Null;
 
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_Buffer);
@@ -227,7 +227,7 @@ OpcUa_StatusCode OpcUa_Buffer_Write(
     OpcUa_Byte*  a_pData,
     OpcUa_UInt32 a_uCount)
 {
-    OpcUa_UInt32        bytesAvailable = 0; 
+    OpcUa_UInt32        bytesAvailable = 0;
     OpcUa_Buffer*       buffer = OpcUa_Null;
     OpcUa_StatusCode    uStatus = OpcUa_Good;
 
@@ -258,7 +258,7 @@ OpcUa_StatusCode OpcUa_Buffer_Write(
         }
 
         /* all or nothing write - fail if the entire block can't be written */
-        if(     buffer->MaxSize != 0 
+        if(     buffer->MaxSize != 0
             &&  newSize > buffer->MaxSize)
         {
             return OpcUa_BadEndOfStream;
@@ -274,7 +274,7 @@ OpcUa_StatusCode OpcUa_Buffer_Write(
 
         buffer->Data = newData;
         buffer->Size = newSize;
-        
+
         bytesAvailable = buffer->Size - buffer->Position;
     }
 
@@ -312,7 +312,7 @@ OpcUa_StatusCode OpcUa_Buffer_GetPosition(
     OpcUa_ReturnErrorIfInvalidBuffer();
 
     buffer = (OpcUa_Buffer*)a_Handle;
-    
+
     *position = buffer->Position;
 
     return uStatus;
@@ -333,7 +333,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Buffer_SetPosition(
     OpcUa_ReturnErrorIfInvalidBuffer();
 
     pBuffer = (OpcUa_Buffer*)a_Handle;
-    
+
     if (a_uPosition == OpcUa_BufferPosition_Start)
     {
         pBuffer->Position = 0;
@@ -373,7 +373,7 @@ OpcUa_StatusCode OpcUa_Buffer_SetEmpty(OpcUa_Buffer* a_pBuffer)
  *===========================================================================*/
 OpcUa_Boolean OpcUa_Buffer_IsEmpty(OpcUa_Buffer* a_pBuffer)
 {
-    return (((a_pBuffer == OpcUa_Null)||(a_pBuffer->EndOfData==0))?OpcUa_True:OpcUa_False); 
+    return (((a_pBuffer == OpcUa_Null)||(a_pBuffer->EndOfData==0))?OpcUa_True:OpcUa_False);
 }
 
 /*============================================================================
@@ -391,7 +391,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Buffer_SetEndOfData(
     OpcUa_ReturnErrorIfInvalidBuffer();
 
     pBuffer = (OpcUa_Buffer*)a_Handle;
-    
+
     if(a_uEndOfData > pBuffer->Size)
     {
         return OpcUa_BadEndOfStream;
@@ -419,7 +419,7 @@ OpcUa_StatusCode OpcUa_Buffer_GetData(
     OpcUa_ReturnErrorIfInvalidBuffer();
 
     pBuffer = (OpcUa_Buffer*)a_Handle;
-    
+
     if(a_ppData != OpcUa_Null)
     {
         *a_ppData = pBuffer->Data;

@@ -23,7 +23,7 @@ OPCUA_BEGIN_EXTERN_C
  * Trace Levels
  *===========================================================================*/
 /* custom trace levels - add your trace levels here ... */
-#define OPCUA_TRACE_LEVEL_YOURTRACELEVEL 0x00000040 
+#define OPCUA_TRACE_LEVEL_YOURTRACELEVEL 0x00000040
 /* ... */
 
 /* predefined trace levels */
@@ -68,7 +68,7 @@ OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Clear();
 OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_ChangeTraceLevel(OpcUa_UInt32 a_uNewTraceLevel);
 
 /*============================================================================
- * Activate/Deactivate Trace 
+ * Activate/Deactivate Trace
  *===========================================================================*/
 /**
  * Activate or deactivate trace output during runtime.
@@ -79,7 +79,7 @@ OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Toggle(OpcUa_Boolean a_bActive
  * Tracefunction
  *===========================================================================*/
 /**
-* @brief Writes the given string and the parameters to the trace device, if the given 
+* @brief Writes the given string and the parameters to the trace device, if the given
 * trace level is activated in the header file.
 *
 * @see OpcUa_P_Trace
@@ -93,7 +93,7 @@ OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Toggle(OpcUa_Boolean a_bActive
   #define OpcUa_Trace OpcUa_Trace_Imp
  #endif /* OPCUA_TRACE_FILE_LINE_INFO */
 #else /* OPCUA_TRACE_ENABLE */
-#ifdef _MSC_VER 
+#ifdef _MSC_VER
  #if _MSC_VER >= 1400
   #define OpcUa_Trace(x,y,...) ((void)0)
  #else
@@ -106,8 +106,8 @@ OPCUA_EXPORT OpcUa_Void OPCUA_DLLCALL OpcUa_Trace_Toggle(OpcUa_Boolean a_bActive
 #endif
 #endif /* OPCUA_TRACE_ENABLE */
 
-OPCUA_EXPORT OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Imp( 
-    OpcUa_UInt32 uTraceLevel, 
+OPCUA_EXPORT OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Imp(
+    OpcUa_UInt32 uTraceLevel,
 #if OPCUA_TRACE_FILE_LINE_INFO
     OpcUa_CharA* sFile,
     OpcUa_UInt32 sLine,
@@ -115,8 +115,8 @@ OPCUA_EXPORT OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Imp(
     OpcUa_CharA* sFormat,
     ...);
 
-OPCUA_EXPORT OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Nop( 
-    OpcUa_UInt32 uTraceLevel, 
+OPCUA_EXPORT OpcUa_Boolean OPCUA_DLLCALL OpcUa_Trace_Nop(
+    OpcUa_UInt32 uTraceLevel,
 #if OPCUA_TRACE_FILE_LINE_INFO
     OpcUa_CharA* sFile,
     OpcUa_UInt32 sLine,

@@ -16,7 +16,7 @@
 
 /* This are the UA Proxy/Stub internal data type definitions! */
 
-/* This is the Win32 version of this file! */   
+/* This is the Win32 version of this file! */
 
 #ifndef _OpcUa_P_Types_H_
 #define _OpcUa_P_Types_H_ 1
@@ -65,7 +65,7 @@ struct _OpcUa_UInt64 {
 typedef struct _OpcUa_UInt64 OpcUa_UInt64;
 #endif
 
-struct _OpcUa_DateTime 
+struct _OpcUa_DateTime
 {
     OpcUa_UInt32 dwLowDateTime;
     OpcUa_UInt32 dwHighDateTime;
@@ -74,18 +74,18 @@ typedef struct _OpcUa_DateTime OpcUa_DateTime;
 
 
 /**
- * @brief OpcUa_SocketManager Type 
+ * @brief OpcUa_SocketManager Type
  */
 typedef OpcUa_Void*     OpcUa_SocketManager;
 
 /**
  * @brief OpcUa_Socket Type
- */ 
+ */
 typedef OpcUa_Void*     OpcUa_Socket;
 
 /**
  * @brief OpcUa_Thread Type
- */ 
+ */
 typedef OpcUa_Void*     OpcUa_Thread;
 
 
@@ -114,7 +114,7 @@ typedef OpcUa_Void*     OpcUa_Semaphore;
  */
 typedef OpcUa_Void*     OpcUa_Timer;
 
-/** 
+/**
  * @brief A function used to compare elements when sorting or searching.
  *
  * @param pContext  [in] The context passed to the sorting/searching function.
@@ -123,7 +123,7 @@ typedef OpcUa_Void*     OpcUa_Timer;
  *
  * @return Zero if elements are equal, < 0 if element1 is less that element2.
  */
-typedef OpcUa_Int (OPCUA_CDECL OpcUa_PfnCompare)(   const OpcUa_Void* pElement1, 
+typedef OpcUa_Int (OPCUA_CDECL OpcUa_PfnCompare)(   const OpcUa_Void* pElement1,
                                                     const OpcUa_Void* pElement2);
 
 /*============================================================================
@@ -160,7 +160,7 @@ typedef struct _OpcUa_Guid
 #ifdef _DEBUG
 typedef struct _OpcUa_String
 {
-    OpcUa_UInt16 flags;  
+    OpcUa_UInt16 flags;
     OpcUa_UInt32 uLength;
     OpcUa_CharA* strContent;
 } OpcUa_String, *OpcUa_pString;
@@ -248,7 +248,7 @@ struct _OpcUa_TimeVal
 #if OPCUA_SWAP_ALTERNATIVE
 
 #ifdef LITTLE_ENDIAN
-    
+
     /* this is the wire format */
 
     #define OpcUa_SwapBytes_2(xDst, xSrc) \

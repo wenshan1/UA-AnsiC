@@ -26,7 +26,7 @@ OPCUA_BEGIN_EXTERN_C
 /*============================================================================
  * OpcUa_Endpoint_State
  *===========================================================================*/
-/** 
+/**
  * @brief Describes the current state of the endpoint object.
  */
 enum _OpcUa_Endpoint_State
@@ -40,7 +40,7 @@ typedef enum _OpcUa_Endpoint_State OpcUa_Endpoint_State;
 /*============================================================================
  * OpcUa_EndpointInternal
  *===========================================================================*/
-/** 
+/**
  * @brief Manages an endpoint for a server. (internal representation)
  */
 typedef struct _OpcUa_EndpointInternal
@@ -53,7 +53,7 @@ typedef struct _OpcUa_EndpointInternal
 
     /*! @brief The url for the endpoint. */
     OpcUa_String Url;
- 
+
     /*! @brief The type of encoding to use with the endpoint. */
     OpcUa_EncoderType EncoderType;
 
@@ -76,11 +76,11 @@ typedef struct _OpcUa_EndpointInternal
     struct _OpcUa_Decoder* Decoder;
 
     /*! @brief The services supported by the endpoint. */
-    OpcUa_ServiceTable SupportedServices; 
- 
+    OpcUa_ServiceTable SupportedServices;
+
     /*! @brief A mutex used to synchronize access to the endpoint structure. */
     OpcUa_Mutex Mutex;
- 
+
     /*! @brief The current status of the endpoint. */
     OpcUa_StatusCode Status;
 } OpcUa_EndpointInternal;

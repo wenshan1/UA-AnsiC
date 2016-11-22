@@ -61,7 +61,7 @@ OPCUA_BEGIN_EXTERN_C
     #define OPCUA_IMEXPORT __declspec(dllimport)
   #else
     /* build/using static lib */
-    #define OPCUA_IMEXPORT 
+    #define OPCUA_IMEXPORT
   #endif
 
 /* call exported functions by stdcall convention */
@@ -166,7 +166,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_StrnCatA(xDst, xDstSize, xSrc, xCount)    strncat(xDst, xSrc, xCount)
 
 #ifndef _INC_STDIO
-/* import prototype for direct mapping on sprintf for files which are not allowed to include 
+/* import prototype for direct mapping on sprintf for files which are not allowed to include
    system headers */
 OPCUA_IMPORT OpcUa_Int sprintf(OpcUa_CharA* buffer, const OpcUa_CharA* format, ...);
 #endif /* _INC_STDIO */
@@ -183,7 +183,7 @@ OPCUA_IMPORT OpcUa_Int sprintf(OpcUa_CharA* buffer, const OpcUa_CharA* format, .
 #define OpcUa_SnPrintfA                                 _snprintf
 #endif
 
-/* import prototype for direct mapping on sscanf for files which are not allowed to include 
+/* import prototype for direct mapping on sscanf for files which are not allowed to include
    system headers */
 #ifndef _INC_STDIO
 OPCUA_IMPORT OpcUa_Int sscanf(const OpcUa_CharA* buffer, const OpcUa_CharA* format, ... );

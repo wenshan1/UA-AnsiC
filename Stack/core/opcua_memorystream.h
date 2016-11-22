@@ -20,10 +20,10 @@
 #include <opcua_stream.h>
 
 OPCUA_BEGIN_EXTERN_C
- 
-/** 
+
+/**
   @brief Allocates a new readable memory stream.
- 
+
   The caller must ensure the buffer is valid memory until Close is called.
 
   @param buffer     [in]  The buffer which is the source for the stream.
@@ -32,12 +32,12 @@ OPCUA_BEGIN_EXTERN_C
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_MemoryStream_CreateReadable(
     OpcUa_Byte*         buffer,
-    OpcUa_UInt32        bufferSize, 
+    OpcUa_UInt32        bufferSize,
     OpcUa_InputStream** istrm);
 
-/** 
+/**
   @brief Allocates a new writeable memory stream.
- 
+
   @param blockSize  [in]  The size of the block to allocate when new memory is required.
   @param maxSize    [in]  The maximum buffer size (0 means no limit).
   @param ostrm      [out] The output stream.
@@ -47,9 +47,9 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_MemoryStream_CreateWriteable(
     OpcUa_UInt32         maxSize,
     OpcUa_OutputStream** ostrm);
 
-/** 
+/**
   @brief Returns the internal buffer for a writeable stream.
- 
+
   This function cannot be called until the stream is closed.
 
   The memory returned by this function is owned by the stream and will be

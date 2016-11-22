@@ -19,14 +19,14 @@
 
 #ifdef OPCUA_HAVE_THREADPOOL
 
-/** 
+/**
  * @brief Threadpool Handle.
  */
 typedef OpcUa_Void* OpcUa_ThreadPool;
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @brief Create a thread pool with uMinThreads static threads and uMaxThreads - uMinThreads dynamic threads.
  */
 OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_ThreadPool_Create(      OpcUa_ThreadPool*       phThreadPool,
@@ -36,12 +36,12 @@ OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_ThreadPool_Create(      OpcUa_ThreadPool
                                                                 OpcUa_Boolean           bBlockIfFull,
                                                                 OpcUa_UInt32            uTimeout);
 
-/** 
+/**
  * @brief Destroy a thread pool.
  */
 OpcUa_Void          OPCUA_DLLCALL OpcUa_ThreadPool_Delete(      OpcUa_ThreadPool*       phThreadPool);
 
-/** 
+/**
  * @brief Assing a job to a thread pool. The job may be queued for later execution.
  */
 OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_ThreadPool_AddJob(      OpcUa_ThreadPool        hThreadPool,

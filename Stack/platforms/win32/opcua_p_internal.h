@@ -116,7 +116,7 @@
 #endif
 
 #if defined(OPCUA_HAVE_HTTPS) && !OPCUA_SUPPORT_PKI
-# error PKI support is required for HTTPS; globally define OPCUA_SUPPORT_PKI 
+# error PKI support is required for HTTPS; globally define OPCUA_SUPPORT_PKI
 #endif
 
 /**********************************************************************************/

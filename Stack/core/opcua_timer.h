@@ -23,12 +23,12 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_P_TIMER_DELETE  OpcUa_ProxyStub_g_PlatformLayerCalltable->TimerDelete
 #define OPCUA_P_CLEANUPTIMERS OpcUa_ProxyStub_g_PlatformLayerCalltable->TimersCleanup
 
-typedef OpcUa_StatusCode (OPCUA_DLLCALL OpcUa_Timer_Callback)(  OpcUa_Void*             pvCallbackData, 
+typedef OpcUa_StatusCode (OPCUA_DLLCALL OpcUa_Timer_Callback)(  OpcUa_Void*             pvCallbackData,
                                                                 OpcUa_Timer             hTimer,
                                                                 OpcUa_UInt32            msecElapsed);
 
 OPCUA_EXPORT OpcUa_StatusCode OPCUA_DLLCALL OpcUa_Timer_Create( OpcUa_Timer*            hTimer,
-                                                                OpcUa_UInt32            msecInterval, 
+                                                                OpcUa_UInt32            msecInterval,
                                                                 OpcUa_Timer_Callback*   fpTimerCallback,
                                                                 OpcUa_Timer_Callback*   fpKillCallback,
                                                                 OpcUa_Void*             pvCallbackData);

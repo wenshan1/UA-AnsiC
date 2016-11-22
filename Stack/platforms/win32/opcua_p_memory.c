@@ -85,9 +85,9 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Memory_Free(OpcUa_Void* pBuffer)
  * OpcUa_Memory_MemCpy
  *===========================================================================*/
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Memory_MemCpy(
-    OpcUa_Void*  pBuffer, 
-    OpcUa_UInt32 nSizeInBytes, 
-    OpcUa_Void*  pSource, 
+    OpcUa_Void*  pBuffer,
+    OpcUa_UInt32 nSizeInBytes,
+    OpcUa_Void*  pSource,
     OpcUa_UInt32 nCount)
 {
 #ifdef _WIN32_WCE

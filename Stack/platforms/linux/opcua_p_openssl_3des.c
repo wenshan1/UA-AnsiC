@@ -27,8 +27,8 @@
 /* own headers */
 #include <opcua_p_openssl.h>
 
-/*  DES_ede3_cbc_encrypt() implements outer triple CBC DES encryption with three keys. 
-    This means that each DES operation inside the CBC mode is really an 
+/*  DES_ede3_cbc_encrypt() implements outer triple CBC DES encryption with three keys.
+    This means that each DES operation inside the CBC mode is really an
     C=E(ks3,D(ks2,E(ks1,M))). This mode is used by SSL. http://www.openssl.org/docs/crypto/des.html# */
 
 /*============================================================================
@@ -45,7 +45,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_3DES_Encrypt(  OpcUa_CryptoProvider*   a_pProvi
     DES_key_schedule    ks1;
     DES_key_schedule    ks2;
     DES_key_schedule    ks3;
-    
+
     DES_cblock*         desKey              = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Encrypt");
@@ -106,7 +106,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_3DES_Decrypt(  OpcUa_CryptoProvider*   a_pProvi
     DES_key_schedule    ks1;
     DES_key_schedule    ks2;
     DES_key_schedule    ks3;
-    
+
     DES_cblock*         desKey              = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Decrypt");
@@ -115,9 +115,9 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Decrypt");
     OpcUa_ReturnErrorIfArgumentNull(a_key.Key.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_pInitalVector);
     OpcUa_ReturnErrorIfArgumentNull(a_pPlainTextLen);
-    
+
     OpcUa_ReferenceParameter(a_pProvider);
-    
+
     /* get key(s) */
     desKey = (DES_cblock*)a_key.Key.Data;
 
@@ -131,7 +131,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Decrypt");
     DES_set_key_unchecked(&desKey[0], &ks1);
     DES_set_key_unchecked(&desKey[1], &ks2);
     DES_set_key_unchecked(&desKey[2], &ks3);
-    
+
     /* decrypt ciphertext */
     DES_ede3_cbc_encrypt(   a_pCipherText,                  /* input                    */
                             a_pPlainText,                   /* output                   */
@@ -141,7 +141,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DES_CBC_Decrypt");
                             &ks3,                           /* key schedule 3           */
                             (DES_cblock*)a_pInitalVector,   /* initialization vector    */
                             DES_DECRYPT);                   /* do decrypt               */
-    
+
     if(a_pPlainTextLen != OpcUa_Null)
     {
         *a_pPlainTextLen = a_cipherTextLen;

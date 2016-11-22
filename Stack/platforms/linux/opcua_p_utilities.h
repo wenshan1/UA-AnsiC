@@ -19,7 +19,7 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
  * @see OpcUa_P_QSort
  */
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_QSort( OpcUa_Void*       pElements,

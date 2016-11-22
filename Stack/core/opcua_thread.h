@@ -43,7 +43,7 @@ typedef OpcUa_Void (OpcUa_PfnThreadMain)(OpcUa_Void* pArgument);
  *
  * @return An error code for the operation.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_StatusCode    OpcUa_Thread_Create(        OpcUa_Thread*        pThread,
                                                 OpcUa_PfnThreadMain* pThreadMain,
                                                 OpcUa_Void*          pThreadArgument);
@@ -55,7 +55,7 @@ OpcUa_StatusCode    OpcUa_Thread_Create(        OpcUa_Thread*        pThread,
  *
  * @return
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_Void          OpcUa_Thread_Delete(        OpcUa_Thread* pThread);
 
 
@@ -70,7 +70,7 @@ OpcUa_Void          OpcUa_Thread_Delete(        OpcUa_Thread* pThread);
  *
  * @return An error code for the operation.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_StatusCode OpcUa_Thread_Start(            OpcUa_Thread   Thread);
 
 /**
@@ -81,8 +81,8 @@ OpcUa_StatusCode OpcUa_Thread_Start(            OpcUa_Thread   Thread);
  *
  * @return An error code for the operation.
  */
-OPCUA_EXPORT 
-OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread   Thread, 
+OPCUA_EXPORT
+OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread   Thread,
                                                 OpcUa_UInt32    msecTimeout);
 
 
@@ -91,7 +91,7 @@ OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread   Thread,
  *
  * @param msecTimeout [in] The time in milliseconds to suspend the calling thread.
  */
-OPCUA_EXPORT 
+OPCUA_EXPORT
 OpcUa_Void OpcUa_Thread_Sleep(                  OpcUa_UInt32    msecTimeout);
 
 /**

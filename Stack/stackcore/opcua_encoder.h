@@ -25,9 +25,9 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief Opens an encoder and attaches it to the stream.
- 
+
   The caller must ensure the context and stream are valid until the encoder is closed.
 
   @param pEncoder         [in] The encoder to open.
@@ -36,20 +36,20 @@ OPCUA_BEGIN_EXTERN_C
   @param phEncodeContext [out] The encoder instance is being created in this call.
 */
 typedef OpcUa_StatusCode (OpcUa_Encoder_PfnOpen)(
-    struct _OpcUa_Encoder* pEncoder, 
+    struct _OpcUa_Encoder* pEncoder,
     OpcUa_OutputStream*    pOstrm,
     OpcUa_MessageContext*  pContext,
     OpcUa_Handle*          phEncodeContext);
 
 OPCUA_EXPORT OpcUa_Void OpcUa_Encoder_Open(
-    struct _OpcUa_Encoder* pEncoder, 
+    struct _OpcUa_Encoder* pEncoder,
     OpcUa_OutputStream*    pOstrm,
     OpcUa_MessageContext*  pContext,
     OpcUa_Handle*          phEncodeContext);
 
-/** 
+/**
   @brief Closes a stream and releases all resources allocated to it.
- 
+
   During normal operation all encoders must be closed. Deleting an encoder without
   closing it could have unexpected side effects.
 
@@ -64,12 +64,12 @@ OPCUA_EXPORT OpcUa_Void OpcUa_Encoder_Close(
     struct _OpcUa_Encoder* pEncoder,
     OpcUa_Handle*          phEncodeContext);
 
-/** 
+/**
   @brief Frees the encoder structure.
 
   This function aborts all I/O operations and frees all memory. It should be
   used only to clean up when the encoder is not needed.
- 
+
   @param ppEncoder [in/out] The encoder to free.
 */
 typedef OpcUa_Void (OpcUa_Encoder_PfnDelete)(
@@ -78,31 +78,31 @@ typedef OpcUa_Void (OpcUa_Encoder_PfnDelete)(
 OPCUA_EXPORT OpcUa_Void OpcUa_Encoder_Delete(
     struct _OpcUa_Encoder** ppEncoder);
 
-/** 
+/**
   @brief Sets the default namespace for subsequent operations.
- 
+
   @param pEncoder      [in] The encoder.
   @param namespaceUri [in] The namespace to push onto the stack.
 */
 typedef OpcUa_StatusCode (OpcUa_Encoder_PfnPushNamespace)(
-    struct _OpcUa_Encoder* pEncoder, 
+    struct _OpcUa_Encoder* pEncoder,
     OpcUa_String*          namespaceUri);
 
-/** 
+/**
   @brief Restores the previous default namespace.
- 
+
   @param pEncoder [in] The encoder.
 */
 typedef OpcUa_StatusCode (OpcUa_Encoder_PfnPopNamespace)(
     struct _OpcUa_Encoder* pEncoder);
 
-/** 
+/**
   @brief Writes a Boolean value.
 
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
- 
+
   @param pEncoder   [in]     The encoder.
   @param sFieldName [in]     The name of the field being encoded.
   @param pValue     [in]     The value to encode.
@@ -114,9 +114,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteBoolean)(
     OpcUa_Boolean*         pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a SByte value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -132,9 +132,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteSByte)(
     OpcUa_SByte*           pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Byte value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -150,9 +150,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteByte)(
     OpcUa_Byte*            pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int16 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -168,9 +168,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt16)(
     OpcUa_Int16*           pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt16 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -186,9 +186,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt16)(
     OpcUa_UInt16*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int32 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -204,9 +204,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt32)(
     OpcUa_Int32*           pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt32 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -222,9 +222,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt32)(
     OpcUa_UInt32*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int64 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -240,9 +240,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt64)(
     OpcUa_Int64*           pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt64 value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -258,9 +258,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt64)(
     OpcUa_UInt64*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Float value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -276,9 +276,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteFloat)(
     OpcUa_Float*           pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Double value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -294,9 +294,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDouble)(
     OpcUa_Double*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a String value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -312,9 +312,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteString)(
     OpcUa_String*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DateTime value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -330,9 +330,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDateTime)(
     OpcUa_DateTime*        pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Guid value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -348,9 +348,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteGuid)(
     OpcUa_Guid*            pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ByteString value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -366,9 +366,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteByteString)(
     OpcUa_ByteString*      pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a XmlElement value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -384,9 +384,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteXmlElement)(
     OpcUa_XmlElement*      pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a NodeId value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -402,9 +402,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteNodeId)(
     OpcUa_NodeId*          pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ExpandedNodeId value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -420,9 +420,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteExpandedNodeId)(
     OpcUa_ExpandedNodeId*  pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a StatusCode value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -438,9 +438,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteStatusCode)(
     OpcUa_StatusCode*      pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DiagnosticInfo value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -456,9 +456,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDiagnosticInfo)(
     OpcUa_DiagnosticInfo*  pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a LocalizedText value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -474,9 +474,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteLocalizedText)(
     OpcUa_LocalizedText*   pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a QualifiedName value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -492,9 +492,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteQualifiedName)(
     OpcUa_QualifiedName*   pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ExtensionObject value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -510,9 +510,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteExtensionObject)(
     OpcUa_ExtensionObject* pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DataValue value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -528,9 +528,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDataValue)(
     OpcUa_DataValue*       pValue,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Variant value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -545,10 +545,10 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteVariant)(
     OpcUa_StringA          sFieldName,
     OpcUa_Variant*         pValue,
     OpcUa_Int32*           pSize);
-    
-/** 
+
+/**
   @brief Writes an Encodeable value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -565,10 +565,10 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteEncodeable)(
     OpcUa_Void*            pValue,
     OpcUa_EncodeableType*  pType,
     OpcUa_Int32*           pSize);
-    
-/** 
+
+/**
   @brief Writes a enumerated value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -586,13 +586,13 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteEnumerated)(
     OpcUa_EnumeratedType*  pType,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Boolean array value.
 
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
- 
+
   @param pEncoder   [in]     The encoder.
   @param sFieldName [in]     The name of the field being encoded.
   @param pArray     [in]     The array to encode.
@@ -606,9 +606,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteBooleanArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a SByte array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -626,9 +626,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteSByteArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Byte array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -646,9 +646,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteByteArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int16 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -666,9 +666,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt16Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt16 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -686,9 +686,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt16Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int32 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -706,9 +706,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt32Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt32 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -726,9 +726,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt32Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Int64 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -746,9 +746,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteInt64Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a UInt64 array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -766,9 +766,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteUInt64Array)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Float array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -786,9 +786,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteFloatArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Double array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -806,9 +806,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDoubleArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a String array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -826,9 +826,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteStringArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DateTime array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -846,9 +846,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDateTimeArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Guid array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -866,9 +866,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteGuidArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ByteString array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -886,9 +886,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteByteStringArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a XmlElement array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -906,9 +906,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteXmlElementArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a NodeId array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -926,9 +926,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteNodeIdArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ExpandedNodeId array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -946,9 +946,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteExpandedNodeIdArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a StatusCode array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -966,9 +966,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteStatusCodeArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DiagnosticInfo array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -986,9 +986,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDiagnosticInfoArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a LocalizedText array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1006,9 +1006,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteLocalizedTextArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a QualifiedName array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1026,9 +1026,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteQualifiedNameArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a ExtensionObject array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1046,9 +1046,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteExtensionObjectArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a DataValue array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1066,9 +1066,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteDataValueArray)(
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Writes a Variant array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1085,10 +1085,10 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteVariantArray)(
     OpcUa_Variant*         pArray,
     OpcUa_Int32            nCount,
     OpcUa_Int32*           pSize);
-    
-/** 
+
+/**
   @brief Writes an Encodeable array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1107,10 +1107,10 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteEncodeableArray)(
     OpcUa_Int32            nCount,
     OpcUa_EncodeableType*  pType,
     OpcUa_Int32*           pSize);
-    
-/** 
+
+/**
   @brief Writes a enumerated array value.
- 
+
   If the pSize parameter is not null then encoder only calculates the size of the encoded
   value and returns it in the pSize parameter. The value is NOT written to the stream.
   Returns Bad_NotSupported if size cannot be precalculated.
@@ -1130,9 +1130,9 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteEnumeratedArray)(
     OpcUa_EnumeratedType*  pType,
     OpcUa_Int32*           pSize);
 
-/** 
+/**
   @brief Write a message.
- 
+
   @param pEncoder     [in]  The encoder.
   @param pMessage     [in]  The message to encode.
   @param pMessageType [out] The type of message being encoded.
@@ -1142,7 +1142,7 @@ typedef OpcUa_StatusCode (OpcUa_Encoder_PfnWriteMessage)(
     OpcUa_Void*            pMessage,
     OpcUa_EncodeableType*  pMessageType);
 
-/** 
+/**
   @brief The type of encoder.
 */
 typedef enum _OpcUa_EncoderType
@@ -1155,7 +1155,7 @@ typedef enum _OpcUa_EncoderType
 }
 OpcUa_EncoderType;
 
-/** 
+/**
   @brief A generic encoder.
 */
 typedef struct _OpcUa_Encoder
@@ -1168,10 +1168,10 @@ typedef struct _OpcUa_Encoder
 
     /*! @brief Initializes the decoder for use. */
     OpcUa_Encoder_PfnOpen* Open;
-    
+
     /*! @brief Closes the encoder. */
     OpcUa_Encoder_PfnClose* Close;
-    
+
     /*! @brief Frees the structure. */
     OpcUa_Encoder_PfnDelete* Delete;
 

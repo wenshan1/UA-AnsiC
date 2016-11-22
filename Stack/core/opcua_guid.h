@@ -47,8 +47,8 @@ OPCUA_EXPORT OpcUa_Guid* OpcUa_Guid_Create(OpcUa_Guid* pGuid);
   @param szText  [in] The string representation.
   @param pGuid  [out] The binary representation.
 */
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_FromString(     
-    OpcUa_CharA* szText, 
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_FromString(
+    OpcUa_CharA* szText,
     OpcUa_Guid*  pGuid);
 
 /**
@@ -57,8 +57,8 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_FromString(
   @param pGuid  [in] The binary representation.
   @param szText [bi] The string representation.
 */
-OPCUA_EXPORT OpcUa_CharA* OpcUa_Guid_ToStringA( 
-    OpcUa_Guid*  pGuid, 
+OPCUA_EXPORT OpcUa_CharA* OpcUa_Guid_ToStringA(
+    OpcUa_Guid*  pGuid,
     OpcUa_CharA* szText);
 
 /**
@@ -67,8 +67,8 @@ OPCUA_EXPORT OpcUa_CharA* OpcUa_Guid_ToStringA(
   @param pGuid   [in]  The binary representation.
   @param pszText [out] The string representation.
 */
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_ToString(   
-    OpcUa_Guid*     pGuid, 
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_ToString(
+    OpcUa_Guid*     pGuid,
     OpcUa_String**  pszText);
 
 /**
@@ -78,7 +78,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Guid_ToString(
   @param pGuid2 [in] The second guid to compare.
 */
 OPCUA_EXPORT OpcUa_Boolean OpcUa_Guid_IsEqual(
-    OpcUa_Guid* pGuid1, 
+    OpcUa_Guid* pGuid1,
     OpcUa_Guid* pGuid2);
 
 /**
@@ -95,7 +95,7 @@ OPCUA_EXPORT OpcUa_Boolean OpcUa_Guid_IsNull(OpcUa_Guid* pGuid);
   @param pSrcGuid [in] The guid to copy.
 */
 OPCUA_EXPORT OpcUa_Void OpcUa_Guid_Copy(
-    OpcUa_Guid* pDstGuid, 
+    OpcUa_Guid* pDstGuid,
     OpcUa_Guid* pSrcGuid);
 
 

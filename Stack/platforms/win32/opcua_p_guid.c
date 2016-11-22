@@ -36,7 +36,7 @@
  * CreateGuid
  *===========================================================================*/
 /**
-* CreateGuid generates a global unique identifier. It calls the 
+* CreateGuid generates a global unique identifier. It calls the
 * Win32 API function for doing this.
 */
 OpcUa_Guid* OPCUA_DLLCALL OpcUa_P_Guid_Create(OpcUa_Guid* Guid)

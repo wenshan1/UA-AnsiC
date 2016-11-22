@@ -19,23 +19,23 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/** 
+/**
   @brief A table of strings accessible by index.
 */
 typedef struct _OpcUa_StringTable
 {
     /*! @brief The number of entries in the table. */
-    OpcUa_UInt32 Count; 
+    OpcUa_UInt32 Count;
 
     /*! @brief The number of entries allocated in the table. */
-    OpcUa_UInt32 Length; 
+    OpcUa_UInt32 Length;
 
     /*! @brief The table of strings. */
     OpcUa_String* Values;
 }
 OpcUa_StringTable;
 
-/** 
+/**
   @brief Puts the table into a known state.
 
   @param pTable [in] The table to initialize.
@@ -43,7 +43,7 @@ OpcUa_StringTable;
 OPCUA_EXPORT OpcUa_Void OpcUa_StringTable_Initialize(
     OpcUa_StringTable* pTable);
 
-/** 
+/**
   @brief Frees all memory used by a string table.
 
   @param pTable [in] The table to clear.
@@ -51,7 +51,7 @@ OPCUA_EXPORT OpcUa_Void OpcUa_StringTable_Initialize(
 OPCUA_EXPORT OpcUa_Void OpcUa_StringTable_Clear(
     OpcUa_StringTable* pTable);
 
-/** 
+/**
   @brief Adds a null terminated list of strings to the table.
 
   @param pTable   [in] The table to update.
@@ -61,7 +61,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_AddStringList(
     OpcUa_StringTable* pTable,
     OpcUa_StringA*     pStrings);
 
-/** 
+/**
   @brief Adds an array of strings to the table.
 
   @param pTable       [in] The table to update.
@@ -73,7 +73,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_AddStrings(
     OpcUa_String*      pStrings,
     OpcUa_UInt32       nNoOfStrings);
 
-/** 
+/**
   @brief Finds the index of the specified string.
 
   @param pTable  [in]  The string table to search.
@@ -85,7 +85,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_StringTable_FindIndex(
     OpcUa_String*      pString,
     OpcUa_Int32*       pIndex);
 
-/** 
+/**
   @brief Finds the string at the specified index.
 
   @param pTable  [in]  The string table to search.

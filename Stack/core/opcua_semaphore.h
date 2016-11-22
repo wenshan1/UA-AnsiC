@@ -17,7 +17,7 @@
 #if OPCUA_USE_SYNCHRONISATION
 # define OPCUA_P_SEMAPHORE_CREATE    OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphoreCreate
 # define OPCUA_P_SEMAPHORE_DELETE    OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphoreDelete
-# define OPCUA_P_SEMAPHORE_WAIT      OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphoreWait    
+# define OPCUA_P_SEMAPHORE_WAIT      OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphoreWait
 # define OPCUA_P_SEMAPHORE_TIMEDWAIT OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphoreTimedWait
 # define OPCUA_P_SEMAPHORE_POST      OpcUa_ProxyStub_g_PlatformLayerCalltable->SemaphorePost
 #else /* OPCUA_USE_SYNCHRONISATION */

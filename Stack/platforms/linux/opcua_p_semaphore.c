@@ -45,9 +45,9 @@ static int report_error(int code, const char *where, const char *what)
         /* strerror_r is the thread safe version of strerror */
         strerror_r(code, szMsg, 256);
 
-        fprintf(stderr, "%s: %s failure: %s\n", 
-                where, 
-                what, 
+        fprintf(stderr, "%s: %s failure: %s\n",
+                where,
+                what,
                 szMsg);
     }
     return code;
@@ -59,7 +59,7 @@ static int report_error(int code, const char *where, const char *what)
  * @param a_uMaxRange The maximum value of the semaphore. This has no effect on linux, because the system has no maximim limit. But the parameter is checked to make sense 0 &lt;= InitValue &lt; MaxRange.
  * @return OpcUa_Good if the semaphore could be created, OpcUa_BadInvalidArgument MaxRange is not plausible, or OpcUa_BadInternalError in case of a system call error.
  */
-OpcUa_StatusCode    OpcUa_P_Semaphore_Create(OpcUa_Semaphore* a_Semaphore, 
+OpcUa_StatusCode    OpcUa_P_Semaphore_Create(OpcUa_Semaphore* a_Semaphore,
                                              OpcUa_UInt32   a_uInitalValue,
                                              OpcUa_UInt32   a_uMaxRange)
 {
@@ -67,7 +67,7 @@ OpcUa_StatusCode    OpcUa_P_Semaphore_Create(OpcUa_Semaphore* a_Semaphore,
 
     if (a_uMaxRange == 0) return OpcUa_BadInvalidArgument;
     if (a_uMaxRange < a_uInitalValue) return OpcUa_BadInvalidArgument;
-    
+
     *a_Semaphore = OpcUa_Null;
 
     pInternalSemaphore = (sem_t *)malloc(sizeof(sem_t));
@@ -92,7 +92,7 @@ OpcUa_StatusCode    OpcUa_P_Semaphore_Create(OpcUa_Semaphore* a_Semaphore,
 OpcUa_Void OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore)
 {
     sem_t*  pInternalSemaphore  = OpcUa_Null;
-    
+
     if (pRawSemaphore == OpcUa_Null || *pRawSemaphore == OpcUa_Null) return;
 
     pInternalSemaphore = (sem_t*) *pRawSemaphore;
@@ -119,10 +119,10 @@ OpcUa_StatusCode OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemaphore)
     do
     {
         err = 0;
-        if (sem_wait(pInternalSemaphore) == -1) err = errno; 
+        if (sem_wait(pInternalSemaphore) == -1) err = errno;
     }
     while (err == EINTR);
-    
+
     if(err != 0)
     {
         report_error(errno, "OpcUa_P_Semaphore_Wait", "sem_wait failed");
@@ -151,10 +151,10 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
         do
         {
             err = 0;
-            if (sem_wait(pInternalSemaphore) == -1) err = errno; 
+            if (sem_wait(pInternalSemaphore) == -1) err = errno;
         }
         while (err == EINTR);
-        
+
         if (err != 0)
         {
             report_error(errno, "OpcUa_P_Semaphore_TimedWait", "sem_wait failed");
@@ -165,7 +165,7 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
     {
         int sec  = msecTimeout / 1000;
         int nsec = (msecTimeout % 1000) * 1000000;
-        
+
         if (clock_gettime(CLOCK_REALTIME, &Timeout) == -1)
         {
             report_error(errno, "OpcUa_P_Semaphore_TimedWait", "clock_gettime failed");
@@ -179,14 +179,14 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
             Timeout.tv_nsec -= 1000000000;
             Timeout.tv_sec++;
         }
-        
+
         do
         {
             err = 0;
-            if (sem_timedwait(pInternalSemaphore, &Timeout) == -1) err = errno; 
+            if (sem_timedwait(pInternalSemaphore, &Timeout) == -1) err = errno;
         }
         while (err == EINTR);
-        
+
         if(err != 0)
         {
             if(errno == ETIMEDOUT)

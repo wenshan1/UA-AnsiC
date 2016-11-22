@@ -58,7 +58,7 @@ static OpcUa_Int OPCUA_CDECL OpcUa_EncodeableType_Compare(const OpcUa_Void* a_pE
     {
         return -1;
     }
-    
+
     if (pEntry1->TypeId > pEntry2->TypeId)
     {
         return +1;
@@ -95,7 +95,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_Create(OpcUa_EncodeableTypeTable* a_p
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);
 
     a_pTable->Entries = OpcUa_Null;
-    a_pTable->Count = 0;    
+    a_pTable->Count = 0;
     a_pTable->Index = OpcUa_Null;
     a_pTable->IndexCount = 0;
 
@@ -137,7 +137,7 @@ OpcUa_Void OpcUa_EncodeableTypeTable_Delete(OpcUa_EncodeableTypeTable* a_pTable)
         OpcUa_Free(a_pTable->Index);
 
         a_pTable->Entries = OpcUa_Null;
-        a_pTable->Count = 0;    
+        a_pTable->Count = 0;
         a_pTable->Index = OpcUa_Null;
         a_pTable->IndexCount = 0;
     }
@@ -183,7 +183,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
         if (a_pTypes[ii]->XmlEncodingTypeId != 0)
         {
             nIndexCount++;
-        }       
+        }
     }
 
     if (ii > 0)
@@ -194,11 +194,11 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
         /* reallocate the table */
         pEntries = (OpcUa_EncodeableType*)OpcUa_ReAlloc(a_pTable->Entries, nCount*sizeof(OpcUa_EncodeableType));
         OpcUa_GotoErrorIfAllocFailed(pEntries);
-        
+
         /* reallocate the index */
         pIndex = (OpcUa_EncodeableTypeTableEntry*)OpcUa_ReAlloc(a_pTable->Index, nIndexCount*sizeof(OpcUa_EncodeableTypeTableEntry));
         OpcUa_GotoErrorIfAllocFailed(pIndex);
-        
+
         /* copy new definitions */
         for (ii = a_pTable->Count; ii < nCount; ii++)
         {
@@ -260,7 +260,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    /* zero any new entries that could not be added but don't free the reallocated table */ 
+    /* zero any new entries that could not be added but don't free the reallocated table */
     if (pEntries != OpcUa_Null)
     {
         for (ii = a_pTable->Count; ii < nCount; ii++)
@@ -269,7 +269,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
         }
     }
 
-    /* zero any new entries that could not be added but don't free the reallocated index */ 
+    /* zero any new entries that could not be added but don't free the reallocated index */
     if (pIndex != OpcUa_Null)
     {
         for (ii = a_pTable->IndexCount; ii < nIndexCount; ii++)
@@ -311,7 +311,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     /* reallocate the index */
     pIndex = (OpcUa_EncodeableTypeTableEntry*)OpcUa_ReAlloc(a_pTable->Index, nIndexCount*sizeof(OpcUa_EncodeableTypeTableEntry));
     OpcUa_GotoErrorIfAllocFailed(pIndex);
-    
+
     pIndexEntry = &(pIndex[nIndexCount-1]);
 
     pIndexEntry->TypeId = a_uTypeId;
@@ -353,13 +353,13 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_Find(
     OpcUa_UInt32                a_nTypeId,
     OpcUa_StringA               a_sNamespaceUri,
     OpcUa_EncodeableType**      a_pType)
-{       
+{
     OpcUa_EncodeableTypeTableEntry cKey;
     OpcUa_EncodeableTypeTableEntry* pResult = OpcUa_Null;
 
     OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EncodeableTypeTable_Find");
 
-    /* check for nulls */   
+    /* check for nulls */
     OpcUa_ReturnErrorIfArgumentNull(a_pTable);
     OpcUa_ReturnErrorIfArgumentNull(a_pType);
 
@@ -377,10 +377,10 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_Find(
 
         /* search for by description matching the type id and namespace uri. */
         pResult = (OpcUa_EncodeableTypeTableEntry*)OpcUa_BSearch(
-            &cKey, 
+            &cKey,
             a_pTable->Index,
-            a_pTable->IndexCount, 
-            sizeof(OpcUa_EncodeableTypeTableEntry), 
+            a_pTable->IndexCount,
+            sizeof(OpcUa_EncodeableTypeTableEntry),
             OpcUa_EncodeableType_Compare,
             OpcUa_Null);
 
@@ -410,10 +410,10 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_Find(
 OpcUa_StatusCode OpcUa_EncodeableObject_Create(
     OpcUa_EncodeableType* a_pType,
     OpcUa_Void**          a_pEncodeable)
-{       
+{
     OpcUa_InitializeStatus(OpcUa_Module_Serializer, "EncodeableObject_Create");
 
-    /* check for nulls */   
+    /* check for nulls */
     OpcUa_ReturnErrorIfArgumentNull(a_pType);
     OpcUa_ReturnErrorIfArgumentNull(a_pEncodeable);
 
@@ -441,7 +441,7 @@ OpcUa_StatusCode OpcUa_EncodeableObject_Create(
 OpcUa_Void OpcUa_EncodeableObject_Delete(
     OpcUa_EncodeableType* pType,
     OpcUa_Void**          ppEncodeable)
-{       
+{
     if (ppEncodeable != OpcUa_Null)
     {
         if (pType != OpcUa_Null)
@@ -460,8 +460,8 @@ OpcUa_Void OpcUa_EncodeableObject_Delete(
 OpcUa_StatusCode OpcUa_EncodeableObject_CreateExtension(
     OpcUa_EncodeableType*  a_pType,
     OpcUa_ExtensionObject* a_pExtension,
-    OpcUa_Void**           a_ppObject)                                    
-{ 
+    OpcUa_Void**           a_ppObject)
+{
     OpcUa_InitializeStatus(OpcUa_Module_Channel, "OpcUa_EncodeableObject_CreateExtension");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pType);
@@ -474,7 +474,7 @@ OpcUa_StatusCode OpcUa_EncodeableObject_CreateExtension(
 
     /* create and initialize the object */
     uStatus = OpcUa_EncodeableObject_Create(a_pType, a_ppObject);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* attach to extension object which will take ownership of the memory */
     a_pExtension->Encoding = OpcUa_ExtensionObjectEncoding_EncodeableObject;
@@ -497,8 +497,8 @@ OpcUa_StatusCode OpcUa_EncodeableObject_ParseExtension(
     OpcUa_ExtensionObject* a_pExtension,
     OpcUa_MessageContext*  a_pContext,
     OpcUa_EncodeableType*  a_pType,
-    OpcUa_Void**           a_ppObject)                     
-{ 
+    OpcUa_Void**           a_ppObject)
+{
     OpcUa_Decoder* pDecoder = 0;
     OpcUa_InputStream* pIstrm = 0;
     OpcUa_Handle hDecodeContext = OpcUa_Null;
@@ -515,28 +515,28 @@ OpcUa_StatusCode OpcUa_EncodeableObject_ParseExtension(
     /* only binary encoding supported at this time */
     if (a_pExtension->Encoding != OpcUa_ExtensionObjectEncoding_Binary)
     {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);    
+        OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
     }
-    
+
     /* create decoder */
     uStatus = OpcUa_BinaryDecoder_Create(&pDecoder);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* create stream */
     uStatus = OpcUa_MemoryStream_CreateReadable(a_pExtension->Body.Binary.Data, a_pExtension->Body.Binary.Length, &pIstrm);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* open the decoder */
     uStatus = pDecoder->Open(pDecoder, pIstrm, a_pContext, &hDecodeContext);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* create and initialize the object */
     uStatus = OpcUa_EncodeableObject_Create(a_pType, a_ppObject);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* read the object */
     uStatus = pDecoder->ReadEncodeable((struct _OpcUa_Decoder*)hDecodeContext, OpcUa_Null, a_pType, (OpcUa_Void*)*a_ppObject);
-    OpcUa_GotoErrorIfBad(uStatus);    
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* close and delete decoder */
     OpcUa_Decoder_Close(pDecoder, &hDecodeContext);

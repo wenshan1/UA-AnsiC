@@ -28,26 +28,26 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Set_Memory_Functions(  OpcUa_P_Memory_Alloc_Fun
                                                         OpcUa_P_Memory_ReAlloc_Func pReAlloc,
                                                         OpcUa_P_Memory_Free_Func pFree);
 
-/** 
+/**
  * @see OpcUa_Memory_Alloc
  */
 OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_Alloc(         OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @brief Reallocates a new block of memory
  *
  * @param pBuffer [in] The existing memory block.
  * @param nSize   [in] The size of the block to allocate.
  */
-OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_ReAlloc(       OpcUa_Void*  pBuffer, 
+OpcUa_Void* OPCUA_DLLCALL OpcUa_P_Memory_ReAlloc(       OpcUa_Void*  pBuffer,
                                                         OpcUa_UInt32 nSize);
 
-/** 
+/**
  * @see OpcUa_Memory_Free
  */
 OpcUa_Void OPCUA_DLLCALL OpcUa_P_Memory_Free(           OpcUa_Void* pvBuffer);
 
-/** 
+/**
  * @see OpcUa_Memory_MemCpy
  */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Memory_MemCpy(   OpcUa_Void*  pBuffer,

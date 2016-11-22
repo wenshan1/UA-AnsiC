@@ -49,7 +49,7 @@
 /*============================================================================
  * Create a Semaphore
  *===========================================================================*/
-OpcUa_StatusCode    OpcUa_P_Semaphore_Create(      OpcUa_Semaphore* a_Semaphore, 
+OpcUa_StatusCode    OpcUa_P_Semaphore_Create(      OpcUa_Semaphore* a_Semaphore,
                                                    OpcUa_UInt32     a_uInitalValue,
                                                    OpcUa_UInt32     a_uMaxRange)
 {
@@ -73,7 +73,7 @@ OpcUa_StatusCode    OpcUa_P_Semaphore_Create(      OpcUa_Semaphore* a_Semaphore,
         return OpcUa_BadInternalError;
     }
 
-    *a_Semaphore = (OpcUa_Semaphore)pInternalSemaphore;        
+    *a_Semaphore = (OpcUa_Semaphore)pInternalSemaphore;
 
     return OpcUa_Good;
 }
@@ -86,7 +86,7 @@ OpcUa_Void OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore)
     sem_t*              ppInternalSemaphore = (sem_t*)*pRawSemaphore;
     struct sem_t_*      pInternalSemaphore  = OpcUa_Null;
 
-    if(     pRawSemaphore           == OpcUa_Null 
+    if(     pRawSemaphore           == OpcUa_Null
         ||  *ppInternalSemaphore    == OpcUa_Null)
     {
         return;
@@ -118,13 +118,13 @@ OpcUa_Void OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore)
             /* self-suspend to give release thread time to */
             /* leave the post completely                   */
             *ppInternalSemaphore = pInternalSemaphore;
-            Sleep(0); 
+            Sleep(0);
         }
     }
 }
 
 /*============================================================================
- * Wait 
+ * Wait
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemaphore)
 {
@@ -173,7 +173,7 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
         else
         {
             return OpcUa_BadInternalError;
-        }        
+        }
     }
 
     return OpcUa_Good;
@@ -200,7 +200,7 @@ OpcUa_StatusCode OpcUa_P_Semaphore_Post(OpcUa_Semaphore RawSemaphore,
 /*============================================================================
  * Create a Semaphore
  *===========================================================================*/
-OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore* a_Semaphore, 
+OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore* a_Semaphore,
                                                             OpcUa_UInt32     a_uInitalValue,
                                                             OpcUa_UInt32     a_uMaxRange)
 {
@@ -214,9 +214,9 @@ OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore* a_S
     }
 
 
-    InternalSemaphore = CreateSemaphore(    NULL, 
-                                            a_uInitalValue, 
-                                            a_uMaxRange, 
+    InternalSemaphore = CreateSemaphore(    NULL,
+                                            a_uInitalValue,
+                                            a_uMaxRange,
                                             (LPCTSTR)NULL);
 
     if(InternalSemaphore == NULL)
@@ -224,7 +224,7 @@ OpcUa_StatusCode    OPCUA_DLLCALL OpcUa_P_Semaphore_Create( OpcUa_Semaphore* a_S
         return OpcUa_BadInternalError;
     }
 
-    *a_Semaphore = (OpcUa_Semaphore)InternalSemaphore;        
+    *a_Semaphore = (OpcUa_Semaphore)InternalSemaphore;
 
     return OpcUa_Good;
 }
@@ -251,12 +251,12 @@ OpcUa_Void OPCUA_DLLCALL OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore
 }
 
 /*============================================================================
- * Wait 
+ * Wait
  *===========================================================================*/
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemaphore)
 {
     HANDLE  InternalSemaphore = (HANDLE)RawSemaphore;
-    DWORD   dwResult;       
+    DWORD   dwResult;
 
     dwResult = WaitForSingleObject(InternalSemaphore, INFINITE);
 
@@ -267,7 +267,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemapho
 /* TODO: find return value */
 /*
     else if(dwResult == WAIT_ABANDONED)
-    {        
+    {
     }
 */
     else if(dwResult == WAIT_OBJECT_0)
@@ -283,11 +283,11 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemapho
 /*============================================================================
  * Wait for a maximum of seconds.
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_TimedWait( OpcUa_Semaphore a_RawSemaphore, 
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_TimedWait( OpcUa_Semaphore a_RawSemaphore,
                                                             OpcUa_UInt32    a_msecTimeout)
 {
     HANDLE  InternalSemaphore = (HANDLE)a_RawSemaphore;
-    DWORD   dwResult;       
+    DWORD   dwResult;
 
     dwResult = WaitForSingleObject(InternalSemaphore, a_msecTimeout);
 
@@ -325,7 +325,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Semaphore_Post(  OpcUa_Semaphore RawSemap
     else
     {
         DWORD dwLastError = GetLastError();
-        
+
         switch(dwLastError)
         {
         case ERROR_TOO_MANY_POSTS:

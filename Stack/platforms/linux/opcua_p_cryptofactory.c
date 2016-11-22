@@ -38,7 +38,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_CreateCryptoProvider(  OpcU
     OpcUa_CryptoProviderConfig* pConfig = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
-    
+
     OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
     OpcUa_ReturnErrorIfArgumentNull(a_Uri);
 
