@@ -626,6 +626,71 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
+ * OpcUa_SecureListener_OpenChannel
+ *===========================================================================*/
+/** @brief Create and initialize a new secure channel. Close the underlying
+           connection on error. This is the handler for channel openend messages. */
+static OpcUa_StatusCode OpcUa_SecureListener_OpenChannel(
+    OpcUa_Listener*         a_pSecureListenerInterface,
+    OpcUa_Handle            a_hTransportConnection,
+    OpcUa_StatusCode        a_uOperationStatus)
+{
+    OpcUa_SecureListener*   pSecureListener = OpcUa_Null;
+    OpcUa_SecureChannel*    pSecureChannel  = OpcUa_Null;
+    OpcUa_UInt32            uReceiveBufferSize = 0;
+
+OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OpenChannel");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSecureListenerInterface);
+    OpcUa_ReturnErrorIfArgumentNull(a_hTransportConnection);
+    OpcUa_ReferenceParameter(a_uOperationStatus);
+
+    /*** get listener handle ***/
+    pSecureListener = (OpcUa_SecureListener*)a_pSecureListenerInterface->Handle;
+    OpcUa_ReturnErrorIfNull(pSecureListener, OpcUa_BadInvalidState);
+
+    /* create TcpSecureChannel */
+    uStatus = OpcUa_TcpSecureChannel_Create(&pSecureChannel);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    pSecureChannel->TransportConnection = a_hTransportConnection;
+    pSecureChannel->SecureChannelId = OPCUA_SECURECHANNEL_ID_INVALID;
+    pSecureChannel->uOverlapCounter = (OpcUa_UInt32)(OPCUA_SECURELISTENER_CHANNELTIMEOUT/OPCUA_SECURELISTENER_WATCHDOG_INTERVAL);
+
+    /* Calculate max number of chunks per message. */
+    uStatus = OpcUa_Listener_GetReceiveBufferSize(pSecureListener->TransportListener,
+                                                  pSecureChannel->TransportConnection,
+                                                  &uReceiveBufferSize);
+    OpcUa_GotoErrorIfBad(uStatus);
+    pSecureChannel->nMaxBuffersPerMessage = OpcUa_ProxyStub_g_Configuration.iSerializer_MaxMessageSize/uReceiveBufferSize + 1;
+
+    /* Get the peer information from transport listener here - the listener is definitely valid in this context */
+    uStatus = OpcUa_Listener_GetPeerInfo(pSecureListener->TransportListener,
+                                         pSecureChannel->TransportConnection,
+                                         &pSecureChannel->sPeerInfo);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    /* add SecureChannel to SecureChannelManager */
+    uStatus = OpcUa_SecureListener_ChannelManager_AddChannel(pSecureListener->ChannelManager, pSecureChannel);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pSecureChannel != OpcUa_Null)
+    {
+        OpcUa_TcpSecureChannel_Delete(&pSecureChannel);
+    }
+
+    pSecureListener->TransportListener->CloseConnection(
+           pSecureListener->TransportListener,
+           a_hTransportConnection,
+           uStatus);
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * OpcUa_SecureListener_OnNotify
  *===========================================================================*/
 /* Gets called from the non secure listener on events. */
@@ -686,33 +751,11 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OnNotify");
         }
     case OpcUa_ListenerEvent_ChannelOpened:
         {
-            OpcUa_UInt32 uReceiveBufferSize = 0;
-
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_OnNotify: Transport Connection Opened\n");
 
-            /* create TcpSecureChannel */
-            uStatus = OpcUa_TcpSecureChannel_Create(&pSecureChannel);
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            pSecureChannel->SecureChannelId = OPCUA_SECURECHANNEL_ID_INVALID;
-            pSecureChannel->uOverlapCounter = (OpcUa_UInt32)(OPCUA_SECURELISTENER_CHANNELTIMEOUT/OPCUA_SECURELISTENER_WATCHDOG_INTERVAL);
-
-            /* Calculate max number of chunks per message. */
-            OpcUa_Listener_GetReceiveBufferSize(a_pTransportListener,
-                                                a_hTransportConnection,
-                                                &uReceiveBufferSize);
-            pSecureChannel->nMaxBuffersPerMessage = OpcUa_ProxyStub_g_Configuration.iSerializer_MaxMessageSize/uReceiveBufferSize + 1;
-
-            pSecureChannel->TransportConnection = a_hTransportConnection;
-
-            /* Get the peer information from transport listener here - the listener is definitely valid in this context */
-            uStatus = OpcUa_Listener_GetPeerInfo(pSecureListener->TransportListener,
-                                                 pSecureChannel->TransportConnection,
-                                                 &pSecureChannel->sPeerInfo);
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            /* add SecureChannel to SecureChannelManager */
-            uStatus = OpcUa_SecureListener_ChannelManager_AddChannel(pSecureListener->ChannelManager, pSecureChannel);
+            uStatus = OpcUa_SecureListener_OpenChannel( (OpcUa_Listener*)a_pCallbackData,
+                                                        a_hTransportConnection,
+                                                        a_uOperationStatus);
             OpcUa_GotoErrorIfBad(uStatus);
 
             break;
