@@ -1134,10 +1134,8 @@ OpcUa_BeginErrorHandling;
         OpcUa_TcpListener_ConnectionManager_RemoveConnection(pTcpListener->ConnectionManager, pConnection);
         OpcUa_TcpListener_Connection_Delete(&pConnection);
     }
-    else
-    {
-        OPCUA_P_SOCKET_CLOSE(pTcpInputStream->Socket);
-    }
+
+    OPCUA_P_SOCKET_CLOSE(pTcpInputStream->Socket);
 
 OpcUa_FinishErrorHandling;
 }
