@@ -2715,6 +2715,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "DataReady");
             {
                 pHttpInputStream->State = OpcUa_HttpsStream_State_StartLine;
             }
+            /* fall thru */
             case OpcUa_HttpsStream_State_StartLine:/*************************************************************************/
             {
                 /* read message start line */
@@ -2742,6 +2743,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "DataReady");
 
                 pHttpInputStream->State = OpcUa_HttpsStream_State_Headers;
             }
+            /* fall thru */
             case OpcUa_HttpsStream_State_Headers:/***************************************************************************/
             {
                 for(;;)
@@ -2811,6 +2813,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "DataReady");
                     uActualLength = 0;
                 }
             }
+            /* fall thru */
             case OpcUa_HttpsStream_State_Body:/******************************************************************************/
             {
 OpcUa_HttpsStream_State_Body:
@@ -2878,6 +2881,7 @@ OpcUa_HttpsStream_State_Body:
                     }
                 }
             }
+            /* fall thru */
             case OpcUa_HttpsStream_State_MessageComplete:/*******************************************************************/
             {
                 bReadAgain = OpcUa_False;

@@ -20,10 +20,6 @@
 #include <opcua_p_string.h>
 
 /* own */
-#if OPCUA_SUPPORT_PKI_WIN32
-#include <opcua_p_win32_pki.h>
-#endif /* OPCUA_SUPPORT_PKI_WIN32 */
-
 #include <opcua_p_openssl_pki.h>
 #include <opcua_p_pkifactory.h>
 

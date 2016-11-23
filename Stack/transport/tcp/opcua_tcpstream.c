@@ -1230,6 +1230,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "DataReady");
             /* no "break;" here, since after header is complete,    */
             /* the handling for message body can start immediately  */
         }
+        /* fall thru */
     case OpcUa_TcpStream_State_HeaderComplete: /* Header was completed, currently message body */
         {
             /* security check for length exceeds buffersize (which would be an error) */
@@ -1281,6 +1282,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "DataReady");
                 return OpcUa_GoodCallAgain;
             }
         }
+        /* fall thru */
     case OpcUa_TcpStream_State_MessageComplete: /* just in case... */
         {
             /* The message has been completely received and dispatched to the upper layer. */

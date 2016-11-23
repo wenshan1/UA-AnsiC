@@ -645,20 +645,10 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
         break;
 
     case EVP_PKEY_EC:
-        uStatus =  OpcUa_BadNotSupported;
-        OpcUa_GotoErrorIfBad(uStatus);
-
     case EVP_PKEY_DSA:
-        uStatus =  OpcUa_BadNotSupported;
-        OpcUa_GotoErrorIfBad(uStatus);
-
     case EVP_PKEY_DH:
-        uStatus =  OpcUa_BadNotSupported;
-        OpcUa_GotoErrorIfBad(uStatus);
-
     default:
-        uStatus =  OpcUa_BadNotSupported;
-        OpcUa_GotoErrorIfBad(uStatus);
+        OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
     }
 
     /*** clean up ***/

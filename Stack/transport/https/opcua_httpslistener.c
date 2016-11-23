@@ -909,13 +909,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                                                                 a_ppInputStream,                                    /* the ready input stream    */
                                                                 OpcUa_Good);                                        /* event status code         */
             }
-            else
-            {
-                /* delete and close input stream */
-                OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
-                OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
-                OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
-            }
 
             break;
         }
@@ -974,13 +967,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "ProcessRequest");
                                                                 (OpcUa_Handle)a_pListenerConnection,                /* handle for the connection */
                                                                 a_ppInputStream,                                    /* the ready input stream    */
                                                                 OpcUa_Good);                                        /* event status code         */
-            }
-            else
-            {
-                /* delete and close input stream */
-                OpcUa_HttpsStream_Close((OpcUa_Stream*)(*a_ppInputStream));
-                OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppInputStream);
-                OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &a_pListenerConnection);
             }
 
 #else /* OPCUA_HTTPS_ALLOW_GET */
@@ -1562,7 +1548,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AcceptEventHandler");
 
     pHttpsListener = (OpcUa_HttpsListener *)a_pListener->Handle;
 
-#if OPCUA_HTTPLISTENER_USEEXTRAMAXCONNSOCKET
+#if OPCUA_HTTPSLISTENER_USEEXTRAMAXCONNSOCKET
     {
         OpcUa_UInt32 uConnectionCount = 0;
 
@@ -1571,7 +1557,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AcceptEventHandler");
 
         OpcUa_GotoErrorIfTrue(uConnectionCount >= OPCUA_HTTPLISTENER_MAXCONNECTIONS, OpcUa_BadMaxConnectionsReached);
     }
-#endif /* OPCUA_HTTPLISTENER_USEEXTRAMAXCONNSOCKET */
+#endif /* OPCUA_HTTPSLISTENER_USEEXTRAMAXCONNSOCKET */
 
     /* check, if there is already a connection with this object */
     OpcUa_HttpsListener_ConnectionManager_GetConnectionBySocket(    pHttpsListener->pConnectionManager,

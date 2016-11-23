@@ -27,9 +27,10 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_HTTPS_COPYHEADERS                                     OPCUA_CONFIG_NO
 
 /** @brief Allow HTTP GET request to pass this layer. */
-#ifndef OPCUA_HTTPS_ALLOW_GET
 #define OPCUA_HTTPS_ALLOW_GET                                       OPCUA_CONFIG_NO
-#endif /* OPCUA_HTTPS_ALLOW_GET */
+
+/** @brief Allow HTTP/1.0 request to pass this layer. */
+#define OPCUA_HTTPS_ALLOW_HTTP10                                    OPCUA_CONFIG_NO
 
 /*============================================================================
  * Used HTTP version
