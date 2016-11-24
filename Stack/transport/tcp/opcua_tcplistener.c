@@ -158,7 +158,7 @@ OpcUa_Void OpcUa_TcpListener_Delete(OpcUa_Listener** a_ppListener)
     OpcUa_TcpListener* pTcpListener = OpcUa_Null;
     OpcUa_InputStream* pInputStream = OpcUa_Null;
 
-    if (a_ppListener == OpcUa_Null || *a_ppListener == OpcUa_Null)
+    if(a_ppListener == OpcUa_Null || *a_ppListener == OpcUa_Null)
     {
         return;
     }
@@ -245,7 +245,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "Create");
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
-    if (*a_pListener != OpcUa_Null)
+    if(*a_pListener != OpcUa_Null)
     {
         OpcUa_TcpListener_ConnectionManager_Delete(&(pTcpListener->ConnectionManager));
         OpcUa_List_Delete(&(pTcpListener->PendingMessages));
@@ -1057,18 +1057,6 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
     pConnection->SendBufferSize     = (pConnection->SendBufferSize    > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->SendBufferSize;
     pConnection->ReceiveBufferSize  = (pConnection->ReceiveBufferSize > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->ReceiveBufferSize;
 
-    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
-    if(pConnection->SendBufferSize < 8192)
-    {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
-    }
-
-    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
-    if(pConnection->ReceiveBufferSize < 8192)
-    {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);
-    }
-
     if(     pConnection->MaxMessageSize  == 0
         ||  pConnection->MaxMessageSize  >  (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxMessageLength)
     {
@@ -1088,6 +1076,15 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
         pConnection->MaxChunkCount);
 
     pConnection->bConnected = OpcUa_True;
+
+    /* This value shall be greater or equal than 8 192 bytes (see 1.03 Errata) */
+    if(pConnection->SendBufferSize < 8192 || pConnection->ReceiveBufferSize < 8192)
+    {
+        uStatus = OpcUa_TcpListener_CloseConnection(a_pListener,
+                                                    pConnection,
+                                                    OpcUa_BadConnectionRejected);
+        OpcUa_ReturnStatusCode;
+    }
 
 #if OPCUA_TCPLISTENER_USEEXTRAMAXCONNSOCKET
     OpcUa_TcpListener_ConnectionManager_GetConnectionCount(pTcpListener->ConnectionManager,
