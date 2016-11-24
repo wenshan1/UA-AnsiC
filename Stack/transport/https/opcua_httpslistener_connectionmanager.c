@@ -261,7 +261,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_ConnectionManager_AddConnection(
     return OpcUa_Good;
 
 Error:
-    return OpcUa_Bad;
+    return uStatus;
 }
 
 /***  HttpListener_Connection Class  ***/

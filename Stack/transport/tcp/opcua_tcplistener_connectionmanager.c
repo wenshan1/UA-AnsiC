@@ -223,7 +223,7 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_AddConnection(
     return OpcUa_Good;
 
 Error:
-    return OpcUa_Bad;
+    return uStatus;
 }
 
 /*==============================================================================*/
