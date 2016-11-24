@@ -977,63 +977,50 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
     pTcpInputStream = (OpcUa_TcpInputStream*)a_istrm->Handle;
     OpcUa_ReturnErrorIfArgumentNull(pTcpInputStream);
 
-    /* check, if there is already a connection with this object */
-    OpcUa_TcpListener_ConnectionManager_GetConnectionBySocket(  pTcpListener->ConnectionManager,
-                                                                pTcpInputStream->Socket,
-                                                                &pConnection);
+    /* create and add a new connection object for the accepted connection  */
+    uStatus = OpcUa_TcpListener_Connection_Create(&pConnection);
+    OpcUa_GotoErrorIfBad(uStatus);
 
-    /* if no connection exists create a new one */
-    if(pConnection == OpcUa_Null)
-    {
-        /* create and add a new connection object for the accepted connection  */
-        uStatus = OpcUa_TcpListener_Connection_Create(&pConnection);
-        OpcUa_GotoErrorIfBad(uStatus);
-
-        pConnection->Socket          = pTcpInputStream->Socket;
-        pConnection->pListenerHandle = (OpcUa_Listener*)a_pListener;
+    pConnection->Socket          = pTcpInputStream->Socket;
+    pConnection->pListenerHandle = (OpcUa_Listener*)a_pListener;
 
 
 #if OPCUA_P_SOCKETGETPEERINFO_V2
-        uStatus = OPCUA_P_SOCKET_GETPEERINFO(pConnection->Socket, pConnection->achPeerInfo, OPCUA_P_PEERINFO_MIN_SIZE);
-        if(OpcUa_IsGood(uStatus))
-        {
-            /* Give some debug information. */
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
-                        "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %s accepted on socket %p!\n",
-                        pConnection->achPeerInfo,
-                        pConnection->Socket);
-        }
-        else
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
-        }
-#else /* OPCUA_P_SOCKETGETPEERINFO_V2 */
-        uStatus = OPCUA_P_SOCKET_GETPEERINFO(pTcpInputStream->Socket, &(pConnection->PeerIp), &(pConnection->PeerPort));
-        if(OpcUa_IsGood(uStatus))
-        {
-            /* Give some debug information. */
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
-                        "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %d.%d.%d.%d:%d accepted on socket %p!\n",
-                        (OpcUa_Int)(pConnection->PeerIp>>24)&0xFF,
-                        (OpcUa_Int)(pConnection->PeerIp>>16)&0xFF,
-                        (OpcUa_Int)(pConnection->PeerIp>>8) &0xFF,
-                        (OpcUa_Int) pConnection->PeerIp     &0xFF,
-                        pConnection->PeerPort,
-                        pConnection->Socket);
-        }
-        else
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
-        }
-#endif /* OPCUA_P_SOCKETGETPEERINFO_V2 */
-
-        uStatus = OpcUa_TcpListener_ConnectionManager_AddConnection(pTcpListener->ConnectionManager, pConnection);
-        OpcUa_GotoErrorIfBad(uStatus);
+    uStatus = OPCUA_P_SOCKET_GETPEERINFO(pConnection->Socket, pConnection->achPeerInfo, OPCUA_P_PEERINFO_MIN_SIZE);
+    if(OpcUa_IsGood(uStatus))
+    {
+        /* Give some debug information. */
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
+                    "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %s accepted on socket %p!\n",
+                    pConnection->achPeerInfo,
+                    pConnection->Socket);
     }
     else
     {
-        return(OpcUa_BadUnexpectedError);
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
     }
+#else /* OPCUA_P_SOCKETGETPEERINFO_V2 */
+    uStatus = OPCUA_P_SOCKET_GETPEERINFO(pTcpInputStream->Socket, &(pConnection->PeerIp), &(pConnection->PeerPort));
+    if(OpcUa_IsGood(uStatus))
+    {
+        /* Give some debug information. */
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
+                    "OpcUa_TcpListener_ProcessHelloMessage: Transport connection from %d.%d.%d.%d:%d accepted on socket %p!\n",
+                    (OpcUa_Int)(pConnection->PeerIp>>24)&0xFF,
+                    (OpcUa_Int)(pConnection->PeerIp>>16)&0xFF,
+                    (OpcUa_Int)(pConnection->PeerIp>>8) &0xFF,
+                    (OpcUa_Int) pConnection->PeerIp     &0xFF,
+                    pConnection->PeerPort,
+                    pConnection->Socket);
+    }
+    else
+    {
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "OpcUa_TcpListener_ProcessHelloMessage: Could not retrieve connection information for socket %p!\n", pConnection->Socket);
+    }
+#endif /* OPCUA_P_SOCKETGETPEERINFO_V2 */
+
+    uStatus = OpcUa_TcpListener_ConnectionManager_AddConnection(pTcpListener->ConnectionManager, pConnection);
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* protocol version */
     uStatus = OpcUa_UInt32_BinaryDecode(&pConnection->uProtocolVersion, a_istrm);
@@ -1364,9 +1351,18 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ReadEventHandler");
             case OpcUa_TcpStream_MessageType_Hello:
                 {
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ReadEventHandler: MessageType HELLO\n");
-                    uStatus = OpcUa_TcpListener_ProcessHelloMessage(a_pListener, pInputStream);
-                    OpcUa_TcpStream_Close((OpcUa_Stream*)pInputStream);
-                    OpcUa_TcpStream_Delete((OpcUa_Stream**)&pInputStream);
+                    if(pTcpListenerConnection == OpcUa_Null)
+                    {
+                        uStatus = OpcUa_TcpListener_ProcessHelloMessage(a_pListener, pInputStream);
+                        OpcUa_TcpStream_Close((OpcUa_Stream*)pInputStream);
+                        OpcUa_TcpStream_Delete((OpcUa_Stream**)&pInputStream);
+                    }
+                    else
+                    {
+                        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_TcpListener_ReadEventHandler: Received duplicate HELLO request!\n");
+                        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+                    }
+
                     break;
                 }
             case OpcUa_TcpStream_MessageType_SecureChannel:
