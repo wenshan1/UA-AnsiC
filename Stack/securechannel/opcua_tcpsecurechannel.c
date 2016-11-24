@@ -357,8 +357,8 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "CheckSequenceNumber");
 
     /* The SequenceNumber shall also monotonically increase for all Messages
        and shall not wrap around until it is greater than 4 294 966 271
-       (UInt32.MaxValue – 1 024). The first number after the wrap around
-       shall be less than 1 024. */
+       (UInt32.MaxValue - 1 024). The first number after the wrap around
+       shall be less than 1 024. */
     if(!((a_uSequenceNumber == a_pSecureChannel->uLastSequenceNumberRcvd + 1) ||
          ((a_uSequenceNumber < 1024) &&
           (a_pSecureChannel->uLastSequenceNumberRcvd > 4294966271u))))
