@@ -772,6 +772,10 @@ OpcUa_Void          OpcUa_List_EnQueueCurrentElement(OpcUa_List*         a_pList
     {
         *a_ppQueueFirst = deleteElement;
     }
+    else
+    {
+        (*a_ppQueueLast)->nextElement = deleteElement;
+    }
 
     *a_ppQueueLast = deleteElement;
 
