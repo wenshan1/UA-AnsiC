@@ -178,7 +178,7 @@ static OpcUa_StatusCode OpcUa_Https_ReadCharFromBuffer(
     OpcUa_ReturnErrorIfArgumentNull(a_pBuffer);
     OpcUa_ReturnErrorIfArgumentNull(a_pValue);
 
-    if (a_pBuffer->EndOfData - a_pBuffer->Position <= 0)
+    if(a_pBuffer->EndOfData - a_pBuffer->Position <= 0)
     {
         return OpcUa_BadEndOfStream;
     }
@@ -1888,8 +1888,8 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "CreateOutput");
     }
     else
     {
-        OpcUa_HttpsHeaderCollection_Create(&(pHttpOutputStream->Headers));
-        OpcUa_GotoErrorIfAllocFailed(pHttpOutputStream->Headers);
+        uStatus = OpcUa_HttpsHeaderCollection_Create(&(pHttpOutputStream->Headers));
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
 #else /* OPCUA_HTTPSSTREAM_OUTPUT_HAS_HEADERCOLLECTION */
