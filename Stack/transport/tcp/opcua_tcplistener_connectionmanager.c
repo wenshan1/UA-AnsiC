@@ -76,7 +76,7 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_Initialize(
     OpcUa_StatusCode uStatus    = OpcUa_Good;
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_TcpListener);
 
-    if (a_pConnectionManager == OpcUa_Null)
+    if(a_pConnectionManager == OpcUa_Null)
     {
         return OpcUa_BadInvalidArgument;
     }
@@ -98,7 +98,7 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_Initialize(
 OpcUa_Void OpcUa_TcpListener_ConnectionManager_Clear(
     OpcUa_TcpListener_ConnectionManager* a_pConnectionManager)
 {
-    if (a_pConnectionManager == OpcUa_Null)
+    if(a_pConnectionManager == OpcUa_Null)
     {
         return;
     }
@@ -116,7 +116,7 @@ OpcUa_Void OpcUa_TcpListener_ConnectionManager_Clear(
 OpcUa_Void OpcUa_TcpListener_ConnectionManager_Delete(
     OpcUa_TcpListener_ConnectionManager** a_ppConnectionManager)
 {
-    if (a_ppConnectionManager != OpcUa_Null)
+    if(a_ppConnectionManager != OpcUa_Null)
     {
         OpcUa_TcpListener_ConnectionManager_Clear(*a_ppConnectionManager);
         OpcUa_Free(*a_ppConnectionManager);
@@ -215,10 +215,10 @@ OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_AddConnection(
     a_pConnection->ConnectTime = OPCUA_P_DATETIME_UTCNOW(); /* expiration of connection would be DisconnectTime+Lifetime */
 
     OpcUa_List_Enter(a_pConnectionManager->Connections);
-    OpcUa_List_AddElement(a_pConnectionManager->Connections, a_pConnection);
-    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ConnectionManager_AddConnection: Connection added!\n");
+    uStatus = OpcUa_List_AddElement(a_pConnectionManager->Connections, a_pConnection);
     OpcUa_List_Leave(a_pConnectionManager->Connections);
-
+    OpcUa_GotoErrorIfBad(uStatus);
+    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_TcpListener_ConnectionManager_AddConnection: Connection added!\n");
 
     return OpcUa_Good;
 
