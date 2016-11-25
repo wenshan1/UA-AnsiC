@@ -2765,7 +2765,11 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "DataReady");
                     OpcUa_GotoErrorIfBad(uStatus);
 
                     uStatus = OpcUa_HttpsHeaderCollection_AddHeader(pHttpInputStream->Headers, pMessageHeader);
-                    OpcUa_GotoErrorIfBad(uStatus);
+                    if(OpcUa_IsBad(uStatus))
+                    {
+                        OpcUa_HttpsHeader_Delete(&pMessageHeader);
+                        OpcUa_GotoError;
+                    }
                 }
 
                 if(uStatus == OpcUa_GoodCallAgain)
