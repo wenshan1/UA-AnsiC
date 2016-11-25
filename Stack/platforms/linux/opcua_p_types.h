@@ -21,8 +21,6 @@
 #ifndef _OpcUa_P_Types_H_
 #define _OpcUa_P_Types_H_ 1
 
-#include <limits.h>
-
 #define OPCUA_P_NATIVE64 1
 
 /*============================================================================
@@ -221,10 +219,10 @@ struct _OpcUa_TimeVal
 #define OpcUa_Int16_Max     (OpcUa_Int16)32767
 #define OpcUa_UInt16_Min    (OpcUa_UInt16)0
 #define OpcUa_UInt16_Max    (OpcUa_UInt16)65535
-#define OpcUa_Int32_Min     INT_MIN
-#define OpcUa_Int32_Max     INT_MAX
-#define OpcUa_UInt32_Min    UINT_MIN
-#define OpcUa_UInt32_Max    UINT_MAX
+#define OpcUa_Int32_Min     (OpcUa_Int32)(-2147483647L-1)
+#define OpcUa_Int32_Max     (OpcUa_Int32)2147483647
+#define OpcUa_UInt32_Min    (OpcUa_UInt32)0
+#define OpcUa_UInt32_Max    (OpcUa_UInt32)4294967295U
 #define OpcUa_Int64_Max     (OpcUa_Int64)9223372036854775807LL
 #define OpcUa_Int64_Min     (OpcUa_Int64)(-OpcUa_Int64_Max - 1LL)
 #define OpcUa_UInt64_Min    (OpcUa_UInt64)0
