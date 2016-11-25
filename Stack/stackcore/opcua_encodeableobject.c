@@ -194,10 +194,12 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
         /* reallocate the table */
         pEntries = (OpcUa_EncodeableType*)OpcUa_ReAlloc(a_pTable->Entries, nCount*sizeof(OpcUa_EncodeableType));
         OpcUa_GotoErrorIfAllocFailed(pEntries);
+        a_pTable->Entries = pEntries;
 
         /* reallocate the index */
         pIndex = (OpcUa_EncodeableTypeTableEntry*)OpcUa_ReAlloc(a_pTable->Index, nIndexCount*sizeof(OpcUa_EncodeableTypeTableEntry));
         OpcUa_GotoErrorIfAllocFailed(pIndex);
+        a_pTable->Index = pIndex;
 
         /* copy new definitions */
         for (ii = a_pTable->Count; ii < nCount; ii++)
@@ -249,9 +251,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
         OpcUa_QSort(pIndex, nIndexCount, sizeof(OpcUa_EncodeableTypeTableEntry), OpcUa_EncodeableType_Compare, OpcUa_Null);
 
         /* save the new table */
-        a_pTable->Entries = pEntries;
         a_pTable->Count = nCount;
-        a_pTable->Index = pIndex;
         a_pTable->IndexCount = nIndexCount;
     }
 
@@ -259,24 +259,6 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddTypes(
 
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
-
-    /* zero any new entries that could not be added but don't free the reallocated table */
-    if (pEntries != OpcUa_Null)
-    {
-        for (ii = a_pTable->Count; ii < nCount; ii++)
-        {
-            OpcUa_MemSet(&(pEntries[ii]), 0, sizeof(OpcUa_EncodeableType));
-        }
-    }
-
-    /* zero any new entries that could not be added but don't free the reallocated index */
-    if (pIndex != OpcUa_Null)
-    {
-        for (ii = a_pTable->IndexCount; ii < nIndexCount; ii++)
-        {
-            OpcUa_MemSet(&(pIndex[ii]), 0, sizeof(OpcUa_EncodeableTypeTableEntry));
-        }
-    }
 
     OPCUA_P_MUTEX_UNLOCK(a_pTable->Mutex);
 
@@ -311,6 +293,7 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     /* reallocate the index */
     pIndex = (OpcUa_EncodeableTypeTableEntry*)OpcUa_ReAlloc(a_pTable->Index, nIndexCount*sizeof(OpcUa_EncodeableTypeTableEntry));
     OpcUa_GotoErrorIfAllocFailed(pIndex);
+    a_pTable->Index = pIndex;
 
     pIndexEntry = &(pIndex[nIndexCount-1]);
 
@@ -332,7 +315,6 @@ OpcUa_StatusCode OpcUa_EncodeableTypeTable_AddUnknownTypeMapping(
     OpcUa_QSort(pIndex, nIndexCount, sizeof(OpcUa_EncodeableTypeTableEntry), OpcUa_EncodeableType_Compare, OpcUa_Null);
 
     /* save the new table */
-    a_pTable->Index = pIndex;
     a_pTable->IndexCount = nIndexCount;
 
     OPCUA_P_MUTEX_UNLOCK(a_pTable->Mutex);
