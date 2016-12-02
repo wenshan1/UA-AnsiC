@@ -64,8 +64,9 @@ and "platforms/win32/opcua_platformdefs.h".
 Detailed information exists at the top of these files.
 All settings are described within the source code.
 
+- OPC UA 1.03 compatible.
 - windows and linux layers work with 32 and 64 bit O/S.
-- linux implements full IPv6 support, windows only on server side.
+- windows and linux implement full IPv6 support.
 - pki store implementation reworked to be more flexible.
 - conformant with strict aliasing rules.
 - enumeral values are checked on receive.

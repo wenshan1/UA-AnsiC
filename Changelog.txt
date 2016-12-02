@@ -9,7 +9,7 @@ Version 1.03.340
 		- linux platform added.
 		- windows and linux layers work with 32 and 64 bit O/S.
 		- optimised async sockets handling implemented.
-		- linux implements full IPv6 support, windows only on server side.
+		- windows and linux implement full IPv6 support.
 		- pki store implementation reworked to be more flexible.
 		- conformant with strict aliasing rules.
 		- enumeral values are checked on receive.
