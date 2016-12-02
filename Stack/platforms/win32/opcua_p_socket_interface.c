@@ -21,6 +21,7 @@
 /* System Headers */
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <openssl/ssl.h>
 
 /* UA platform definitions */
 #include <opcua_p_internal.h>
@@ -39,7 +40,6 @@
 #include <opcua_p_socket.h>
 #include <opcua_p_socket_internal.h>
 #include <opcua_p_socket_interface.h>
-
 
 #if OPCUA_MULTITHREADED
 /*============================================================================
@@ -652,17 +652,23 @@ OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
 
+extern OpcUa_StatusCode OpcUa_Socket_ProcessTlsError(
+    OpcUa_InternalSocket* a_pSocket,
+    OpcUa_Int a_iSslError);
+
 /*============================================================================
  * Read Socket.
  *===========================================================================*/
-OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_Read( OpcUa_Socket    a_pSocket,
-                                                    OpcUa_Byte*     a_pBuffer,
-                                                    OpcUa_UInt32    a_nBufferSize,
-                                                    OpcUa_UInt32*   a_pBytesRead)
+OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_Read( 
+    OpcUa_Socket    a_pSocket,
+    OpcUa_Byte*     a_pBuffer,
+    OpcUa_UInt32    a_nBufferSize,
+    OpcUa_UInt32*   a_pBytesRead)
 {
     OpcUa_SocketServiceTable** ppSocketServiceTable = (OpcUa_SocketServiceTable**)a_pSocket;
-
     OpcUa_ReturnErrorIfArgumentNull(a_pSocket);
+
+    OpcUa_InternalSocket* pInternalSocket = (OpcUa_InternalSocket*)a_pSocket;
 
     return (*ppSocketServiceTable)->SocketRead(a_pSocket, a_pBuffer, a_nBufferSize, a_pBytesRead);
 }
@@ -671,15 +677,17 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_Read( OpcUa_Socket    a_pSocket,
  * Write Socket.
  *===========================================================================*/
 /* returns number of bytes written to the socket */
-OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_Socket_Write( OpcUa_Socket    a_pSocket,
-                                                OpcUa_Byte*     a_pBuffer,
-                                                OpcUa_UInt32    a_uBufferSize,
-                                                OpcUa_Boolean   a_bBlock)
+OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_Socket_Write(
+    OpcUa_Socket    a_pSocket,
+    OpcUa_Byte*     a_pBuffer,
+    OpcUa_UInt32    a_uBufferSize,
+    OpcUa_Boolean   a_bBlock)
 {
     OpcUa_SocketServiceTable** ppSocketServiceTable = (OpcUa_SocketServiceTable**)a_pSocket;
-
     OpcUa_ReturnErrorIfArgumentNull(a_pSocket);
 
+    OpcUa_InternalSocket* pInternalSocket = (OpcUa_InternalSocket*)a_pSocket;
+    
     return (*ppSocketServiceTable)->SocketWrite(a_pSocket, a_pBuffer, a_uBufferSize, a_bBlock);
 }
 

@@ -37,7 +37,7 @@
 #include <opcua_connection.h>
 #include <opcua_tcpconnection.h>
 #include <opcua_secureconnection.h>
-#include <opcua_tcplistener.h>
+#include <opcua_wssconnection.h>
 
 #ifdef OPCUA_HAVE_HTTPS
 #include <opcua_httpsconnection.h>
@@ -689,13 +689,19 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "OnNotify");
         {
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Channel_OnNotify: Underlying connection raised connect event with status 0x%08X!\n", a_uOperationStatus);
 
-            if(pInternalChannel->pfCallback != OpcUa_Null)
+            if(pInternalChannel->pfConnectCallback != OpcUa_Null)
             {
                 OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Channel_OnNotify: Notifying application!\n");
-                uStatus = pInternalChannel->pfCallback( pInternalChannel,
-                                                        pInternalChannel->pvCallbackData,
-                                                        eOpcUa_Channel_Event_Connected,
-                                                        a_uOperationStatus);
+                
+                uStatus = pInternalChannel->pfConnectCallback( 
+                    pInternalChannel,
+                    pInternalChannel->pvConnectCallbackData,
+                    eOpcUa_Channel_Event_Connected,
+                    a_uOperationStatus);
+
+                pInternalChannel->pfConnectCallback = OpcUa_Null;
+                pInternalChannel->pvConnectCallbackData = OpcUa_Null;
+
                 OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Channel_OnNotify: Notifying application done!\n");
             }
             else
@@ -714,13 +720,16 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "OnNotify");
         {
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Channel_OnNotify: Underlying connection raised disconnect event!\n");
 
-            if(pInternalChannel->pfCallback != OpcUa_Null)
+            if (pInternalChannel->pfCallback != OpcUa_Null)
             {
                 OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Channel_OnNotify: Notifying application!\n");
-                uStatus = pInternalChannel->pfCallback( pInternalChannel,
-                                                        pInternalChannel->pvCallbackData,
-                                                        eOpcUa_Channel_Event_Disconnected,
-                                                        a_uOperationStatus);
+                
+                uStatus = pInternalChannel->pfCallback( 
+                    pInternalChannel,
+                    pInternalChannel->pvCallbackData,
+                    eOpcUa_Channel_Event_Disconnected,
+                    a_uOperationStatus);
+
                 pInternalChannel->pfCallback = OpcUa_Null;
                 pInternalChannel->pvCallbackData = OpcUa_Null;
             }
@@ -734,12 +743,25 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "OnNotify");
         {
             OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_Channel_OnNotify: Underlying connection raised unexpected error event!\n");
 
-            if(pInternalChannel->pfCallback != OpcUa_Null)
+            if(pInternalChannel->pfConnectCallback != OpcUa_Null)
             {
-                uStatus = pInternalChannel->pfCallback( pInternalChannel,
-                                                        pInternalChannel->pvCallbackData,
-                                                        eOpcUa_Channel_Event_Disconnected,
-                                                        a_uOperationStatus);
+                uStatus = pInternalChannel->pfConnectCallback(
+                    pInternalChannel,
+                    pInternalChannel->pvConnectCallbackData,
+                    eOpcUa_Channel_Event_Disconnected,
+                    a_uOperationStatus);
+
+                pInternalChannel->pfConnectCallback = OpcUa_Null;
+                pInternalChannel->pvConnectCallbackData = OpcUa_Null;
+            }
+            else if(pInternalChannel->pfCallback != OpcUa_Null)
+            {
+                uStatus = pInternalChannel->pfCallback( 
+                    pInternalChannel,
+                    pInternalChannel->pvCallbackData,
+                    eOpcUa_Channel_Event_Disconnected,
+                    a_uOperationStatus);
+
                 pInternalChannel->pfCallback = OpcUa_Null;
                 pInternalChannel->pvCallbackData = OpcUa_Null;
             }
@@ -915,6 +937,32 @@ static OpcUa_StatusCode OpcUa_Channel_InternalConnectComplete(  OpcUa_Channel   
     return OpcUa_AsyncCallState_SignalCompletion((OpcUa_AsyncCallState*)a_pCallbackData, a_uStatus);
 }
 
+static OpcUa_StatusCode OpcUa_Channel_Socket_CertificateCallback(
+    OpcUa_Socket        a_hSocket,
+    OpcUa_Void*         a_pUserData,
+    OpcUa_ByteString*   a_pCertificate,
+    OpcUa_StatusCode    a_uResult)
+{
+    OpcUa_InternalChannel* pChannel = (OpcUa_InternalChannel*)a_pUserData;
+
+OpcUa_InitializeStatus(OpcUa_Module_Channel, "BeginConnect");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pUserData);
+
+    if (pChannel->pfCallback != OpcUa_Null)
+    {
+        uStatus = pChannel->pfCallback(
+            a_pUserData,
+            pChannel->pvCallbackData,
+            eOpcUa_Channel_Event_VerifyCertificate,
+            a_uResult);
+    }
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+OpcUa_FinishErrorHandling;
+}
+
 /*============================================================================
  * OpcUa_Channel_InternalBeginConnect
  *===========================================================================*/
@@ -932,8 +980,8 @@ OpcUa_StatusCode OpcUa_Channel_BeginConnect(OpcUa_Channel                       
                                             OpcUa_Channel_PfnConnectionStateChanged*    a_pfCallback,
                                             OpcUa_Void*                                 a_pCallbackData)
 {
-    OpcUa_InternalChannel*          pChannel                = (OpcUa_InternalChannel*)a_pChannel;
-    OpcUa_ClientCredential*         pClientCredentials      = OpcUa_Null;
+    OpcUa_InternalChannel* pChannel = (OpcUa_InternalChannel*)a_pChannel;
+    OpcUa_ClientCredential* pClientCredentials = OpcUa_Null;
 
 #if OPCUA_USE_SYNCHRONISATION
     OpcUa_Boolean                   bLocked                 = OpcUa_False;
@@ -943,6 +991,9 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "BeginConnect");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pChannel);
     OpcUa_ReturnErrorIfArgumentNull(a_pfCallback);
+
+    pChannel->pfConnectCallback = a_pfCallback;
+    pChannel->pvConnectCallbackData = a_pCallbackData;
 
     if(a_nNetworkTimeout == 0)
     {
@@ -994,12 +1045,39 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "BeginConnect");
         uStatus = OpcUa_TcpConnection_Create(&pChannel->TransportConnection);
         OpcUa_GotoErrorIfBad(uStatus);
 
-        uStatus = OpcUa_SecureConnection_Create(pChannel->TransportConnection,
-                                                pChannel->Encoder,
-                                                pChannel->Decoder,
-                                                &OpcUa_ProxyStub_g_NamespaceUris,
-                                                &OpcUa_ProxyStub_g_EncodeableTypes,
-                                                &pChannel->SecureConnection);
+        uStatus = OpcUa_SecureConnection_Create(
+            pChannel->TransportConnection,
+            pChannel->Encoder,
+            pChannel->Decoder,
+            &OpcUa_ProxyStub_g_NamespaceUris,
+            &OpcUa_ProxyStub_g_EncodeableTypes,
+            &pChannel->SecureConnection);
+
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+    else if(!OpcUa_String_StrnCmp(  &(pChannel->Url),
+                                    OpcUa_String_FromCString("opc.wss:"),
+                                    8,
+                                    OpcUa_True))
+    {
+        uStatus = OpcUa_WssConnection_Create(
+            a_pClientCertificate,
+            a_pClientPrivateKey,
+            a_pPKIConfig,
+            OpcUa_Channel_Socket_CertificateCallback,
+            pChannel,
+            &pChannel->TransportConnection);
+        
+        OpcUa_GotoErrorIfBad(uStatus);
+
+        uStatus = OpcUa_SecureConnection_Create(
+            pChannel->TransportConnection,
+            pChannel->Encoder,
+            pChannel->Decoder,
+            &OpcUa_ProxyStub_g_NamespaceUris,
+            &OpcUa_ProxyStub_g_EncodeableTypes,
+            &pChannel->SecureConnection);
+
         OpcUa_GotoErrorIfBad(uStatus);
     }
 #ifdef OPCUA_HAVE_HTTPS
@@ -1017,9 +1095,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "BeginConnect");
         uStatus = OpcUa_BadNotSupported;
         OpcUa_GotoError;
     }
-
-    pChannel->pfCallback        = a_pfCallback;
-    pChannel->pvCallbackData    = a_pCallbackData;
 
     /* create transport credential */
     pClientCredentials = (OpcUa_ClientCredential*)OpcUa_Alloc(sizeof(OpcUa_ClientCredential));
@@ -1087,8 +1162,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "Connect");
     OpcUa_ReturnErrorIfArgumentNull(a_hChannel);
     OpcUa_ReturnErrorIfArgumentNull(a_sUrl);
 
-    OpcUa_ReferenceParameter(a_pfCallback);
-    OpcUa_ReferenceParameter(a_pvCallbackData);
+    pInternalChannel->pfCallback = a_pfCallback;
+    pInternalChannel->pvCallbackData = a_pvCallbackData;
 
     /* create waithandle */
     uStatus =  OpcUa_AsyncCallState_Create(a_hChannel, OpcUa_Null, OpcUa_Null, &pAsyncState);
@@ -1128,12 +1203,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "Connect");
     if(OpcUa_IsGood(uStatus))
     {
         uStatus = pAsyncState->Status;
-    }
-
-    if(OpcUa_IsGood(uStatus))
-    {
-        pInternalChannel->pfCallback        = a_pfCallback;
-        pInternalChannel->pvCallbackData    = a_pvCallbackData;
     }
 
 #if OPCUA_USE_SYNCHRONISATION

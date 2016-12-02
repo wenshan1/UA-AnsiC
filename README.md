@@ -64,7 +64,7 @@ The following tree shows the directory layout as required by the included projec
 - |- prototypes   					 Root directory for all prototype projects.
 - |  |- amqp						 Sample subscribers and publishers that use AMQP.
 - |  |- oauth2						 Sample clients that use OAuth2 to request user identity tokens.
-- |  |- tls						 	 Sample client and server which implement the TLS transport. 
+- |  |- websockets				 	 Sample client and server which implement the WebSockets transport. 
 
 
 ## Known issues

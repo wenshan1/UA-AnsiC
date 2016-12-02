@@ -157,7 +157,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_StrCmpA(xStr1, xStr2)                     strcmp(xStr1, xStr2)
 #define OpcUa_StrnCmpA(xStr1, xStr2, xCount)            strncmp(xStr1, xStr2, xCount)
 #define OpcUa_StriCmpA(xStr1, xStr2)                    stricmp(xStr1, xStr2)
-#define OpcUa_StrinCmpA(xStr1, xStr2, xCount)           strnicmp(xStr1, xStr2, xCount)
+#define OpcUa_StrinCmpA(xStr1, xStr2, xCount)           _strnicmp(xStr1, xStr2, xCount)
 #define OpcUa_StrLenA(xStr)                             (OpcUa_UInt32)strlen(xStr)
 #define OpcUa_StrChrA(xString, xChar)                   strchr(xString, xChar)
 #define OpcUa_StrrChrA(xString, xChar)                  strrchr(xString, xChar)

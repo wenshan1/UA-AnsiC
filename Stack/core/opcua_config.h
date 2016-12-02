@@ -196,10 +196,10 @@
 #define OPCUA_SECURITYTOKEN_LIFETIME_MIN            600000
 
 /** @brief The interval in which securechannels get checked for lifetime timeout in milliseconds. */
-#define OPCUA_SECURELISTENER_WATCHDOG_INTERVAL      10000
+#define OPCUA_SECURELISTENER_WATCHDOG_INTERVAL      100000000 // temp increase 
 
-/** @brief How many milliseconds a passive secure channel may wait for its activation. */
-#define OPCUA_SECURELISTENER_CHANNELTIMEOUT         10000
+/** @brief How many milliseconds a passive secure channel may  for its activation. */
+#define OPCUA_SECURELISTENER_CHANNELTIMEOUT         100000000 // temp increase  
 
 /** @brief Shall the secureconnection validate the server certificate given by the client application? */
 #define OPCUA_SECURECONNECTION_VALIDATE_SERVERCERT  OPCUA_CONFIG_NO

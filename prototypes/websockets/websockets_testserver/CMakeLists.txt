@@ -2,26 +2,26 @@
 
 include_directories(.)
 
-set(tlstestclient_HEADERS
+set(websockets_testserver_HEADERS
     ${OPCUA_UTILS_DIR}/opcua_applicationsettings.h
     ${OPCUA_UTILS_DIR}/urldecode.h
 )
 
-set(tlstestclient_SOURCES
-	uatestclient.c
+set(websockets_testserver_SOURCES
+	uatestserver.c
     ${OPCUA_UTILS_DIR}/opcua_applicationsettings.c
     ${OPCUA_UTILS_DIR}/urldecode.c
 )
 
 add_executable(
-	tlstestclient
-    ${tlstestclient_SOURCES}
-    ${tlstestclient_HEADERS})
+	websockets_testserver
+    ${websockets_testserver_SOURCES}
+    ${websockets_testserver_HEADERS})
 
-add_dependencies(tlstestclient uastack)
+add_dependencies(websockets_testserver uastack)
 
 target_link_libraries(
-	tlstestclient
+	websockets_testserver
 	${UASTACK_LIBRARIES}
 	${OPENSSL_LIBRARIES})
 	
@@ -32,22 +32,25 @@ if (WIN32)
 	add_definitions(-DOPCUA_TRACE_ENABLE)
 
 	target_link_libraries(
-		tlstestclient
+		websockets_testserver
 		ws2_32
 		secur32
 		crypt32
 		rpcrt4)
 		
-	file(COPY $ENV{OPENSSL_ROOT_DIR}/bin/libeay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
-	file(COPY $ENV{OPENSSL_ROOT_DIR}/bin/ssleay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+	file(COPY ${OPENSSL_ROOT_DIR}/bin/libeay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
+	file(COPY ${OPENSSL_ROOT_DIR}/bin/ssleay32.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 	file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../PKI DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 else()
 	
 	target_link_libraries(
-		tlstestclient
+		websockets_testserver
 		ssl
 		crypto)
 		
 endif()
 
+install(TARGETS websockets_testserver
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib)
+		

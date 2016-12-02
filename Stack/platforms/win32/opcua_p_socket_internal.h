@@ -75,6 +75,13 @@ struct _OpcUa_InternalSocket
     } Flags;
     OpcUa_UInt32                 uintTimeout;        /* interval until connection is considered timed out */
     OpcUa_UInt32                 uintLastAccess;     /* system tick count in seconds when last action on this socket took place */
+
+    SSL* pSSLConnection;
+    SSL_CTX* pSSLContext;
+    OpcUa_Boolean bSSLConnected;
+    OpcUa_Void* pPKIConfig;
+    OpcUa_Socket_CertificateCallback pfnCertificateValidation;
+    OpcUa_Void* pCertificateValidationCallbackData;
 };
 
 /**

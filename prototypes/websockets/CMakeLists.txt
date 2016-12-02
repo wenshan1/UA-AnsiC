@@ -1,14 +1,18 @@
-project(ua-ansic-tls)
+project(ua-ansic-websockets)
 cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 find_package(OpenSSL)
 
+if (NOT $ENV{OPENSSL_ROOT_DIR} STREQUAL "")
+	STRING(REGEX REPLACE "\\\\" "/" OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT_DIR})
+endif()
+
 if (NOT OPENSSL_FOUND)
 	MESSAGE(WARNING "OPENSSL_ROOT_DIR environment variable was not set. Assuming a relative path will work." )
-	set(ENV{OPENSSL_ROOT_DIR} ${CMAKE_CURRENT_LIST_DIR}/../../third-party/openssl INTERNAL)
-	set(OPENSSL_INCLUDE_DIR $ENV{OPENSSL_ROOT_DIR}/include CACHE INTERNAL "This is the include folder for OpenSSL" FORCE)
-	set(OPENSSL_LIBRARIES $ENV{OPENSSL_ROOT_DIR}/lib/ssleay32.lib $ENV{OPENSSL_ROOT_DIR}/lib/libeay32.lib CACHE INTERNAL "These are the OpenSSL libraries" FORCE)
+	set(${OPENSSL_ROOT_DIR} ${CMAKE_CURRENT_LIST_DIR}/../../third-party/openssl INTERNAL)
+	set(OPENSSL_INCLUDE_DIR ${OPENSSL_ROOT_DIR}/include CACHE INTERNAL "This is the include folder for OpenSSL" FORCE)
+	set(OPENSSL_LIBRARIES ${OPENSSL_ROOT_DIR}/lib/ssleay32.lib ${OPENSSL_ROOT_DIR}/lib/libeay32.lib CACHE INTERNAL "These are the OpenSSL libraries" FORCE)
 endif()
 
 set(OPCUA_UTILS_DIR ${CMAKE_CURRENT_LIST_DIR}/../opcua_utils CACHE INTERNAL "This is the include folder for the OPC UA sample utilities" FORCE)
@@ -51,5 +55,14 @@ include_directories(${JSONC_INCLUDE_DIR})
 include_directories(${OPENSSL_INCLUDE_DIR})
 
 add_subdirectory(${UASTACK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Stack)
-add_subdirectory(tlstestserver)
-add_subdirectory(tlstestclient)
+add_subdirectory(websockets_testserver)
+add_subdirectory(websockets_testclient)
+		
+install(FILES 
+		${OPENSSL_ROOT_DIR}/bin/libeay32.dll 
+		${OPENSSL_ROOT_DIR}/bin/ssleay32.dll 
+		DESTINATION bin)
+		
+install(DIRECTORY  
+		${CMAKE_CURRENT_SOURCE_DIR}/PKI 
+		DESTINATION bin)

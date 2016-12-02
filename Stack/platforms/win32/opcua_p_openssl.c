@@ -81,10 +81,11 @@ void OpcUa_P_OpenSSL_Cleanup()
 #endif
 #endif /* OPCUA_P_SOCKETMANAGER_SUPPORT_SSL */
     EVP_cleanup();
-    CRYPTO_cleanup_all_ex_data ();
-    ERR_remove_state (0);
-    ERR_free_strings ();
+    CRYPTO_cleanup_all_ex_data();
+    ERR_remove_state(0);
+    ERR_free_strings();
 #if OPCUA_USE_SYNCHRONISATION
+    CRYPTO_set_id_callback(NULL);
     CRYPTO_set_locking_callback(OpcUa_Null);
     OpcUa_P_Mutex_Delete(&OpenSSL_Mutex);
 #endif /* OPCUA_P_SOCKETMANAGER_SUPPORT_SSL */
