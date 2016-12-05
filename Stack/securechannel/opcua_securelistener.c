@@ -698,11 +698,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OnNotify");
             pSecureChannel->uOverlapCounter = (OpcUa_UInt32)(OPCUA_SECURELISTENER_CHANNELTIMEOUT/OPCUA_SECURELISTENER_WATCHDOG_INTERVAL);
 
             /* Calculate max number of chunks per message. */
-            OpcUa_Listener_GetReceiveBufferSize(a_pTransportListener,
-                                                a_hTransportConnection,
-                                                &uReceiveBufferSize);
-
-            pSecureChannel->nMaxBuffersPerMessage = OpcUa_ProxyStub_g_Configuration.iSerializer_MaxMessageSize/uReceiveBufferSize + 1;
+            pSecureChannel->nMaxBuffersPerMessage = OpcUa_ProxyStub_g_Configuration.iSerializer_MaxMessageSize/8096 + 1;
 
             pSecureChannel->TransportConnection = a_hTransportConnection;
 

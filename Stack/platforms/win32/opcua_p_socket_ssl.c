@@ -18,6 +18,9 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include <openssl/err.h>
+#include <openssl/ssl.h>
+
 /* UA platform definitions */
 #include <opcua_p_internal.h>
 
@@ -34,9 +37,6 @@
 #include <opcua_p_socket_ssl.h>
 
 #if OPCUA_P_SOCKETMANAGER_SUPPORT_SSL
-
-#include <openssl/err.h>
-#include <openssl/ssl.h>
 
 /*============================================================================
  * The Ssl Socket Type
@@ -410,7 +410,7 @@ OpcUa_FinishErrorHandling;
 static OpcUa_StatusCode OpcUa_P_SocketService_SslSetUserData(OpcUa_Socket a_pSocket,
                                                              OpcUa_Void*  a_pvUserData)
 {
-    OpcUa_InternalSocket*   pInternalSocket = (OpcUa_InternalSocket*)a_pSocket;
+    OpcUa_InternalSocket* pInternalSocket = (OpcUa_InternalSocket*)a_pSocket;
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSetUserData");
 
@@ -624,207 +624,15 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
-* Create TLS context for given socket
-*===========================================================================*/
-OpcUa_StatusCode OpcUa_Socket_SetSslContext(
-    OpcUa_InternalSslSocket* a_pSocket,
-    OpcUa_ByteString*        a_pServerCertificate,
-    OpcUa_Key*               a_pServerPrivateKey,
-    OpcUa_Void*              a_pPKIConfig,
-    OpcUa_Int                a_iMode,
-    const SSL_METHOD*        a_pSSLMethod)
-{
-    int iResult = 0;
-    OpcUa_P_OpenSSL_CertificateStore_Config* pPKIConfig = (OpcUa_P_OpenSSL_CertificateStore_Config*)a_pPKIConfig;
-    EVP_PKEY* pKey = NULL;
-    X509* pCert = NULL;
-    const unsigned char* pData;
-
-    OpcUa_InitializeStatus(OpcUa_Module_Socket, "OpcUa_Socket_SetSslContext");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pSocket);
-    OpcUa_ReturnErrorIfArgumentNull(a_pSSLMethod);
-
-    /* Convert certificate and key */
-    if (a_pServerCertificate != OpcUa_Null && a_pServerCertificate->Data != OpcUa_Null && a_pServerCertificate->Length > 0
-        && a_pServerPrivateKey != OpcUa_Null && a_pServerPrivateKey->Key.Data != OpcUa_Null && a_pServerPrivateKey->Key.Length > 0)
-    {
-        /* convert certificate */
-        pData = a_pServerCertificate->Data;
-        pCert = d2i_X509((X509**)OpcUa_Null,
-            (const unsigned char**)&pData,
-            a_pServerCertificate->Length);
-        OpcUa_GotoErrorIfNull(pCert, OpcUa_BadInvalidArgument);
-
-        /* convert key */
-        pData = a_pServerPrivateKey->Key.Data;
-        pKey = d2i_PrivateKey(EVP_PKEY_RSA, OpcUa_Null, &pData, a_pServerPrivateKey->Key.Length);
-        OpcUa_GotoErrorIfNull(pKey, OpcUa_BadInvalidArgument);
-    }
-
-    /* create TLS context (TODO: would it be enough for servers to hold a single context at the listen socket?) */
-#if OPENSSL_VERSION_NUMBER >= 0x1000000fL
-    a_pSocket->pSslContext = SSL_CTX_new(a_pSSLMethod);
-#else
-    a_pSocket->pSSLContext = SSL_CTX_new((SSL_METHOD*)a_pSSLMethod);
-#endif
-    if (a_pSocket->pSslContext == OpcUa_Null)
-    {
-        /* error */
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
-    }
-
-    /* set certificate */
-    if (pCert != OpcUa_Null && pKey != OpcUa_Null)
-    {
-        iResult = SSL_CTX_use_certificate(a_pSocket->pSslContext, pCert);
-    }
-    else
-    {
-        iResult = 1;
-    }
-
-    if (iResult == 0)
-    {
-        /* error */
-        ERR_print_errors_fp(stderr);
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
-    }
-
-    /* set private key */
-    if (pCert != OpcUa_Null && pKey != OpcUa_Null)
-    {
-        iResult = SSL_CTX_use_PrivateKey(a_pSocket->pSslContext, pKey);
-    }
-    else
-    {
-        iResult = 1;
-    }
-
-    if (iResult == 0)
-    {
-        /* error */
-        ERR_print_errors_fp(stderr);
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
-    }
-
-    /* Load CA */
-    if (pPKIConfig != OpcUa_Null
-        && pPKIConfig->PkiType != OpcUa_NO_PKI
-        && pPKIConfig->CertificateTrustListLocation != OpcUa_Null)
-    {
-        iResult = SSL_CTX_load_verify_locations(a_pSocket->pSslContext,
-            OpcUa_Null, /* multi cert PEM */
-            pPKIConfig->CertificateUntrustedListLocation); /* folder containing multiple CA PEM certs */
-    }
-    else
-    {
-        iResult = 1;
-    }
-
-    if (iResult == 0)
-    {
-        /* error */
-        ERR_print_errors_fp(stderr);
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
-    }
-
-    if (a_iMode != SSL_VERIFY_NONE)
-    {
-#if OPCUA_P_SOCKET_SSL_USE_OWN_CERT_VERIFY
-        SSL_CTX_set_cert_verify_callback(a_pSocket->pSSLContext, OpcUa_Socket_SslCertificateVerifyCallback, (void*)a_pSocket);
-#endif
-
-        /* set requested certificate verification mode */
-#if OPCUA_P_SOCKET_USE_SSL_VERIFY_CALLBACK
-        /* not tested */
-        SSL_CTX_set_verify(a_pSocket->pSSLContext, a_iMode, OpcUa_Socket_SslVerifyCallback);
-#else
-        SSL_CTX_set_verify(a_pSocket->pSslContext, a_iMode, NULL);
-#endif
-    }
-
-    /* create TLS connection */
-    a_pSocket->pSslConnection = SSL_new(a_pSocket->pSslContext);
-    //a_pSocket->eSSLState = OpcUa_P_SSLState_WaitForTransport;
-    //a_pSocket->bSSLConnected = OpcUa_False;
-
-    /* TODO: Test which alternative works best; first one is preferred. */
-    /* bind native socket to TLS connection */
-
-    {
-        BIO *sbio = BIO_new_socket((int)((SOCKET)(a_pSocket->pRawSocket)), BIO_NOCLOSE);
-        if (sbio != NULL)
-        {
-            SSL_set_bio(a_pSocket->pSslConnection, sbio, sbio);
-        }
-        else
-        {
-            OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
-        }
-    }
-
-    EVP_PKEY_free(pKey);
-    X509_free(pCert);
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-
-    if (a_pSocket != OpcUa_Null)
-    {
-        /* call TLS service to clean up */
-        if (a_pSocket->pSslConnection != OpcUa_Null)
-        {
-            /*int ret = SSL_shutdown(pInternalSocket->pSSLConnection);*/
-            SSL_free(a_pSocket->pSslConnection);
-        }
-
-        if (a_pSocket->pSslContext != OpcUa_Null)
-        {
-            SSL_CTX_free(a_pSocket->pSslContext);
-            a_pSocket->pSslContext = OpcUa_Null;
-        }
-
-        a_pSocket->pSslConnection = OpcUa_Null;
-
-        if (a_pSocket->pServerCertificate != OpcUa_Null)
-        {
-            OpcUa_P_ByteString_Clear(a_pSocket->pServerCertificate);
-            OpcUa_P_Memory_Free(a_pSocket->pServerCertificate);
-            a_pSocket->pServerCertificate = OpcUa_Null;
-        }
-
-        if (a_pSocket->pServerPrivateKey != OpcUa_Null)
-        {
-            OpcUa_Key_Clear(a_pSocket->pServerPrivateKey);
-            OpcUa_P_Memory_Free(a_pSocket->pServerPrivateKey);
-            a_pSocket->pServerPrivateKey = OpcUa_Null;
-        }
-    }
-
-    if (pKey != NULL)
-    {
-        EVP_PKEY_free(pKey);
-    }
-
-    if (pCert != NULL)
-    {
-        X509_free(pCert);
-    }
-
-OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
 * Set socket TLS state depending on error code
 *===========================================================================*/
 OpcUa_StatusCode OpcUa_Socket_ProcessSslError(
-    OpcUa_InternalSslSocket*   a_pSocket,
-    OpcUa_Int               a_iSslError)
+    OpcUa_InternalSslSocket* a_pSocket,
+    OpcUa_Int a_iSslError)
 {
-    int             iErr = SSL_ERROR_NONE;
-    OpcUa_StringA   sInfo = OpcUa_Null;
-    OpcUa_UInt32    uTraceLevel = OPCUA_TRACE_LEVEL_WARNING;
+    int iErr = SSL_ERROR_NONE;
+    OpcUa_StringA sInfo = OpcUa_Null;
+    OpcUa_UInt32 uTraceLevel = OPCUA_TRACE_LEVEL_WARNING;
 
  OpcUa_InitializeStatus(OpcUa_Module_Socket, "OpcUa_Socket_ProcessSslError");
 
@@ -833,102 +641,104 @@ OpcUa_StatusCode OpcUa_Socket_ProcessSslError(
 
     switch (iErr)
     {
-    case SSL_ERROR_ZERO_RETURN:
-    {
-        sInfo = "SSL_ERROR_ZERO_RETURN";
-        uStatus = OpcUa_BadCommunicationError;
-        break;
-    }
-    case SSL_ERROR_WANT_READ:
-    {
-        sInfo = "SSL_ERROR_WANT_READ";
-        uTraceLevel = OPCUA_TRACE_LEVEL_CONTENT;
-        break;
-    }
-    case SSL_ERROR_WANT_WRITE:
-    {
-        sInfo = "SSL_ERROR_WANT_WRITE";
-        break;
-    }
-    case SSL_ERROR_WANT_CONNECT:
-    {
-        sInfo = "SSL_ERROR_WANT_CONNECT";
-        break;
-    }
-    case SSL_ERROR_WANT_ACCEPT:
-    {
-        sInfo = "SSL_ERROR_WANT_ACCEPT";
-        break;
-    }
-    case SSL_ERROR_WANT_X509_LOOKUP:
-    {
-        sInfo = "SSL_ERROR_WANT_X509_LOOKUP";
-        ERR_print_errors_fp(stderr);
-        break;
-    }
-    case SSL_ERROR_SYSCALL:
-    {
-        unsigned long ulPeekedError = ERR_peek_error();
-
-        sInfo = "SSL_ERROR_SYSCALL";
-
-        if (ulPeekedError != 0)
+        case SSL_ERROR_ZERO_RETURN:
         {
-            ERR_print_errors_fp(stderr);
-            uStatus = OpcUa_BadUnexpectedError;
+            sInfo = "SSL_ERROR_ZERO_RETURN";
+            uStatus = OpcUa_BadCommunicationError;
+            break;
         }
-        else
+        case SSL_ERROR_WANT_READ:
         {
-            if (a_iSslError == -1)
+            sInfo = "SSL_ERROR_WANT_READ";
+            uTraceLevel = OPCUA_TRACE_LEVEL_CONTENT;
+            uStatus = OpcUa_GoodCallAgain;
+            break;
+        }
+        case SSL_ERROR_WANT_WRITE:
+        {
+            sInfo = "SSL_ERROR_WANT_WRITE";
+            uStatus = OpcUa_GoodCallAgain;
+            break;
+        }
+        case SSL_ERROR_WANT_CONNECT:
+        {
+            sInfo = "SSL_ERROR_WANT_CONNECT";
+            break;
+        }
+        case SSL_ERROR_WANT_ACCEPT:
+        {
+            sInfo = "SSL_ERROR_WANT_ACCEPT";
+            break;
+        }
+        case SSL_ERROR_WANT_X509_LOOKUP:
+        {
+            sInfo = "SSL_ERROR_WANT_X509_LOOKUP";
+            //ERR_print_errors_fp(stderr);
+            break;
+        }
+        case SSL_ERROR_SYSCALL:
+        {
+            unsigned long ulPeekedError = ERR_peek_error();
+
+            sInfo = "SSL_ERROR_SYSCALL";
+
+            if (ulPeekedError != 0)
             {
-                /* underlying BIO error */
-                uStatus = OpcUa_P_Socket_GetLastError(a_pSocket);
-                if (OpcUa_IsGood(uStatus))
-                {
-                    /* the system should report an error */
-                    uStatus = OpcUa_BadUnexpectedError;
-                }
-                else
-                {
-                    /* control trace level for known regular error codes. */
-                    switch (uStatus)
-                    {
-                        case OpcUa_BadWouldBlock:
-                        {
-                            /* common return code -> lowest trace level */
-                            uTraceLevel = OPCUA_TRACE_LEVEL_CONTENT;
-                            break;
-                        }
-                        default:
-                        {
-                            break;
-                        }
-                    }
-                }
+                //ERR_print_errors_fp(stderr);
+                uStatus = OpcUa_BadUnexpectedError;
             }
             else
             {
-                /* it was a non fatal error */
-                uStatus = OpcUa_Bad;
+                if (a_iSslError == -1)
+                {
+                    /* underlying BIO error */
+                    uStatus = OpcUa_P_Socket_GetLastError(a_pSocket);
+                    if (OpcUa_IsGood(uStatus))
+                    {
+                        /* the system should report an error */
+                        uStatus = OpcUa_BadUnexpectedError;
+                    }
+                    else
+                    {
+                        /* control trace level for known regular error codes. */
+                        switch (uStatus)
+                        {
+                            case OpcUa_BadWouldBlock:
+                            {
+                                /* common return code -> lowest trace level */
+                                uTraceLevel = OPCUA_TRACE_LEVEL_CONTENT;
+                                break;
+                            }
+                            default:
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    /* it was a non fatal error */
+                    uStatus = OpcUa_Bad;
+                }
             }
+            break;
         }
-        break;
-    }
-    case SSL_ERROR_SSL:
-    {
-        sInfo = "SSL_ERROR_SSL";
-        ERR_print_errors_fp(stderr);
-        uStatus = OpcUa_BadSecurityChecksFailed;
-        break;
-    }
-    default:
-    {
-        /* unexpected error */
-        sInfo = "unknown error";
-        ERR_print_errors_fp(stderr);
-        uStatus = OpcUa_BadUnexpectedError;
-        break;
-    }
+        case SSL_ERROR_SSL:
+        {
+            sInfo = "SSL_ERROR_SSL";
+            //ERR_print_errors_fp(stderr);
+            uStatus = OpcUa_BadSecurityChecksFailed;
+            break;
+        }
+        default:
+        {
+            /* unexpected error */
+            sInfo = "unknown error";
+            //ERR_print_errors_fp(stderr);
+            uStatus = OpcUa_BadUnexpectedError;
+            break;
+        }
     }
 
     OpcUa_Trace(uTraceLevel, "OpcUa_Socket_ProcessSslError: TLS error code is %s; mapped to status code 0x%08X\n", sInfo, uStatus);
@@ -937,120 +747,6 @@ OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
-
-OpcUa_StatusCode OpcUa_Socket_TlsServerStartUpgrade(OpcUa_Socket a_pSocket)
-{
-    int iResult = 0;
-    OpcUa_InternalSslSocket* pInternalSocket = OpcUa_Null;
-
-OpcUa_InitializeStatus(OpcUa_Module_Socket, "TlsServerStartUpgrade");
-
-    OpcUa_GotoErrorIfArgumentNull(a_pSocket);
-
-    pInternalSocket = (OpcUa_InternalSslSocket*)a_pSocket;
-
-    uStatus = OpcUa_Socket_SetSslContext(
-        a_pSocket,
-        pInternalSocket->pServerCertificate, 
-        pInternalSocket->pServerPrivateKey, 
-        pInternalSocket->pPKIConfig, 
-        SSL_VERIFY_NONE,
-        TLSv1_server_method());
-
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Socket_TlsServerStartUpgrade: Initiating TLS accept.\n");
-
-    pInternalSocket->bSslProgress = OpcUa_False;
-    iResult = SSL_accept(pInternalSocket->pSslConnection);
-
-    switch (iResult)
-    {
-    case 1: /* successfully completed */
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "OpcUa_Socket_TlsServerStartUpgrade: TLS accept completed immediately.\n");
-
-        //if (OPCUA_P_SOCKET_ISSUBSCRIBED(pInternalSocket))
-        {
-            uStatus = pInternalSocket->pfnEventCallback(a_pSocket, OPCUA_SOCKET_ACCEPT_EVENT, pInternalSocket->pvUserData, 0, OpcUa_True);
-        }
-        break;
-    }
-    case 0: /* not successful, shut down controlled */
-    default: /* < 0 fatal error */
-    {
-        uStatus = OpcUa_Socket_ProcessSslError(pInternalSocket, iResult);
-
-        if (OpcUa_IsBad(uStatus))
-        {
-            if (OpcUa_IsNotEqual(OpcUa_BadWouldBlock))
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Socket_TlsServerStartUpgrade: TLS accept failed.\n");
-                OpcUa_P_Socket_Close(a_pSocket);
-            }
-            else
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_CONTENT, "OpcUa_Socket_TlsServerStartUpgrade: SSL_ERROR_SYSCALL was OpcUa_BadWouldBlock.\n");
-            }
-        }
-        break;
-    }
-    } /* switch */
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
-}
-
-OpcUa_StatusCode OpcUa_Socket_TlsServerContinueUpgrade(OpcUa_Socket a_pSocket)
-{
-    int iResult = 0;
-    OpcUa_InternalSslSocket* pInternalSocket = OpcUa_Null;
-
-OpcUa_InitializeStatus(OpcUa_Module_Socket, "TlsServerContinueUpgrade");
-
-    OpcUa_GotoErrorIfArgumentNull(a_pSocket);
-
-    pInternalSocket = (OpcUa_InternalSslSocket*)a_pSocket;  /* continue server side TLS handshake */
-
-    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Socket_TlsServerContinueUpgrade: Continuing TLS accept.\n");
-    iResult = SSL_accept(pInternalSocket->pSslConnection);
-
-    switch (iResult)
-    {
-    case 1: /* successfully completed */
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "OpcUa_Socket_TlsServerContinueUpgrade: TLS accept complete.\n");
-
-        pInternalSocket->bSslProgress = OpcUa_True;
-
-        //if (OPCUA_P_SOCKET_ISSUBSCRIBED(pInternalSocket))
-        {
-            uStatus = pInternalSocket->pfnEventCallback(a_pSocket, OPCUA_SOCKET_ACCEPT_EVENT, pInternalSocket->pvUserData, 0, OpcUa_True);
-        }
-        break;
-    }
-    case 0: /* not successful, shut down controlled */
-    default: /* < 0 fatal error */
-    {
-        uStatus = OpcUa_Socket_ProcessSslError(pInternalSocket, iResult);
-        if (OpcUa_IsBad(uStatus))
-        {
-            if (OpcUa_IsNotEqual(OpcUa_BadWouldBlock))
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_Socket_TlsServerContinueUpgrade: TLS accept failed.\n");
-                OpcUa_P_Socket_Close(a_pSocket);
-            }
-        }
-        break;
-    }
-    } /* switch */
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
-}
-
 
 /*============================================================================
  * Accept a SSL server socket

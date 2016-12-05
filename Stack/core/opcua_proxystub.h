@@ -38,7 +38,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_TransportProfile_UaTcp          "http://opcfoundation.org/UA-Profile/Transport/uatcp-uasc-uabinary"
 #define OpcUa_TransportProfile_SoapHttpBinary "http://opcfoundation.org/UA-Profile/Transport/http-uasc-uabinary"
 #define OpcUa_TransportProfile_HttpsBinary    "http://opcfoundation.org/UA-Profile/Transport/https-uabinary"
-#define OpcUa_TransportProfile_UaTls          "http://opcfoundation.org/UA-Profile/Transport/uatls-uabinary"
+#define OpcUa_TransportProfile_UaWebSockets   "http://opcfoundation.org/UA-Profile/Transport/uatcp-wss-uabinary"
 
 /** Holds the runtime configuration values for the proxy stub modules.  
     There may be some interference with the endpoint configuration at this time. 

@@ -83,6 +83,10 @@ struct _OpcUa_InternalChannel
     OpcUa_Handle                                hAsyncContext;
 #else
     /*! @brief  */
+    OpcUa_Channel_PfnConnectionStateChanged*    pfConnectCallback;
+    /*! @brief  */
+    OpcUa_Void*                                 pvConnectCallbackData;
+    /*! @brief  */
     OpcUa_Channel_PfnConnectionStateChanged*    pfCallback;
     /*! @brief  */
     OpcUa_Void*                                 pvCallbackData;

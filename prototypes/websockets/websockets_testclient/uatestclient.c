@@ -49,7 +49,7 @@
 #define UATESTCLIENT_TIMEOUT                                OPCUA_INFINITE
 /* URL of the server */
 #define UATESTCLIENT_SERVER_URL                             "opc.tcp://localhost:48040"
-#define UATESTCLIENT_SERVER_TLS_URL                         "opc.tls://localhost:48043"
+#define UATESTCLIENT_SERVER_TLS_URL                         "opc.wss://localhost:48043"
 /* wait for user input after shutting down */
 #define UATESTCLIENT_WAIT_FOR_USER_INPUT                    1
 /* how often the request should be repeated */
@@ -69,58 +69,14 @@
 /* use selfsigned certificate as application certificate */
 #define UATESTCLIENT_SELFSIGNED                             1
 
-#if UATESTCLIENT_LARGE_REQUEST
-    /* define the size in bytes of the large requests body (count of elements in UaTestClient_g_HugeCharArray). */
-    #define UATESTCLIENT_LARGE_BODY                         4194304
-#endif /* UATESTCLIENT_LARGE_REQUEST */
-
-#if !UATESTCLIENT_STRING_REQUEST
-    /* define the number of elements in the UInt32 array  (count of elements in UaTestClient_g_UInt32Array). */
-    #define UATESTCLIENT_UINT32_ARRAY_SIZE                  1000
-#endif /* UATESTCLIENT_STRING_REQUEST */
-
 /* PKI Locations - this may need to be changed with other platform layers! */
-#if UATESTCLIENT_USEWIN32PKI
-#define UATESTCLIENT_CERTIFICATE_TRUST_LIST_LOCATION                "UA Applications"
-#define UATESTCLIENT_CERTIFICATE_REVOCATION_LIST_LOCATION           "UA Applications"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION         "UA Certificate Authorities"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION    "UA Certificate Authorities"
-#define UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION                    L"UA Sample Client"
-#define UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION                    (OpcUa_CharA*)L"UA Sample Client"
-#define UATESTCLIENT_SERVER_CERTIFICATE_LOCATION                    L"UA Sample Server"
-#else /* UATESTCLIENT_USEWIN32PKI */
-#if 1 /* UA TCP */
-
-#if UATESTCLIENT_SELFSIGNED
 #define UATESTCLIENT_CERTIFICATE_TRUST_LIST_LOCATION                "./PKI/certs/"
 #define UATESTCLIENT_CERTIFICATE_REVOCATION_LIST_LOCATION           "./PKI/crl/"
 #define UATESTCLIENT_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION         "./PKI/issuers/"
 #define UATESTCLIENT_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION    "./PKI/crl/"
-#define UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION                    "./PKI/certs/selfsigned.der"
-#define UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION                    "./PKI/private/selfsignedkey.pem"
-#else /* UATESTCLIENT_SELFSIGNED */
-#define UATESTCLIENT_CERTIFICATE_TRUST_LIST_LOCATION                "../PKI/certs/"
-#define UATESTCLIENT_CERTIFICATE_REVOCATION_LIST_LOCATION           "../PKI/crl/"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION         "../PKI/issuers/"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION    "../PKI/crl/"
-#define UATESTCLIENT_CLIENT_CA_CERTIFICATE_LOCATION                 "../PKI/ca/rootca.der"
-#define UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION                    "../PKI/certs/rootcasigned.der"
-#define UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION                    "../PKI/private/rootcasignedkey.pem"
-#endif /* UATESTCLIENT_SELFSIGNED */
-
-#define UATESTCLIENT_SERVER_CERTIFICATE_LOCATION                    "./PKI/certs/selfsigned.der"
-
-#else /* HTTPS */
-
-#define UATESTCLIENT_CERTIFICATE_TRUST_LIST_LOCATION                "../PKI/CA/certs/"
-#define UATESTCLIENT_CERTIFICATE_REVOCATION_LIST_LOCATION           "../PKI/CA/crl/"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION         "../PKI/CA/issuers/"
-#define UATESTCLIENT_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION    "../PKI/CA/crl/"
-#define UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION                    OpcUa_Null
-#define UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION                    OpcUa_Null
-#define UATESTCLIENT_SERVER_CERTIFICATE_LOCATION                    OpcUa_Null
-#endif
-#endif /* UATESTCLIENT_USEWIN32PKI */
+#define UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION                    "./PKI/certs/prototype_client.der"
+#define UATESTCLIENT_SERVER_CERTIFICATE_LOCATION                    "./PKI/certs/prototype_server.der"
+#define UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION                    "./PKI/private/prototype_client.pem"
 
 /* configuration checks */
 #if UATESTCLIENT_USE_SIGNING || UATESTCLIENT_USE_ENCRYPTION
@@ -203,35 +159,9 @@ typedef struct _UaTestClient_CertificateLocations
     OpcUa_StringA ServerCertificateLocation;
 } UaTestClient_CertificateLocations;
 
-#if !UATESTCLIENT_USE_SYNC_API
-
-typedef enum _eUaTestClient_State
-{
-    UaTestClient_e_Invalid,
-    UaTestClient_e_Connecting,
-    UaTestClient_e_Connected,
-    UaTestClient_e_Request,
-    UaTestClient_e_Disconnecting,
-    UaTestClient_e_Disconnected
-} UaTestClient_State;
-
-typedef struct _UaTestClient_AsyncContext
-{
-    OpcUa_Channel       hChannel;
-    UaTestClient_State  eState;
-    OpcUa_UInt32        uRemainingNumberOfRequests;
-    /* other stuff - like session info for example */
-} UaTestClient_AsyncContext;
-
-#endif /* !UATESTCLIENT_USE_SYNC_API */
-
 /*********************************************************************************************/
 /***********************                 Prototypes                   ************************/
 /*********************************************************************************************/
-
-#if !UATESTCLIENT_USE_SYNC_API
-OpcUa_StatusCode UaTestClient_DoAsyncRequest(UaTestClient_AsyncContext* pAsyncContext);
-#endif /* !UATESTCLIENT_USE_SYNC_API */
 
 /*********************************************************************************************/
 /***********************                  Globals                     ************************/
@@ -248,19 +178,6 @@ OpcUa_ByteString                            UaTestClient_g_ServerCertificate    
 OpcUa_ByteString                            UaTestClient_g_ClientPrivateKey          = OPCUA_BYTESTRING_STATICINITIALIZER;
 OpcUa_ProxyStubConfiguration                UaTestClient_g_pProxyStubConfiguration;
 OpcUa_P_OpenSSL_CertificateStore_Config     UaTestClient_g_PkiConfig;
-
-#if UATESTCLIENT_STRING_REQUEST
-
-#if UATESTCLIENT_LARGE_REQUEST
-OpcUa_CharA                                 UaTestClient_g_HugeCharArray[UATESTCLIENT_LARGE_BODY];
-#endif /* UATESTCLIENT_LARGE_REQUEST */
-
-#else /* UATESTCLIENT_STRING_REQUEST */
-
-OpcUa_Int32                                 UaTestClient_g_UInt32ArrayLength        = UATESTCLIENT_UINT32_ARRAY_SIZE;
-OpcUa_UInt32                                UaTestClient_g_UInt32Array[UATESTCLIENT_UINT32_ARRAY_SIZE];
-
-#endif /* UATESTCLIENT_STRING_REQUEST */
 
 /*********************************************************************************************/
 /***********************               Internal Helpers               ************************/
@@ -324,8 +241,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
 
 #ifdef UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION
 
-#if UATESTCLIENT_SELFSIGNED
-
     /*** Get client certificate ***/
     uStatus = UaTestClient_g_PkiProvider.LoadCertificate(   &UaTestClient_g_PkiProvider,
                                                             UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION,
@@ -352,65 +267,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
         }
     }
 #endif /* UATESTCLIENT_VERIFY_CLIENT_CERTIFICATE_LOCALLY */
-
-#else /* UATESTCLIENT_SELFSIGNED */
-
-    /*** load CA certificate and append to client certificate ***/
-    uStatus = UaTestClient_g_PkiProvider.LoadCertificate(   &UaTestClient_g_PkiProvider,
-                                                            UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION,
-                                                            hCertificateStore,
-                                                            &UaTestClient_g_ClientCertificate);
-
-    if(OpcUa_IsBad(uStatus))
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestClient_InitializePKI: Failed to load client certificate \"%s\"! (0x%08X)\n", UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION, uStatus);
-        OpcUa_GotoError;
-    }
-    else
-    {
-        OpcUa_ByteString bsCertificate = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-#if UATESTCLIENT_VERIFY_CLIENT_CERTIFICATE_LOCALLY
-        {
-            OpcUa_Int iValidationCode = 0;
-
-            uStatus = UaTestClient_g_PkiProvider.ValidateCertificate(   &UaTestClient_g_PkiProvider,
-                                                                        &UaTestClient_g_ClientCertificate,
-                                                                        hCertificateStore,
-                                                                        &iValidationCode);
-            if(OpcUa_IsBad(uStatus))
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestClient_InitializePKI: Client certificate invalid!\n");
-                return uStatus;
-            }
-        }
-#endif /* UATESTCLIENT_VERIFY_CLIENT_CERTIFICATE_LOCALLY */
-
-        uStatus = UaTestClient_g_PkiProvider.LoadCertificate(   &UaTestClient_g_PkiProvider,
-                                                                UATESTCLIENT_CLIENT_CA_CERTIFICATE_LOCATION,
-                                                                hCertificateStore,
-                                                                &bsCertificate);
-
-        if(OpcUa_IsBad(uStatus))
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestClient_InitializePKI: Failed to load CA certificate \"%s\"! (0x%08X)\n", UATESTCLIENT_CLIENT_CA_CERTIFICATE_LOCATION, uStatus);
-            OpcUa_GotoError;
-        }
-
-        uStatus = OpcUa_ByteString_Concatenate( &bsCertificate,
-                                                &UaTestClient_g_ClientCertificate,
-                                                0);
-
-        if(OpcUa_IsBad(uStatus))
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestClient_InitializePKI: Could not append client certificate! (0x%08X)\n", uStatus);
-            OpcUa_GotoError;
-        }
-
-        OpcUa_ByteString_Clear(&bsCertificate);
-    }
-
-#endif /* UATESTCLIENT_SELFSIGNED */
 
 #endif /* UATESTCLIENT_CLIENT_CERTIFICATE_LOCATION */
 
@@ -443,7 +299,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
 #endif /* UATESTCLIENT_VERIFY_SERVER_CERTIFICATE_LOCALLY */
 #endif
 
-#ifdef UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION
     {
         /*** Get private key ***/
         uStatus = UaTestClient_g_PkiProvider.LoadPrivateKeyFromFile(UATESTCLIENT_CLIENT_PRIVATE_KEY_LOCATION, 
@@ -456,7 +311,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
             OpcUa_GotoError;
         }
     }
-#endif
 
     /* Close Certificate Store */
     UaTestClient_g_PkiProvider.CloseCertificateStore(   &UaTestClient_g_PkiProvider,
@@ -530,11 +384,6 @@ OpcUa_StatusCode UaTestClient_Initialize(OpcUa_Void)
 
     uStatus = UaTestClient_InitializePKI();
 
-#if UATESTCLIENT_LARGE_REQUEST
-    OpcUa_MemSet(UaTestClient_g_HugeCharArray, 'A', sizeof(UaTestClient_g_HugeCharArray));
-    UaTestClient_g_HugeCharArray[UATESTCLIENT_LARGE_BODY - 1] = '\0';
-#endif /* UATESTCLIENT_LARGE_REQUEST */
-
     return uStatus;
 }
 
@@ -597,7 +446,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "ChannelCallback");
             break;
         }
 
-#if OPCUA_HAVE_HTTPS
     case eOpcUa_Channel_Event_VerifyCertificate:
         {
             OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM,
@@ -606,7 +454,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "ChannelCallback");
             uStatus = OpcUa_BadContinue; 
             break;
         }
-#endif
 
     default:
         {
@@ -751,9 +598,9 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "UaTestClient_DoSyncRequest");
     OpcUa_RequestHeader_Initialize(&RequestHeader);
     OpcUa_ResponseHeader_Initialize(&ResponseHeader);
 
-	if (strncmp(a_sServerUrl, "opc.tls", 7) == 0)
+	if (strncmp(a_sServerUrl, "opc.wss", 7) == 0)
 	{
-		sTransportProfile = OpcUa_TransportProfile_UaTls;
+		sTransportProfile = OpcUa_TransportProfile_UaWebSockets;
 	}
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "[Connecting to EndpointUrl] %s\r\n", a_sServerUrl);
@@ -903,9 +750,9 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "UaTestClient_DoSecurityTest");
 	OpcUa_RequestHeader_Initialize(&RequestHeader);
 	OpcUa_ResponseHeader_Initialize(&ResponseHeader);
 
-	if (strncmp(a_sServerUrl, "opc.tls", 7) == 0)
+	if (strncmp(a_sServerUrl, "opc.wss", 7) == 0)
 	{
-		sTransportProfile = OpcUa_TransportProfile_UaTls;
+		sTransportProfile = OpcUa_TransportProfile_UaWebSockets;
 	}
 
 	OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "[Connecting to EndpointUrl] %s\r\n", a_sServerUrl);
@@ -1108,10 +955,9 @@ int main(int argc, char* argv[])
 	OpcUa_CharA sEndpointUrl[MAX_PATH];
 
 #if UATESTCLIENT_USE_CRTDBG
-    _CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    /*_CrtSetBreakAlloc(905);*/
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    //_CrtSetBreakAlloc(10784);
 #endif
-    Sleep(2000); /* Waiting to startup the server in Multi debug environment */
     OpcUa_ReferenceParameter(argc);
     OpcUa_ReferenceParameter(argv);
 
@@ -1138,6 +984,7 @@ int main(int argc, char* argv[])
     getchar();
 #endif
 
+    _CrtDumpMemoryLeaks();
     return 0;
 
 Error:
@@ -1149,6 +996,7 @@ Error:
     getchar();
 #endif
 
+    _CrtDumpMemoryLeaks();
     return uStatus;
 }
 

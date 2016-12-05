@@ -1974,7 +1974,8 @@ OpcUa_StatusCode OpcUa_TcpListener_Close(OpcUa_Listener* a_pListener)
 /*============================================================================
 * OpcUa_TlsListener_SslEventHandler
 *===========================================================================*/
-OpcUa_StatusCode OpcUa_TlsListener_SslEventHandler(OpcUa_Socket        a_hSocket,
+OpcUa_StatusCode OpcUa_TlsListener_SslEventHandler(
+    OpcUa_Socket        a_hSocket,
     OpcUa_Void*         a_pUserData,
     OpcUa_ByteString*   a_pCertificate,
     OpcUa_StatusCode    a_uResult)
@@ -2086,31 +2087,13 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "Open");
                                             uSocketManagerFlags);
     OpcUa_GotoErrorIfBad(uStatus);
 
-
-    if (OpcUa_StrnCmpA(OpcUa_String_GetRawString(a_sUrl), "opc.tls:", 8) != 0)
-    {
-        uStatus = OPCUA_P_SOCKETMANAGER_CREATESERVER(
-            pTcpListener->SocketManager,
-            OpcUa_String_GetRawString(a_sUrl),
-            a_bListenOnAllInterfaces,
-            OpcUa_TcpListener_EventCallback,
-            (OpcUa_Void*)a_pListener,
-            &(pTcpListener->Socket));
-    }
-    else
-    {
-        uStatus = OPCUA_P_SOCKETMANAGER_CREATESSLSERVER(
-            pTcpListener->SocketManager,
-            OpcUa_String_GetRawString(a_sUrl),
-            a_bListenOnAllInterfaces,
-            pTcpListener->pCertificate,
-            pTcpListener->pPrivateKey,
-            pTcpListener->pPKIConfig,
-            OpcUa_TcpListener_EventCallback,
-            OpcUa_TlsListener_SslEventHandler,
-            (OpcUa_Void*)a_pListener,
-            &(pTcpListener->Socket));
-    }
+    uStatus = OPCUA_P_SOCKETMANAGER_CREATESERVER(
+        pTcpListener->SocketManager,
+        OpcUa_String_GetRawString(a_sUrl),
+        a_bListenOnAllInterfaces,
+        OpcUa_TcpListener_EventCallback,
+        (OpcUa_Void*)a_pListener,
+        &(pTcpListener->Socket));
 
 #else /* OPCUA_MULTITHREADED */
 

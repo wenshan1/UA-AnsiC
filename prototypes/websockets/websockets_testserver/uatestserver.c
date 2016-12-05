@@ -52,13 +52,13 @@
 /* Transport profile supported by the server */
 #define UATESTSERVER_DEFAULT_TRANSPORT_PROFILE_URI          OpcUa_TransportProfile_UaTcp
 /* URL of the server on TLS channel */
-#define UATESTSERVER_ENDPOINT_TLS_URL                       "opc.tls://localhost:48043"
+#define UATESTSERVER_ENDPOINT_TLS_URL                       "opc.wss://localhost:48043"
 /* Transport profile supported by the server */
-#define UATESTSERVER_TLS_TRANSPORT_PROFILE_URI              OpcUa_TransportProfile_UaTls
+#define UATESTSERVER_WSS_TRANSPORT_PROFILE_URI              OpcUa_TransportProfile_UaWebSockets
 /* set to 1 to use the content of UaTestServer_g_HugeCharArray instead of the string World for responses. */
 #define UATESTSERVER_LARGE_RESPONSE                         0
 /* the used trace level */
-#define UATESTSERVER_TRACE_LEVEL                            OPCUA_TRACE_OUTPUT_LEVEL_SYSTEM
+#define UATESTSERVER_TRACE_LEVEL                            OPCUA_TRACE_OUTPUT_LEVEL_INFO
 /* defines whether Win32 PKI is used or OpenSSL */
 #define UATESTSERVER_USEWIN32PKI                            0
 /* print uastack version information */
@@ -74,54 +74,14 @@
 /* number of integers in the response array (used in response for uint32 array requests) */
 #define UATESTSERVER_UINT32_ARRAY_SIZE                      1000
 
-/* !0 if asynchronous service handling should be used */
-#define UATESTSERVER_DORESPONSEASYNC                        0
-#if UATESTSERVER_DORESPONSEASYNC
-/* if response is sent asynchronously, delay the sending for this amount of milliseconds */
-# define UATESTSERVER_ASYNCRESPONSEDELAY                    5
-# if UATESTSERVER_SYNC
-#   error UATESTSERVER_DORESPONSEASYNC does not allow UATESTSERVER_SYNC
-# endif /* UATESTSERVER_SYNC */
-#endif /* UATESTSERVER_DORESPONSEASYNC */
-
 #if UATESTSERVER_SUPPORT_SECURE_COMMUNICATION
 
-/* PKI Locations - this may need to be changed with other platform layers! */
-#if UATESTSERVER_USEWIN32PKI
-
-/* Personal folder of Store specified in PKIConfig; defines where the
-   certificate (or the associated private key) to be loaded/exported 
-   is located. It also defines where a certificate to be saved/imported 
-   is stored.*/
-# define UATESTSERVER_CERTIFICATE_TRUST_LIST_LOCATION             "UA Applications"
-/* untrusted certificates folder in windows certificate store is used.*/
-# define UATESTSERVER_CERTIFICATE_REVOCATION_LIST_LOCATION        "UA Applications"
-# define UATESTSERVER_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION      "UA Certificate Authorities"
-# define UATESTSERVER_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION "UA Certificate Authorities"
-/* subject name of servercertificate */
-# define UATESTSERVER_SERVER_CERTIFICATE_LOCATION                 L"UA Sample Server"
-/* key is identified by server certificate in the store */
-# define UATESTSERVER_SERVER_PRIVATE_KEY_LOCATION                 (OpcUa_CharA*)L"UA Sample Server"
-
-#else /* UATESTSERVER_USEWIN32PKI */
-
-#if UATESTSERVER_SELFSIGNED
 # define UATESTSERVER_CERTIFICATE_TRUST_LIST_LOCATION             "./PKI/certs/"
 # define UATESTSERVER_CERTIFICATE_REVOCATION_LIST_LOCATION        "./PKI/crl/"
 # define UATESTSERVER_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION      "./PKI/issuers/"
 # define UATESTSERVER_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION "./PKI/crl/"
-# define UATESTSERVER_SERVER_CERTIFICATE_LOCATION                 "./PKI/certs/selfsigned.der"
-# define UATESTSERVER_SERVER_PRIVATE_KEY_LOCATION                 "./PKI/private/selfsignedkey.pem"
-#else /* UATESTSERVER_SELFSIGNED */
-# define UATESTSERVER_CERTIFICATE_TRUST_LIST_LOCATION             "../PKI/certs/"
-# define UATESTSERVER_CERTIFICATE_REVOCATION_LIST_LOCATION        "../PKI/crl/"
-# define UATESTSERVER_ISSUER_CERTIFICATE_TRUST_LIST_LOCATION      "../PKI/issuers/"
-# define UATESTSERVER_ISSUER_CERTIFICATE_REVOCATION_LIST_LOCATION "../PKI/crl/"
-# define UATESTSERVER_SERVER_CA_CERTIFICATE_LOCATION              "../PKI/ca/rootca.der"
-# define UATESTSERVER_SERVER_CERTIFICATE_LOCATION                 "../PKI/certs/rootcasigned.der"
-# define UATESTSERVER_SERVER_PRIVATE_KEY_LOCATION                 "../PKI/private/rootcasignedkey.pem"
-#endif /* UATESTSERVER_SELFSIGNED */
-#endif /* UATESTSERVER_USEWIN32PKI */
+# define UATESTSERVER_SERVER_CERTIFICATE_LOCATION                 "./PKI/certs/prototype_server.der"
+# define UATESTSERVER_SERVER_PRIVATE_KEY_LOCATION                 "./PKI/private/prototype_server.pem"
 
 #endif /* UATESTSERVER_SUPPORT_SECURE_COMMUNICATION */
 
@@ -246,10 +206,6 @@ OpcUa_UInt32                                UaTestServer_g_uNoOfSecurityPolicies
 OpcUa_P_OpenSSL_CertificateStore_Config     UaTestServer_g_PkiConfig                     = { OpcUa_NO_PKI, OpcUa_Null, OpcUa_Null, OpcUa_Null, 0, OpcUa_Null };
 OpcUa_Endpoint_SecurityPolicyConfiguration* UaTestServer_g_pSecurityPolicyConfigurations = OpcUa_Null;
 OpcUa_ProxyStubConfiguration                UaTestServer_g_pProxyStubConfiguration;
-
-#if UATESTSERVER_LARGE_RESPONSE
-OpcUa_CharA                                 UaTestServer_g_HugeCharArray[UATESTSERVER_LARGE_BODY];
-#endif /* #if UATESTSERVER_LARGE_RESPONSE */
 
 /*********************************************************************************************/
 /***********************            Service Declarations              ************************/
@@ -388,7 +344,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
         OpcUa_GotoError;
     }
 
-#if UATESTSERVER_SELFSIGNED
     /*** load server certificate ***/
     uStatus = UaTestServer_g_PkiProvider.LoadCertificate(   &UaTestServer_g_PkiProvider,
                                                             UATESTSERVER_SERVER_CERTIFICATE_LOCATION,
@@ -400,62 +355,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "InitializePKI");
         OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestServer_InitializePKI: Failed to load server certificate \"%s\"! (0x%08X)\n", UATESTSERVER_SERVER_CERTIFICATE_LOCATION, uStatus);
         OpcUa_GotoError;
     }
-#else
-    /*** load server certificate and append CA certificate ***/
-    uStatus = UaTestServer_g_PkiProvider.LoadCertificate(   &UaTestServer_g_PkiProvider,
-                                                            UATESTSERVER_SERVER_CERTIFICATE_LOCATION,
-                                                            hCertificateStore,
-                                                            &UaTestServer_g_ServerCertificate);
-
-    if(OpcUa_IsBad(uStatus))
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestServer_InitializePKI: Failed to load server certificate \"%s\"! (0x%08X)\n", UATESTSERVER_SERVER_CERTIFICATE_LOCATION, uStatus);
-        OpcUa_GotoError;
-    }
-    else
-    {
-        OpcUa_ByteString bsCertificate = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-#if UATESTSERVER_VERIFY_SERVER_CERTIFICATE_LOCALLY
-        {
-            OpcUa_Int iValidationCode = 0;
-
-            uStatus = UaTestServer_g_PkiProvider.ValidateCertificate(   &UaTestServer_g_PkiProvider,
-                                                                        &UaTestServer_g_ServerCertificate,
-                                                                        hCertificateStore,
-                                                                        &iValidationCode);
-            if(OpcUa_IsBad(uStatus))
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestServer_InitializePKI: Server certificate invalid!\n");
-                return uStatus;
-            }
-        }
-#endif /* UATESTSERVER_VERIFY_SERVER_CERTIFICATE_LOCALLY */
-
-        uStatus = UaTestServer_g_PkiProvider.LoadCertificate(   &UaTestServer_g_PkiProvider,
-                                                                UATESTSERVER_SERVER_CA_CERTIFICATE_LOCATION,
-                                                                hCertificateStore,
-                                                                &bsCertificate);
-
-        if(OpcUa_IsBad(uStatus))
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestServer_InitializePKI: Failed to load CA certificate \"%s\"! (0x%08X)\n", UATESTSERVER_SERVER_CA_CERTIFICATE_LOCATION, uStatus);
-            OpcUa_GotoError;
-        }
-
-        uStatus = OpcUa_ByteString_Concatenate( &bsCertificate,
-                                                &UaTestServer_g_ServerCertificate,
-                                                0);
-
-        OpcUa_ByteString_Clear(&bsCertificate);
-
-        if(OpcUa_IsBad(uStatus))
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "UaTestServer_InitializePKI: Could not append server certificate! (0x%08X)\n", uStatus);
-            OpcUa_GotoError;
-        }
-    }
-#endif
 
     /*** get server private key ***/
     uStatus = UaTestServer_g_PkiProvider.LoadPrivateKeyFromFile(UATESTSERVER_SERVER_PRIVATE_KEY_LOCATION,
@@ -568,11 +467,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "Initialize");
 
     uStatus = UaTestServer_CreateSecurityPolicies();
     OpcUa_GotoErrorIfBad(uStatus);
-
-#if UATESTSERVER_LARGE_RESPONSE
-    OpcUa_MemSet(UaTestServer_g_HugeCharArray, 'B', sizeof(UaTestServer_g_HugeCharArray));
-    UaTestServer_g_HugeCharArray[UATESTSERVER_LARGE_BODY - 1] = '\0';
-#endif /* UATESTSERVER_LARGE_RESPONSE */
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -796,20 +690,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "EndpointCallback");
             OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "UaTestServer_EndpointCallback: SecureChannel %i received a request that could not be decoded! (0x%08X)\n", a_uSecureChannelId, a_uStatus);
             break;
         }
-		/*
-    case eOpcUa_Endpoint_Event_SecureChannelOpenVerifyCertificate:
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "UaTestServer_EndpointCallback: Automatically accepting invalid Client certificate! (open, 0x%08X)\n", a_uStatus);
-			uStatus = OpcUa_BadContinue;
-            break;
-        }
-    case eOpcUa_Endpoint_Event_SecureChannelRenewVerifyCertificate:
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "UaTestServer_EndpointCallback: Automatically accepting invalid Client certificate! (renew, 0x%08X)\n", a_uStatus);
-			uStatus = OpcUa_BadContinue;
-            break;
-        }
-		*/
     case eOpcUa_Endpoint_Event_Invalid:
     default:
         {
@@ -984,7 +864,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "UaTestServer_GetEndpoints");
 			uStatus = OpcUa_String_AttachCopy(&pEndpoints[ii].EndpointUrl, UATESTSERVER_ENDPOINT_TLS_URL);
 			OpcUa_GotoErrorIfBad(uStatus);
 
-			uStatus = OpcUa_String_AttachCopy(&pEndpoints[ii].TransportProfileUri, UATESTSERVER_TLS_TRANSPORT_PROFILE_URI);
+			uStatus = OpcUa_String_AttachCopy(&pEndpoints[ii].TransportProfileUri, UATESTSERVER_WSS_TRANSPORT_PROFILE_URI);
 			OpcUa_GotoErrorIfBad(uStatus);
 		}
 
@@ -1148,7 +1028,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Server, "UaTestServer_Serve");
 	OpcUa_GotoErrorIfBad(uStatus);
 
 	/* initialize TLS endpoint */
-	uStatus = UaTestServer_OpenEndpoint(UATESTSERVER_ENDPOINT_TLS_URL, UATESTSERVER_TLS_TRANSPORT_PROFILE_URI, &hTlsEndpoint);
+	uStatus = UaTestServer_OpenEndpoint(UATESTSERVER_ENDPOINT_TLS_URL, UATESTSERVER_WSS_TRANSPORT_PROFILE_URI, &hTlsEndpoint);
 	OpcUa_GotoErrorIfBad(uStatus);
 
     OpcUa_Trace(OPCUA_TRACE_LEVEL_SYSTEM, "********************** Server started! *************************\n");
@@ -1220,6 +1100,10 @@ int main(void)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
     //_CrtSetBreakAlloc(140);
 #endif
+
+
+    char x[2013];
+    GetCurrentDirectoryA(2000, x);
 
     /* Initialize Stack */
     uStatus = UaTestServer_Initialize();

@@ -67,6 +67,9 @@ typedef struct _OpcUa_StatusCodeString
 #define OpcUa_Module_SecureChannel      0x00000108L
 #define OpcUa_Module_HttpStream         0x00000109L
 #define OpcUa_Module_HttpConnection     0x00000110L
+#define OpcUa_Module_WssListener        0x00000111L
+#define OpcUa_Module_WssConnection      0x00000112L
+#define OpcUa_Module_WssStream          0x00000113L
 
 /* core modules */
 #define OpcUa_Module_Mutex              0x00000201L

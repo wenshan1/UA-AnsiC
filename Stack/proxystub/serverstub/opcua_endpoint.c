@@ -31,6 +31,7 @@
 /* communication */
 #include <opcua_securelistener.h>
 #include <opcua_tcplistener.h>
+#include <opcua_wsslistener.h>
 
 #ifdef OPCUA_HAVE_HTTPS
 #include <opcua_httpslistener.h>
@@ -432,15 +433,15 @@ OpcUa_StatusCode OpcUa_Endpoint_OnSecureChannelEvent(   OpcUa_UInt32            
  * OpcUa_Endpoint_Open
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_Endpoint_Open(   OpcUa_Endpoint                              a_hEndpoint,
-                                        OpcUa_StringA                               a_sUrl,
-                                        OpcUa_Boolean                               a_bListenOnAllInterfaces,
-                                        OpcUa_Endpoint_PfnEndpointCallback*         a_pfEndpointCallback,
-                                        OpcUa_Void*                                 a_pvEndpointCallbackData,
-                                        OpcUa_ByteString*                           a_pServerCertificate,
-                                        OpcUa_Key*                                  a_pServerPrivateKey,
-                                        OpcUa_Void*                                 a_pPKIConfig,
-                                        OpcUa_UInt32                                a_nNoOfSecurityPolicies,
-                                        OpcUa_Endpoint_SecurityPolicyConfiguration* a_pSecurityPolicies)
+    OpcUa_StringA                               a_sUrl,
+    OpcUa_Boolean                               a_bListenOnAllInterfaces,
+    OpcUa_Endpoint_PfnEndpointCallback*         a_pfEndpointCallback,
+    OpcUa_Void*                                 a_pvEndpointCallbackData,
+    OpcUa_ByteString*                           a_pServerCertificate,
+    OpcUa_Key*                                  a_pServerPrivateKey,
+    OpcUa_Void*                                 a_pPKIConfig,
+    OpcUa_UInt32                                a_nNoOfSecurityPolicies,
+    OpcUa_Endpoint_SecurityPolicyConfiguration* a_pSecurityPolicies)
 {
     OpcUa_EndpointInternal* pEndpointInt = OpcUa_Null;
 
@@ -456,12 +457,14 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
     pEndpointInt->State = eOpcUa_Endpoint_State_Open;
 
     /* attach the given url to the endpoint (make copy) */
-    OpcUa_String_AttachToString(    a_sUrl,
-                                    OPCUA_STRINGLENZEROTERMINATED,
-                                    0,
-                                    OpcUa_True,
-                                    OpcUa_False,
-                                    &(pEndpointInt->Url));
+    OpcUa_String_AttachToString(    
+        a_sUrl,
+        OPCUA_STRINGLENZEROTERMINATED,
+        0,
+        OpcUa_True,
+        OpcUa_False,
+        &(pEndpointInt->Url));
+
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* create the encoder and decoder */
@@ -481,10 +484,11 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
     }
 
     /* select the connect type based on the url scheme */
-    if(!OpcUa_String_StrnCmp(   &(pEndpointInt->Url),
-                                OpcUa_String_FromCString("opc.tcp:"),
-                                (OpcUa_UInt32)8,
-                                OpcUa_True))
+    if (!OpcUa_String_StrnCmp(
+            &(pEndpointInt->Url),
+            OpcUa_String_FromCString("opc.tcp:"),
+            (OpcUa_UInt32)8,
+            OpcUa_True))
     {
         uStatus = OpcUa_TcpListener_Create(
             a_pServerCertificate,
@@ -494,35 +498,40 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
 
         OpcUa_GotoErrorIfBad(uStatus);
 
-        uStatus = OpcUa_SecureListener_Create(  pEndpointInt->TransportListener,
-                                                pEndpointInt->Decoder,
-                                                pEndpointInt->Encoder,
-                                                &OpcUa_ProxyStub_g_NamespaceUris,
-                                                &OpcUa_ProxyStub_g_EncodeableTypes,
-                                                a_pServerCertificate,
-                                                a_pServerPrivateKey,
-                                                a_pPKIConfig,
-                                                a_nNoOfSecurityPolicies,
-                                                (OpcUa_SecureListener_SecurityPolicyConfiguration*)a_pSecurityPolicies,
-                                                OpcUa_Endpoint_OnSecureChannelEvent,
-                                                (OpcUa_Void*)pEndpointInt,
-                                                &pEndpointInt->SecureListener);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-	else if (!OpcUa_String_StrnCmp(&(pEndpointInt->Url),
-		OpcUa_String_FromCString("opc.tls:"),
-		(OpcUa_UInt32)8,
-		OpcUa_True))
-	{
-		uStatus = OpcUa_TcpListener_Create(
+        uStatus = OpcUa_SecureListener_Create(  
+            pEndpointInt->TransportListener,
+            pEndpointInt->Decoder,
+            pEndpointInt->Encoder,
+            &OpcUa_ProxyStub_g_NamespaceUris,
+            &OpcUa_ProxyStub_g_EncodeableTypes,
             a_pServerCertificate,
             a_pServerPrivateKey,
             a_pPKIConfig,
+            a_nNoOfSecurityPolicies,
+            (OpcUa_SecureListener_SecurityPolicyConfiguration*)a_pSecurityPolicies,
+            OpcUa_Endpoint_OnSecureChannelEvent,
+            (OpcUa_Void*)pEndpointInt,
+            &pEndpointInt->SecureListener);
+        
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+	else if (!OpcUa_String_StrnCmp(&(pEndpointInt->Url),
+		      OpcUa_String_FromCString("opc.wss:"),
+		      (OpcUa_UInt32)8,
+		      OpcUa_True))
+	{
+		uStatus = OpcUa_WssListener_Create(
+            a_pServerCertificate,
+            a_pServerPrivateKey,
+            a_pPKIConfig,
+            OpcUa_Endpoint_OnSecureChannelEvent,
+            (OpcUa_Void*)pEndpointInt,
             &pEndpointInt->TransportListener);
-
+        
 		OpcUa_GotoErrorIfBad(uStatus);
 
-		uStatus = OpcUa_SecureListener_Create(pEndpointInt->TransportListener,
+		uStatus = OpcUa_SecureListener_Create(
+            pEndpointInt->TransportListener,
 			pEndpointInt->Decoder,
 			pEndpointInt->Encoder,
 			&OpcUa_ProxyStub_g_NamespaceUris,
@@ -535,48 +544,54 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
 			OpcUa_Endpoint_OnSecureChannelEvent,
 			(OpcUa_Void*)pEndpointInt,
 			&pEndpointInt->SecureListener);
+
 		OpcUa_GotoErrorIfBad(uStatus);
 	}
+
 #ifdef OPCUA_HAVE_HTTPS
-    else if(!OpcUa_String_StrnCmp(  &(pEndpointInt->Url),
-                                    OpcUa_String_FromCString("https:"),
-                                    (OpcUa_UInt32)6,
-                                    OpcUa_True))
+    else if(!OpcUa_String_StrnCmp(
+                &(pEndpointInt->Url),
+                OpcUa_String_FromCString("https:"),
+                (OpcUa_UInt32)6,
+                OpcUa_True))
 
     {
-        uStatus = OpcUa_HttpsListener_Create(   a_pServerCertificate,
-                                                a_pServerPrivateKey,
-                                                a_pPKIConfig,
-                                                OpcUa_Endpoint_OnSecureChannelEvent,
-                                                (OpcUa_Void*)pEndpointInt,
-                                                &pEndpointInt->SecureListener);
+        uStatus = OpcUa_HttpsListener_Create( 
+            a_pServerCertificate,
+            a_pServerPrivateKey,
+            a_pPKIConfig,
+            OpcUa_Endpoint_OnSecureChannelEvent,
+            (OpcUa_Void*)pEndpointInt,
+            &pEndpointInt->SecureListener);
+
         OpcUa_GotoErrorIfBad(uStatus);
     }
 #endif /* OPCUA_HAVE_HTTPS */
+
     /* the endpoint type is not supported */
     else
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
     }
 
-    pEndpointInt->pfEndpointCallback        = a_pfEndpointCallback;
-    pEndpointInt->pvEndpointCallbackData    = a_pvEndpointCallbackData;
+    pEndpointInt->pfEndpointCallback = a_pfEndpointCallback;
+    pEndpointInt->pvEndpointCallbackData = a_pvEndpointCallbackData;
 
     pEndpointInt->Status = OpcUa_BadWaitingForResponse;
 
 
     /* open the endpoint. */
-    uStatus = OpcUa_Listener_Open(  pEndpointInt->SecureListener,
-                                    &(pEndpointInt->Url),
-                                    a_bListenOnAllInterfaces,
-                                    OpcUa_Endpoint_OnNotify,
-                                    (OpcUa_Void*)a_hEndpoint);
+    uStatus = OpcUa_Listener_Open(
+        pEndpointInt->SecureListener,
+        &(pEndpointInt->Url),
+        a_bListenOnAllInterfaces,
+        OpcUa_Endpoint_OnNotify,
+        (OpcUa_Void*)a_hEndpoint);
 
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* release lock */
     OPCUA_P_MUTEX_UNLOCK(pEndpointInt->Mutex);
-
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
