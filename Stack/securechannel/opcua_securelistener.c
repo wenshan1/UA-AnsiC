@@ -2713,7 +2713,10 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ValidateDiscoveryChannel");
     uStatus = OpcUa_UInt32_BinaryDecode(&uTypeId, a_pStream);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    if(uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary) && uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersRequest_Encoding_DefaultBinary))
+    if(uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary) && 
+	   uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersRequest_Encoding_DefaultBinary) && 
+	   uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultBinary)
+	   )
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadServiceUnsupported);
     }
