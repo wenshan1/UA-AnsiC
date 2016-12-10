@@ -385,7 +385,7 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "SendHttpUpgradeRequest");
     OpcUa_SPrintfA(
         pWssOutputStream->Buffer.Data, 
         pWssOutputStream->Buffer.Size, 
-        "GET / HTTP/1.1\r\nConnection: Upgrade\r\nUpgrade: WebSocket\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: %s\r\nSec-WebSocket-Protocol: application/opcua+uatcp\r\n\r\n", 
+        "GET / HTTP/1.1\r\nConnection: Upgrade\r\nUpgrade: WebSocket\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: %s\r\nSec-WebSocket-Protocol: opcua+uatcp\r\n\r\n", 
         sKey);
 
     pWssConnection->sWebSocketKey = sKey;
@@ -455,6 +455,18 @@ OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
 
+#define HTTP_VERSION "HTTP/1.1"
+#define CONNECTION_HEADER "Connection:"
+#define CONNECTION_UPGRADE "Upgrade"
+#define UPGRADE_HEADER "Upgrade:"
+#define UPGRADE_WEBSOCKET "WebSocket"
+#define WEBSOCKET_ACCEPT_HEADER "Sec-WebSocket-Accept:"
+#define WEBSOCKET_PROTOCOL_HEADER "Sec-WebSocket-Protocol:"
+#define WEBSOCKET_PROTOCOL_UATCP "opcua+uatcp"
+#define ORIGIN_HEADER "Origin:"
+#define ALLOW_ORIGIN_HEADER "Access-Control-Allow-Origin:"
+#define MAX_HEADER_LENGTH 256
+
 /*============================================================================
 * OpcUa_StatusCode OOpcUa_WssConnection_ProcessHttpUpgradeResponse
 *===========================================================================*/
@@ -483,7 +495,7 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "ProcessHttpUpgradeResponse")
     sHeader = pWssInputStream->Buffer.Data;
     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "HTTP Upgrade Header: %s\n", sHeader);
 
-    if (OpcUa_StrinCmpA("HTTP/1.1", sHeader, 8) != 0)
+    if (OpcUa_StrinCmpA(HTTP_VERSION, sHeader, OpcUa_StrLenA(HTTP_VERSION)) != 0)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
     }
@@ -502,16 +514,16 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "ProcessHttpUpgradeResponse")
 
     while (*sHeader != '\0')
     {
-        if (OpcUa_StrinCmpA("Connection:", sHeader, 11) == 0)
+        if (OpcUa_StrinCmpA(CONNECTION_HEADER, sHeader, OpcUa_StrLenA(CONNECTION_HEADER)) == 0)
         {
             OpcUa_Boolean bConnectionUpgrade = OpcUa_False;
 
-            sHeader += 12;
+            sHeader += OpcUa_StrLenA(CONNECTION_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
             while (*sHeader != '\r')
             {
-                if (OpcUa_StrinCmpA("Upgrade", sHeader, 7) == 0)
+                if (OpcUa_StrinCmpA(CONNECTION_UPGRADE, sHeader, OpcUa_StrLenA(CONNECTION_UPGRADE)) == 0)
                 {
                     bConnectionUpgrade = OpcUa_True;
                     break;
@@ -528,12 +540,12 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "ProcessHttpUpgradeResponse")
             bConnectionHeader = OpcUa_True;
         }
 
-        else if (OpcUa_StrinCmpA("Upgrade:", sHeader, 8) == 0)
+        else if (OpcUa_StrinCmpA(UPGRADE_HEADER, sHeader, OpcUa_StrLenA(UPGRADE_HEADER)) == 0)
         {
-            sHeader += 9;
+            sHeader += OpcUa_StrLenA(UPGRADE_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
-            if (OpcUa_StrinCmpA("WebSocket", sHeader, 7) != 0)
+            if (OpcUa_StrinCmpA(UPGRADE_WEBSOCKET, sHeader, OpcUa_StrLenA(UPGRADE_WEBSOCKET)) != 0)
             {
                 OpcUa_GotoErrorWithStatus(OpcUa_BadDecodingError);
             }
@@ -541,10 +553,10 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "ProcessHttpUpgradeResponse")
             bUpgradeHeader = OpcUa_True;
         }
 
-        else if (OpcUa_StrinCmpA("Sec-WebSocket-Accept:", sHeader, 21) == 0)
+        else if (OpcUa_StrinCmpA(WEBSOCKET_ACCEPT_HEADER, sHeader, OpcUa_StrLenA(WEBSOCKET_ACCEPT_HEADER)) == 0)
         {
             OpcUa_CharA* sAcceptKey = OpcUa_Null;
-            sHeader += 22;
+            sHeader += OpcUa_StrLenA(WEBSOCKET_ACCEPT_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
             sAcceptKey = sHeader;
@@ -556,12 +568,12 @@ OpcUa_InitializeStatus(OpcUa_Module_WssConnection, "ProcessHttpUpgradeResponse")
             sHeader++;
         }
 
-        else if (OpcUa_StrinCmpA("Sec-WebSocket-Protocol:", sHeader, 23) == 0)
+        else if (OpcUa_StrinCmpA(WEBSOCKET_PROTOCOL_HEADER, sHeader, OpcUa_StrLenA(WEBSOCKET_PROTOCOL_HEADER)) == 0)
         {
-            sHeader += 24;
+            sHeader += OpcUa_StrLenA(WEBSOCKET_PROTOCOL_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
-            if (OpcUa_StrinCmpA("application/opcua+uatcp", sHeader, 5) != 0)
+            if (OpcUa_StrinCmpA(WEBSOCKET_PROTOCOL_UATCP, sHeader, OpcUa_StrLenA(WEBSOCKET_PROTOCOL_UATCP)) != 0)
             {
                 OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
             }
