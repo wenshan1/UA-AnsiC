@@ -36,13 +36,16 @@
 OpcUa_Guid* OpcUa_P_Guid_Create(OpcUa_Guid* guid)
 {
 #if OPCUA_REQUIRE_OPENSSL
-    (void) RAND_bytes((unsigned char*)guid, sizeof(guid));
+    if(RAND_bytes((unsigned char*)guid, sizeof(OpcUa_Guid)) <= 0)
+    {
+        return OpcUa_Null;
+    }
 #else
     unsigned int *data = (unsigned int*)guid;
     int chunks = 16 / sizeof(unsigned int);
     static const int intbits = sizeof(int)*8;
     static int randbits = 0;
-    if (!randbits)
+    if(!randbits)
     {
         int max = RAND_MAX;
         do { ++randbits; } while ((max=max>>1));
@@ -50,7 +53,7 @@ OpcUa_Guid* OpcUa_P_Guid_Create(OpcUa_Guid* guid)
         rand(); /* Skip first */
     }
 
-    while (chunks--)
+    while(chunks--)
     {
         unsigned int randNumber = 0;
         int filled;

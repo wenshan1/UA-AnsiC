@@ -388,7 +388,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    if(RAND_bytes(a_pKey->Key.Data, a_pKey->Key.Length) == 0)
+    if(RAND_bytes(a_pKey->Key.Data, a_pKey->Key.Length) <= 0)
     {
         uStatus = OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
