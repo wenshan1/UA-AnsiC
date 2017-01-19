@@ -1057,7 +1057,7 @@ static OpcUa_NodeEncoding OpcUa_NodeId_GetEncodingType(OpcUa_NodeId* a_pNodeId)
 {
     OpcUa_NodeEncoding encodingType = (OpcUa_NodeEncoding)0;
 
-    if(OpcUa_Null != a_pNodeId)
+    if(a_pNodeId != OpcUa_Null)
     {
         switch (a_pNodeId->IdentifierType)
         {
@@ -3777,7 +3777,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_Create(
     pHandle->Context     = OpcUa_Null;
 
     uStatus = OPCUA_P_MUTEX_CREATE(&pHandle->Mutex);
-    OpcUa_ReturnErrorIfBad(uStatus);
+    OpcUa_GotoErrorIfBad(uStatus);
 
     *a_ppEncoder = (OpcUa_Encoder*)OpcUa_Alloc(sizeof(OpcUa_Encoder));
     OpcUa_GotoErrorIfAllocFailed(*a_ppEncoder);
@@ -3850,9 +3850,19 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_Create(
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    OpcUa_Free(pHandle);
-    OpcUa_Free(*a_ppEncoder);
-    *a_ppEncoder = OpcUa_Null;
+    if(pHandle != OpcUa_Null)
+    {
+        if(pHandle->Mutex != OpcUa_Null)
+        {
+            OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
+        }
+        OpcUa_Free(pHandle);
+    }
+    if(a_ppEncoder != OpcUa_Null)
+    {
+        OpcUa_Free(*a_ppEncoder);
+        *a_ppEncoder = OpcUa_Null;
+    }
 
     OpcUa_FinishErrorHandling;
 }

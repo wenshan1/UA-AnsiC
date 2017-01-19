@@ -3274,15 +3274,15 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_Create(
     OpcUa_ReturnStatusCode;
     OpcUa_BeginErrorHandling;
 
-    if(OpcUa_Null != pHandle)
+    if(pHandle != OpcUa_Null)
     {
-        if(OpcUa_Null != pHandle->Mutex)
+        if(pHandle->Mutex != OpcUa_Null)
         {
             OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
         }
         OpcUa_Free(pHandle);
     }
-    if(OpcUa_Null != a_ppDecoder)
+    if(a_ppDecoder != OpcUa_Null)
     {
         OpcUa_Free(*a_ppDecoder);
         *a_ppDecoder = OpcUa_Null;
