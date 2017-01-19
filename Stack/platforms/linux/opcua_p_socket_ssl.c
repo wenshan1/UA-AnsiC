@@ -66,6 +66,7 @@ struct _OpcUa_InternalSslSocket
     OpcUa_UInt                       bWriteBlocked:1;    /* is an unfinished ssl write pending  */
     OpcUa_UInt                       bReadBlocked:1;     /* does the application refuse to read */
     OpcUa_UInt                       bSslProgress:1;     /* did the ssl protocol make progress  */
+    OpcUa_UInt                       bSslError:1;        /* a fatal ssl protocol error occurred */
 #ifndef OPENSSL_NO_DH
     DH*                              pDHparams;          /* optional DH param on listen socket  */
 #endif /* OPENSSL_NO_DH */
@@ -136,11 +137,18 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSocket_DoStateMachine");
         else if(pWriteSize != OpcUa_Null && *pWriteSize > 0)
         {
             ssl_result = SSL_write(pInternalSocket->pSslConnection, pWriteData, *pWriteSize);
+            ssl_error = SSL_get_error(pInternalSocket->pSslConnection, ssl_result);
             if(ssl_result > 0)
             {
                 pInternalSocket->bSslProgress = OpcUa_True;
                 pWriteData  += ssl_result;
                 *pWriteSize -= ssl_result;
+            }
+            else if(ssl_error == SSL_ERROR_SSL || ssl_error == SSL_ERROR_SYSCALL)
+            {
+                pInternalSocket->bSslError = OpcUa_True;
+                OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
+                OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
             }
         }
         else if(bCanCallBack)
@@ -161,6 +169,10 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSocket_DoStateMachine");
 #if OPCUA_USE_SYNCHRONISATION
                 OpcUa_P_Mutex_Lock(pInternalSocket->pMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
+                if(pInternalSocket->bSslError)
+                {
+                    OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
+                }
             }
             if(!pInternalSocket->bReadBlocked)
             {
@@ -176,6 +188,10 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSocket_DoStateMachine");
 #if OPCUA_USE_SYNCHRONISATION
                 OpcUa_P_Mutex_Lock(pInternalSocket->pMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
+                if(pInternalSocket->bSslError)
+                {
+                    OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
+                }
             }
             wpending1 = BIO_wpending(pInternalSocket->pRawBio);
             if(wpending1 > 0 && (wpending0 > wpending1 || pInternalSocket->bSslProgress))
@@ -233,7 +249,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslRead");
     OpcUa_P_Mutex_Lock(pInternalSocket->pMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
-    if(pInternalSocket->bListenSocket || pInternalSocket->bWantShutdown)
+    if(pInternalSocket->bListenSocket || pInternalSocket->bWantShutdown || pInternalSocket->bSslError)
     {
 #if OPCUA_USE_SYNCHRONISATION
         OpcUa_P_Mutex_Unlock(pInternalSocket->pMutex);
@@ -262,6 +278,12 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslRead");
                 break;
             case SSL_ERROR_ZERO_RETURN:
                 uStatus = OpcUa_BadDisconnect;
+                break;
+            case SSL_ERROR_SSL:
+            case SSL_ERROR_SYSCALL:
+                pInternalSocket->bSslError = OpcUa_True;
+                OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
+                uStatus = OpcUa_BadInternalError;
                 break;
             default:
                 uStatus = OpcUa_BadCommunicationError;
@@ -309,7 +331,7 @@ static OpcUa_Int32 OpcUa_P_SocketService_SslWrite( OpcUa_Socket    a_pSocket,
     OpcUa_P_Mutex_Lock(pInternalSocket->pMutex);
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
-    if(pInternalSocket->bListenSocket || pInternalSocket->bWantShutdown)
+    if(pInternalSocket->bListenSocket || pInternalSocket->bWantShutdown || pInternalSocket->bSslError)
     {
 #if OPCUA_USE_SYNCHRONISATION
         OpcUa_P_Mutex_Unlock(pInternalSocket->pMutex);
@@ -351,7 +373,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslClose");
     {
         OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
     }
-    else
+    else if(!pInternalSocket->bSslError)
     {
         /* Initiate SSL Shutdown */
         pInternalSocket->bWantShutdown = OpcUa_True;
@@ -664,6 +686,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "InternalAccept");
     pInternalSocket->bWriteBlocked            = OpcUa_False;
     pInternalSocket->bReadBlocked             = OpcUa_False;
     pInternalSocket->bSslProgress             = OpcUa_False;
+    pInternalSocket->bSslError                = OpcUa_False;
 
     pInternalSocket->pSslContext              = SSL_CTX_new(SSLv23_server_method());
     OpcUa_GotoErrorIfAllocFailed(pInternalSocket->pSslContext);
@@ -1040,6 +1063,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateSslClient");
     pInternalSocket->bWriteBlocked            = OpcUa_False;
     pInternalSocket->bReadBlocked             = OpcUa_False;
     pInternalSocket->bSslProgress             = OpcUa_False;
+    pInternalSocket->bSslError                = OpcUa_False;
 
     pInternalSocket->pSslContext              = SSL_CTX_new(SSLv23_client_method());
     OpcUa_GotoErrorIfAllocFailed(pInternalSocket->pSslContext);
