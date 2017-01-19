@@ -260,6 +260,10 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_HttpsConnection_WatchdogTimerCallback( OpcU
                                     OpcUa_BadTimeout,       /* status of the request    */
                                     OpcUa_Null);            /* the stream to read from  */
             }
+            else
+            {
+                OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+            }
         }
         else
         {
@@ -272,18 +276,21 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_HttpsConnection_WatchdogTimerCallback( OpcU
                 OPCUA_P_SOCKET_CLOSE(pRequest->Socket);
                 pRequest->Socket = OpcUa_Null;
 
-                if(pRequest->OutgoingStream != OpcUa_Null)
-                {
-                    /* clean outgoing stream */
-                    pRequest->OutgoingStream->Delete((OpcUa_Stream**)&pRequest->OutgoingStream);
-                    pRequest->OutgoingStream = OpcUa_Null;
-                }
+                pRequest->OutgoingStream = OpcUa_Null;
 
                 if(pRequest->IncomingStream != OpcUa_Null)
                 {
                     pRequest->IncomingStream->Close((OpcUa_Stream*)pRequest->IncomingStream);
                     pRequest->IncomingStream->Delete((OpcUa_Stream**)&pRequest->IncomingStream);
                     pRequest->IncomingStream = OpcUa_Null;
+                }
+
+                while(pRequest->pSendQueue != OpcUa_Null)
+                {
+                    OpcUa_BufferList* pCurrentBuffer = pRequest->pSendQueue;
+                    pRequest->pSendQueue = pCurrentBuffer->pNext;
+                    OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
+                    OpcUa_Free(pCurrentBuffer);
                 }
             }
 
@@ -316,6 +323,8 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_HttpsConnection_WatchdogTimerKillCallback( 
     {
         OpcUa_HttpsConnection_Request* pRequest = &pHttpsConnection->arrHttpsRequests[uIndex];
 
+        OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
+
         /* tell all waiting callbacks of the cancellation */
         if(pRequest->RequestCallback != OpcUa_Null)
         {
@@ -325,10 +334,16 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_HttpsConnection_WatchdogTimerKillCallback( 
             pRequest->RequestCallback       = OpcUa_Null;
             pRequest->RequestCallbackData   = OpcUa_Null;
 
+            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+
             pfnRequestCallback( (OpcUa_Connection*)a_pvCallbackData,    /* source of the event      */
                                 pvRequestCallbackData,                  /* the callback data        */
                                 OpcUa_BadDisconnect,                    /* status of the request    */
                                 OpcUa_Null);                            /* the stream to read from  */
+        }
+        else
+        {
+            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
         }
     }
 
@@ -362,8 +377,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetRequestByStream");
         if(pRequest->OutgoingStream == a_pOutputStream)
         {
             *a_ppRequest = pRequest;
-
-            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
             break;
         }
 
@@ -402,12 +415,13 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "GetRequestInState");
         pRequest = &a_pHttpConnection->arrHttpsRequests[uIndex];
 
         OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
+
         if(pRequest->ConnectionState == a_eState)
         {
-            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
             *a_ppRequest = pRequest;
             break;
         }
+
         OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
     }
 
@@ -428,7 +442,6 @@ static OpcUa_StatusCode OpcUa_HttpsConnection_HandleDisconnect(
     OpcUa_HttpsConnection_Request*  a_pRequest,
     OpcUa_StatusCode                a_uReason)
 {
-    OpcUa_HttpsConnection* pHttpConnection = OpcUa_Null;
     OpcUa_Connection*      pConnection     = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "HandleDisconnect");
@@ -439,7 +452,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "HandleDisconnect");
     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_HandleDisconnect: request %p!\n", a_pRequest);
 
     pConnection     = a_pRequest->pConnection;
-    pHttpConnection = (OpcUa_HttpsConnection*)pConnection->Handle;
 
     /* mark the connection as closed */
     OPCUA_HTTPSCONNECTION_REQUEST_LOCK(a_pRequest);
@@ -447,7 +459,29 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "HandleDisconnect");
     OPCUA_P_SOCKET_CLOSE(a_pRequest->Socket);
     a_pRequest->Socket = OpcUa_Null;
 
+    if(a_pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+    {
+        a_pRequest->OutgoingStream->Delete((OpcUa_Stream**)&a_pRequest->OutgoingStream);
+    }
+
     a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
+
+    a_pRequest->OutgoingStream = OpcUa_Null;
+
+    if(a_pRequest->IncomingStream != OpcUa_Null)
+    {
+        a_pRequest->IncomingStream->Close((OpcUa_Stream*)a_pRequest->IncomingStream);
+        a_pRequest->IncomingStream->Delete((OpcUa_Stream**)&a_pRequest->IncomingStream);
+        a_pRequest->IncomingStream = OpcUa_Null;
+    }
+
+    while(a_pRequest->pSendQueue != OpcUa_Null)
+    {
+        OpcUa_BufferList* pCurrentBuffer = a_pRequest->pSendQueue;
+        a_pRequest->pSendQueue = pCurrentBuffer->pNext;
+        OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
+        OpcUa_Free(pCurrentBuffer);
+    }
 
     /* notify upper layer about disconnect */
     if(a_pRequest->RequestCallback != OpcUa_Null)
@@ -476,7 +510,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "HandleDisconnect");
     }
 
     /* if the first connection fails, shutdown completely */
-    if(a_pRequest == &pHttpConnection->arrHttpsRequests[0])
+    if(a_pRequest->bNotify != OpcUa_False)
     {
         OpcUa_HttpsConnection_Disconnect(pConnection, OpcUa_True);
     }
@@ -704,6 +738,7 @@ OpcUa_StatusCode OpcUa_HttpsConnection_ExceptEventHandler(
     OpcUa_Connection_PfnOnResponse* pfnRequestCallback      = OpcUa_Null;
     OpcUa_Void*                     pvRequestCallbackData   = OpcUa_Null;
     OpcUa_Connection*               pConnection             = OpcUa_Null;
+    OpcUa_Boolean                   bIsConnecting           = OpcUa_False;
 
 OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ExceptEventHandler");
 
@@ -713,25 +748,46 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ExceptEventHandler");
 
     OPCUA_HTTPSCONNECTION_REQUEST_LOCK(a_pRequest);
 
+    if(a_pRequest->Socket != a_hSocket)
+    {
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
+
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsConnection_ExceptEventHandler: wrong socket %p on request %p (expected %p)!\n", a_hSocket, a_pRequest, a_pRequest->Socket);
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
     pConnection     = a_pRequest->pConnection;
     pHttpConnection = (OpcUa_HttpsConnection*)pConnection->Handle;
+
+    if(a_pRequest->ConnectionState == OpcUa_HttpsConnectionState_Connecting)
+    {
+        bIsConnecting = OpcUa_True;
+    }
+    else if(a_pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+    {
+        a_pRequest->OutgoingStream->Delete((OpcUa_Stream**)&a_pRequest->OutgoingStream);
+    }
 
     a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
 
     OPCUA_P_SOCKET_CLOSE(a_hSocket);
     a_pRequest->Socket = OpcUa_Null;
 
-    if(a_pRequest->OutgoingStream != OpcUa_Null)
-    {
-        /* clean outgoing stream */
-        a_pRequest->OutgoingStream->Delete((OpcUa_Stream**)&a_pRequest->OutgoingStream);
-        a_pRequest->OutgoingStream = OpcUa_Null;
-    }
+    a_pRequest->OutgoingStream = OpcUa_Null;
+
     if(a_pRequest->IncomingStream != OpcUa_Null)
     {
         a_pRequest->IncomingStream->Close((OpcUa_Stream*)a_pRequest->IncomingStream);
         a_pRequest->IncomingStream->Delete((OpcUa_Stream**)&a_pRequest->IncomingStream);
         a_pRequest->IncomingStream = OpcUa_Null;
+    }
+
+    while(a_pRequest->pSendQueue != OpcUa_Null)
+    {
+        OpcUa_BufferList* pCurrentBuffer = a_pRequest->pSendQueue;
+        a_pRequest->pSendQueue = pCurrentBuffer->pNext;
+        OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
+        OpcUa_Free(pCurrentBuffer);
     }
 
     pfnRequestCallback      = a_pRequest->RequestCallback;
@@ -752,16 +808,22 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ExceptEventHandler");
 
     if(a_pRequest->bNotify != OpcUa_False)
     {
-        /* only notify about the first connect */
-        a_pRequest->bNotify = OpcUa_False;
-
-        if(pHttpConnection->NotifyCallback != OpcUa_Null)
+        if(bIsConnecting != OpcUa_False)
         {
-            pHttpConnection->NotifyCallback(pConnection,
-                                            pHttpConnection->CallbackData,
-                                            OpcUa_ConnectionEvent_Connect,
-                                            OpcUa_Null, /* no stream for this event */
-                                            OpcUa_BadCommunicationError);
+            OpcUa_HttpsConnection_Disconnect(pConnection, OpcUa_False);
+
+            if(pHttpConnection->NotifyCallback != OpcUa_Null)
+            {
+                pHttpConnection->NotifyCallback(pConnection,
+                                                pHttpConnection->CallbackData,
+                                                OpcUa_ConnectionEvent_Connect,
+                                                OpcUa_Null, /* no stream for this event */
+                                                OpcUa_BadCommunicationError);
+            }
+        }
+        else
+        {
+            OpcUa_HttpsConnection_Disconnect(pConnection, OpcUa_True);
         }
     }
 
@@ -780,71 +842,62 @@ OpcUa_StatusCode OpcUa_HttpsConnection_WriteEventHandler(
     OpcUa_HttpsConnection_Request*  a_pRequest,
     OpcUa_Socket                    a_pSocket)
 {
-    OpcUa_HttpsConnection* pHttpsConnection = OpcUa_Null;
-
 OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "WriteEventHandler");
 
     OpcUa_GotoErrorIfArgumentNull(a_pRequest);
-    OpcUa_GotoErrorIfArgumentNull(a_pRequest->pConnection);
-    OpcUa_GotoErrorIfArgumentNull(a_pRequest->pConnection->Handle);
     OpcUa_GotoErrorIfArgumentNull(a_pSocket);
 
-    pHttpsConnection = (OpcUa_HttpsConnection*)a_pRequest->pConnection->Handle;
+    OPCUA_HTTPSCONNECTION_REQUEST_LOCK(a_pRequest);
 
     /* look for pending output stream */
-    do
+    while(a_pRequest->pSendQueue != OpcUa_Null)
     {
-        while(a_pRequest->pSendQueue != OpcUa_Null)
+        OpcUa_BufferList*        pCurrentBuffer = a_pRequest->pSendQueue;
+        OpcUa_Int32              iDataLength    = pCurrentBuffer->Buffer.EndOfData - pCurrentBuffer->Buffer.Position;
+
+        OpcUa_Int32              iDataWritten   = OPCUA_P_SOCKET_WRITE(a_pRequest->Socket,
+                                                                       &pCurrentBuffer->Buffer.Data[pCurrentBuffer->Buffer.Position],
+                                                                       iDataLength,
+                                                                       OpcUa_False);
+        if(iDataWritten < 0)
         {
-            OpcUa_BufferList*        pCurrentBuffer = a_pRequest->pSendQueue;
-            OpcUa_Int32              iDataLength    = pCurrentBuffer->Buffer.EndOfData - pCurrentBuffer->Buffer.Position;
-
-            OpcUa_Int32              iDataWritten   = OPCUA_P_SOCKET_WRITE(a_pSocket,
-                                                                           &pCurrentBuffer->Buffer.Data[pCurrentBuffer->Buffer.Position],
-                                                                           iDataLength,
-                                                                           OpcUa_False);
-            if(iDataWritten < 0)
-            {
-                return OpcUa_HttpsConnection_HandleDisconnect(a_pRequest, OpcUa_BadCommunicationError);
-            }
-            else if(iDataWritten == 0)
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: no data sent\n");
-                uStatus = OpcUa_GoodCallAgain;
-                OpcUa_ReturnStatusCode;
-            }
-            else if(iDataWritten < iDataLength)
-            {
-                pCurrentBuffer->Buffer.Position += iDataWritten;
-
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: data partially sent (%i bytes)!\n", iDataWritten);
-
-                uStatus = OpcUa_GoodCallAgain;
-                OpcUa_ReturnStatusCode;
-            }
-            else
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: data sent!\n");
-                a_pRequest->pSendQueue = pCurrentBuffer->pNext;
-                OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
-                OpcUa_Free(pCurrentBuffer);
-            }
-        } /* end while */
-
-        if(pHttpsConnection->NotifyCallback != OpcUa_Null)
-        {
-            pHttpsConnection->NotifyCallback(   a_pRequest->pConnection,
-                                                (OpcUa_Void*)pHttpsConnection->CallbackData,
-                                                OpcUa_ConnectionEvent_RefillSendQueue,
-                                                OpcUa_Null,
-                                                uStatus);
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
         }
+        else if(iDataWritten == 0)
+        {
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: no data sent\n");
+            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
+            uStatus = OpcUa_GoodCallAgain;
+            OpcUa_ReturnStatusCode;
+        }
+        else if(iDataWritten < iDataLength)
+        {
+            pCurrentBuffer->Buffer.Position += iDataWritten;
 
-        /* send queue may have been changed during the callback. */
-    } while(a_pRequest->pSendQueue != OpcUa_Null);
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: data partially sent (%i bytes)!\n", iDataWritten);
+
+            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
+            uStatus = OpcUa_GoodCallAgain;
+            OpcUa_ReturnStatusCode;
+        }
+        else
+        {
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_WriteEventHandler: data sent!\n");
+            a_pRequest->pSendQueue = pCurrentBuffer->pNext;
+            OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
+            OpcUa_Free(pCurrentBuffer);
+        }
+    } /* end while */
+
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
+
+    OpcUa_HttpsConnection_HandleDisconnect(a_pRequest, uStatus);
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -854,17 +907,13 @@ OpcUa_FinishErrorHandling;
 static OpcUa_StatusCode OpcUa_HttpsConnectionRequest_AddToSendQueue(OpcUa_HttpsConnection_Request*  a_pRequest,
                                                                     OpcUa_BufferList*               a_pBufferList)
 {
-    OpcUa_HttpsConnection* pHttpsConnection = (OpcUa_HttpsConnection*)a_pRequest->pConnection->Handle;
-
 OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueue");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pRequest);
 
-    OPCUA_P_MUTEX_LOCK(pHttpsConnection->Mutex);
-
     if(a_pRequest->pSendQueue == OpcUa_Null)
     {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnectionRequest_AddToSendQueue: Set buffer list of request %p connection %p to %p.\n", a_pRequest, pHttpsConnection, a_pBufferList);
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnectionRequest_AddToSendQueue: Set buffer list of request %p to %p.\n", a_pRequest, a_pBufferList);
         a_pRequest->pSendQueue = a_pBufferList;
     }
     else
@@ -875,12 +924,10 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueue");
             pLastEntry = pLastEntry->pNext;
         }
 
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnectionRequest_AddToSendQueue: Append buffer list %p to request %p connection %p.\n", a_pBufferList, a_pRequest, pHttpsConnection);
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnectionRequest_AddToSendQueue: Append buffer list %p to request %p.\n", a_pBufferList, a_pRequest);
 
         pLastEntry->pNext = a_pBufferList;
     }
-
-    OPCUA_P_MUTEX_UNLOCK(pHttpsConnection->Mutex);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -1031,7 +1078,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SslEventHandler");
     }
     else
     {
-        pHttpsConnection->bsUsedServerCertificate.Data = OpcUa_Memory_Alloc(a_pCertificate->Length);
+        pHttpsConnection->bsUsedServerCertificate.Data = OpcUa_Alloc(a_pCertificate->Length);
         OpcUa_GotoErrorIfAllocFailed(pHttpsConnection->bsUsedServerCertificate.Data);
         pHttpsConnection->bsUsedServerCertificate.Length = a_pCertificate->Length;
         OpcUa_MemCpy(pHttpsConnection->bsUsedServerCertificate.Data,
@@ -1067,66 +1114,54 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ConnectEventHandler");
 
     OpcUa_ReturnErrorIfArgumentNull(pHttpConnection);
 
-    /* first time we get the new socket, so store it. */
-    a_pRequest->Socket = a_hSocket;
+    OPCUA_HTTPSCONNECTION_REQUEST_LOCK(a_pRequest);
 
-    OPCUA_P_MUTEX_LOCK(pHttpConnection->Mutex);
-
-    if(a_pRequest->OutgoingStream != OpcUa_Null)
+    if(a_pRequest->Socket != a_hSocket)
     {
-        if(a_pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
+
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsConnection_ConnectEventHandler: wrong socket %p on request %p (expected %p)!\n", a_hSocket, a_pRequest, a_pRequest->Socket);
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    if(a_pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+    {
+        OpcUa_OutputStream* pOutputStream = a_pRequest->OutgoingStream;
+
+        /* progress normally */
+        a_pRequest->OutgoingStream = OpcUa_Null;
+        a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_WaitingForResponse;
+
+        OpcUa_HttpsStream_SetSocket(    pOutputStream,
+                                        a_pRequest->Socket);
+
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_ConnectEventHandler: Sending buffered request!\n");
+
+        /* close and flush stream */
+        uStatus = pOutputStream->Close((OpcUa_Stream*)pOutputStream);
+        if(OpcUa_IsEqual(OpcUa_BadWouldBlock))
         {
-            OpcUa_OutputStream* pOutputStream = a_pRequest->OutgoingStream;
-
-            /* progress normally */
-            a_pRequest->OutgoingStream = OpcUa_Null;
-            a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_WaitingForResponse;
-
-            OpcUa_HttpsStream_SetSocket(    pOutputStream,
-                                            a_pRequest->Socket);
-
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_ConnectEventHandler: Sending buffered request!\n");
-
-            /* close and flush stream */
-            uStatus = pOutputStream->Close((OpcUa_Stream*)pOutputStream);
-            if(OpcUa_IsEqual(OpcUa_BadWouldBlock))
-            {
-                /* try to put stream content into buffer queue for delayed sending */
-                uStatus = OpcUa_HttpsConnection_AddStreamToSendQueue(a_pRequest, pOutputStream);
-            }
-
-            if(OpcUa_IsBad(uStatus))
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_ConnectEventHandler: could not send request! 0x%08X \n", uStatus);
-            }
-
-            /* clean up stream resources */
-            pOutputStream->Delete((OpcUa_Stream**)&pOutputStream);
+            /* try to put stream content into buffer queue for delayed sending */
+            uStatus = OpcUa_HttpsConnection_AddStreamToSendQueue(a_pRequest, pOutputStream);
         }
-        else
+
+        if(OpcUa_IsBad(uStatus))
         {
-            /* connect finished before EndSendRequest was called. */
-            a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_PreparingForRequest;
-
-            OpcUa_HttpsStream_SetSocket(    a_pRequest->OutgoingStream,
-                                            a_pRequest->Socket);
-
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_ConnectEventHandler: could not send request! 0x%08X \n", uStatus);
         }
+
+        /* clean up stream resources */
+        pOutputStream->Delete((OpcUa_Stream**)&pOutputStream);
     }
     else
     {
         a_pRequest->ConnectionState = OpcUa_HttpsConnectionState_Connected;
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
     }
+
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(a_pRequest);
 
     if(a_pRequest->bNotify != OpcUa_False)
     {
-        /* only notify about the first connect */
-        a_pRequest->bNotify = OpcUa_False;
-
         if(pHttpConnection->NotifyCallback != OpcUa_Null)
         {
             pHttpConnection->NotifyCallback(a_pRequest->pConnection,
@@ -1275,8 +1310,6 @@ static OpcUa_StatusCode OpcUa_HttpsConnection_SocketCallback(
 {
     OpcUa_StringA                       strEvent        = OpcUa_Null;
     OpcUa_HttpsConnection_EventHandler  fEventHandler   = OpcUa_Null;
-    OpcUa_HttpsConnection*              pHttpConnection = OpcUa_Null;
-    OpcUa_HttpsConnection_Request*      pRequest        = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SocketCallback");
 
@@ -1285,12 +1318,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SocketCallback");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hSocket);
     OpcUa_ReturnErrorIfArgumentNull(a_pUserData);
-
-    pRequest = (OpcUa_HttpsConnection_Request*)a_pUserData;
-    OpcUa_ReturnErrorIfArgumentNull(pRequest->pConnection);
-    OpcUa_ReturnErrorIfArgumentNull(pRequest->pConnection->Handle);
-
-    pHttpConnection = (OpcUa_HttpsConnection*)pRequest->pConnection->Handle;
 
 #if 1 /* debug code */
     switch(a_uSocketEvent)
@@ -1361,22 +1388,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SocketCallback");
     /* debug code end */
 #endif
 
-    OPCUA_P_MUTEX_LOCK(pHttpConnection->Mutex);
-
-    if(    pRequest->ConnectionState != OpcUa_HttpsConnectionState_Connected
-        && pRequest->ConnectionState != OpcUa_HttpsConnectionState_Connecting
-        && pRequest->ConnectionState != OpcUa_HttpsConnectionState_PreparingForRequest
-        && pRequest->ConnectionState != OpcUa_HttpsConnectionState_WaitingForResponse
-        && pRequest->ConnectionState != OpcUa_HttpsConnectionState_RequestPrepared
-        && pRequest->ConnectionState != OpcUa_HttpsConnectionState_Error)
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, " * OpcUa_HttpsConnection_SocketCallback: Ignoring Socket(%p) Event(%s) due state %u!\n", a_hSocket, strEvent, pRequest->ConnectionState);
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-        return OpcUa_Good;
-    }
-
-    OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-
     switch(a_uSocketEvent)
     {
         case OPCUA_SOCKET_READ_EVENT:
@@ -1401,6 +1412,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SocketCallback");
         }
         case OPCUA_SOCKET_CLOSE_EVENT:
         {
+            fEventHandler = OpcUa_HttpsConnection_ExceptEventHandler;
             break;
         }
         case OPCUA_SOCKET_CONNECT_EVENT:
@@ -1663,6 +1675,8 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "Connect");
 #endif /* OPCUA_MULTITHREADED */
     OpcUa_GotoErrorIfBad(uStatus);
 
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+
     /* tell the caller to expect a callback (only for non-blocking sockets)*/
     uStatus = OpcUa_GoodCompletesAsynchronously;
 
@@ -1680,6 +1694,8 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "Connect");
     pHttpConnection->NotifyCallback     = a_pfnCallback;
     pHttpConnection->CallbackData       = a_pCallbackData;
 
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+
     a_pfnCallback(  a_pConnection,
                     a_pCallbackData,
                     OpcUa_ConnectionEvent_Connect,
@@ -1694,6 +1710,7 @@ OpcUa_BeginErrorHandling;
     if(pRequest != OpcUa_Null)
     {
         pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
     }
 
 OpcUa_FinishErrorHandling;
@@ -1726,17 +1743,20 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "Disconnect");
         pRequest = &pHttpConnection->arrHttpsRequests[uIndex];
 
         /* check, if the connection is in the right state for being disconnected */
+        OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
+        if(pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+        {
+            pRequest->OutgoingStream->Delete((OpcUa_Stream**)&pRequest->OutgoingStream);
+        }
+        pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
+        pRequest->bNotify         = OpcUa_False;
         if(pRequest->Socket != OpcUa_Null)
         {
-            /* set state */
-            pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
-
-            OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
             /* blind close without error checking */
             OPCUA_P_SOCKET_CLOSE(pRequest->Socket);
             pRequest->Socket = OpcUa_Null;
-            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
         }
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
     }
 
     hTimerToDelete = pHttpConnection->hWatchdogTimer;
@@ -1796,7 +1816,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
 
     if(pHttpConnection->hWatchdogTimer == OpcUa_Null)
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsConnection_BeginSendRequest: Connection is not connected!\n");
         OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
     }
@@ -1814,7 +1833,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
                                                             &pRequest);
         if(OpcUa_IsBad(uStatus))
         {
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_BeginSendRequest: No free connection rescource available!\n");
             OpcUa_GotoErrorWithStatus(OpcUa_BadResourceUnavailable);
         }
@@ -1823,7 +1841,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
     /* must close the existing outgoing stream before creating another. */
     if(pRequest->OutgoingStream != OpcUa_Null)
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_BeginSendRequest: Open outstream detected!\n");
         OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
     }
@@ -1840,7 +1857,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
                                              a_ppOutputStream);
     if(OpcUa_IsBad(uStatus))
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_GotoError;
     }
 
@@ -1851,7 +1867,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
 
     if(OpcUa_IsBad(uStatus))
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_GotoError;
     }
 
@@ -1862,7 +1877,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
 
     if(OpcUa_IsBad(uStatus))
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_GotoError;
     }
 
@@ -1881,10 +1895,18 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "BeginSendRequest");
         OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_BeginSendRequest: Reusing existent connection %p for request %p!\n", pHttpConnection, pRequest);
     }
 
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
     OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    if(pRequest != OpcUa_Null)
+    {
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+    }
+
+    OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
 
     OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppOutputStream);
 
@@ -1917,15 +1939,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
     /* cast onto the backend types */
     pHttpConnection = (OpcUa_HttpsConnection*)a_pConnection->Handle;
 
-    OPCUA_P_MUTEX_LOCK(pHttpConnection->Mutex);
-
-    if(pHttpConnection->hWatchdogTimer == OpcUa_Null)
-    {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsConnection_EndSendRequest: Connection is not connected!\n");
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
-    }
-
     /* fetch matching request object from output stream */
     uStatus = OpcUa_HttpsConnection_GetRequestByStream( pHttpConnection,
                                                         *a_ppOutputStream,
@@ -1933,30 +1946,21 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
 
     if(OpcUa_IsBad(uStatus))
     {
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
         OpcUa_GotoError;
     }
 
-    OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
+    /* check for consistency */
+    if(pRequest->RequestCallback != OpcUa_Null)
+    {
+        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_EndSendRequest: Request in wrong state\n");
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
+    }
 
     /* set request data */
     pRequest->RequestTimeout        = a_uTimeout;
     pRequest->RequestStartTime      = OpcUa_GetTickCount();
     pRequest->RequestCallback       = a_pfnCallback;
     pRequest->RequestCallbackData   = a_pCallbackData;
-
-    /* check for consistency */
-    if(pRequest->OutgoingStream == OpcUa_Null)
-    {
-        pRequest->RequestCallback       = OpcUa_Null;
-        pRequest->RequestCallbackData   = OpcUa_Null;
-        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
-        OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_EndSendRequest: no outgoing stream\n");
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidState);
-    }
-
-    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
 
     /* check for valid connection state */
     switch(pRequest->ConnectionState)
@@ -2004,14 +2008,11 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
                 pRequest->OutgoingStream        = OpcUa_Null;
                 pRequest->RequestCallback       = OpcUa_Null;
                 pRequest->RequestCallbackData   = OpcUa_Null;
-                OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-                /* clean up stream resources */
-                (*a_ppOutputStream)->Delete((OpcUa_Stream**)a_ppOutputStream);
+                pRequest->ConnectionState  = OpcUa_HttpsConnectionState_Disconnected;
                 OpcUa_GotoError;
             }
 
             pRequest->ConnectionState = OpcUa_HttpsConnectionState_RequestPrepared;
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
 
             OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsConnection_EndSendRequest: waiting for connection %p.\n", pHttpConnection);
 
@@ -2020,7 +2021,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
             break;
         }
     case OpcUa_HttpsConnectionState_PreparingForRequest:    /* connection reuse */
-    case OpcUa_HttpsConnectionState_Connected:              /* connect finished */
         {
             /* progress normally */
             pRequest->OutgoingStream = OpcUa_Null;
@@ -2044,11 +2044,8 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
                 pRequest->RequestCallback       = OpcUa_Null;
                 pRequest->RequestCallbackData   = OpcUa_Null;
                 pRequest->ConnectionState       = OpcUa_HttpsConnectionState_Connected;
-                OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
                 OpcUa_GotoError;
             }
-
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
 
             break;
         }
@@ -2057,19 +2054,20 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
             pRequest->OutgoingStream        = OpcUa_Null;
             pRequest->RequestCallback       = OpcUa_Null;
             pRequest->RequestCallbackData   = OpcUa_Null;
-            OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-
-            /* clean up stream resources */
-            (*a_ppOutputStream)->Delete((OpcUa_Stream**)a_ppOutputStream);
 
             OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionClosed);
         }
     }
 
-    OpcUa_GotoErrorIfBad(uStatus);
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    if(pRequest != OpcUa_Null)
+    {
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+    }
 
     OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_EndSendRequest: could not send request! 0x%08X (cookie %p)\n", uStatus, a_pCallbackData);
 
@@ -2096,12 +2094,15 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "AbortSendRequest");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pConnection);
     OpcUa_ReturnErrorIfArgumentNull(a_pConnection->Handle);
-
-    OpcUa_ReturnErrorIfTrue(   *a_ppOutputStream != OpcUa_Null
-                            && (*a_ppOutputStream)->Handle == OpcUa_Null,
-                            OpcUa_BadInvalidArgument);
+    OpcUa_ReturnErrorIfArgumentNull(a_ppOutputStream);
+    OpcUa_ReturnErrorIfArgumentNull(*a_ppOutputStream);
+    OpcUa_ReturnErrorIfArgumentNull((*a_ppOutputStream)->Handle);
 
     OpcUa_ReturnErrorIfInvalidConnection(a_pConnection);
+
+    /* no insecure abort messages implemented and allowed! */
+    OpcUa_ReferenceParameter(a_uStatus);
+    OpcUa_ReferenceParameter(a_psReason);
 
     /* cast onto the backend type */
     pHttpConnection = (OpcUa_HttpsConnection*)a_pConnection->Handle;
@@ -2113,29 +2114,32 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "AbortSendRequest");
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* clean outgoing stream */
-    if(pRequest->OutgoingStream != OpcUa_Null)
+    pRequest->OutgoingStream = OpcUa_Null;
+
+    if(pRequest->ConnectionState == OpcUa_HttpsConnectionState_Connecting)
     {
-        pRequest->OutgoingStream = OpcUa_Null;
+        pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
     }
-    else
+    else if(pRequest->ConnectionState == OpcUa_HttpsConnectionState_PreparingForRequest)
     {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "OpcUa_HttpsConnection_AbortSendRequest: no active stream detected!\n");
+        pRequest->ConnectionState = OpcUa_HttpsConnectionState_Connected;
     }
 
-    if(a_ppOutputStream != OpcUa_Null)
-    {
-        /* clean up */
-        OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppOutputStream);
-    }
-    else
-    {
-        /* no insecure abort messages implemented and allowed! */
-        OpcUa_ReferenceParameter(a_uStatus);
-        OpcUa_ReferenceParameter(a_psReason);
-    }
+    OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+
+    /* clean up */
+    OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppOutputStream);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    if(pRequest != OpcUa_Null)
+    {
+        OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
+    }
+
+    OpcUa_HttpsStream_Delete((OpcUa_Stream**)a_ppOutputStream);
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -2170,26 +2174,6 @@ OpcUa_Void OpcUa_HttpsConnection_Delete(OpcUa_Connection** a_ppConnection)
         OpcUa_Timer_Delete(&(pHttpConnection->hWatchdogTimer));
     }
 
-    OPCUA_P_MUTEX_LOCK(pHttpConnection->Mutex);
-
-    for(uIndex = 0; uIndex < OPCUA_HTTPS_CONNECTION_MAXPENDINGREQUESTS; uIndex++)
-    {
-        pRequest = &pHttpConnection->arrHttpsRequests[uIndex];
-
-        if(pRequest->Socket != OpcUa_Null)
-        {
-            /* blind close without error checking */
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsConnection_Delete: Rude disconnect!\n");
-            pRequest->ConnectionState = OpcUa_HttpsConnectionState_Disconnected;
-            OPCUA_HTTPSCONNECTION_REQUEST_LOCK(pRequest);
-            OPCUA_P_SOCKET_CLOSE(pRequest->Socket);
-            pRequest->Socket = OpcUa_Null;
-            OPCUA_HTTPSCONNECTION_REQUEST_UNLOCK(pRequest);
-        }
-    }
-
-    OPCUA_P_MUTEX_UNLOCK(pHttpConnection->Mutex);
-
 #if OPCUA_MULTITHREADED
     /* HINT: waits internally for receive thread to shutdown, so this call may block. */
     if(pHttpConnection->SocketManager != OpcUa_Null)
@@ -2205,15 +2189,16 @@ OpcUa_Void OpcUa_HttpsConnection_Delete(OpcUa_Connection** a_ppConnection)
         pRequest->RequestCallback        = OpcUa_Null;
         pRequest->RequestCallbackData    = OpcUa_Null;
 
+        if(pRequest->ConnectionState == OpcUa_HttpsConnectionState_RequestPrepared)
+        {
+            pRequest->OutgoingStream->Delete((OpcUa_Stream**)&pRequest->OutgoingStream);
+        }
+
         /* the architecture should prevent from getting here with active streams */
         if(pRequest->IncomingStream != OpcUa_Null)
         {
             pRequest->IncomingStream->Close((OpcUa_Stream*)pRequest->IncomingStream);
             pRequest->IncomingStream->Delete((OpcUa_Stream**)&pRequest->IncomingStream);
-        }
-        if(pRequest->OutgoingStream != OpcUa_Null)
-        {
-            pRequest->OutgoingStream->Delete((OpcUa_Stream**)&pRequest->OutgoingStream);
         }
 
         while(pRequest->pSendQueue != OpcUa_Null)
