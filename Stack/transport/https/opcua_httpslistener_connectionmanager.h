@@ -63,12 +63,6 @@ struct _OpcUa_HttpsListener_Connection
     OpcUa_Int32                 iReferenceCount;
     /** @brief The queued list of data blocks to be sent. */
     OpcUa_BufferList*           pSendQueue;
-    /** @brief Should this connection close when the send completes. */
-    OpcUa_Boolean               bCloseWhenDone;
-    /** @brief Should this connection block the receiver until the send completes. */
-    OpcUa_Boolean               bNoRcvUntilDone;
-    /** @brief Tells wether data has been delayed because of bNoRcvUntilDone. */
-    OpcUa_Boolean               bRcvDataPending;
 };
 
 typedef struct _OpcUa_HttpsListener_Connection OpcUa_HttpsListener_Connection;

@@ -325,9 +325,6 @@ OpcUa_StatusCode OpcUa_HttpsListener_Connection_Initialize(OpcUa_HttpsListener_C
     a_pConnection->bConnected               = OpcUa_False;
 
     a_pConnection->pSendQueue               = OpcUa_Null;
-    a_pConnection->bCloseWhenDone           = OpcUa_False;
-    a_pConnection->bNoRcvUntilDone          = OpcUa_False;
-    a_pConnection->bRcvDataPending          = OpcUa_False;
 
     a_pConnection->bCallbackPending         = OpcUa_False;
     a_pConnection->hValidationResult        = OpcUa_BadNoData;
