@@ -1333,7 +1333,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "GetPosition");
             return OpcUa_BadInvalidState;
         }
 
-        *a_pPosition = pHttpInputStream->Buffer[0].Position;
+        *a_pPosition = pHttpInputStream->nAbsolutePosition;
     }
     else
     {
@@ -1357,34 +1357,9 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "SetPosition");
     OpcUa_ReturnErrorIfArgumentNull(a_pStream);
     OpcUa_ReturnErrorIfArgumentNull(a_pStream->Handle);
     OpcUa_ReturnErrorIfInvalidStream(a_pStream, SetPosition);
+    OpcUa_ReferenceParameter(a_uPosition);
 
-    if(a_pStream->Type == OpcUa_StreamType_Output)
-    {
-        OpcUa_HttpsOutputStream* pHttpOutputStream = (OpcUa_HttpsOutputStream*)a_pStream->Handle;
-
-        if(pHttpOutputStream->Closed)
-        {
-            return OpcUa_BadInvalidState;
-        }
-
-        /* set the position */
-        uStatus = OpcUa_Buffer_SetPosition(&(pHttpOutputStream->Buffer), a_uPosition);
-    }
-    else if(a_pStream->Type == OpcUa_StreamType_Input)
-    {
-        OpcUa_HttpsInputStream* pHttpInputStream = (OpcUa_HttpsInputStream*)a_pStream->Handle;
-
-        if(pHttpInputStream->Closed)
-        {
-            return OpcUa_BadInvalidState;
-        }
-
-        uStatus = OpcUa_Buffer_SetPosition(&pHttpInputStream->Buffer, a_uPosition);
-    }
-    else
-    {
-        uStatus = OpcUa_BadInvalidArgument;
-    }
+    uStatus = OpcUa_BadNotImplemented;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -2362,6 +2337,9 @@ static OpcUa_StatusCode OpcUa_HttpsStream_ReadChunkLength(  OpcUa_InputStream*  
 {
     OpcUa_String            sChunkHeader        = OPCUA_STRING_STATICINITIALIZER;
     OpcUa_Int               iResult             = 0;
+#if !OPCUA_HTTPS_COPYHEADERS
+    OpcUa_CharA             chRawString[20];
+#endif
 
 OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "ReadChunkLength");
 
@@ -2381,7 +2359,14 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "ReadChunkLength");
         OpcUa_GotoError;
     }
 
+#if OPCUA_HTTPS_COPYHEADERS
     iResult = OpcUa_SScanfA(OpcUa_String_GetRawString(&sChunkHeader), "%X", a_piChunkLength);
+#else
+    OpcUa_MemSet(chRawString, 0, sizeof(chRawString));
+    uStatus = OpcUa_MemCpy(chRawString, sizeof(chRawString)-1, OpcUa_String_GetRawString(&sChunkHeader), OpcUa_String_StrSize(&sChunkHeader));
+    OpcUa_GotoErrorIfBad(uStatus);
+    iResult = OpcUa_SScanfA(chRawString, "%X", a_piChunkLength);
+#endif
     if((iResult != 1) || (*a_piChunkLength < 0) || (*a_piChunkLength > OPCUA_HTTPS_MAX_RECV_MESSAGE_LENGTH))
     {
         OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_HttpsStream_ReadChunkLength: Chunk size could not be read!\n");
