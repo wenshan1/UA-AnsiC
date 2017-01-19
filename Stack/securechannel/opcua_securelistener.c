@@ -1058,7 +1058,6 @@ OpcUa_BeginErrorHandling;
 
     if(pSecureInputStream->InnerStrm != OpcUa_Null)
     {
-        pSecureInputStream->InnerStrm->Close(pSecureInputStream->InnerStrm);
         pSecureInputStream->InnerStrm->Delete(&pSecureInputStream->InnerStrm);
     }
 
@@ -1294,7 +1293,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "EndSendOpenSecureChannelRes
     /*** send response over the wire ***/
     uStatus = pSecureListener->TransportListener->EndSendResponse(  pSecureListener->TransportListener,
                                                                     a_uStatus,
-                                                                    (OpcUa_OutputStream**)&(pSecureStream->InnerStrm));
+                                                                    (OpcUa_OutputStream**)&pSecureStream->InnerStrm);
     OpcUa_GotoErrorIfBad(uStatus);
 
     /*** cleanup ***/
@@ -2404,6 +2403,11 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
         pSecurityToken = OpcUa_Null;
     }
 
+    if(pSecureStream != OpcUa_Null && pSecureStream->InnerStrm != OpcUa_Null)
+    {
+        pSecureStream->InnerStrm->Delete(&pSecureStream->InnerStrm);
+    }
+
     if(pSecureIStrm != OpcUa_Null)
     {
         OpcUa_Stream_Close((OpcUa_Stream*)pSecureIStrm);
@@ -2443,10 +2447,9 @@ OpcUa_BeginErrorHandling;
         pCryptoProvider = OpcUa_Null;
     }
 
-    if((pSecureStream != OpcUa_Null) && pSecureStream->InnerStrm != OpcUa_Null)
+    if(pSecureStream != OpcUa_Null && pSecureStream->InnerStrm != OpcUa_Null)
     {
-        pSecureStream->InnerStrm->Close((OpcUa_Stream*)pSecureStream->InnerStrm);
-        pSecureStream->InnerStrm->Delete((OpcUa_Stream**)&(pSecureStream->InnerStrm));
+        pSecureStream->InnerStrm->Delete(&pSecureStream->InnerStrm);
         *a_ppTransportIstrm = OpcUa_Null;
     }
 
