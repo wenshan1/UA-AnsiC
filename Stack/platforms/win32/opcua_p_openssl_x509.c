@@ -121,13 +121,13 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_AddCustomExtension");
         pName,
         pValue);
 
-    if (pExtension == OpcUa_Null)
+    if(pExtension == OpcUa_Null)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_Bad);
     }
 
     /* add it to the certificate. */
-    if (!X509_add_ext(*a_ppCertificate, pExtension, -1))
+    if(!X509_add_ext(*a_ppCertificate, pExtension, -1))
     {
         OpcUa_GotoErrorWithStatus(OpcUa_Bad);
     }
@@ -144,25 +144,6 @@ OpcUa_BeginErrorHandling;
     }
 
 OpcUa_FinishErrorHandling;
-}
-
-/** \internal Compares the two given DateTime values.
- * @return 0 if equal, -1 if \c a is smaller than \c b, 1 otherwise.
- */
-int OpcUa_P_DateTime_Compare(const OpcUa_DateTime *a, const OpcUa_DateTime *b)
-{
-    if (a == b) return 0;
-    if (a->dwHighDateTime == b->dwHighDateTime)
-    {
-        if (a->dwLowDateTime == b->dwLowDateTime) return 0;
-        if (a->dwLowDateTime < b->dwLowDateTime) return -1;
-        return 1;
-    }
-    else if (a->dwHighDateTime < b->dwHighDateTime)
-    {
-        return -1;
-    }
-    return 1;
 }
 
 /*============================================================================
@@ -213,14 +194,14 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     }
 
     pSubjectPublicKey = d2i_PublicKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pSubjectPublicKey.Key.Data)),a_pSubjectPublicKey.Key.Length);
-    if (pSubjectPublicKey == OpcUa_Null)
+    if(pSubjectPublicKey == OpcUa_Null)
     {
         uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
     pIssuerPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pIssuerPrivateKey.Key.Data)),a_pIssuerPrivateKey.Key.Length);
-    if (pIssuerPrivateKey == OpcUa_Null)
+    if(pIssuerPrivateKey == OpcUa_Null)
     {
         uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
@@ -228,7 +209,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
 
     /* create new certificate object */
     pCert = X509_new();
-    if (pCert == OpcUa_Null)
+    if(pCert == OpcUa_Null)
     {
         uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
@@ -242,7 +223,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     }
 
     /* generate a unique number for a serial number if none provided. */
-    if (a_serialNumber == 0)
+    if(a_serialNumber == 0)
     {
         ASN1_INTEGER* pSerialNumber = X509_get_serialNumber(pCert);
 
@@ -250,11 +231,15 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
         pSerialNumber->data   = OPENSSL_realloc(pSerialNumber->data, 16);
         pSerialNumber->length = 16;
 
-        OpcUa_P_Guid_Create((OpcUa_Guid*)pSerialNumber->data);
+        if(pSerialNumber->data == NULL || OpcUa_P_Guid_Create((OpcUa_Guid*)pSerialNumber->data) == NULL)
+        {
+            uStatus =  OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
     }
 
     /* use the integer passed in - note the API should not be using a 32-bit integer - must fix sometime */
-    else if (ASN1_INTEGER_set(X509_get_serialNumber(pCert), a_serialNumber) == 0)
+    else if(ASN1_INTEGER_set(X509_get_serialNumber(pCert), a_serialNumber) == 0)
     {
         uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
@@ -353,7 +338,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    if (X509_verify(pCert, pIssuerPrivateKey) <= 0)
+    if(X509_verify(pCert, pIssuerPrivateKey) <= 0)
     {
         uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
@@ -411,19 +396,16 @@ OpcUa_BeginErrorHandling;
     if(pSubjectPublicKey != OpcUa_Null)
     {
         EVP_PKEY_free(pSubjectPublicKey);
-        pSubjectPublicKey = OpcUa_Null;
     }
 
     if(pIssuerPrivateKey != OpcUa_Null)
     {
         EVP_PKEY_free(pIssuerPrivateKey);
-        pIssuerPrivateKey = OpcUa_Null;
     }
 
     if(pSubj != OpcUa_Null)
     {
         X509_NAME_free(pSubj);
-        pSubj = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -594,14 +576,14 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
 
     BIO_free(bi);
 
-    if (pCertificate == OpcUa_Null)
+    if(pCertificate == OpcUa_Null)
     {
         return OpcUa_BadCertificateInvalid;
     }
 
     /* get EVP_PKEY from X509 certificate */
     pPublicKey = X509_get_pubkey(pCertificate);
-    if (pPublicKey == OpcUa_Null)
+    if(pPublicKey == OpcUa_Null)
     {
         X509_free(pCertificate);
         return OpcUa_BadCertificateInvalid;
@@ -802,27 +784,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
     if(pX509Certificate == OpcUa_Null)
     {
         uStatus = OpcUa_Bad;
-        OpcUa_GotoError;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     a_pSignature->Signature.Length = pX509Certificate->signature->length;
-
-    if(a_pSignature->Signature.Data == OpcUa_Null)
-    {
-        X509_free(pX509Certificate);
-        OpcUa_ReturnStatusCode;
-    }
-
-    OpcUa_P_Memory_MemCpy(  a_pSignature->Signature.Data,
-                            pX509Certificate->signature->length,
-                            pX509Certificate->signature->data,
-                            pX509Certificate->signature->length);
-
-    if(a_pSignature->Signature.Data == OpcUa_Null)
-    {
-        uStatus = OpcUa_Bad;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
 
     a_pSignature->Algorithm = OBJ_obj2nid(pX509Certificate->sig_alg->algorithm);
 
@@ -832,11 +797,16 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    if(pX509Certificate != OpcUa_Null)
+    if(a_pSignature->Signature.Data != OpcUa_Null)
     {
-        X509_free(pX509Certificate);
-        pX509Certificate = OpcUa_Null;
+        uStatus = OpcUa_P_Memory_MemCpy(a_pSignature->Signature.Data,
+                                        a_pSignature->Signature.Length,
+                                        pX509Certificate->signature->data,
+                                        pX509Certificate->signature->length);
+
     }
+
+    X509_free(pX509Certificate);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -844,7 +814,6 @@ OpcUa_BeginErrorHandling;
     if(pX509Certificate != OpcUa_Null)
     {
         X509_free(pX509Certificate);
-        pX509Certificate = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -884,7 +853,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetCertificateThumbprint");
     if(pX509Certificate == OpcUa_Null)
     {
         uStatus = OpcUa_Bad;
-        OpcUa_GotoError;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     /* update pX509Certificate->sha1_hash */
