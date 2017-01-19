@@ -1311,7 +1311,14 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadDiagnosticInfo(
         OpcUa_GotoErrorIfAllocFailed(a_pValue->InnerDiagnosticInfo);
         OpcUa_DiagnosticInfo_Initialize(a_pValue->InnerDiagnosticInfo);
 
+        if (pHandle->RecursionDepth > pHandle->Context->MaxRecursionDepth)
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadEncodingLimitsExceeded);
+        }
+
+        pHandle->RecursionDepth++;
         uStatus = OpcUa_BinaryDecoder_ReadDiagnosticInfo(a_pDecoder, OpcUa_Null, a_pValue->InnerDiagnosticInfo);
+        pHandle->RecursionDepth--;
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
