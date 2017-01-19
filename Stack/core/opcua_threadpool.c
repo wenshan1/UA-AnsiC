@@ -560,7 +560,7 @@ OpcUa_InitializeStatus(OpcUa_Module_ThreadPool, "Create");
 
     *a_phThreadPool = OpcUa_Null;
 
-    pThreadPoolInternal = (OpcUa_ThreadPoolInternal*)OpcUa_Memory_Alloc(sizeof(OpcUa_ThreadPoolInternal));
+    pThreadPoolInternal = (OpcUa_ThreadPoolInternal*)OpcUa_Alloc(sizeof(OpcUa_ThreadPoolInternal));
     OpcUa_ReturnErrorIfAllocFailed(pThreadPoolInternal);
 
     uStatus = OpcUa_ThreadPool_Initialize(  (OpcUa_ThreadPool)pThreadPoolInternal,

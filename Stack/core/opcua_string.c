@@ -132,7 +132,7 @@ static OpcUa_StatusCode _OpcUa_ExpandString(  /* bi */ OpcUa_String*    a_pStrin
         {
             if(pStringInt->strContent != OpcUa_Null)
             {
-                OpcUa_Memory_Free((OpcUa_Void*)pStringInt->strContent);
+                OpcUa_Free((OpcUa_Void*)pStringInt->strContent);
             }
         }
 
