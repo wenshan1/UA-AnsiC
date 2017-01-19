@@ -1535,6 +1535,8 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadExtensionObject(
     if (pType != OpcUa_Null)
     {
         OpcUa_Int32 nIndex = 0;
+        OpcUa_UInt32 uBodyStart = 0;
+        OpcUa_UInt32 uBodyEnd = 0;
 
         /* allocate instance of the encodeable type */
         uStatus = OpcUa_EncodeableObject_Create(pType, &a_pValue->Body.EncodeableObject.Object);
@@ -1547,6 +1549,10 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadExtensionObject(
         uStatus = OpcUa_BinaryDecoder_ReadInt32(a_pDecoder, OpcUa_Null, &nLength);
         OpcUa_GotoErrorIfBad(uStatus);
 
+        /* get the start position */
+        uStatus = pHandle->Istrm->GetPosition((OpcUa_Stream*)pHandle->Istrm, &uBodyStart);
+        OpcUa_GotoErrorIfBad(uStatus);
+
         /* read body */
         uStatus = OpcUa_BinaryDecoder_ReadEncodeable(
             a_pDecoder,
@@ -1555,6 +1561,16 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadExtensionObject(
             a_pValue->Body.EncodeableObject.Object);
 
         OpcUa_GotoErrorIfBad(uStatus);
+
+        /* get the end position */
+        uStatus = pHandle->Istrm->GetPosition((OpcUa_Stream*)pHandle->Istrm, &uBodyEnd);
+        OpcUa_GotoErrorIfBad(uStatus);
+
+        /* the body length must match */
+        if ((OpcUa_UInt32)nLength != (uBodyEnd - uBodyStart))
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadDecodingError);
+        }
 
         /* update type id */
         if (a_pValue->TypeId.NodeId.IdentifierType != OpcUa_IdentifierType_Numeric ||
