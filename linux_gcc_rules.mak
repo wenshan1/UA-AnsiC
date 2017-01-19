@@ -24,11 +24,18 @@ MKDIR = mkdir -p
 ifndef MACHINE_TYPE
 ifndef CROSS_COMPILE
 	TMP_MACHINE_TYPE = $(shell uname -i)
-	# sometimes "unknown" is returned - default to i386
 	ifeq ($(TMP_MACHINE_TYPE),x86_64)
 		MACHINE_TYPE = x86_64
 	else
+	ifeq ($(TMP_MACHINE_TYPE),i386)
 		MACHINE_TYPE = i386
+	else
+	ifeq ($(TMP_MACHINE_TYPE),i686)
+		MACHINE_TYPE = i386
+	else
+		MACHINE_TYPE = unknown
+	endif
+	endif
 	endif
 else
 	MACHINE_TYPE = unknown
