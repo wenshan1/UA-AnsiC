@@ -79,11 +79,6 @@ OpcUa_StatusCode OpcUa_HttpsListener_AbortSendResponse(
     OpcUa_String*                   a_sReason,
     OpcUa_OutputStream**            a_ppOutputStream);
 
-OpcUa_StatusCode OpcUa_HttpsListener_CloseConnection(
-    OpcUa_Listener*                 a_pListener,
-    OpcUa_Handle                    a_hConnection,
-    OpcUa_StatusCode                a_uStatus);
-
 OpcUa_StatusCode OpcUa_HttpsListener_ProcessDisconnect(
     OpcUa_Listener*                  a_pListener,
     OpcUa_HttpsListener_Connection** a_ppListenerConnection);
@@ -91,8 +86,7 @@ OpcUa_StatusCode OpcUa_HttpsListener_ProcessDisconnect(
 OpcUa_StatusCode OpcUa_HttpsListener_AddToSendQueue(
     OpcUa_Listener*                 a_pListener,
     OpcUa_Handle                    a_hConnection,
-    OpcUa_BufferList*               a_pBufferList,
-    OpcUa_UInt32                    a_uFlags);
+    OpcUa_BufferList*               a_pBufferList);
 
 OpcUa_StatusCode OpcUa_HttpsListener_ReadEventHandler(
     OpcUa_Listener* a_pListener,
@@ -161,12 +155,10 @@ OpcUa_Void OpcUa_HttpsListener_Delete(OpcUa_Listener** a_ppListener)
 
     if(pHttpsListener != OpcUa_Null)
     {
-        OPCUA_P_MUTEX_LOCK(pHttpsListener->Mutex);
         pHttpsListener->SanityCheck = 0;
 
         OpcUa_HttpsListener_ConnectionManager_Delete(&(pHttpsListener->pConnectionManager));
 
-        OPCUA_P_MUTEX_UNLOCK(pHttpsListener->Mutex);
         OPCUA_P_MUTEX_DELETE(&(pHttpsListener->Mutex));
 
         OpcUa_Free(pHttpsListener);
@@ -227,11 +219,11 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "Create");
     (*a_ppListener)->BeginSendResponse              = OpcUa_HttpsListener_BeginSendResponse;
     (*a_ppListener)->EndSendResponse                = OpcUa_HttpsListener_EndSendResponse;
     (*a_ppListener)->AbortSendResponse              = OpcUa_HttpsListener_AbortSendResponse;
-    (*a_ppListener)->CloseConnection                = OpcUa_HttpsListener_CloseConnection;
+    (*a_ppListener)->CloseConnection                = OpcUa_Null;
     (*a_ppListener)->GetReceiveBufferSize           = OpcUa_Null;
     (*a_ppListener)->GetPeerInfo                    = OpcUa_Null; /*OpcUa_HttpsListener_GetPeerInfo;*/
     (*a_ppListener)->Delete                         = OpcUa_HttpsListener_Delete;
-    (*a_ppListener)->AddToSendQueue                 = OpcUa_HttpsListener_AddToSendQueue;
+    (*a_ppListener)->AddToSendQueue                 = OpcUa_Null;
     (*a_ppListener)->CheckProtocolVersion           = OpcUa_Null;
 
 OpcUa_ReturnStatusCode;
@@ -355,53 +347,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "GetPeerInfo");
 
     OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(    pHttpsListener->pConnectionManager,
                                                                 &pHttpsConnection);
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_HttpsListener_CloseConnection
- *===========================================================================*/
-/** @brief Close a particular connection of this listener. */
-OpcUa_StatusCode OpcUa_HttpsListener_CloseConnection(
-    OpcUa_Listener*     a_pListener,
-    OpcUa_Handle        a_hConnection,
-    OpcUa_StatusCode    a_uStatus)
-{
-    OpcUa_HttpsListener_Connection*  pListenerConnection    = OpcUa_Null;
-    OpcUa_HttpsListener*             pHttpsListener         = OpcUa_Null;
-
-OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "CloseConnection");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pListener);
-    OpcUa_ReturnErrorIfArgumentNull(a_hConnection);
-
-    pHttpsListener      = (OpcUa_HttpsListener*)a_pListener->Handle;
-    pListenerConnection = (OpcUa_HttpsListener_Connection*)a_hConnection;
-
-    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG,
-                "OpcUa_HttpsListener_CloseConnection: Connection %p is being closed! 0x%08X\n",
-                a_hConnection,
-                a_uStatus);
-
-    if(OpcUa_IsBad(a_uStatus))
-    {
-        OpcUa_HttpsListener_SendImmediateResponse(  a_pListener,
-                                                    a_hConnection,
-                                                    500,
-                                                    "Internal Server Error",
-                                                    "Server: OPC-ANSI-C-HTTPS-API/0.1\r\n"
-                                                    "Content-Type: application/octet-stream\r\n",
-                                                    OpcUa_Null,
-                                                    0);
-    }
-
-    OPCUA_P_SOCKET_CLOSE(pListenerConnection->Socket);
-    pListenerConnection->Socket = OpcUa_Null;
-    OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(    pHttpsListener->pConnectionManager,
-                                                               &pListenerConnection);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -573,8 +518,7 @@ OpcUa_FinishErrorHandling;
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_HttpsListener_AddToSendQueue(OpcUa_Listener*          a_pListener,
                                                     OpcUa_Handle             a_hConnection,
-                                                    OpcUa_BufferList*        a_pBufferList,
-                                                    OpcUa_UInt32             a_uFlags)
+                                                    OpcUa_BufferList*        a_pBufferList)
 {
     OpcUa_HttpsListener_Connection* pListenerConnection = (OpcUa_HttpsListener_Connection*)a_hConnection;
 
@@ -582,8 +526,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueue");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hConnection);
     OpcUa_ReferenceParameter(a_pListener);
-
-    OPCUA_P_MUTEX_LOCK(pListenerConnection->Mutex);
 
     if(pListenerConnection->pSendQueue == OpcUa_Null)
     {
@@ -602,18 +544,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "AddToSendQueue");
 
         pLastEntry->pNext = a_pBufferList;
     }
-
-    if(a_uFlags & OPCUA_LISTENER_CLOSE_WHEN_DONE)
-    {
-        pListenerConnection->bCloseWhenDone = OpcUa_True;
-    }
-
-    if(a_uFlags & OPCUA_LISTENER_NO_RCV_UNTIL_DONE)
-    {
-        pListenerConnection->bNoRcvUntilDone = OpcUa_True;
-    }
-
-    OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -646,8 +576,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "OpcUa_HttpsListener_AddStream
             {
                 uStatus = OpcUa_HttpsListener_AddToSendQueue(   a_pListener,
                                                                 a_pListenerConnection,
-                                                                pEntry,
-                                                                0);
+                                                                pEntry);
                 if(OpcUa_IsBad(uStatus))
                 {
                     /* free Entry */
@@ -1209,103 +1138,72 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "WriteEventHandler");
     uStatus = OpcUa_HttpsListener_ConnectionManager_GetConnectionBySocket(pHttpsListener->pConnectionManager,
                                                                           a_hSocket,
                                                                           &pListenerConnection);
-    if(OpcUa_IsBad(uStatus) && OpcUa_IsNotEqual(OpcUa_BadNotFound))
+    if(OpcUa_IsBad(uStatus))
     {
         /* no connection available */
-        OpcUa_GotoError;
+        OPCUA_P_SOCKET_CLOSE(a_hSocket);
+        OpcUa_ReturnStatusCode;
     }
 
     /******************************************************************************************************/
 
+    OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+
     /* look for pending output stream */
-    if(pListenerConnection != OpcUa_Null)
+    while(pListenerConnection->pSendQueue != OpcUa_Null)
     {
-        do{
-            while(pListenerConnection->pSendQueue != OpcUa_Null)
-            {
-                OpcUa_BufferList*        pCurrentBuffer = pListenerConnection->pSendQueue;
-                OpcUa_Int32              iDataLength    = pCurrentBuffer->Buffer.EndOfData - pCurrentBuffer->Buffer.Position;
-                OpcUa_Int32              iDataWritten   = OPCUA_P_SOCKET_WRITE(
-                                                                a_hSocket,
-                                                                &pCurrentBuffer->Buffer.Data[pCurrentBuffer->Buffer.Position],
-                                                                iDataLength,
-                                                                OpcUa_False);
+        OpcUa_BufferList*        pCurrentBuffer = pListenerConnection->pSendQueue;
+        OpcUa_Int32              iDataLength    = pCurrentBuffer->Buffer.EndOfData - pCurrentBuffer->Buffer.Position;
+        OpcUa_Int32              iDataWritten   = OPCUA_P_SOCKET_WRITE(
+                                                        a_hSocket,
+                                                        &pCurrentBuffer->Buffer.Data[pCurrentBuffer->Buffer.Position],
+                                                        iDataLength,
+                                                        OpcUa_False);
 
-                if(iDataWritten<0)
-                {
-                    OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
-                    return OpcUa_HttpsListener_TimeoutEventHandler(a_pListener, a_hSocket);
-                }
-                else if(iDataWritten == 0)
-                {
-                    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: no data sent\n");
-                    uStatus = OpcUa_GoodCallAgain;
-                    OpcUa_ReturnStatusCode;
-                }
-                else if(iDataWritten<iDataLength)
-                {
-                    pCurrentBuffer->Buffer.Position += iDataWritten;
-
-                    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: data partially sent (%i bytes)!\n", iDataWritten);
-
-                    if((pListenerConnection->bNoRcvUntilDone == OpcUa_False) &&
-                       (pListenerConnection->bRcvDataPending == OpcUa_True))
-                    {
-                        pListenerConnection->bRcvDataPending = OpcUa_False;
-                        uStatus = OpcUa_HttpsListener_ReadEventHandler(a_pListener, a_hSocket);
-                        if(OpcUa_IsBad(uStatus))
-                        {
-                            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
-                            OpcUa_GotoError;
-                        }
-                    }
-
-                    OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
-                    uStatus = OpcUa_GoodCallAgain;
-                    OpcUa_ReturnStatusCode;
-                }
-                else
-                {
-                    OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: data sent!\n");
-                    pListenerConnection->pSendQueue = pCurrentBuffer->pNext;
-                    OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
-                    OpcUa_Free(pCurrentBuffer);
-                }
-            } /* end while */
-
-            if(pListenerConnection->bCloseWhenDone == OpcUa_True)
-            {
-                break;
-            }
-
-            pListenerConnection->bNoRcvUntilDone = OpcUa_False;
-
-            pHttpsListener->pfListenerCallback(
-                a_pListener,                            /* the event source */
-                (OpcUa_Void*)pHttpsListener->pvListenerCallbackData,/* the callback data */
-                OpcUa_ListenerEvent_RefillSendQueue,    /* the event that occurred */
-                pListenerConnection,                    /* a connection handle */
-                OpcUa_Null,                             /* the input stream for the event (none in this case) */
-                uStatus);                               /* a status code for the event */
-
-        } while(pListenerConnection->pSendQueue != OpcUa_Null);
-
-        if(pListenerConnection->bCloseWhenDone == OpcUa_True)
+        if(iDataWritten < 0)
         {
-            uStatus = OpcUa_HttpsListener_TimeoutEventHandler(a_pListener, a_hSocket);
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
         }
-        else if((pListenerConnection->bNoRcvUntilDone == OpcUa_False) &&
-                (pListenerConnection->bRcvDataPending == OpcUa_True))
+        else if(iDataWritten == 0)
         {
-            pListenerConnection->bRcvDataPending = OpcUa_False;
-            uStatus = OpcUa_HttpsListener_ReadEventHandler(a_pListener, a_hSocket);
-        }
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: no data sent\n");
 
-        OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
-    }
+            OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
+            uStatus = OpcUa_GoodCallAgain;
+            OpcUa_ReturnStatusCode;
+        }
+        else if(iDataWritten < iDataLength)
+        {
+            pCurrentBuffer->Buffer.Position += iDataWritten;
+
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: data partially sent (%i bytes)!\n", iDataWritten);
+
+            OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+            OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
+            uStatus = OpcUa_GoodCallAgain;
+            OpcUa_ReturnStatusCode;
+        }
+        else
+        {
+            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_HttpsListener_WriteEventHandler: data sent!\n");
+            pListenerConnection->pSendQueue = pCurrentBuffer->pNext;
+            OpcUa_Buffer_Clear(&pCurrentBuffer->Buffer);
+            OpcUa_Free(pCurrentBuffer);
+        }
+    } /* end while */
+
+    OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+
+    OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(pHttpsListener->pConnectionManager, &pListenerConnection);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
+    OPCUA_P_MUTEX_UNLOCK(pListenerConnection->Mutex);
+
+    OpcUa_HttpsListener_ProcessDisconnect(a_pListener, &pListenerConnection);
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -1632,6 +1530,8 @@ OpcUa_BeginErrorHandling;
         OpcUa_HttpsListener_Connection_Delete(&pListenerConnection);
     }
 
+    OPCUA_P_SOCKET_CLOSE(a_hSocket);
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -1736,10 +1636,6 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "EventCallback");
             fEventHandler = OpcUa_HttpsListener_ReadEventHandler;
             break;
         }
-        case OPCUA_SOCKET_EXCEPT_EVENT:
-        {
-            break;
-        }
         case OPCUA_SOCKET_WRITE_EVENT:
         {
             fEventHandler = OpcUa_HttpsListener_WriteEventHandler;
@@ -1750,6 +1646,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "EventCallback");
             fEventHandler = OpcUa_HttpsListener_AcceptEventHandler;
             break;
         }
+        case OPCUA_SOCKET_EXCEPT_EVENT:
         case OPCUA_SOCKET_TIMEOUT_EVENT:
         case OPCUA_SOCKET_CLOSE_EVENT:
         {
@@ -1877,7 +1774,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "SslEventHandler");
 
     pHttpsConnection->hValidationResult = a_uResult;
     pHttpsConnection->bsClientCertificate.Length = a_pCertificate->Length;
-    pHttpsConnection->bsClientCertificate.Data = OpcUa_Memory_Alloc(a_pCertificate->Length);
+    pHttpsConnection->bsClientCertificate.Data = OpcUa_Alloc(a_pCertificate->Length);
     OpcUa_GotoErrorIfAllocFailed(pHttpsConnection->bsClientCertificate.Data);
     OpcUa_MemCpy(pHttpsConnection->bsClientCertificate.Data, pHttpsConnection->bsClientCertificate.Length,
                  a_pCertificate->Data, a_pCertificate->Length);
