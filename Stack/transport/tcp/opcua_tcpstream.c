@@ -659,7 +659,6 @@ OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
     OpcUa_Free(pTcpInputStream);
-    OpcUa_Free(*a_ppIstrm);
 
     *a_ppIstrm = OpcUa_Null;
 
@@ -833,7 +832,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
             OpcUa_GotoErrorIfBad(uStatus);
             /* reserve message length field */
             uStatus = OpcUa_UInt32_BinaryEncode(0, *a_ppOstrm);
-            OpcUa_ReturnErrorIfBad(uStatus);
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
     case OpcUa_TcpStream_MessageType_Hello:
@@ -843,7 +842,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
             OpcUa_GotoErrorIfBad(uStatus);
             /* reserve message length field */
             uStatus = OpcUa_UInt32_BinaryEncode(0xFFFFFFFF, *a_ppOstrm);
-            OpcUa_ReturnErrorIfBad(uStatus);
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
     case OpcUa_TcpStream_MessageType_Acknowledge:
@@ -853,7 +852,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
             OpcUa_GotoErrorIfBad(uStatus);
             /* reserve message length field */
             uStatus = OpcUa_UInt32_BinaryEncode(0xAAAAAAAA, *a_ppOstrm);
-            OpcUa_ReturnErrorIfBad(uStatus);
+            OpcUa_GotoErrorIfBad(uStatus);
             break;
         }
     case OpcUa_TcpStream_MessageType_Unknown:
