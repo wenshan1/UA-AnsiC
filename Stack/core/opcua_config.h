@@ -152,21 +152,6 @@
 #define OPCUA_THREADPOOL_RELOOPTIME                 500
 
 /*============================================================================
- * server call dispatching
- *===========================================================================*/
-/** @brief Put fully received requests into the servers thread job queue. (Be carefull with the blocking setting!) */
-#define OPCUA_SECURELISTENER_SUPPORT_THREADPOOL     OPCUA_CONFIG_NO
-
-/** @brief Minimum number of threads (static) in the securelisteners job queue. */
-#define OPCUA_SECURELISTENER_THREADPOOL_MINTHREADS  5
-
-/** @brief Maximum number of threads (static) in the securelisteners job queue. */
-#define OPCUA_SECURELISTENER_THREADPOOL_MAXTHREADS  5
-
-/** @brief Maximum total number of jobs being processed by the thread pool. */
-#define OPCUA_SECURELISTENER_THREADPOOL_MAXJOBS     20
-
-/*============================================================================
  * tracer
  *===========================================================================*/
 /** @brief Enable output to trace device. */

@@ -222,18 +222,6 @@ OpcUa_InitializeStatus(OpcUa_Module_ProxyStub, "ReInitialize");
     {
         OpcUa_ProxyStub_g_Configuration.iSerializer_MaxRecursionDepth            = OPCUA_ENCODER_MAXRECURSIONDEPTH;
     }
-    if(OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MinThreads == -1)
-    {
-        OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MinThreads    = OPCUA_SECURELISTENER_THREADPOOL_MINTHREADS;
-    }
-    if(OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxThreads == -1)
-    {
-        OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxThreads    = OPCUA_SECURELISTENER_THREADPOOL_MAXTHREADS;
-    }
-    if(OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxJobs == -1)
-    {
-        OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxJobs       = OPCUA_SECURELISTENER_THREADPOOL_MAXJOBS;
-    }
     if(OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize == -1)
     {
         OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize            = OPCUA_TCPLISTENER_DEFAULTCHUNKSIZE;

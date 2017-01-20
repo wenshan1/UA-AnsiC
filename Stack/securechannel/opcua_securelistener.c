@@ -157,33 +157,6 @@ typedef enum _OpcUa_SecureListenerState
 OpcUa_SecureListenerState;
 
 /*============================================================================
- * OpcUa_SecureListener_ThreadPoolJobArgument
- *===========================================================================*/
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-typedef struct _OpcUa_SecureListener_ThreadPoolJobArgument
-{
-    /** @brief the transport connection */
-    OpcUa_Handle                    hConnection;
-    /** @brief secure listener interface */
-    OpcUa_Listener*                 pListener;
-    /** @brief transport input stream for last append */
-    OpcUa_InputStream*              pTransportIstrm;
-    /** @brief unfinished secure input stream waiting for last append */
-    OpcUa_InputStream*              pSecureIstrm;
-    /** @brief application callback function */
-    OpcUa_Void*                     pCallback;
-    /** @brief application callback function data */
-    OpcUa_Void*                     pCallbackData;
-    /** @brief whether the job can only handle discovery service calls */
-    OpcUa_Boolean                   bDiscoveryOnly;
-    /** @brief the security token id */
-    OpcUa_UInt32                    uTokenId;
-    /** @brief the security token id */
-    OpcUa_UInt32                    uSecureChannelId;
-} OpcUa_SecureListener_ThreadPoolJobArgument;
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
-
-/*============================================================================
  * OpcUa_SecureListener
  *===========================================================================*/
 typedef struct _OpcUa_SecureListener
@@ -206,9 +179,6 @@ typedef struct _OpcUa_SecureListener
     OpcUa_ByteString*                               pServerCertificate;
     OpcUa_Key                                       ServerPrivateKey;
     OpcUa_UInt32                                    uNextSecureChannelId;
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-    OpcUa_ThreadPool                                hThreadPool;
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
 }
 OpcUa_SecureListener;
 
@@ -1326,13 +1296,6 @@ OpcUa_Void OpcUa_SecureListener_Delete(OpcUa_Listener** a_ppListener)
 
     OPCUA_P_MUTEX_LOCK(pSecureListener->Mutex);
 
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-    if(OpcUa_ProxyStub_g_Configuration.bSecureListener_ThreadPool_Enabled != OpcUa_False)
-    {
-        OpcUa_ThreadPool_Delete(&pSecureListener->hThreadPool);
-    }
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
-
     if(pSecureListener->ChannelManager != OpcUa_Null)
     {
         OpcUa_SecureListener_ChannelManager_Delete(&pSecureListener->ChannelManager);
@@ -1449,20 +1412,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "Create");
     pSecureListener = (OpcUa_SecureListener*)OpcUa_Alloc(sizeof(OpcUa_SecureListener));
     OpcUa_GotoErrorIfAllocFailed(pSecureListener);
     OpcUa_MemSet(pSecureListener, 0, sizeof(OpcUa_SecureListener));
-
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-    /* create ThreadPool */
-    if(OpcUa_ProxyStub_g_Configuration.bSecureListener_ThreadPool_Enabled != OpcUa_False)
-    {
-        uStatus = OpcUa_ThreadPool_Create(  &pSecureListener->hThreadPool,
-                                            OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MinThreads,
-                                            OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxThreads,
-                                            OpcUa_ProxyStub_g_Configuration.iSecureListener_ThreadPool_MaxJobs,
-                                            OpcUa_ProxyStub_g_Configuration.bSecureListener_ThreadPool_BlockOnAdd,
-                                            OpcUa_ProxyStub_g_Configuration.uSecureListener_ThreadPool_Timeout);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
 
     /* create SecureChannelManager */
     uStatus = OpcUa_SecureListener_ChannelManager_Create(
@@ -2817,121 +2766,6 @@ OpcUa_FinishErrorHandling;
 #endif
 
 /*============================================================================
- * OpcUa_SecureListener_ThreadPoolJobMain
- *===========================================================================*/
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-static OpcUa_Void OpcUa_SecureListener_ThreadPoolJobMain(OpcUa_Void* a_pArgument)
-{
-    OpcUa_StatusCode                            uStatus             = OpcUa_Good;
-    OpcUa_SecureListener_ThreadPoolJobArgument* pArg                = (OpcUa_SecureListener_ThreadPoolJobArgument*)a_pArgument;
-    OpcUa_SecureListener*                       pSecureListener     = OpcUa_Null;
-    OpcUa_SecureStream*                         pSecureStream       = OpcUa_Null;
-    OpcUa_SecureChannel*                        pSecureChannel      = OpcUa_Null;
-    OpcUa_CryptoProvider*                       pCryptoProvider     = OpcUa_Null;
-    OpcUa_SecurityKeyset*                       pReceivingKeyset    = OpcUa_Null;
-
-    if(pArg == OpcUa_Null)
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "SecureListener: Empty Arg!!\n");
-        return;
-    }
-    else
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ThreadPoolJobMain started processing of job %p\n", pArg);
-    }
-
-    pSecureListener = (OpcUa_SecureListener*)pArg->pListener->Handle;
-
-    /*** find appropriate channel in channel manager or create CryptoProvider with SecurityPolicy ***/
-    uStatus = OpcUa_SecureListener_ChannelManager_GetChannelBySecureChannelID(  pSecureListener->ChannelManager,
-                                                                                pArg->uSecureChannelId,
-                                                                                &pSecureChannel);
-
-    if(OpcUa_IsGood(uStatus))
-    {
-        /* Get reference to keyset for requested token id */
-        uStatus = pSecureChannel->GetSecuritySet(   pSecureChannel,
-                                                    pArg->uTokenId,
-                                                    &pReceivingKeyset,
-                                                    OpcUa_Null,
-                                                    &pCryptoProvider);
-    }
-
-    if(OpcUa_IsGood(uStatus))
-    {
-        /* this is the final chunk */
-        uStatus = OpcUa_SecureStream_AppendInput(    pArg->pTransportIstrm,
-                                                     pArg->pSecureIstrm,
-                                                    &pReceivingKeyset->SigningKey,
-                                                    &pReceivingKeyset->EncryptionKey,
-                                                    &pReceivingKeyset->InitializationVector,
-                                                     pCryptoProvider,
-                                                     pSecureChannel);
-
-        /* release reference to security set */
-        pSecureChannel->ReleaseSecuritySet( pSecureChannel,
-                                            pArg->uTokenId);
-
-        if(OpcUa_IsGood(uStatus))
-        {
-            pSecureStream = (OpcUa_SecureStream*)pArg->pSecureIstrm->Handle;
-
-            /* reset buffer index to start reading from the first buffer */
-            pSecureStream->nCurrentReadBuffer = 0;
-
-            /* ensure that discovery only channels don't process non-discovery requests */
-            if(pArg->bDiscoveryOnly != OpcUa_False)
-            {
-                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureListener, pArg->pSecureIstrm);
-            }
-
-            if(OpcUa_IsGood(uStatus))
-            {
-                /*** invoke callback */
-                /* this goes to the owner of the secure listener, which is the endpoint ***/
-                if(pSecureListener->Callback != OpcUa_Null)
-                {
-                    uStatus = pSecureListener->Callback(    pArg->pListener,                /* the source of the event          */
-                                                            pSecureListener->CallbackData,  /* the callback data                */
-                                                            OpcUa_ListenerEvent_Request,    /* the type of the event            */
-                                                            pArg->hConnection,              /* the handle for the connection    */
-                                                            &pArg->pSecureIstrm,            /* the stream to read from          */
-                                                            OpcUa_Good);                    /* the event status                 */
-                }
-
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ThreadPoolJobMain: Endpoint returned with status 0x%08X\n", uStatus);
-            }
-            else
-            {
-                OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ThreadPoolJobMain: OpcUa_SecureListener_ValidateDiscoveryChannel failed with status 0x%08X\n", uStatus);
-            }
-
-        }
-        else
-        {
-            OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ThreadPoolJobMain: OpcUa_SecureStream_AppendInput failed with status 0x%08X\n", uStatus);
-        }
-    }
-    else
-    {
-        OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ThreadPoolJobMain: Could not get securechannel for id %u: 0x%08X\n", pArg->uSecureChannelId, uStatus);
-    }
-
-    OpcUa_SecureListener_ChannelManager_ReleaseChannel(
-            pSecureListener->ChannelManager,
-            &pSecureChannel);
-
-    /* delete stream */
-    OpcUa_Stream_Delete((OpcUa_Stream**)&(pArg->pSecureIstrm));
-
-    /* delete argument */
-    OpcUa_Free(pArg);
-
-    return;
-}
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
-
-/*============================================================================
  * OpcUa_SecureListener_ProcessSessionCallRequest
  *===========================================================================*/
 /* HINT: Function assumes that its called with SecureListener object locked once!
@@ -2951,10 +2785,6 @@ OpcUa_StatusCode OpcUa_SecureListener_ProcessSessionCallRequest(
     OpcUa_UInt32            uTokenId                = 0;
     OpcUa_UInt32            uSecureChannelId        = OPCUA_SECURECHANNEL_ID_INVALID;
     OpcUa_SecurityKeyset*   pReceivingKeyset        = OpcUa_Null;
-
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-    OpcUa_SecureListener_ThreadPoolJobArgument* pPoolJob = OpcUa_Null;
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
 
 OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest");
 
@@ -3060,134 +2890,80 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest")
 
         pSecureStream->SecureChannelId = pSecureChannel->SecureChannelId;
 
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-        if(OpcUa_ProxyStub_g_Configuration.bSecureListener_ThreadPool_Enabled == OpcUa_False)
+        /* this is the final chunk */
+        uStatus = OpcUa_SecureStream_AppendInput(   *a_ppTransportIstrm,
+                                                    pSecureIStrm,
+                                                    &pReceivingKeyset->SigningKey,
+                                                    &pReceivingKeyset->EncryptionKey,
+                                                    &pReceivingKeyset->InitializationVector,
+                                                    pCryptoProvider,
+                                                    pSecureChannel);
+        /* release reference to security set */
+        pSecureChannel->ReleaseSecuritySet( pSecureChannel,
+                                            uTokenId);
+
+        OpcUa_GotoErrorIfBad(uStatus);
+
+        /* Clear the pending input stream marker */
+        uStatus = OpcUa_SecureChannel_SetPendingInputStream(    pSecureChannel,
+                                                                OpcUa_Null);
+        OpcUa_GotoErrorIfBad(uStatus);
+
+        /* reset buffer index to start reading from the first buffer */
+        pSecureStream->nCurrentReadBuffer = 0;
+
+        /* ensure that discovery only channels don't process non-discovery requests */
+        if(pSecureChannel->DiscoveryOnly)
         {
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
-
-            /* this is the final chunk */
-            uStatus = OpcUa_SecureStream_AppendInput(   *a_ppTransportIstrm,
-                                                        pSecureIStrm,
-                                                        &pReceivingKeyset->SigningKey,
-                                                        &pReceivingKeyset->EncryptionKey,
-                                                        &pReceivingKeyset->InitializationVector,
-                                                        pCryptoProvider,
-                                                        pSecureChannel);
-            /* release reference to security set */
-            pSecureChannel->ReleaseSecuritySet( pSecureChannel,
-                                                uTokenId);
-
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            /* Clear the pending input stream marker */
-            uStatus = OpcUa_SecureChannel_SetPendingInputStream(    pSecureChannel,
-                                                                    OpcUa_Null);
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            /* reset buffer index to start reading from the first buffer */
-            pSecureStream->nCurrentReadBuffer = 0;
-
-            /* ensure that discovery only channels don't process non-discovery requests */
-            if(pSecureChannel->DiscoveryOnly)
+            uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureListener, pSecureIStrm);
+            if(OpcUa_IsBad(uStatus))
             {
-                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureListener, pSecureIStrm);
-                if(OpcUa_IsBad(uStatus))
-                {
-                    OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_SecureListener_ProcessSessionCallRequest: NonDiscovery Service requested through non secure channel.\n");
-                    OpcUa_GotoError;
-                }
+                OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_SecureListener_ProcessSessionCallRequest: NonDiscovery Service requested through non secure channel.\n");
+                OpcUa_GotoError;
             }
-
-
-            /*** invoke callback */
-            /* this goes to the owner of the secure listener, which is the endpoint ***/
-            if(pSecureListener->Callback != OpcUa_Null)
-            {
-                /*** release lock. ***/
-                OPCUA_P_MUTEX_UNLOCK(pSecureListener->Mutex);
-
-                uStatus = pSecureListener->Callback(
-                    a_pListener,                        /* the source of the event          */
-                    pSecureListener->CallbackData,      /* the callback data                */
-                    OpcUa_ListenerEvent_Request,        /* the type of the event            */
-                    a_hConnection,                      /* the handle for the connection    */
-                    &pSecureIStrm,                      /* the stream to read from          */
-                    uStatus);                           /* the event status                 */
-                if(pSecureChannel->uPendingMessageCount > OPCUA_SECURECONNECTION_MAXPENDINGMESSAGES)
-                {
-                    pSecureChannel->LockWriteMutex(pSecureChannel);
-                    OpcUa_Listener_AddToSendQueue(
-                        pSecureListener->TransportListener,
-                        pSecureChannel->TransportConnection,
-                        pSecureChannel->pPendingSendBuffers,
-                        OPCUA_LISTENER_NO_RCV_UNTIL_DONE);
-                    pSecureChannel->pPendingSendBuffers = OpcUa_Null;
-                    pSecureChannel->uPendingMessageCount = 0;
-                    pSecureChannel->UnlockWriteMutex(pSecureChannel);
-                }
-
-                if(pSecureIStrm == OpcUa_Null)
-                {
-                    /* stream is unlinked */
-                    *a_ppTransportIstrm = OpcUa_Null;
-                }
-                else
-                {
-                    OpcUa_Stream_Delete((OpcUa_Stream**)&pSecureIStrm);
-                }
-
-                /*** acquire lock until callback is complete. ***/
-                OPCUA_P_MUTEX_LOCK(pSecureListener->Mutex);
-            }
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
         }
-        else
+
+
+        /*** invoke callback */
+        /* this goes to the owner of the secure listener, which is the endpoint ***/
+        if(pSecureListener->Callback != OpcUa_Null)
         {
-            /* release reference to security set */
-            pSecureChannel->ReleaseSecuritySet( pSecureChannel,
-                                                uTokenId);
-
-            /* Clear the pending input stream marker */
-            uStatus = OpcUa_SecureChannel_SetPendingInputStream(  pSecureChannel,
-                                                                  OpcUa_Null);
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            /* create a threadpool job */
-            pPoolJob = (OpcUa_SecureListener_ThreadPoolJobArgument*)OpcUa_Alloc(sizeof(OpcUa_SecureListener_ThreadPoolJobArgument));
-            OpcUa_GotoErrorIfAllocFailed(pPoolJob);
-            OpcUa_MemSet(pPoolJob, 0, sizeof(OpcUa_SecureListener_ThreadPoolJobArgument));
-
-            pPoolJob->pListener         = a_pListener;
-            pPoolJob->hConnection       = a_hConnection;
-            pPoolJob->pTransportIstrm   = *a_ppTransportIstrm;
-            pPoolJob->pSecureIstrm      = pSecureIStrm;
-            pPoolJob->pCallback         = pSecureListener->CallbackData;
-            pPoolJob->pCallbackData     = pSecureListener->CallbackData;
-            pPoolJob->bDiscoveryOnly    = pSecureChannel->DiscoveryOnly;
-            pPoolJob->uTokenId          = uTokenId;
-            pPoolJob->uSecureChannelId  = uSecureChannelId;
-
-            *a_ppTransportIstrm = OpcUa_Null;
-
             /*** release lock. ***/
             OPCUA_P_MUTEX_UNLOCK(pSecureListener->Mutex);
 
-            /* add a threadpool job */
-            uStatus = OpcUa_ThreadPool_AddJob(  pSecureListener->hThreadPool,
-                                                OpcUa_SecureListener_ThreadPoolJobMain,
-                                                pPoolJob);
-
-            /*** acquire lock until add job is complete. ***/
-            OPCUA_P_MUTEX_LOCK(pSecureListener->Mutex);
-
-            if(OpcUa_IsEqual(OpcUa_BadWouldBlock))
+            uStatus = pSecureListener->Callback(
+                a_pListener,                        /* the source of the event          */
+                pSecureListener->CallbackData,      /* the callback data                */
+                OpcUa_ListenerEvent_Request,        /* the type of the event            */
+                a_hConnection,                      /* the handle for the connection    */
+                &pSecureIStrm,                      /* the stream to read from          */
+                uStatus);                           /* the event status                 */
+            if(pSecureChannel->uPendingMessageCount > OPCUA_SECURECONNECTION_MAXPENDINGMESSAGES)
             {
-                uStatus = OpcUa_BadTcpServerTooBusy;
+                pSecureChannel->LockWriteMutex(pSecureChannel);
+                OpcUa_Listener_AddToSendQueue(
+                    pSecureListener->TransportListener,
+                    pSecureChannel->TransportConnection,
+                    pSecureChannel->pPendingSendBuffers,
+                    OPCUA_LISTENER_NO_RCV_UNTIL_DONE);
+                pSecureChannel->pPendingSendBuffers = OpcUa_Null;
+                pSecureChannel->uPendingMessageCount = 0;
+                pSecureChannel->UnlockWriteMutex(pSecureChannel);
             }
 
-            OpcUa_GotoErrorIfBad(uStatus);
+            if(pSecureIStrm == OpcUa_Null)
+            {
+                /* stream is unlinked */
+                *a_ppTransportIstrm = OpcUa_Null;
+            }
+            else
+            {
+                OpcUa_Stream_Delete((OpcUa_Stream**)&pSecureIStrm);
+            }
+
+            /*** acquire lock until callback is complete. ***/
+            OPCUA_P_MUTEX_LOCK(pSecureListener->Mutex);
         }
-#endif /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
     }
 
     OpcUa_SecureListener_ChannelManager_ReleaseChannel(
@@ -3196,13 +2972,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest")
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
-
-#if OPCUA_SECURELISTENER_SUPPORT_THREADPOOL
-    if(pPoolJob != OpcUa_Null)
-    {
-        OpcUa_Free(pPoolJob);
-    }
-#endif  /* OPCUA_SECURELISTENER_SUPPORT_THREADPOOL */
 
     /* clear pending input stream  */
     OpcUa_SecureChannel_SetPendingInputStream(  pSecureChannel,
