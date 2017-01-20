@@ -204,6 +204,12 @@
 /** @brief How many secure channels can be created, 0 means no explicit limit. */
 #define OPCUA_SECURELISTENER_MAXCONNECTIONS         0
 
+/** @brief How many request chunks are allowed in discovery only mode. */
+#define OPCUA_SECURELISTENER_DISCOVERY_MAXCHUNKS    1
+
+/** @brief Shall the FindServersOnNetwork request be allowed in discovery only mode. */
+#define OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON   OPCUA_CONFIG_NO
+
 /** @brief Shall the secureconnection validate the server certificate given by the client application? */
 #define OPCUA_SECURECONNECTION_VALIDATE_SERVERCERT  OPCUA_CONFIG_NO
 

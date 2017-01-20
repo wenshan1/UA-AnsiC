@@ -1564,7 +1564,8 @@ OpcUa_FinishErrorHandling;
 OpcUa_StatusCode OpcUa_SecureListener_ReadRequest(  OpcUa_SecureListener*   a_pSecureListener,
                                                     OpcUa_InputStream*      a_pIstrm,
                                                     OpcUa_UInt32            a_expectedTypeId,
-                                                    OpcUa_Void**            a_ppRequest)
+                                                    OpcUa_Void**            a_ppRequest,
+                                                    OpcUa_EncodeableType**  a_ppRequestType)
 {
     OpcUa_Decoder*          pDecoder        = OpcUa_Null;
     OpcUa_EncodeableType*   pRequestType    = OpcUa_Null;
@@ -1594,9 +1595,14 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ReadRequest");
     uStatus = pDecoder->ReadMessage((struct _OpcUa_Decoder*)hDecodeContext, &pRequestType, a_ppRequest);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    if(pRequestType->TypeId != a_expectedTypeId)
+    if(a_expectedTypeId != 0 && pRequestType->TypeId != a_expectedTypeId)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    if(a_ppRequestType != OpcUa_Null)
+    {
+        *a_ppRequestType = pRequestType;
     }
 
     /* close decoder */
@@ -2207,7 +2213,15 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
         uStatus = OpcUa_SecureListener_ReadRequest( pSecureListener,
                                                     pSecureIStrm,
                                                     OpcUaId_OpenSecureChannelRequest,
-                                                    (OpcUa_Void**)&pRequest);
+                                                    (OpcUa_Void**)&pRequest,
+                                                    OpcUa_Null);
+
+        if((pSecureChannel->DiscoveryOnly != OpcUa_False) &&
+           (OpcUa_IsBad(uStatus) || pRequest->RequestHeader.AdditionalHeader.Encoding != OpcUa_ExtensionObjectEncoding_None))
+        {
+            uStatus = OpcUa_BadServiceUnsupported;
+        }
+
         OpcUa_GotoErrorIfBad(uStatus);
 
         /* check that the ClientProtocolVersion matches the ClientHello message */
@@ -2542,6 +2556,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessCloseSecureChannelRe
         /* create inputstream and check if processing can be started or delayed until last chunk is received. */
         uStatus = OpcUa_SecureStream_CreateInput(   pCryptoProvider,
                                                     pSecureChannel->MessageSecurityMode,
+                                                    pSecureChannel->DiscoveryOnly ? OPCUA_SECURELISTENER_DISCOVERY_MAXCHUNKS :
                                                     pSecureChannel->nMaxBuffersPerMessage,
                                                     &pSecureIstrm);
         if(OpcUa_IsBad(uStatus))
@@ -2626,7 +2641,15 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessCloseSecureChannelRe
         uStatus = OpcUa_SecureListener_ReadRequest( pSecureListener,
                                                     pSecureIstrm,
                                                     OpcUaId_CloseSecureChannelRequest,
-                                                    (OpcUa_Void**)&pRequest);
+                                                    (OpcUa_Void**)&pRequest,
+                                                    OpcUa_Null);
+
+        if((pSecureChannel->DiscoveryOnly != OpcUa_False) &&
+           (OpcUa_IsBad(uStatus) || pRequest->RequestHeader.AdditionalHeader.Encoding != OpcUa_ExtensionObjectEncoding_None))
+        {
+            uStatus = OpcUa_BadServiceUnsupported;
+        }
+
         OpcUa_GotoErrorIfBad(uStatus);
 
         /*** invoke callback ***/
@@ -2699,38 +2722,99 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_SecureListener_ValidateDiscoveryChannel
  *===========================================================================*/
+#if OPCUA_SECURELISTENER_DISCOVERY_MAXCHUNKS == 1
+OpcUa_StatusCode OpcUa_SecureListener_ValidateDiscoveryChannel(OpcUa_SecureListener* a_pSecureListener,
+                                                               OpcUa_InputStream*    a_pSecureIstrm)
+{
+    OpcUa_UInt32          uPosition    = 0;
+    OpcUa_Void*           pRequest     = OpcUa_Null;
+    OpcUa_EncodeableType* pRequestType = OpcUa_Null;
+
+OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ValidateDiscoveryChannel");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSecureListener);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSecureIstrm);
+
+    uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)a_pSecureIstrm, &uPosition);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    /*** read request ***/
+    uStatus = OpcUa_SecureListener_ReadRequest( a_pSecureListener,
+                                                a_pSecureIstrm,
+                                                0,
+                                                &pRequest,
+                                                &pRequestType);
+    if(OpcUa_IsBad(uStatus))
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadServiceUnsupported);
+    }
+
+    if(pRequestType->TypeId != OpcUaId_GetEndpointsRequest
+       && pRequestType->TypeId != OpcUaId_FindServersRequest
+#if OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON
+       && pRequestType->TypeId != OpcUaId_FindServersOnNetworkRequest
+#endif
+       )
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadServiceUnsupported);
+    }
+
+    if(((OpcUa_RequestHeader*)pRequest)->AdditionalHeader.Encoding != OpcUa_ExtensionObjectEncoding_None)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadServiceUnsupported);
+    }
+
+    uStatus = OpcUa_Stream_SetPosition((OpcUa_Stream*)a_pSecureIstrm, uPosition);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    OpcUa_EncodeableObject_Delete(pRequestType, &pRequest);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    OpcUa_EncodeableObject_Delete(pRequestType, &pRequest);
+
+OpcUa_FinishErrorHandling;
+}
+#else /* OPCUA_SECURELISTENER_DISCOVERY_MAXCHUNKS > 1 */
 #define OpcUa_MakeFourByteNodeId(x) (0x00000001 | (((x)&0x0000FFFF)<<16))
 
-OpcUa_StatusCode OpcUa_SecureListener_ValidateDiscoveryChannel(OpcUa_InputStream* a_pStream)
+OpcUa_StatusCode OpcUa_SecureListener_ValidateDiscoveryChannel(OpcUa_SecureListener* a_pSecureListener,
+                                                               OpcUa_InputStream*    a_pSecureIstrm)
 {
     OpcUa_UInt32 uTypeId = 0;
     OpcUa_UInt32 uPosition = 0;
 
 OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ValidateDiscoveryChannel");
 
-    OpcUa_ReturnErrorIfArgumentNull(a_pStream);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSecureListener);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSecureIstrm);
 
-    uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)a_pStream, &uPosition);
+    uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)a_pSecureIstrm, &uPosition);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    uStatus = OpcUa_UInt32_BinaryDecode(&uTypeId, a_pStream);
+    /* We can't read multiple chunks and jump back again. */
+    uStatus = OpcUa_UInt32_BinaryDecode(&uTypeId, a_pSecureIstrm);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    if(uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary) && 
-	   uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersRequest_Encoding_DefaultBinary) && 
-	   uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultBinary)
-	   )
+    if(uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_GetEndpointsRequest_Encoding_DefaultBinary)
+       && uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersRequest_Encoding_DefaultBinary)
+#if OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON
+       && uTypeId != OpcUa_MakeFourByteNodeId(OpcUaId_FindServersOnNetworkRequest_Encoding_DefaultBinary)
+#endif
+       )
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadServiceUnsupported);
     }
 
-    uStatus = OpcUa_Stream_SetPosition((OpcUa_Stream*)a_pStream, uPosition);
+    uStatus = OpcUa_Stream_SetPosition((OpcUa_Stream*)a_pSecureIstrm, uPosition);
     OpcUa_GotoErrorIfBad(uStatus);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
+#endif
 
 /*============================================================================
  * OpcUa_SecureListener_ThreadPoolJobMain
@@ -2798,7 +2882,7 @@ static OpcUa_Void OpcUa_SecureListener_ThreadPoolJobMain(OpcUa_Void* a_pArgument
             /* ensure that discovery only channels don't process non-discovery requests */
             if(pArg->bDiscoveryOnly != OpcUa_False)
             {
-                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pArg->pSecureIstrm);
+                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureListener, pArg->pSecureIstrm);
             }
 
             if(OpcUa_IsGood(uStatus))
@@ -2923,6 +3007,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest")
         /* create inputstream and check if processing can be started or delayed until last chunk is received. */
         uStatus = OpcUa_SecureStream_CreateInput(   pCryptoProvider,
                                                     pSecureChannel->MessageSecurityMode,
+                                                    pSecureChannel->DiscoveryOnly ? OPCUA_SECURELISTENER_DISCOVERY_MAXCHUNKS :
                                                     pSecureChannel->nMaxBuffersPerMessage,
                                                     &pSecureIStrm);
         if(OpcUa_IsBad(uStatus))
@@ -3005,7 +3090,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest")
             /* ensure that discovery only channels don't process non-discovery requests */
             if(pSecureChannel->DiscoveryOnly)
             {
-                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureIStrm);
+                uStatus = OpcUa_SecureListener_ValidateDiscoveryChannel(pSecureListener, pSecureIStrm);
                 if(OpcUa_IsBad(uStatus))
                 {
                     OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_SecureListener_ProcessSessionCallRequest: NonDiscovery Service requested through non secure channel.\n");
