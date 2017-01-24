@@ -89,8 +89,9 @@ OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutp
    OpcUa_StatusCode uStatus; \
    OpcUa_MessageContext cContext; \
    OpcUa_Encoder* pEncoder; \
+   OpcUa_Handle hEncoderContext; \
    OpcUa_Decoder* pDecoder; \
-   OpcUa_Handle hContext; \
+   OpcUa_Handle hDecoderContext; \
    OpcUa_OutputStream* pOutputStream; \
    OpcUa_InputStream* pInputStream; \
    OpcUa_Byte* pBuffer; \
@@ -99,31 +100,37 @@ OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutp
    cContext.KnownTypes = &OpcUa_ProxyStub_g_EncodeableTypes; \
    cContext.NamespaceUris = &OpcUa_ProxyStub_g_NamespaceUris; \
    cContext.AlwaysCheckLengths = OpcUa_False; \
-   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
    uStatus = OpcUa_MemoryStream_CreateWriteable(SizeHint, 0, &pOutputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hContext); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pEncoder->Write##Type((OpcUa_Encoder*)hContext, OpcUa_Null, pInput, OpcUa_Null); \
-   OpcUa_Encoder_Close(pEncoder, &hContext); \
-   OpcUa_Encoder_Delete(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) goto err0; \
+   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) goto err1; \
+   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hEncoderContext); \
+   if (OpcUa_IsBad(uStatus)) goto err2; \
+   uStatus = pEncoder->Write##Type((OpcUa_Encoder*)hEncoderContext, OpcUa_Null, pInput, OpcUa_Null); \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    pOutputStream->Close((OpcUa_Stream*)pOutputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream, &pBuffer, &uBufferSize); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    uStatus = OpcUa_MemoryStream_CreateReadable(pBuffer, uBufferSize, &pInputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    uStatus = OpcUa_BinaryDecoder_Create(&pDecoder); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hContext); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pDecoder->Read##Type((OpcUa_Decoder*)hContext, OpcUa_Null, pOutput); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hDecoderContext); \
+   if (OpcUa_IsBad(uStatus)) goto err5; \
+   uStatus = pDecoder->Read##Type((OpcUa_Decoder*)hDecoderContext, OpcUa_Null, pOutput); \
+   OpcUa_Decoder_Close(pDecoder, &hDecoderContext); \
+err5: \
+   OpcUa_Decoder_Delete(&pDecoder); \
+err4: \
    pInputStream->Close((OpcUa_Stream*)pInputStream); \
    pInputStream->Delete((OpcUa_Stream**)&pInputStream); \
+err3: \
+   OpcUa_Encoder_Close(pEncoder, &hEncoderContext); \
+err2: \
+   OpcUa_Encoder_Delete(&pEncoder); \
+err1: \
    pOutputStream->Delete((OpcUa_Stream**)&pOutputStream); \
-   OpcUa_Decoder_Close(pDecoder, &hContext); \
-   OpcUa_Decoder_Delete(&pDecoder); \
+err0: \
    OpcUa_MessageContext_Clear(&cContext); \
    return uStatus; \
 }
@@ -142,8 +149,9 @@ OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutp
    OpcUa_StatusCode uStatus; \
    OpcUa_MessageContext cContext; \
    OpcUa_Encoder* pEncoder; \
+   OpcUa_Handle hEncoderContext; \
    OpcUa_Decoder* pDecoder; \
-   OpcUa_Handle hContext; \
+   OpcUa_Handle hDecoderContext; \
    OpcUa_OutputStream* pOutputStream; \
    OpcUa_InputStream* pInputStream; \
    OpcUa_Byte* pBuffer; \
@@ -152,31 +160,37 @@ OpcUa_StatusCode OpcUa_##Type##_CopyTo(OpcUa_##Type *pInput, OpcUa_##Type *pOutp
    cContext.KnownTypes = &OpcUa_ProxyStub_g_EncodeableTypes; \
    cContext.NamespaceUris = &OpcUa_ProxyStub_g_NamespaceUris; \
    cContext.AlwaysCheckLengths = OpcUa_False; \
-   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
    uStatus = OpcUa_MemoryStream_CreateWriteable(SizeHint, 0, &pOutputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hContext); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = OpcUa_##Type##_Encode(pInput, (OpcUa_Encoder*)hContext); \
-   OpcUa_Encoder_Close(pEncoder, &hContext); \
-   OpcUa_Encoder_Delete(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) goto err0; \
+   uStatus = OpcUa_BinaryEncoder_Create(&pEncoder); \
+   if (OpcUa_IsBad(uStatus)) goto err1; \
+   uStatus = pEncoder->Open(pEncoder, pOutputStream, &cContext, &hEncoderContext); \
+   if (OpcUa_IsBad(uStatus)) goto err2; \
+   uStatus = OpcUa_##Type##_Encode(pInput, (OpcUa_Encoder*)hEncoderContext); \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    pOutputStream->Close((OpcUa_Stream*)pOutputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream, &pBuffer, &uBufferSize); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    uStatus = OpcUa_MemoryStream_CreateReadable(pBuffer, uBufferSize, &pInputStream); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
+   if (OpcUa_IsBad(uStatus)) goto err3; \
    uStatus = OpcUa_BinaryDecoder_Create(&pDecoder); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hContext); \
-   if (OpcUa_IsBad(uStatus)) return uStatus; \
-   uStatus = OpcUa_##Type##_Decode(pOutput, (OpcUa_Decoder*)hContext); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = pDecoder->Open(pDecoder, pInputStream, &cContext, &hDecoderContext); \
+   if (OpcUa_IsBad(uStatus)) goto err5; \
+   uStatus = OpcUa_##Type##_Decode(pOutput, (OpcUa_Decoder*)hDecoderContext); \
+   OpcUa_Decoder_Close(pDecoder, &hDecoderContext); \
+err5: \
+   OpcUa_Decoder_Delete(&pDecoder); \
+err4: \
    pInputStream->Close((OpcUa_Stream*)pInputStream); \
    pInputStream->Delete((OpcUa_Stream**)&pInputStream); \
+err3: \
+   OpcUa_Encoder_Close(pEncoder, &hEncoderContext); \
+err2: \
+   OpcUa_Encoder_Delete(&pEncoder); \
+err1: \
    pOutputStream->Delete((OpcUa_Stream**)&pOutputStream); \
-   OpcUa_Decoder_Close(pDecoder, &hContext); \
-   OpcUa_Decoder_Delete(&pDecoder); \
+err0: \
    OpcUa_MessageContext_Clear(&cContext); \
    return uStatus; \
 }
