@@ -1593,7 +1593,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "OnNotify");
                                                     pSecureConnection->CallbackData,
                                                     OpcUa_ConnectionEvent_Disconnect,
                                                     a_ppTransportInputStream,
-                                                    uStatus);
+                                                    OpcUa_Good);
                     }
 
                     /* cancel all open requests */
