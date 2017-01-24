@@ -581,12 +581,6 @@ static OpcUa_Void OpcUa_VariantArrayValue_Clear(
                 break;
             }
 
-            case OpcUaType_DataValue:
-            {
-                OpcUa_DataValue_Clear(&a_pValue->DataValueArray[ii]);
-                break;
-            }
-
             case OpcUaType_Variant:
             {
                 OpcUa_Variant_Clear(&a_pValue->VariantArray[ii]);
@@ -679,13 +673,6 @@ static OpcUa_Void OpcUa_VariantUnion_Clear(OpcUa_UInt16 datatype, OpcUa_VariantU
         {
             OpcUa_LocalizedText_Clear(a_pValue->LocalizedText);
             OpcUa_Free(a_pValue->LocalizedText);
-            break;
-        }
-
-        case OpcUaType_DataValue:
-        {
-            OpcUa_DataValue_Clear(a_pValue->DataValue);
-            OpcUa_Free(a_pValue->DataValue);
             break;
         }
 
