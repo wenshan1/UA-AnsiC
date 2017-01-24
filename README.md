@@ -17,7 +17,7 @@ OPC UA, empowering the Industrial Internet of Things (IIOT) and Industrie 4.0.
 
 ## Runtime Dependencies
 
-OpenSSL v1.0.1t was used in development and testing of this stack and is required for the Crypto and PKI implementations, and must be separately installed on the build machine at specific locations. 
+OpenSSL v1.0.2j was used in development and testing of this stack and is required for the Crypto and PKI implementations, and must be separately installed on the build machine at specific locations. 
 If you need to use a different version (because of bug fixes or availability in your system) you may have to update the implementation particularly if the OpenSSL API has changed.
 
 OpenSSL has several algorithms which are patented and have import/export restrictions to some states, therefore please download a copy from the project website(http://www.openssl.org/source). 
@@ -29,7 +29,7 @@ Please consult the OpenSSL documentation for help building the library.
 
 Open the Visual Studio Command Shell .
 Make sure that perl installed on the build machine and the path executable is available in the path.  Any perl will do, even cygwin.
-Download and extract the latest openssl-1.0.1/1.0.2 source tar ball to the besides the stack root folder.
+Download and extract the latest openssl-1.0.2 source tar ball to the stack root folder.
 Then cd to the root folder and execute build_win32.bat or build_win64.bat depending on your target architecture.
 This will automatically build openssl, the OPC UA Stack and the sample server.
 Dependencies are not supported, it will always be a full build.
@@ -45,7 +45,10 @@ Then cd to the root folder and execute: ./build_linux.sh
 This builds both debug and release binaries.
 Dependencies and incremental builds are supported.
 To force a full build use: ./build_linux.sh clean all
- 
+
+This is an example how to build with non-standard compiler options:
+./build_linux.sh CROSS_COMPILE=arm-linux-gnueabi- MACHINE_TYPE=arm MACHINE_OPT="-g -fsanitize=address -fno-omit-frame-pointer"
+
 
 ## Examples
 
