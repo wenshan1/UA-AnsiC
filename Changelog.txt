@@ -1,6 +1,17 @@
 OPC Foundation OPC UA ANSI C-Stack
 ====================================
 
+Current Version
+
+	API changes from the 1.03.340 version:
+
+	- removed non-conforming support for Variant of DataValue / DataValueArray
+	- removed OPCUA_SECURELISTENER_SUPPORT_THREADPOOL because of inherent race conditions (issue #32)
+	- added a new configure option to control access in discovery only mode (issue #25):
+		Use OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON to enable FindServersOnNetwork in discoyery only mode.
+		Note: Always leave this option disabled unless you are building the Stack for use in the LDS.
+	- fixed memory leaks (issue #27, #28, #29)
+
 Version 1.03.340
 	
 	Highlights: 
