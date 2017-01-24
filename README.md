@@ -81,6 +81,7 @@ All settings are described within the source code.
 
 The following tree shows the directory layout as required by the included project:
 
+```
 - /-- UA-AnsiC
 - |  |- Stack                   
 - |     |- core                      Configuration and utilities
@@ -96,7 +97,8 @@ The following tree shows the directory layout as required by the included projec
 - |        |- https                  HTTPS transport (optional)
 - |        |- tcp                    OPC TCP Binary transport
 - |- AnsiCSample						Simple example of an OPC UA nano embedded server
-- |- openssl-1.0.1t                  Required third-party libraries
+- |- openssl-1.0.2j                  Required third-party libraries
+```
 
 Windows and linux build scripts, as well as Visual Studio 2013 solution can be found in the root folder.
 
