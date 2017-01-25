@@ -139,6 +139,28 @@ typedef struct _OpcUa_StatusCodeString
 /* tests if a status code is equal the specified code. */
 #define OpcUa_IsEqual(xCode) (((xCode) & 0xFFFF0000) == uStatus)
 
+/* status code info type flag. */
+#define OpcUa_StatusCode_InfoType_DataValue                 0x00000400
+
+/* StructureChanged and SemanticChanged flags of a status code. */
+#define OpcUa_StatusCode_StructureChanged                   0x00008000
+#define OpcUa_StatusCode_SemanticsChanged                   0x00004000
+
+/* status code info bits. */
+#define OpcUa_StatusCode_InfoBit_Limit_None                 0x00000000
+#define OpcUa_StatusCode_InfoBit_Limit_Low                  0x00000100
+#define OpcUa_StatusCode_InfoBit_Limit_High                 0x00000200
+#define OpcUa_StatusCode_InfoBit_Limit_Constant             0x00000300
+
+#define OpcUa_StatusCode_InfoBit_Overflow                   0x00000080
+
+#define OpcUa_StatusCode_InfoBit_Historian_Raw              0x00000000
+#define OpcUa_StatusCode_InfoBit_Historian_Calculated       0x00000001
+#define OpcUa_StatusCode_InfoBit_Historian_Interpolated     0x00000002
+#define OpcUa_StatusCode_InfoBit_Historian_Partial          0x00000004
+#define OpcUa_StatusCode_InfoBit_Historian_ExtraData        0x00000008
+#define OpcUa_StatusCode_InfoBit_Historian_MultiValue       0x00000010
+
 /*============================================================================
  * OpcUa_ReturnErrorIfNull
  *===========================================================================*/
