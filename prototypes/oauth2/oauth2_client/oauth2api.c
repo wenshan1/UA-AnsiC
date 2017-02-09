@@ -304,6 +304,136 @@ OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
 
+#define MAX_URL_SIZE 4096
+
+static OpcUa_CharA* ExtractBase64Blob(OpcUa_CharA* sStart, OpcUa_CharA* sEnd)
+{
+    OpcUa_Int32 uPadding = 0;
+    OpcUa_Int32 uLength = sEnd - sStart;
+    OpcUa_CharA* sBlob = (OpcUa_CharA*)OpcUa_Alloc(uLength + 4);
+
+    if (sBlob != OpcUa_Null)
+    {
+        OpcUa_StrnCpyA(sBlob, uLength+1, sStart, uLength);
+
+        uPadding = 3 - OpcUa_StrLenA(sBlob)%4;
+        sBlob[uLength+uPadding+1] = '\0';
+
+        while (uPadding < 3 && uPadding >= 0)
+        {
+            sBlob[uLength+uPadding] = '=';
+            uPadding--;
+        }
+    }
+
+    return sBlob;
+}
+
+OpcUa_StatusCode OAuth2ValidateToken(OpcUa_CharA* a_sAccessToken)
+{
+    OpcUa_CharA* ii = 0;
+    OpcUa_CharA* start = 0;
+    OpcUa_UInt32 uLength = 0;
+    OpcUa_CharA* sHeader = OpcUa_Null;
+    OpcUa_CharA* sBody = OpcUa_Null;
+    OpcUa_CharA* sSignature = OpcUa_Null;
+    OpcUa_Int32 nJsonLength = 0;
+    OpcUa_CharA* sJson = OpcUa_Null;
+
+OpcUa_InitializeStatus(OpcUa_Module_Client, "OAuth2ValidateToken");
+
+    OpcUa_GotoErrorIfArgumentNull(a_sAccessToken);
+
+    /* parse JWT into the three sections */
+    ii = a_sAccessToken;
+    start = a_sAccessToken;
+
+    while (ii != OpcUa_Null && *ii != '\0')
+    {
+        uLength = ii - start;
+
+        if (uLength > 0 && *ii == '.')
+        {
+            if (sHeader == OpcUa_Null)
+            {
+                sHeader = ExtractBase64Blob(start, ii);
+                OpcUa_GotoErrorIfAllocFailed(sHeader);
+                start = ii + 1;
+            }
+            else if (sBody == OpcUa_Null)
+            {
+                sBody = ExtractBase64Blob(start, ii);
+                OpcUa_GotoErrorIfAllocFailed(sBody);
+                start = ii + 1;
+                ii = a_sAccessToken + OpcUa_StrLenA(a_sAccessToken) + 1;
+                break;
+            }
+        }
+
+        ii++;
+    }
+    
+    if (sSignature == OpcUa_Null)
+    {
+        sSignature = ExtractBase64Blob(start, ii);
+        OpcUa_GotoErrorIfAllocFailed(sSignature)
+    }
+    
+    /* decode JWT header*/
+    uStatus = OpcUa_Base64_Decode(sHeader, &nJsonLength, (OpcUa_Byte**)&sJson);
+    OpcUa_GotoErrorIfBad(uStatus);
+    sJson[nJsonLength] = '\0';
+    OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OAuth2ValidateToken: JWT Header: %s!\n", sJson);
+    OpcUa_Free(sJson);
+    sJson = OpcUa_Null;
+    OpcUa_Free(sHeader);
+    sHeader = OpcUa_Null;
+
+    /* decode JWT body */
+    uStatus = OpcUa_Base64_Decode(sBody, &nJsonLength, (OpcUa_Byte**)&sJson);
+    OpcUa_GotoErrorIfBad(uStatus);
+    sJson[nJsonLength] = '\0';
+    OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OAuth2ValidateToken: JWT Body: %s!\n", sJson);
+    OpcUa_Free(sJson);
+    sJson = OpcUa_Null;
+    OpcUa_Free(sBody);
+    sBody = OpcUa_Null;
+
+    /* check JWT signature */
+    OpcUa_Free(sSignature);
+    sSignature = OpcUa_Null;
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if (sHeader != OpcUa_Null)
+    {
+        OpcUa_Free(sHeader);
+        sHeader = OpcUa_Null;
+    }
+
+    if (sBody != OpcUa_Null)
+    {
+        OpcUa_Free(sBody);
+        sBody = OpcUa_Null;
+    }
+
+    if (sSignature != OpcUa_Null)
+    {
+        OpcUa_Free(sSignature);
+        sSignature = OpcUa_Null;
+    }
+
+    if (sJson != OpcUa_Null)
+    {
+        OpcUa_Free(sJson);
+        sJson = OpcUa_Null;
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+
 void GetSecurityKeysRequest_Initialize(GetSecurityKeysRequest* a_pRequest)
 {
 	if (a_pRequest != NULL)
@@ -359,6 +489,7 @@ OpcUa_StatusCode HttpsGetSecurityKeysWithAccessToken(GetSecurityKeysRequest* a_p
 	json_object* pItem = OpcUa_Null;
 	json_object* pArgs = OpcUa_Null;
 	json_object* pValue = OpcUa_Null;
+    json_object* pNode = OpcUa_Null;
 
 	OpcUa_InitializeStatus(OpcUa_Module_Client, "HttpsGetSecurityKeysWithAccessToken");
 
@@ -372,8 +503,13 @@ OpcUa_StatusCode HttpsGetSecurityKeysWithAccessToken(GetSecurityKeysRequest* a_p
 	pList = json_object_new_array();
 	pItem = json_object_new_object();
 
-	json_object_object_add_ex(pItem, "ObjectId", json_object_new_string("i=14443"), 0);
-	json_object_object_add_ex(pItem, "MethodId", json_object_new_string("i=15215"), 0);
+    pNode = json_object_new_object();
+    json_object_object_add_ex(pNode, "i", json_object_new_int(14443), 0);
+	json_object_object_add_ex(pItem, "ObjectId", pNode, 0);
+
+    pNode = json_object_new_object();
+    json_object_object_add_ex(pNode, "i", json_object_new_int(15215), 0);
+	json_object_object_add_ex(pItem, "MethodId", pNode, 0);
 
 	pArgs = json_object_new_array();
 	pField = json_object_new_object();

@@ -8,7 +8,6 @@ set(oauth2_client_HEADERS
 	print.h
 	main.h
     ${OPCUA_UTILS_DIR}/opcua_applicationsettings.h
-    ${OPCUA_UTILS_DIR}/opcua_base64.h
     ${OPCUA_UTILS_DIR}/urldecode.h
 )
 
@@ -19,7 +18,6 @@ set(oauth2_client_SOURCES
 	oauth2api.c
 	print.c
     ${OPCUA_UTILS_DIR}/opcua_applicationsettings.c
-    ${OPCUA_UTILS_DIR}/opcua_base64.c
     ${OPCUA_UTILS_DIR}/urldecode.c
 )
 
@@ -63,3 +61,7 @@ else()
 		crypto)
 		
 endif()
+
+install(TARGETS oauth2_client
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib)

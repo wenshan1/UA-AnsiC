@@ -210,8 +210,8 @@ int main(int argc, char** argv)
 				OpcUa_AmqpMessageBody_Initialize(&body);
 
 				body.EventId = _strdup(buffer);
-				body.EventType = _strdup("i=11446");
-				body.SourceNode = _strdup("i=2253");
+				body.EventType = _strdup("11446");
+				body.SourceNode = _strdup("2253");
 				body.SourceName = _strdup("Server");
 
 				time(&rawtime);

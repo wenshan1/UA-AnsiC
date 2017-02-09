@@ -47,13 +47,18 @@ int Main_GetSecurityKeyWithHttps()
 	GetSecurityKeysResponse_Initialize(&callResponse);
 
 	gethostname(szHostName, MAX_PATH);
-	sprintf(szUrl, "https://%s:54333/connect/token", szHostName);
+    for (int ii = 0; szHostName[ii] != 0; ii++) szHostName[ii] = tolower(szHostName[ii]);
 
+	sprintf(szUrl, "https://%s:54333/connect/token", szHostName);
 	OpcUa_String_AttachCopy(&oauth2Request.AuthorizationServerUrl, szUrl);
+
 	OpcUa_String_AttachCopy(&oauth2Request.ClientId, UACLIENTURI);
 	OpcUa_String_AttachCopy(&oauth2Request.ClientSecret, UACLIENT_JWT_CLIENTSECRET);
-	OpcUa_String_AttachCopy(&oauth2Request.Resource, "urn:opcfoundation.org:ua:oauth2:resource:site");
-	OpcUa_String_AttachCopy(&oauth2Request.Scope, "pubsub");
+
+    sprintf(szUrl, "urn:%s:somecompany.com:GlobalDiscoveryServer", szHostName);
+	OpcUa_String_AttachCopy(&oauth2Request.Resource, szUrl);
+
+    OpcUa_String_AttachCopy(&oauth2Request.Scope, "UAPubSub");
 
 	uStatus = OAuth2RequestTokenWithClientCredentials(&oauth2Request, &oauth2Response);
 	OpcUa_GotoErrorIfBad(uStatus);
@@ -62,6 +67,9 @@ int Main_GetSecurityKeyWithHttps()
 	{
 		OpcUa_Trace(OPCUA_TRACE_LEVEL_ERROR, "Could not fetch ACCESS TOKEN: %s\n", OpcUa_String_GetRawString(&oauth2Response.ErrorText));
 	}
+
+    // uStatus = OAuth2ValidateToken(OpcUa_String_GetRawString(&oauth2Response.AccessToken));
+    // OpcUa_GotoErrorIfBad(uStatus);
 
 	OpcUa_String_StrnCpy(&callRequest.AccessToken, &oauth2Response.AccessToken, OPCUA_STRING_LENDONTCARE);
 

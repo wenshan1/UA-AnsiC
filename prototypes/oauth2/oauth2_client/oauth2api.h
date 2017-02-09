@@ -28,6 +28,8 @@ void OAuth2Response_Clear(OAuth2Response* pResponse);
 
 OpcUa_StatusCode OAuth2RequestTokenWithClientCredentials(OAuth2Request* pRequest, OAuth2Response* pResponse);
 
+OpcUa_StatusCode OAuth2ValidateToken(OpcUa_CharA* sAccessToken);
+
 typedef struct _GetSecurityKeysRequest
 {
 	OpcUa_String ServerUrl;

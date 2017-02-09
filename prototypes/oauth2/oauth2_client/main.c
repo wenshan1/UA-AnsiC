@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
-	//_CrtSetBreakAlloc(7616);
+	//_CrtSetBreakAlloc(7419);
 #endif
 
 	OpcUa_ReferenceParameter(argc);
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 
 	OAuth2TestClient_Initialize();
 
-	Main_GetSecurityKeyWithUaTcp();
+    Main_GetSecurityKeyWithUaTcp();
 	Main_GetSecurityKeyWithHttps();
 
 #if UACLIENT_WAIT_FOR_USER_INPUT
