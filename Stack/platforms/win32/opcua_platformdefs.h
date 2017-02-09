@@ -162,8 +162,8 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_StrChrA(xString, xChar)                   strchr(xString, xChar)
 #define OpcUa_StrrChrA(xString, xChar)                  strrchr(xString, xChar)
 #define OpcUa_StrStrA(xString, xSubstring)              strstr(xString, xSubstring)
-#define OpcUa_StrnCpyA(xDst, xDstSize, xSrc, xCount)    strncpy(xDst, xSrc, xCount)
-#define OpcUa_StrnCatA(xDst, xDstSize, xSrc, xCount)    strncat(xDst, xSrc, xCount)
+#define OpcUa_StrnCpyA(xDst, xDstSize, xSrc, xCount)    strncpy_s(xDst, xDstSize, xSrc, xCount)
+#define OpcUa_StrnCatA(xDst, xDstSize, xSrc, xCount)    strncat_s(xDst, xDstSize, xSrc, xCount)
 
 #ifndef _INC_STDIO
 /* import prototype for direct mapping on sprintf for files which are not allowed to include 

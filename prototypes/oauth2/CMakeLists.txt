@@ -4,6 +4,10 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 find_package(OpenSSL)
 
+if (NOT $ENV{OPENSSL_ROOT_DIR} STREQUAL "")
+	STRING(REGEX REPLACE "\\\\" "/" OPENSSL_ROOT_DIR $ENV{OPENSSL_ROOT_DIR})
+endif()
+
 if (NOT OPENSSL_FOUND)
 	MESSAGE(WARNING "OPENSSL_ROOT_DIR environment variable was not set. Assuming a relative path will work." )
 	set(ENV{OPENSSL_ROOT_DIR} ${CMAKE_CURRENT_LIST_DIR}/../../third-party/openssl INTERNAL)
@@ -52,3 +56,14 @@ include_directories(${OPENSSL_INCLUDE_DIR})
 
 add_subdirectory(${UASTACK_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Stack)
 add_subdirectory(oauth2_client)
+		
+install(FILES 
+		${CURL_LIB_DIR}/../bin/libcurl.dll 
+		${OPENSSL_ROOT_DIR}/bin/libeay32.dll 
+		${OPENSSL_ROOT_DIR}/bin/ssleay32.dll 
+		DESTINATION bin)
+		
+install(DIRECTORY  
+		${CMAKE_CURRENT_SOURCE_DIR}/PKI 
+		DESTINATION bin)
+		

@@ -190,7 +190,7 @@ static OpcUa_StatusCode OpcUa_Base64_DecodeBlock(
 
     *a_piByteCount = 3;
 
-    for(ii = 3; ii >= 0; ii--)
+    for (ii = 3; ii >= 0; ii--)
     {
         if(a_pChars[ii] == '=')
         {

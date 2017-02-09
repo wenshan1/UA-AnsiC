@@ -451,14 +451,14 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "OAuth2TestClient_RequestAccessToken
 		json_object* pTarget = NULL;
 		szBuffer[0] = 0;
 
-		json_object_object_get_ex(pRoot, "authority", &pTarget);
+		json_object_object_get_ex(pRoot, "ua:authorityUrl", &pTarget);
 
 		if (pTarget != NULL)
 		{
 			strcpy(szBuffer, json_object_get_string(pTarget));
 		}
 
-		json_object_object_get_ex(pRoot, "tokenEndpoint", &pTarget);
+		json_object_object_get_ex(pRoot, "ua:tokenEndpoint", &pTarget);
 
 		if (pTarget != NULL)
 		{
@@ -467,7 +467,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "OAuth2TestClient_RequestAccessToken
 
 		OpcUa_String_AttachCopy(&request.AuthorizationServerUrl, szBuffer);
 
-		json_object_object_get_ex(pRoot, "scopes", &pTarget);
+		json_object_object_get_ex(pRoot, "ua:scopes", &pTarget);
 
 		/* request the default scope recommended by the server and append the 'pubsub' scope. */
 		szBuffer[0] = 0;
@@ -478,7 +478,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Client, "OAuth2TestClient_RequestAccessToken
 			strcat_s(szBuffer, 1024, json_object_get_string(pElement));
 		}
 
-		strcat_s(szBuffer, 1024, " pubsub");
+		strcat_s(szBuffer, 1024, " UAPubSub");
 		OpcUa_String_AttachCopy(&request.Scope, szBuffer);
 
 		json_object_put(pRoot);

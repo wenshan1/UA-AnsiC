@@ -34,7 +34,7 @@
 #define UACLIENT_PRIVATE_KEY_LOCATION                           "./PKI/private/selfsignedkey.pem"
 #define UACLIENT_SERVER_CERTIFICATE_LOCATION                    "./PKI/certs/selfsigned.der"
 
-#define UACLIENT_JWT_POLICYURI    "http://opcfoundation.org/UA/UserTokenPolicy#JWT"
+#define UACLIENT_JWT_POLICYURI    "http://opcfoundation.org/UA/UserToken#JWT"
 #define UACLIENT_JWT_CLIENTSECRET "secret"
 #define UACLIENTNAME              "OAuth2TestClient"
 #define UACLIENTURI               "urn:localhost:OAuth2TestClient"

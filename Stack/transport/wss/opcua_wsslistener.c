@@ -1165,6 +1165,20 @@ OpcUa_FinishErrorHandling;
 #define OPCUA_HTTP_STATUSCODE_NOT_FOUND 404
 #define OPCUA_HTTP_REASON_NOT_FOUND "Not Found"
 
+#define HTTP_VERSION "HTTP/1.1"
+#define CONNECTION_HEADER "Connection:"
+#define CONNECTION_UPGRADE "Upgrade"
+#define UPGRADE_HEADER "Upgrade:"
+#define UPGRADE_WEBSOCKET "WebSocket"
+#define WEBSOCKET_VERSION_HEADER "Sec-WebSocket-Version:"
+#define WEBSOCKET_VERSION_DEFAULT "13"
+#define WEBSOCKET_KEY_HEADER "Sec-WebSocket-Key:"
+#define WEBSOCKET_PROTOCOL_HEADER "Sec-WebSocket-Protocol:"
+#define WEBSOCKET_PROTOCOL_UATCP "opcua+uatcp"
+#define ORIGIN_HEADER "Origin:"
+#define ALLOW_ORIGIN_HEADER "Access-Control-Allow-Origin:"
+#define MAX_HEADER_LENGTH 256
+
 /*============================================================================
 * OpcUa_StatusCode OpcUa_WssListener_ProcessHttpUpgrade
 *===========================================================================*/
@@ -1179,6 +1193,7 @@ static OpcUa_StatusCode OpcUa_WssListener_ProcessHttpUpgrade(
     OpcUa_StringA sAcceptKey = OpcUa_Null;
     OpcUa_UInt16 uHttpStatusCode = OPCUA_HTTP_STATUSCODE_SWITCHING_PROTOCOLS;
     OpcUa_StringA sHttpReason = OPCUA_HTTP_REASON_SWITCHING_PROTOCOLS;
+    OpcUa_CharA sOrigin[MAX_HEADER_LENGTH];
 
 OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
 
@@ -1190,6 +1205,8 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
     pWssInputStream = (OpcUa_WssInputStream*)a_pInputStream->Handle;
     OpcUa_ReturnErrorIfArgumentNull(pWssInputStream);
     
+    *sOrigin = 0;
+
     /* the stream ensures this is a null terminated string */
     sHeader = pWssInputStream->Buffer.Data;
     OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "HTTP Upgrade Header: %s\n", sHeader);
@@ -1214,7 +1231,7 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
     sHeader += 1;
     while (isspace(*sHeader)) sHeader++;
 
-    if (OpcUa_StrinCmpA("HTTP/1.1", sHeader, 8) != 0)
+    if (OpcUa_StrinCmpA(HTTP_VERSION, sHeader, OpcUa_StrLenA(HTTP_VERSION)) != 0)
     {
         uHttpStatusCode = OPCUA_HTTP_STATUSCODE_BAD_REQUEST;
         sHttpReason = OPCUA_HTTP_REASON_BAD_REQUEST;
@@ -1231,16 +1248,16 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
 
     while (*sHeader != '\0')
     {
-        if (OpcUa_StrinCmpA("Connection:", sHeader, 11) == 0)
+        if (OpcUa_StrinCmpA(CONNECTION_HEADER, sHeader, OpcUa_StrLenA(CONNECTION_HEADER)) == 0)
         {
             OpcUa_Boolean bConnectionUpgrade = OpcUa_False;
 
-            sHeader += 12;
+            sHeader += OpcUa_StrLenA(CONNECTION_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
             while (*sHeader != '\r')
             {
-                if (OpcUa_StrinCmpA("Upgrade", sHeader, 7) == 0)
+                if (OpcUa_StrinCmpA(CONNECTION_UPGRADE, sHeader, OpcUa_StrLenA(CONNECTION_UPGRADE)) == 0)
                 {
                     bConnectionUpgrade = OpcUa_True;
                     break;
@@ -1259,12 +1276,12 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
             bConnectionHeader = OpcUa_True;
         }
 
-        else if (OpcUa_StrinCmpA("Upgrade:", sHeader, 8) == 0)
+        else if (OpcUa_StrinCmpA(UPGRADE_HEADER, sHeader, OpcUa_StrLenA(UPGRADE_HEADER)) == 0)
         {
-            sHeader += 9;
+            sHeader += OpcUa_StrLenA(UPGRADE_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
-            if (OpcUa_StrinCmpA("WebSocket", sHeader, 7) != 0)
+            if (OpcUa_StrinCmpA(UPGRADE_WEBSOCKET, sHeader, OpcUa_StrLenA(UPGRADE_WEBSOCKET)) != 0)
             {
                 uHttpStatusCode = OPCUA_HTTP_STATUSCODE_BAD_REQUEST;
                 sHttpReason = OPCUA_HTTP_REASON_BAD_REQUEST;
@@ -1274,12 +1291,12 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
             bUpgradeHeader = OpcUa_True;
         }
 
-        else if (OpcUa_StrinCmpA("Sec-WebSocket-Version:", sHeader, 22) == 0)
+        else if (OpcUa_StrinCmpA(WEBSOCKET_VERSION_HEADER, sHeader, OpcUa_StrLenA(WEBSOCKET_VERSION_HEADER)) == 0)
         {
-            sHeader += 23;
+            sHeader += OpcUa_StrLenA(WEBSOCKET_VERSION_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
-            if (OpcUa_StrinCmpA("13", sHeader, 2) != 0)
+            if (OpcUa_StrinCmpA(WEBSOCKET_VERSION_DEFAULT, sHeader, OpcUa_StrLenA(WEBSOCKET_VERSION_DEFAULT)) != 0)
             {
                 uHttpStatusCode = OPCUA_HTTP_STATUSCODE_BAD_REQUEST;
                 sHttpReason = OPCUA_HTTP_REASON_BAD_REQUEST;
@@ -1289,21 +1306,21 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
             bVersionHeader = OpcUa_True;
         }        
 
-        else if (OpcUa_StrinCmpA("Sec-WebSocket-Key:", sHeader, 18) == 0)
+        else if (OpcUa_StrinCmpA(WEBSOCKET_KEY_HEADER, sHeader, OpcUa_StrLenA(WEBSOCKET_KEY_HEADER)) == 0)
         {
-            sHeader += 19;
+            sHeader += OpcUa_StrLenA(WEBSOCKET_KEY_HEADER);
             while (isspace(*sHeader)) sHeader++;
 
             uStatus = OpcUa_WssListener_CalculateAcceptKey(sHeader, &sAcceptKey);
             OpcUa_GotoErrorIfBad(uStatus);
         }
 
-        else if (OpcUa_StrinCmpA("Sec-WebSocket-Protocol:", sHeader, 23) == 0)
+        else if (OpcUa_StrinCmpA(WEBSOCKET_PROTOCOL_HEADER, sHeader, OpcUa_StrLenA(WEBSOCKET_PROTOCOL_HEADER)) == 0)
         {
-            sHeader += 24;
+            sHeader += OpcUa_StrLenA(WEBSOCKET_PROTOCOL_HEADER)+1;
             while (isspace(*sHeader)) sHeader++;
 
-            if (OpcUa_StrinCmpA("application/opcua+uatcp", sHeader, 5) != 0)
+            if (OpcUa_StrinCmpA(WEBSOCKET_PROTOCOL_UATCP, sHeader, OpcUa_StrLenA(WEBSOCKET_PROTOCOL_UATCP)) != 0)
             {
                 uHttpStatusCode = OPCUA_HTTP_STATUSCODE_BAD_REQUEST;
                 sHttpReason = OPCUA_HTTP_REASON_BAD_REQUEST;
@@ -1311,6 +1328,16 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
             }
 
             bProtocolHeader = OpcUa_True;
+        }
+
+        else if (OpcUa_StrinCmpA(ORIGIN_HEADER, sHeader, OpcUa_StrLenA(ORIGIN_HEADER)) == 0)
+        {
+            OpcUa_CharA* sStart = OpcUa_Null;
+            sHeader += OpcUa_StrLenA(ORIGIN_HEADER);
+            while (isspace(*sHeader)) sHeader++;
+            sStart = sHeader;
+            while (!isspace(*sHeader)) sHeader++;
+            OpcUa_StrnCpyA(sOrigin, MAX_HEADER_LENGTH, sStart, sHeader - sStart);
         }
 
         while (!isspace(*sHeader)) sHeader++;
@@ -1324,7 +1351,16 @@ OpcUa_InitializeStatus(OpcUa_Module_WssListener, "ProcessHttpUpgrade");
         OpcUa_GotoErrorWithStatus(OpcUa_BadDecodingError);
     }
 
-    OpcUa_SPrintfA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, "Connection: Upgrade\r\nUpgrade: WebSocket\r\nSec-WebSocket-Protocol: application/opcua+uatcp\r\nSec-WebSocket-Accept: %s\r\n", sAcceptKey);
+    OpcUa_SPrintfA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, "Connection: Upgrade\r\nUpgrade: WebSocket\r\nSec-WebSocket-Protocol: opcua+uatcp\r\nSec-WebSocket-Accept: %s\r\n", sAcceptKey);
+    
+    if (*sOrigin != 0)
+    {
+        OpcUa_StrnCatA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, ALLOW_ORIGIN_HEADER, OpcUa_StrLenA(ALLOW_ORIGIN_HEADER));
+        OpcUa_StrnCatA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, " ", 1);
+        OpcUa_StrnCatA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, sOrigin, OpcUa_StrLenA(sOrigin));
+        OpcUa_StrnCatA(pWssInputStream->Buffer.Data, pWssInputStream->Buffer.Size, "\r\n", 2);
+    }
+
     OpcUa_WssListener_SendHttpUpgradeResponse(a_pListener, a_pConnection, 101, "Switching Protocols", pWssInputStream->Buffer.Data);
     a_pConnection->eState = OpcUa_WssConnection_StreamState_Open;
 

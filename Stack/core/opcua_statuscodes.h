@@ -483,6 +483,11 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_BadNodeNotInView 0x804E0000
 
 /*============================================================================
+ * The number was not accepted because of a numeric overflow.
+ *===========================================================================*/
+#define OpcUa_BadNumericOverflow 0x81120000
+
+/*============================================================================
  * The ServerUri is not a valid URI.
  *===========================================================================*/
 #define OpcUa_BadServerUriInvalid 0x804F0000
@@ -731,6 +736,11 @@ OPCUA_BEGIN_EXTERN_C
  * The client did not specify all of the input arguments for the method.
  *===========================================================================*/
 #define OpcUa_BadArgumentsMissing 0x80760000
+
+/*============================================================================
+ * The executable attribute does not allow the execution of the method.
+ *===========================================================================*/
+#define OpcUa_BadNotExecutable 0x81110000
 
 /*============================================================================
  * The server has reached its  maximum number of subscriptions.

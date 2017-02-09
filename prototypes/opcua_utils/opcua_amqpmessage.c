@@ -466,9 +466,7 @@ void OpcUa_AmqpMessageBody_Clear(OpcUa_AmqpMessageBody* pBody)
     if (pBody != NULL)
     {
         OpcUa_Free(pBody->EventId);
-        OpcUa_Free(pBody->SourceNode);
         OpcUa_Free(pBody->SourceName);
-        OpcUa_Free(pBody->EventType);
         OpcUa_Free(pBody->Time);
         OpcUa_Free(pBody->ReceiveTime);
         OpcUa_Free(pBody->Message);
@@ -506,18 +504,12 @@ int OpcUa_Message_GetBody(MESSAGE_HANDLE message, OpcUa_AmqpMessageBody* pBody)
 
         if (json_object_object_get_ex(pRoot, "EventType", &pField))
         {
-            if (json_object_object_get_ex(pField, "Id", &pValue))
-            {
-                pBody->EventType = OpcUa_StrDup(json_object_get_string(pValue));
-            }
+            pBody->EventType = OpcUa_StrDup(json_object_get_string(pField));
         }
 
         if (json_object_object_get_ex(pRoot, "SourceNode", &pField))
         {
-            if (json_object_object_get_ex(pField, "Id", &pValue))
-            {
-                pBody->SourceNode = OpcUa_StrDup(json_object_get_string(pValue));
-            }
+            pBody->SourceNode = OpcUa_StrDup(json_object_get_string(pField));
         }
 
         if (json_object_object_get_ex(pRoot, "SourceName", &pField))
@@ -580,14 +572,14 @@ int OpcUa_Message_SetBody(MESSAGE_HANDLE message, OpcUa_AmqpMessageBody* pBody)
     if (pBody->EventType != NULL)
     {
         json_object* pField = json_object_new_object();
-        json_object_object_add_ex(pField, "Id", json_object_new_string(pBody->EventType), 0);
+        json_object_object_add_ex(pField, "i", json_object_new_int(atoi(pBody->EventType)), 0);
         json_object_object_add_ex(pRoot, "EventType", pField, 0);
     }
 
     if (pBody->SourceNode != NULL)
     {
         json_object* pField = json_object_new_object();
-        json_object_object_add_ex(pField, "Id", json_object_new_string(pBody->SourceNode), 0);
+        json_object_object_add_ex(pField, "i", json_object_new_int(atoi(pBody->SourceNode)), 0);
         json_object_object_add_ex(pRoot, "SourceNode", pField, 0);
     }
 
