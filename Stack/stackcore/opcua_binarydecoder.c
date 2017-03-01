@@ -2866,6 +2866,12 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadVariant(
                 break;
             }
 
+            case OpcUaType_DataValue:
+            {
+                OpcUa_AnyArray_BinaryDecode(DataValue);
+                break;
+            }
+
             case OpcUaType_Variant:
             {
                 OpcUa_AnyArray_BinaryDecode(Variant);
@@ -3061,6 +3067,12 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_ReadVariant(
             case OpcUaType_ExtensionObject:
             {
                 OpcUa_Variant_BinaryDecode_ReferenceType(ExtensionObject);
+                break;
+            }
+
+            case OpcUaType_DataValue:
+            {
+                OpcUa_Variant_BinaryDecode_ReferenceType(DataValue);
                 break;
             }
 

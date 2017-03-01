@@ -415,6 +415,7 @@ typedef union _OpcUa_VariantArrayUnion
     OpcUa_QualifiedName*     QualifiedNameArray;
     OpcUa_LocalizedText*     LocalizedTextArray;
     OpcUa_ExtensionObject*   ExtensionObjectArray;
+    struct _OpcUa_DataValue* DataValueArray;
     struct _OpcUa_Variant*   VariantArray;
 }
 OpcUa_VariantArrayUnion;
@@ -478,6 +479,7 @@ typedef union _OpcUa_VariantUnion
     OpcUa_QualifiedName*     QualifiedName;
     OpcUa_LocalizedText*     LocalizedText;
     OpcUa_ExtensionObject*   ExtensionObject;
+    struct _OpcUa_DataValue* DataValue;
     OpcUa_VariantArrayValue  Array;
     OpcUa_VariantMatrixValue Matrix;
 }
