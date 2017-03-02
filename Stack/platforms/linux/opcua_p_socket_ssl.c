@@ -147,6 +147,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSocket_DoStateMachine");
             else if(ssl_error == SSL_ERROR_SSL || ssl_error == SSL_ERROR_SYSCALL)
             {
                 pInternalSocket->bSslError = OpcUa_True;
+                OpcUa_SslSocket_DoStateMachine(pInternalSocket, OpcUa_False,
+                                               OpcUa_Null, OpcUa_Null);
                 OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
                 OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
             }
@@ -212,7 +214,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslSocket_DoStateMachine");
             }
             else if(result < 0)
             {
-                result = BIO_shutdown_wr(pInternalSocket->pRawBio);
+                pInternalSocket->bSslError = OpcUa_True;
                 OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
                 OpcUa_GotoErrorWithStatus(OpcUa_BadDisconnect);
             }
@@ -282,6 +284,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "SslRead");
             case SSL_ERROR_SSL:
             case SSL_ERROR_SYSCALL:
                 pInternalSocket->bSslError = OpcUa_True;
+                OpcUa_SslSocket_DoStateMachine(pInternalSocket, OpcUa_False,
+                                               OpcUa_Null, OpcUa_Null);
                 OpcUa_P_Socket_Close(pInternalSocket->pRawSocket);
                 uStatus = OpcUa_BadInternalError;
                 break;
