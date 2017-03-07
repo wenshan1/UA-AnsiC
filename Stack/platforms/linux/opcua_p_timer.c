@@ -145,17 +145,38 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_InitializeTimers(OpcUa_Void)
     uStatus = OpcUa_P_Semaphore_Create( &g_hTimerAddedSemaphore,
                                         0,  /* not signalled */
                                         1); /* max 1 post */
-    OpcUa_ReturnErrorIfBad(uStatus);
+    if(OpcUa_IsBad(uStatus))
+    {
+#if OPCUA_USE_SYNCHRONISATION
+        OpcUa_P_Mutex_Delete(&g_OpcUa_P_Timer_pTimers_Mutex);
+#endif /* OPCUA_USE_SYNCHRONISATION */
+        return uStatus;
+    }
 
     g_bStopTimerThread = OpcUa_False;
 
     uStatus = OpcUa_P_Thread_Create(&g_pTimerThread);
-    OpcUa_ReturnErrorIfBad(uStatus);
+    if(OpcUa_IsBad(uStatus))
+    {
+        OpcUa_P_Semaphore_Delete(&g_hTimerAddedSemaphore);
+#if OPCUA_USE_SYNCHRONISATION
+        OpcUa_P_Mutex_Delete(&g_OpcUa_P_Timer_pTimers_Mutex);
+#endif /* OPCUA_USE_SYNCHRONISATION */
+        return uStatus;
+    }
 
     uStatus = OpcUa_P_Thread_Start( g_pTimerThread,
                                     OpcUa_P_Timer_Thread,
                                     OpcUa_Null);
-    OpcUa_ReturnErrorIfBad(uStatus);
+    if(OpcUa_IsBad(uStatus))
+    {
+        OpcUa_P_Thread_Delete(&g_pTimerThread);
+        OpcUa_P_Semaphore_Delete(&g_hTimerAddedSemaphore);
+#if OPCUA_USE_SYNCHRONISATION
+        OpcUa_P_Mutex_Delete(&g_OpcUa_P_Timer_pTimers_Mutex);
+#endif /* OPCUA_USE_SYNCHRONISATION */
+        return uStatus;
+    }
 #endif /* OPCUA_MULTITHREADED */
 
     return OpcUa_Good;
