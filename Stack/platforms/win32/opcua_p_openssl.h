@@ -411,23 +411,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
     OpcUa_Key*                  pPublicKey);
 
 /**
-  @brief Gets the private key from a given certificate.
-
-  This is done with PKCS #12 Standard.
-
-  @param pProvider                [in]  A pointer to a crypto provider.
-  @param certificate              [in]  The passed in certificate.
-  @param password                 [in]  Password for certificate. Only used when certificate is password protected. (Not used in current implementation)
-
-  @param pPrivateKey              [out] The read out private key of the certificate.
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPrivateKey(
-    OpcUa_CryptoProvider*       pProvider,
-    OpcUa_StringA               certificateFileName,
-    OpcUa_StringA               password,
-    OpcUa_Key*                  pPrivateKey);
-
-/**
   @brief Gets the signature from a given certificate.
 
   @param pProvider                [in]  A pointer to a crypto provider.
@@ -470,15 +453,6 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_CreateCertificate(
     OpcUa_UInt                  signatureHashAlgorithm,
     OpcUa_Key                   pIssuerPrivateKey,
     OpcUa_ByteString*           pCertificate);
-
-/**
-  @brief
-*/
-OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetPrivateKeyFromCert(
-    OpcUa_CryptoProvider*       pProvider,
-    OpcUa_StringA               certificate,
-    OpcUa_StringA               password,
-    OpcUa_Key*                  pPrivateKey);
 
 /**
   @brief
@@ -761,6 +735,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
   @param data              [in]  The data to sign.
   @param privateKey        [in]  The private key used to sign the data.
   @param padding           [in]  The signature algorithm used (e.g. NID_sha1).
+
   @param pSignature        [out] The signature of the data.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Sign(

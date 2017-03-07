@@ -106,23 +106,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_DeriveChannelKeysets(
                                             a_pServerKeyset);
 }
 
-
-/*============================================================================
- * OpcUa_Crypto_GetPrivateKeyFromCert
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_Crypto_GetPrivateKeyFromCert(
-    struct _OpcUa_CryptoProvider*       a_pProvider,
-    OpcUa_StringA                       a_certificateFileName,
-    OpcUa_StringA                       a_password,             /* this could be optional */
-    OpcUa_Key*                          a_pPrivateKey)
-{
-    OpcUa_DeclareErrorTraceModule(OpcUa_Module_Crypto);
-    OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
-    OpcUa_ReturnErrorIfNull(a_pProvider->GetPrivateKeyFromCert, OpcUa_BadNotSupported);
-
-    return a_pProvider->GetPrivateKeyFromCert(a_pProvider, a_certificateFileName, a_password, a_pPrivateKey);
-}
-
 /*============================================================================
  * OpcUa_Crypto_GetPublicKeyFromCert
  *===========================================================================*/

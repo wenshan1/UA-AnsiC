@@ -54,23 +54,6 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_CreateCertificate(
 }
 
 /*============================================================================
- * OpcUa_P_Crypto_NoSecurity_GetPrivateKeyFromCert
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetPrivateKeyFromCert(
-    OpcUa_CryptoProvider*       a_pProvider,
-    OpcUa_StringA               a_certificate,
-    OpcUa_StringA               a_password,
-    OpcUa_Key*                  a_pPrivateKey)
-{
-    OpcUa_ReferenceParameter(a_pProvider);
-    OpcUa_ReferenceParameter(a_certificate);
-    OpcUa_ReferenceParameter(a_password);
-    OpcUa_ReferenceParameter(a_pPrivateKey);
-
-    return OpcUa_BadNotSupported;
-}
-
-/*============================================================================
  * OpcUa_P_Crypto_NoSecurity_GetPublicKeyFromCert
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetPublicKeyFromCert(

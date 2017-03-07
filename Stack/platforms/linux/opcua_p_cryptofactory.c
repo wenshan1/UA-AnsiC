@@ -108,7 +108,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_Crypto_NoSecurity_CreateCertificate;
-        a_pProvider->GetPrivateKeyFromCert      = OpcUa_P_Crypto_NoSecurity_GetPrivateKeyFromCert;
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_Crypto_NoSecurity_GetPublicKeyFromCert;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_Crypto_NoSecurity_GetSignatureFromCert;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_Crypto_NoSecurity_GetCertificateThumbprint;
@@ -176,7 +175,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;
-        a_pProvider->GetPrivateKeyFromCert      = OpcUa_P_OpenSSL_X509_GetPrivateKey;
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
@@ -244,7 +242,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;
-        a_pProvider->GetPrivateKeyFromCert      = OpcUa_P_OpenSSL_X509_GetPrivateKey;
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
@@ -312,7 +309,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
 
         /* certificate functions */
         a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;
-        a_pProvider->GetPrivateKeyFromCert      = OpcUa_P_OpenSSL_X509_GetPrivateKey;
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
@@ -390,7 +386,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "DeleteCryptoProvider");
 
     /* certificate functions */
     a_pProvider->CreateCertificate            = OpcUa_Null;
-    a_pProvider->GetPrivateKeyFromCert        = OpcUa_Null;
     a_pProvider->GetPublicKeyFromCert         = OpcUa_Null;
     a_pProvider->GetSignatureFromCert         = OpcUa_Null;
 
