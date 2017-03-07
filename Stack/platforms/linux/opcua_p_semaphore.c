@@ -98,7 +98,7 @@ OpcUa_Void OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore)
     pInternalSemaphore = (sem_t*) *pRawSemaphore;
 
     report_error(sem_destroy(pInternalSemaphore), "OpcUa_P_Semaphore_Delete", "sem_destroy");
-    OpcUa_P_Memory_Free(pInternalSemaphore);
+    free(pInternalSemaphore);
     *pRawSemaphore = OpcUa_Null;
 }
 
