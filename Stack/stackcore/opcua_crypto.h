@@ -50,15 +50,6 @@ typedef OpcUa_Void* OpcUa_ProviderHandle;
 #define OPCUA_CRYPTO_KEY_ISNOHANDLE(xKey)           (xKey->Type < (OpcUa_UInt)OpcUa_Crypto_KeyType_Handle_Offset)
 
 /* algorithm codes */
-#define OpcUa_Crypto_Rsa_PKCS1_Name                 L"RSA-PKCS-#1-V1.5"
-#define OpcUa_Crypto_Rsa_PKCS1_Id                   4
-
-#define OpcUa_Crypto_Rsa_OAEP_Name                  L"RSA-OAEP"
-#define OpcUa_Crypto_Rsa_OAEP_Id                    5
-
-#define OpcUa_Crypto_Rsa_Alg_Name                   L"rsaEncryption"
-#define OpcUa_Crypto_Rsa_Alg_Id                     6
-
 #define OpcUa_Crypto_sha1WithRSAEncryption_Name     L"sha1WithRSAEncryption"
 #define OpcUa_Crypto_sha1WithRSAEncryption_Id       65
 #define OpcUa_Crypto_Sig_sha1WithRSAEncryption      OpcUa_Crypto_sha1WithRSAEncryption_Id
@@ -78,42 +69,6 @@ typedef OpcUa_Void* OpcUa_ProviderHandle;
 #define OpcUa_Crypto_sha512WithRSAEncryption_Name   L"sha512WithRSAEncryption"
 #define OpcUa_Crypto_sha512WithRSAEncryption_Id     670
 #define OpcUa_Crypto_Sig_sha512WithRSAEncryption    OpcUa_Crypto_sha512WithRSAEncryption_Id
-
-#define OpcUa_Crypto_hmacWithSHA1_Name              L"hmacWithSHA1"
-#define OpcUa_Crypto_hmacWithSHA1_Id                163
-
-#define OpcUa_Crypto_hmacWithSHA224_Name            L"hmacWithSHA224"
-#define OpcUa_Crypto_hmacWithSHA224_Id              164
-
-#define OpcUa_Crypto_hmacWithSHA256_Name            L"hmacWithSHA256"
-#define OpcUa_Crypto_hmacWithSHA256_Id              165
-
-#define OpcUa_Crypto_hmacWithSHA384_Name            L"hmacWithSHA384"
-#define OpcUa_Crypto_hmacWithSHA384_Id              166
-
-#define OpcUa_Crypto_hmacWithSHA512_Name            L"hmacWithSHA512"
-#define OpcUa_Crypto_hmacWithSHA512_Id              167
-
-#define OpcUa_Crypto_aes_128_ecb_Name               L"aes-128-ecb"
-#define OpcUa_Crypto_aes_128_ecb_Id                 418
-
-#define OpcUa_Crypto_aes_128_cbc_Name               L"aes-128-cbc"
-#define OpcUa_Crypto_aes_128_cbc_Id                 419
-
-#define OpcUa_Crypto_aes_256_ecb_Name               L"aes-256-ecb"
-#define OpcUa_Crypto_aes_256_ecb_Id                 426
-
-#define OpcUa_Crypto_aes_256_cbc_Name               L"aes-256-cbc"
-#define OpcUa_Crypto_aes_256_cbc_Id                 427
-
-#define OpcUa_Crypto_aes_512_ecb_Name               L"aes-512-ecb"
-#define OpcUa_Crypto_aes_512_ecb_Id                 428
-
-#define OpcUa_Crypto_aes_512_cbc_Name               L"aes-2512-cbc"
-#define OpcUa_Crypto_aes_512_cbc_Id                 429
-
-#define OpcUa_Crypto_PSHA1_Name                     L"P-SHA1"
-#define OpcUa_Crypto_PSHA1_Id                       999
 
 
 struct _OpcUa_SecurityKeyset;
