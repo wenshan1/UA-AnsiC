@@ -1074,25 +1074,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_512_Generate(
     OpcUa_ByteString*     pMac);
 
 
-OpcUa_StatusCode OpcUa_P_OpenSSL_3DES_Encrypt(
-    OpcUa_CryptoProvider*   pProvider,
-    OpcUa_Byte*             pPlainText,
-    OpcUa_UInt32            plainTextLen,
-    OpcUa_Key               key,
-    OpcUa_Byte*             pInitalVector,
-    OpcUa_Byte*             pCipherText,
-    OpcUa_UInt32*           pCipherTextLen);
-
-OpcUa_StatusCode OpcUa_P_OpenSSL_3DES_Decrypt(
-    OpcUa_CryptoProvider*   pProvider,
-    OpcUa_Byte*             pCipherText,
-    OpcUa_UInt32            cipherTextLen,
-    OpcUa_Key               key,
-    OpcUa_Byte*             pInitalVector,
-    OpcUa_Byte*             pPlainText,
-    OpcUa_UInt32*           pPlainTextLen);
-
-
 OPCUA_END_EXTERN_C
 
 #endif /* _OpcUa_Crypto_OpenSsl_H_ */

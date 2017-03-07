@@ -89,7 +89,6 @@ OBJECTS = \
 	$(ODIR)\opcua_p_memory.obj \
 	$(ODIR)\opcua_p_mutex.obj \
 	$(ODIR)\opcua_p_openssl.obj \
-	$(ODIR)\opcua_p_openssl_3des.obj \
 	$(ODIR)\opcua_p_openssl_aes.obj \
 	$(ODIR)\opcua_p_openssl_hmac_sha.obj \
 	$(ODIR)\opcua_p_openssl_nosecurity.obj \

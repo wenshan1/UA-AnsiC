@@ -404,9 +404,6 @@
     <ClCompile Include="platforms\win32\opcua_p_openssl.c">
       <Filter>platforms\win32</Filter>
     </ClCompile>
-    <ClCompile Include="platforms\win32\opcua_p_openssl_3des.c">
-      <Filter>platforms\win32</Filter>
-    </ClCompile>
     <ClCompile Include="platforms\win32\opcua_p_openssl_aes.c">
       <Filter>platforms\win32</Filter>
     </ClCompile>
