@@ -593,10 +593,6 @@ OpcUa_FinishErrorHandling;
 /*===========================================================================*
 OpcUa_P_OpenSSL_RSA_Private_Sign
  *===========================================================================*/
-/*
- * ToDo: problems with RSA_PKCS1_OAEP_PADDING -> RSA_PKCS1_PSS_PADDING is
- * needed (Version 0.9.9); RSA_PKCS1_OAEP_PADDING is just for encryption
- */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Sign(
     OpcUa_CryptoProvider* a_pProvider,
     OpcUa_ByteString      a_data,
@@ -612,7 +608,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Private_Sign");
 
     /* unused parameters */
     OpcUa_ReferenceParameter(a_pProvider);
-    OpcUa_ReferenceParameter(a_padding);
 
     /* check parameters */
     OpcUa_ReturnErrorIfArgumentNull(a_data.Data);
@@ -629,7 +624,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Private_Sign");
     OpcUa_GotoErrorIfTrue((a_pSignature->Length < RSA_size(pSSLPrivateKey->pkey.rsa)), OpcUa_BadInvalidArgument);
 
     /* sign data */
-    iErr = RSA_sign(a_data.Length == 32 ? NID_sha256 : NID_sha1, a_data.Data, a_data.Length, a_pSignature->Data, (unsigned int*)&a_pSignature->Length, pSSLPrivateKey->pkey.rsa);
+    iErr = RSA_sign(a_padding, a_data.Data, a_data.Length, a_pSignature->Data, (unsigned int*)&a_pSignature->Length, pSSLPrivateKey->pkey.rsa);
     OpcUa_GotoErrorIfTrue((iErr != 1), OpcUa_BadUnexpectedError);
 
     /* free internal key representation */
@@ -649,9 +644,6 @@ OpcUa_FinishErrorHandling;
 /*============================================================================
  * OpcUa_P_OpenSSL_RSA_Public_Verify
  *===========================================================================*/
-/*
-ToDo: problems with RSA_PKCS1_OAEP_PADDING -> find solution
-*/
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
     OpcUa_CryptoProvider* a_pProvider,
     OpcUa_ByteString      a_data,
@@ -666,7 +658,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Public_Verify");
 
     OpcUa_ReferenceParameter(a_pProvider);
-    OpcUa_ReferenceParameter(a_padding);
 
     OpcUa_ReturnErrorIfArgumentNull(a_data.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_publicKey);
@@ -698,7 +689,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
         OpcUa_GotoErrorWithStatus(OpcUa_BadSignatureInvalid);
     }
 
-    if(RSA_verify(a_data.Length == 32 ? NID_sha256 : NID_sha1, a_data.Data, a_data.Length, a_pSignature->Data, a_pSignature->Length, pPublicKey->pkey.rsa) != 1)
+    if(RSA_verify(a_padding, a_data.Data, a_data.Length, a_pSignature->Data, a_pSignature->Length, pPublicKey->pkey.rsa) != 1)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadSignatureInvalid);
     }

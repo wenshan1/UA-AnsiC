@@ -202,7 +202,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->MaximumAsymmetricKeyLength = 512;
         a_pProvider->MinimumAsymmetricKeyLength = 256;
 
-        a_pProvider->AsymmetricSignatureAlgorithmId  = OpcUa_P_RSA_PKCS1_OAEP_SHA256_Id;
+        a_pProvider->AsymmetricSignatureAlgorithmId  = OpcUa_P_RSA_PKCS1_V15_SHA256_Id;
         a_pProvider->AsymmetricEncryptionAlgorithmId = OpcUa_P_RSA_OAEP_Id;
         a_pProvider->SymmetricSignatureAlgorithmId   = OpcUa_P_HMAC_SHA256_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId  = OpcUa_P_AES_256_CBC_Id;
@@ -224,8 +224,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricDecrypt           = OpcUa_P_OpenSSL_AES_256_CBC_Decrypt;
 
         /* asymmetric signature algorithm */
-        a_pProvider->AsymmetricSign             = OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Sign;
-        a_pProvider->AsymmetricVerify           = OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Verify;
+        a_pProvider->AsymmetricSign             = OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Sign;
+        a_pProvider->AsymmetricVerify           = OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Verify;
 
         /* asymmetric encryption algorithm */
         a_pProvider->AsymmetricEncrypt          = OpcUa_P_OpenSSL_RSA_OAEP_Encrypt;
@@ -270,7 +270,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->MaximumAsymmetricKeyLength = 512;
         a_pProvider->MinimumAsymmetricKeyLength = 128;
 
-        a_pProvider->AsymmetricSignatureAlgorithmId  = OpcUa_P_RSA_PKCS1_OAEP_SHA1_Id;
+        a_pProvider->AsymmetricSignatureAlgorithmId  = OpcUa_P_RSA_PKCS1_V15_SHA1_Id;
         a_pProvider->AsymmetricEncryptionAlgorithmId = OpcUa_P_RSA_OAEP_Id;
         a_pProvider->SymmetricSignatureAlgorithmId   = OpcUa_P_HMAC_SHA1_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId  = OpcUa_P_AES_256_CBC_Id;
@@ -292,8 +292,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricDecrypt           = OpcUa_P_OpenSSL_AES_256_CBC_Decrypt;
 
         /* asymmetric signature algorithm */
-        a_pProvider->AsymmetricSign             = OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Sign;
-        a_pProvider->AsymmetricVerify           = OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Verify;
+        a_pProvider->AsymmetricSign             = OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA1_Sign;
+        a_pProvider->AsymmetricVerify           = OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA1_Verify;
 
         /* asymmetric encryption algorithm */
         a_pProvider->AsymmetricEncrypt          = OpcUa_P_OpenSSL_RSA_OAEP_Encrypt;

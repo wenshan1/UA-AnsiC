@@ -339,62 +339,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Verify(
     OpcUa_Key*            publicKey,
     OpcUa_ByteString*     pSignature);
 
-/**@brief Signs data using <NAME>(RSA) with the private key of the appropriate key pair.
-
-  @param pProvider         [in]  The crypto provider handle.
-  @param data              [in]  The data to sign.
-  @param privateKey        [in]  The private key used to sign the data.
-
-  @param pSignature        [out] The signature of the data.
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Sign(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            privateKey,
-    OpcUa_ByteString*     pSignature);      /* minimum length = key length */
-
-/**
-  @brief Verifies signed data using <NAME>(RSA) with the public key of the appropriate key pair.
-
-  @param pProvider                  [in]  The crypto provider handle.
-  @param data                       [in]  The data that was signed.
-  @param publicKey                  [in]  The public key used to verify the signature.
-  @param pSignature                  [in]  The signature of the data that should be verified.
- */
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Verify(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            publicKey,
-    OpcUa_ByteString*     pSignature);
-
-/**@brief Signs data using <NAME>(RSA) with the private key of the appropriate key pair.
-
-  @param pProvider         [in]  The crypto provider handle.
-  @param data              [in]  The data to sign.
-  @param privateKey        [in]  The private key used to sign the data.
-
-  @param pSignature        [out] The signature of the data.
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Sign(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            privateKey,
-    OpcUa_ByteString*     pSignature);      /* minimum length = key length */
-
-/**
-  @brief Verifies signed data using <NAME>(RSA) with the public key of the appropriate key pair.
-
-  @param pProvider                  [in]  The crypto provider handle.
-  @param data                       [in]  The data that was signed.
-  @param publicKey                  [in]  The public key used to verify the signature.
-  @param pSignature                  [in]  The signature of the data that should be verified.
- */
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Verify(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            publicKey,
-    OpcUa_ByteString*     pSignature);
-
 /**
   @brief
 
@@ -816,8 +760,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
   @param pProvider         [in]  The crypto provider handle.
   @param data              [in]  The data to sign.
   @param privateKey        [in]  The private key used to sign the data.
-  @param padding           [in]  The paddin scheme used for filling empty bytes after encryption. (e.g. RSA_PKCS1_PADDING)
-
+  @param padding           [in]  The signature algorithm used (e.g. NID_sha1).
   @param pSignature        [out] The signature of the data.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Sign(
@@ -833,8 +776,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Sign(
   @param pProvider                  [in]  The crypto provider handle.
   @param data                       [in]  The data that was signed.
   @param publicKey                  [in]  The public key used to verify the signature.
-  @param padding                    [in]  The padding scheme used for filling empty bytes after encryption.
-  @param pSignature                  [in]  The signature of the data that should be verified.
+  @param padding                    [in]  The signature algorithm used (e.g. NID_sha1).
+  @param pSignature                 [in]  The signature of the data that should be verified.
  */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
     OpcUa_CryptoProvider* pProvider,
@@ -843,52 +786,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
     OpcUa_Int16           padding,
     OpcUa_ByteString*     pSignature);
 
-
-/*** ECDSA ASYMMETRIC SIGNATURE ***/
-
-/**
-  @brief
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_GenerateKeys(
-    OpcUa_CryptoProvider*   pProvider,
-    OpcUa_UInt32            bytes,
-    OpcUa_Key*              pPublicKey,
-    OpcUa_Key*              pPrivaeKey);
-
-/**
-  @brief Signs data using Elliptic Curves Digital Signature Algorithm(ECDSA) with the private key of the appropriate key pair
-  and a Elliptic Curves Signature.
-
-  @param pProvider                  [in]  The crypto provider handle.
-  @param data                       [in]  The data that has to be signed.
-  @param privateKey                 [in]  The private key to sign the data.
-  @param padding                    [in]  The padding scheme used for filling empty bytes after signing. (not used for ECDSA)
-
-  @param pSignature                 [out]  The signature of the data.
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_Private_Sign(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            privateKey,
-    OpcUa_Int16           padding,
-    OpcUa_ByteString*     pSignature);
-
-/**
-  @brief Verifies signed data using Elliptic Curves Digital Signature Algorithm(ECDSA) with the public key of the appropriate key pair
-  and a Elliptic Curves Signature.
-
-  @param pProvider                  [in]  The crypto provider handle.
-  @param data                       [in]  The data that was signed.
-  @param publicKey                  [in]  The public key to verify the signature.
-  @param padding                    [in]  The padding scheme used for filling empty bytes after signing. (not used for ECDSA)
-  @param signature                  [in]  The signature of data.
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_Public_Verify(
-    OpcUa_CryptoProvider* pProvider,
-    OpcUa_ByteString      data,
-    OpcUa_Key*            publicKey,
-    OpcUa_Int16           padding,
-    OpcUa_ByteString      signature);
 
 /**
   @brief Generates a session key using secret input data.

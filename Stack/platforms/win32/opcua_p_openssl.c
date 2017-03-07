@@ -588,7 +588,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA1_Sign(
 
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_V15_SHA1_Sign");
 
-    messageDigest.Length = 20; /* 256 bit */
+    messageDigest.Length = 20; /* 160 bit */
 
     if(a_data.Data != OpcUa_Null)
     {
@@ -605,7 +605,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA1_Sign(
     uStatus = OpcUa_P_OpenSSL_RSA_Private_Sign( a_pProvider,
                                                 messageDigest,
                                                 a_privateKey,
-                                                RSA_PKCS1_PADDING,
+                                                NID_sha1,
                                                 a_pSignature);
 
     if(messageDigest.Data != OpcUa_Null)
@@ -650,7 +650,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_V15_SHA1_Verify");
                                                 a_pProvider,
                                                 messageDigest,
                                                 a_publicKey,
-                                                RSA_PKCS1_PADDING,
+                                                NID_sha1,
                                                 a_pSignature);
 
     OpcUa_P_Memory_Free(messageDigest.Data);
@@ -694,7 +694,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Sign(
                                                 a_pProvider,
                                                 messageDigest,
                                                 a_privateKey,
-                                                RSA_PKCS1_PADDING,
+                                                NID_sha256,
                                                 a_pSignature);
 
     if(messageDigest.Data != OpcUa_Null)
@@ -739,183 +739,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Verify(
                                                 a_pProvider,
                                                 messageDigest,
                                                 a_publicKey,
-                                                RSA_PKCS1_PADDING,
-                                                a_pSignature);
-
-    OpcUa_P_Memory_Free(messageDigest.Data);
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_FinishErrorHandling;
-}
-/*============================================================================
- * OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Sign
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Sign(
-    OpcUa_CryptoProvider* a_pProvider,
-    OpcUa_ByteString      a_data,
-    OpcUa_Key*            a_privateKey,
-    OpcUa_ByteString*     a_pSignature)
-{
-    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_OAEP_SHA1_Sign");
-
-    messageDigest.Length = 20; /* 160 bit */
-
-    if(a_data.Data != OpcUa_Null)
-    {
-        messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
-        OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
-
-        uStatus = OpcUa_P_OpenSSL_SHA1_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    uStatus = OpcUa_P_OpenSSL_RSA_Private_Sign(
-                                                a_pProvider,
-                                                messageDigest,
-                                                a_privateKey,
-                                                RSA_PKCS1_OAEP_PADDING,
-                                                a_pSignature);
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Verify
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA1_Verify(
-    OpcUa_CryptoProvider* a_pProvider,
-    OpcUa_ByteString      a_data,
-    OpcUa_Key*            a_publicKey,
-    OpcUa_ByteString*     a_pSignature)
-{
-    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_OAEP_SHA1_Verify");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
-
-    messageDigest.Length = 20; /* 160 bit */
-    messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
-    OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
-
-    uStatus = OpcUa_P_OpenSSL_SHA1_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    uStatus = OpcUa_P_OpenSSL_RSA_Public_Verify(
-                                                a_pProvider,
-                                                messageDigest,
-                                                a_publicKey,
-                                                RSA_PKCS1_OAEP_PADDING,
-                                                a_pSignature);
-
-    OpcUa_P_Memory_Free(messageDigest.Data);
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_FinishErrorHandling;
-}
-/*============================================================================
- * OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Sign
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Sign(
-    OpcUa_CryptoProvider* a_pProvider,
-    OpcUa_ByteString      a_data,
-    OpcUa_Key*            a_privateKey,
-    OpcUa_ByteString*     a_pSignature)
-{
-    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_OAEP_SHA256_Sign");
-
-    messageDigest.Length = 32; /* 256 bit */
-
-    if(a_data.Data != OpcUa_Null)
-    {
-        messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
-        OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
-
-        uStatus = OpcUa_P_OpenSSL_SHA2_256_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    uStatus = OpcUa_P_OpenSSL_RSA_Private_Sign(
-                                                a_pProvider,
-                                                messageDigest,
-                                                a_privateKey,
-                                                RSA_PKCS1_OAEP_PADDING,
-                                                a_pSignature);
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-
-    if(messageDigest.Data != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(messageDigest.Data);
-    }
-
-OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
- * OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Verify
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_OAEP_SHA256_Verify(
-    OpcUa_CryptoProvider* a_pProvider,
-    OpcUa_ByteString      a_data,
-    OpcUa_Key*            a_publicKey,
-    OpcUa_ByteString*     a_pSignature)
-{
-    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
-
-    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_OAEP_SHA256_Verify");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
-
-    messageDigest.Length = 32; /* 256 bit */
-    messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
-    OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
-
-    uStatus = OpcUa_P_OpenSSL_SHA2_256_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    uStatus = OpcUa_P_OpenSSL_RSA_Public_Verify(
-                                                a_pProvider,
-                                                messageDigest,
-                                                a_publicKey,
-                                                RSA_PKCS1_OAEP_PADDING,
+                                                NID_sha256,
                                                 a_pSignature);
 
     OpcUa_P_Memory_Free(messageDigest.Data);
