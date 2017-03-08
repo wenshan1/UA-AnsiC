@@ -3368,37 +3368,3 @@ OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
-
-/*============================================================================
- * OpcUa_SecureStream_VerifyInput
- *===========================================================================*/
-OpcUa_StatusCode OpcUa_SecureStream_VerifyInput(OpcUa_InputStream*      a_pIstrm,
-                                                OpcUa_CryptoProvider*   a_pCryptoProvider,
-                                                OpcUa_Key*              a_pCryptoKey,
-                                                OpcUa_Boolean           a_bUseSymmetricAlgorithm)
-{
-    OpcUa_SecureStream* pSecureStream       = OpcUa_Null;
-    OpcUa_UInt32        uIndex              = 0;
-
-OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "VerifyInput");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pIstrm);
-    OpcUa_ReturnErrorIfArgumentNull(a_pIstrm->Handle);
-    OpcUa_ReturnErrorIfArgumentNull(a_pCryptoKey);
-
-    pSecureStream   = (OpcUa_SecureStream*)a_pIstrm->Handle;
-
-    for(uIndex = 0; uIndex < pSecureStream->nBuffers; uIndex++)
-    {
-        uStatus = OpcUa_SecureStream_VerifyInputBuffer( pSecureStream,
-                                                        &pSecureStream->Buffers[uIndex],
-                                                        a_pCryptoProvider,
-                                                        a_pCryptoKey,
-                                                        a_bUseSymmetricAlgorithm);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
-}

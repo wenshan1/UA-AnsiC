@@ -378,22 +378,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_SecureStream_DecryptInput(  OpcUa_InputStrea
                                                                 OpcUa_Boolean           bUseSymmetricAlgorithm,
                                                                 OpcUa_Key*              pInitialVector);
 
-/**
-  @brief Verifies the signature of a given inputstream. If the validation fails, then the statuscode OpcUa_BadSignatureInvalid is returned.
-
-  @param pIstrm                 [in]  The signed inputstream.
-                                      If this pointer is NULL then an error will be returned.
-  @param pCryptoProvider        [in]  The cryptoprovider used for cryptographic operations on the stream.
-  @param pCryptoKey             [in]  Asymmetric public key or symmetric key.
-                                      If this pointer is NULL then an error will be returned.
-  @param bUseSymmetricAlgorithm [in]  Indicates whether to use symmetric or asymmetric
-                                      cryptographic algorithms to decrypt the inputstream.
-*/
-OpcUa_StatusCode OpcUa_SecureStream_VerifyInput(    OpcUa_InputStream*      pIstrm,
-                                                    OpcUa_CryptoProvider*   pCryptoProvider,
-                                                    OpcUa_Key*              pCryptoKey,
-                                                    OpcUa_Boolean           bUseSymmetricAlgorithm);
-
 OPCUA_END_EXTERN_C
 
 #endif /* _OpcUa_SecureStream_H_ */
