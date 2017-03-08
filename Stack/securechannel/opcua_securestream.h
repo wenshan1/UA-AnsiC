@@ -360,24 +360,6 @@ OpcUa_StatusCode OpcUa_SecureStream_CalculateSignatureOutputLength( OpcUa_UInt32
                                                                     OpcUa_Boolean           bUseSymmetricAlgorithm,
                                                                     OpcUa_UInt32*           pOutputLength);
 
-/**
-  @brief Decrypts a given inputstream.
-
-  @param pIstrm                 [bi]  The encrypted inputstream and after the function has beed processed the decrypted inputstream ("plaintext").
-                                      If this pointer is NULL then an error will be returned.
-  @param pCryptoProvider        [in]  The cryptoprovider used for cryptographic operations on the stream.
-  @param pCryptoKey             [in]  Asymmetric public key or symmetric key.
-                                      If this pointer is NULL then an error will be returned.
-  @param bUseSymmetricAlgorithm [in]  Indicates whether to use symmetric or asymmetric cryptographic algorithms to decrypt the inputstream.
-  @param pInitialVector         [in]  The initial vector that should be used in case of symmetric decryption.
-                                      If bUseSymmetricAlgorithm is OpcUa_True then this pointer must not be NULL or an error will be returned.
-*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_SecureStream_DecryptInput(  OpcUa_InputStream*      pIstrm,
-                                                                OpcUa_CryptoProvider*   pCryptoProvider,
-                                                                OpcUa_Key*              pCryptoKey,
-                                                                OpcUa_Boolean           bUseSymmetricAlgorithm,
-                                                                OpcUa_Key*              pInitialVector);
-
 OPCUA_END_EXTERN_C
 
 #endif /* _OpcUa_SecureStream_H_ */

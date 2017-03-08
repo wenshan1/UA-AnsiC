@@ -2902,48 +2902,6 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_SecureStream_DecryptInput
- *===========================================================================*/
-/* the read position must be at the beginning of the encrypted data */
-OpcUa_StatusCode OpcUa_SecureStream_DecryptInput(   OpcUa_InputStream*      a_pIstrm,
-                                                    OpcUa_CryptoProvider*   a_pCryptoProvider,
-                                                    OpcUa_Key*              a_pEncryptionKey,
-                                                    OpcUa_Boolean           a_bUseSymmetricAlgorithm,
-                                                    OpcUa_Key*              a_pInitializationVector)
-{
-    OpcUa_SecureStream* pSecureStream           = OpcUa_Null;
-    OpcUa_UInt32        uIndex                  = 0;
-
-OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "DecryptInput");
-
-    OpcUa_ReturnErrorIfArgumentNull(a_pIstrm);
-    OpcUa_ReturnErrorIfArgumentNull(a_pIstrm->Handle);
-    OpcUa_ReturnErrorIfArgumentNull(a_pEncryptionKey);
-
-    if(a_bUseSymmetricAlgorithm)
-    {
-        OpcUa_ReturnErrorIfArgumentNull(a_pInitializationVector);
-    }
-
-    pSecureStream = (OpcUa_SecureStream*)a_pIstrm->Handle;
-
-    /* decrypt all buffers */
-    for(uIndex = 0; uIndex < pSecureStream->nBuffers; uIndex++)
-    {
-        uStatus = OpcUa_SecureStream_DecryptInputBuffer(    &pSecureStream->Buffers[uIndex],
-                                                            a_pCryptoProvider,
-                                                            a_pEncryptionKey,
-                                                            a_bUseSymmetricAlgorithm,
-                                                            a_pInitializationVector);
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
-}
-
-/*============================================================================
  * OpcUa_SecureStream_EncryptOutput
  *===========================================================================*/
 /* ToDo: use the same buffer for encrypting */
