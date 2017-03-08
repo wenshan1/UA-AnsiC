@@ -388,7 +388,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "OpcUa_HttpsRequestLine_Parse");
 
     if(     OpcUa_StrnCmpA(pInitialChar, "HTTP/1.1", uLineLength - uPos) != 0
 #if OPCUA_HTTPS_ALLOW_HTTP10
-        &&  OpcUa_StrnCmpA(pInitialChar, "HTTP/1.0", uLineLength - uPos) != 0,
+        &&  OpcUa_StrnCmpA(pInitialChar, "HTTP/1.0", uLineLength - uPos) != 0
 #endif /* OPCUA_HTTPS_ALLOW_HTTP10 */
         )
     {
