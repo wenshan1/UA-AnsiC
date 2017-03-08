@@ -303,7 +303,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_DeriveChannelKeysets(
         OpcUa_SecurityKeyset*                   pServerKeyset);
 
 /**
-  @brief Gets the private key from a given certificate.
+  @brief Gets the public key from a given certificate.
 
   Function Pointer!
 
@@ -320,7 +320,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetPublicKeyFromCert)(
     OpcUa_Key*                          pPublicKey);
 
 /**
-  @brief Gets the private key from a given certificate.
+  @brief Gets the public key from a given certificate.
 
   Abstract!
 
@@ -352,7 +352,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetSignatureFromCert)(
     OpcUa_Signature*                    pSignature);
 
 /**
-  @brief Gets the private key from a given certificate.
+  @brief Gets the signature from a given certificate.
 
   Abstract!
 
@@ -367,7 +367,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_GetSignatureFromCert(
     OpcUa_Signature*                    pSignature);
 
 /**
-  @brief Gets the signature from a given certificate.
+  @brief Gets the SHA1 thumbprint from a given certificate.
 
   Function Pointer!
 
@@ -382,7 +382,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetCertificateThumbprint)(
     OpcUa_ByteString*                   pCertificateThumbprint);
 
 /**
-  @brief Gets the private key from a given certificate.
+  @brief Gets the SHA1 thumbprint from a given certificate.
 
   Abstract!
 
