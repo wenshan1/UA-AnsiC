@@ -303,40 +303,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_DeriveChannelKeysets(
         OpcUa_SecurityKeyset*                   pServerKeyset);
 
 /**
-  @brief Gets the public key from a given certificate.
-
-  Function Pointer!
-
-  @param pProvider               [in]  A pointer to a crypto provider.
-  @param certificate             [in]  The passed in certificate.
-  @param password                [in]  Password for certificate. Only used when certificate is password protected. (Optional)
-
-  @param pPrivateKey             [out] The read out private key of the certificate.
-*/
-typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetPrivateKeyFromCert)(
-    struct _OpcUa_CryptoProvider*       pProvider,
-    OpcUa_StringA                       certificateFileName,
-    OpcUa_StringA                       password,             /* this could be optional */
-    OpcUa_Key*                          pPrivateKey);
-
-/**
-  @brief Gets the public key from a given certificate.
-
-  Abstract!
-
-  @param pProvider               [in]  A pointer to a crypto provider.
-  @param certificate             [in]  The passed in certificate.
-  @param password                [in]  Password for certificate. Only used when certificate is password protected. (Optional)
-
-  @param pPrivateKey             [out] The read out private key of the certificate.
-*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_GetPrivateKeyFromCert(
-    struct _OpcUa_CryptoProvider*       pProvider,
-    OpcUa_StringA                       certificateFileName,
-    OpcUa_StringA                       password,             /* this could be optional */
-    OpcUa_Key*                          pPrivateKey);
-
-/**
   @brief Gets the private key from a given certificate.
 
   Function Pointer!
@@ -860,7 +826,6 @@ typedef struct _OpcUa_CryptoProvider
     OpcUa_Crypto_PfnGenerateAsymmetricKeypair*  GenerateAsymmetricKeypair;
     OpcUa_Crypto_PfnGetAsymmetricKeyLength*     GetAsymmetricKeyLength;
     OpcUa_Crypto_PfnCreateCertificate*          CreateCertificate;
-    OpcUa_Crypto_PfnGetPrivateKeyFromCert*      GetPrivateKeyFromCert;
     OpcUa_Crypto_PfnGetPublicKeyFromCert*       GetPublicKeyFromCert;
     OpcUa_Crypto_PfnGetSignatureFromCert*       GetSignatureFromCert;
     OpcUa_Crypto_PfnGetCertificateThumbprint*   GetCertificateThumbprint;
