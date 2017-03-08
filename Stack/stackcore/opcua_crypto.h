@@ -156,7 +156,16 @@ typedef OpcUa_ByteString OpcUa_Certificate;
 struct _OpcUa_CryptoProvider;
 
 /**
-  @brief
+  @brief Generates an asymmetric key pair.
+
+  Function Pointer!
+
+  @param pProvider        [in]  The crypto provider handle.
+  @param type             [in]  The key type (must be OpcUa_Crypto_Rsa_Id).
+  @param bits             [in]  The desired key length in bits.
+
+  @param pPublicKey       [out] The public RSA key.
+  @param pPrivateKey      [out] The private RSA key.
  */
 typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGenerateAsymmetricKeypair)(
     struct _OpcUa_CryptoProvider*   pProvider,
@@ -166,7 +175,16 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGenerateAsymmetricKeypair)(
     OpcUa_Key*                      pPrivateKey);
 
 /**
-  @brief
+  @brief Generates an asymmetric key pair.
+
+  Abstract!
+
+  @param pProvider        [in]  The crypto provider handle.
+  @param type             [in]  The key type (must be OpcUa_Crypto_Rsa_Id).
+  @param bits             [in]  The desired key length in bits.
+
+  @param pPublicKey       [out] The public RSA key.
+  @param pPrivateKey      [out] The private RSA key.
  */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_GenerateAsymmetricKeypair(
     struct _OpcUa_CryptoProvider*   pProvider,
@@ -176,7 +194,15 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_GenerateAsymmetricKeypair(
     OpcUa_Key*                      pPrivateKey);
 
 /**
-  @brief
+  @brief Gets the asymmetric key length of the public RSA key.
+  Note: the key length is rounded up to a multiple of 8.
+
+  Function Pointer!
+
+  @param pProvider        [in]  The crypto provider handle.
+  @param publicKey        [in]  The public RSA key.
+
+  @param uBits            [out] The key length in bits.
  */
 typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetAsymmetricKeyLength)(
     struct _OpcUa_CryptoProvider*   pProvider,
@@ -184,7 +210,15 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnGetAsymmetricKeyLength)(
     OpcUa_UInt32*                   uBits);
 
 /**
-  @brief
+  @brief Gets the asymmetric key length of the public RSA key.
+  Note: the key length is rounded up to a multiple of 8.
+
+  Abstract!
+
+  @param pProvider        [in]  The crypto provider handle.
+  @param publicKey        [in]  The public RSA key.
+
+  @param uBits            [out] The key length in bits.
  */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_GetAsymmetricKeyLength(
     struct _OpcUa_CryptoProvider*   pProvider,
