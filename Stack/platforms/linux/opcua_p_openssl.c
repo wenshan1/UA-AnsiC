@@ -792,7 +792,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
 
     if (a_pKeyset->InitializationVector.Key.Data == OpcUa_Null)
     {
-        a_pKeyset->InitializationVector.Key.Length = a_pCryptoProvider->SymmetricKeyLength;
+        a_pKeyset->InitializationVector.Key.Length = 16;
         bCalculateSizes = OpcUa_True;
     }
 
