@@ -83,10 +83,11 @@ static void OpcUa_P_OpenSSL_Lock(int mode, int type, const char *file, int line)
 /*============================================================================
  * OpcUa_P_OpenSSL_Initialize
  *===========================================================================*/
-void OpcUa_P_OpenSSL_Initialize()
+OpcUa_StatusCode OpcUa_P_OpenSSL_Initialize()
 {
 #if OPCUA_USE_SYNCHRONISATION
-    OpcUa_P_Mutex_Create(&OpenSSL_Mutex);
+    OpcUa_StatusCode uStatus = OpcUa_P_Mutex_Create(&OpenSSL_Mutex);
+    OpcUa_ReturnErrorIfBad(uStatus);
     CRYPTO_set_locking_callback(OpcUa_P_OpenSSL_Lock);
 #endif /* OPCUA_USE_SYNCHRONISATION */
     OpenSSL_add_all_algorithms();
@@ -95,6 +96,7 @@ void OpcUa_P_OpenSSL_Initialize()
     SSL_library_init();
     SSL_load_error_strings();
 #endif /* OPCUA_P_SOCKETMANAGER_SUPPORT_SSL */
+    return OpcUa_Good;
 }
 
 /*============================================================================

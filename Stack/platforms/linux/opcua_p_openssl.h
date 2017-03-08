@@ -22,7 +22,7 @@ OPCUA_BEGIN_EXTERN_C
 /**
   @brief Initializes the OpenSSL library.
 */
-void OpcUa_P_OpenSSL_Initialize();
+OpcUa_StatusCode OpcUa_P_OpenSSL_Initialize();
 
 /**
   @brief cleans up the OpenSSL library.

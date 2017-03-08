@@ -42,10 +42,6 @@
 #include <opcua_p_pkifactory.h>
 #include <opcua_p_openssl.h>
 
-#ifdef OPCUA_HAVE_XMLPARSER
-#include <opcua_p_libxml2.h>
-#endif /* OPCUA_HAVE_XMLPARSER */
-
 /*============================================================================
  * g_OpcUa_Port_CallTable
  *===========================================================================*/
@@ -171,19 +167,22 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Initialize(OpcUa_Handle* a_pPlatformLayer
         return OpcUa_BadInvalidState;
     }
 
-    /* marked as initialized */
-    g_OpcUa_Port_CallTable.pReserved = (OpcUa_Void*)1;
-
-    uStatus = OpcUa_P_InitializeTimers();
-    OpcUa_ReturnErrorIfBad(uStatus);
-
 #if OPCUA_REQUIRE_OPENSSL
-    OpcUa_P_OpenSSL_Initialize();
+    uStatus = OpcUa_P_OpenSSL_Initialize();
+    OpcUa_ReturnErrorIfBad(uStatus);
 #endif /* OPCUA_REQUIRE_OPENSSL */
 
-#ifdef OPCUA_HAVE_XMLPARSER
-    OpcUa_P_Libxml2_Initialize();
-#endif /* OPCUA_HAVE_XMLPARSER */
+    uStatus = OpcUa_P_InitializeTimers();
+    if(OpcUa_IsBad(uStatus))
+    {
+#if OPCUA_REQUIRE_OPENSSL
+        OpcUa_P_OpenSSL_Cleanup();
+#endif /* OPCUA_REQUIRE_OPENSSL */
+        return uStatus;
+    }
+
+    /* marked as initialized */
+    g_OpcUa_Port_CallTable.pReserved = (OpcUa_Void*)1;
 
     /* assign call table */
     *a_pPlatformLayerHandle = (OpcUa_Handle)&g_OpcUa_Port_CallTable;
@@ -215,10 +214,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Clean(OpcUa_Handle* a_pPlatformLayerHandl
 #if OPCUA_REQUIRE_OPENSSL
     OpcUa_P_OpenSSL_Cleanup();
 #endif /* OPCUA_REQUIRE_OPENSSL */
-
-#ifdef OPCUA_HAVE_XMLPARSER
-    OpcUa_P_Libxml2_Cleanup();
-#endif /* OPCUA_HAVE_XMLPARSER */
 
     /* marked as cleared */
     g_OpcUa_Port_CallTable.pReserved = OpcUa_Null;

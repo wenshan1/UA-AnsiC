@@ -169,15 +169,22 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Initialize(OpcUa_Handle* a_pPlatformLayer
         return OpcUa_BadInvalidState;
     }
 
-    /* marked as initialized */
-    g_OpcUa_Port_CallTable.pReserved = (OpcUa_Void*)1;
+#if OPCUA_REQUIRE_OPENSSL
+    uStatus = OpcUa_P_OpenSSL_Initialize();
+    OpcUa_ReturnErrorIfBad(uStatus);
+#endif /* OPCUA_REQUIRE_OPENSSL */
 
     uStatus = OpcUa_P_InitializeTimers();
-    OpcUa_ReturnErrorIfBad(uStatus);
-
+    if(OpcUa_IsBad(uStatus))
+    {
 #if OPCUA_REQUIRE_OPENSSL
-    OpcUa_P_OpenSSL_Initialize();
+        OpcUa_P_OpenSSL_Cleanup();
 #endif /* OPCUA_REQUIRE_OPENSSL */
+        return uStatus;
+    }
+
+    /* marked as initialized */
+    g_OpcUa_Port_CallTable.pReserved = (OpcUa_Void*)1;
 
     /* assign call table */
     *a_pPlatformLayerHandle = (OpcUa_Handle)&g_OpcUa_Port_CallTable;
