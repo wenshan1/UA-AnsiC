@@ -848,25 +848,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA1_Generate(
 /**
   @brief Generates variant bytes message digest of the given input buffer.
 
-  SHA-1: 160 Bits output
-
-  synchronous!
-
-  @param pProvider        [in]  The crypto provider handle.
-  @param pData            [in]  The data for the hash generation.
-  @param dataLen          [in]  The length data for the hash generation.
-
-  @param pMessageDigest   [out] The resulting message digest (hash).
-*/
-OpcUa_StatusCode OpcUa_P_OpenSSL_SHA1_160_Generate(
-    OpcUa_CryptoProvider*         pProvider,
-    OpcUa_Byte*                   pData,
-    OpcUa_UInt32                  dataLen,
-    OpcUa_Byte*                   pMessageDigest);
-
-/**
-  @brief Generates variant bytes message digest of the given input buffer.
-
   SHA-2: 224 Bits output
 
   synchronous!

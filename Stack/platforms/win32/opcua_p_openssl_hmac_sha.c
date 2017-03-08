@@ -52,13 +52,14 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    HMAC(EVP_sha1(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length));
-
-    if(a_pMac->Length <= 0)
-        uStatus = OpcUa_Bad;
+    if(HMAC(EVP_sha1(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
+
 OpcUa_FinishErrorHandling;
 }
 
@@ -88,10 +89,10 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_224_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    HMAC(EVP_sha224(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length));
-
-    if(a_pMac->Length <= 0)
-        uStatus = OpcUa_Bad;
+    if(HMAC(EVP_sha224(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -125,9 +126,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    HMAC(EVP_sha256(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length));
-
-    if(a_pMac->Length <= 0)
+    if(HMAC(EVP_sha256(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length)) == OpcUa_Null)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_Bad);
     }
@@ -164,10 +163,10 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    HMAC(EVP_sha384(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length));
-
-    if(a_pMac->Length <= 0)
-        uStatus = OpcUa_Bad;
+    if(HMAC(EVP_sha384(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -201,10 +200,10 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_512_Generate(
         OpcUa_ReturnStatusCode;
     }
 
-    HMAC(EVP_sha512(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length));
-
-    if(a_pMac->Length <= 0)
-        uStatus = OpcUa_Bad;
+    if(HMAC(EVP_sha512(),a_key->Key.Data,a_key->Key.Length,a_pData,a_dataLen,a_pMac->Data,(unsigned int*)&(a_pMac->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;

@@ -40,7 +40,7 @@ struct OpcUa_P_OpenSSL_PSHA1_Ctx_
 {
     OpcUa_Int secret_len;
     OpcUa_Int seed_len;
-    OpcUa_SByte A[20]; /* 20 bytes of SHA1 output */
+    OpcUa_Byte A[20]; /* 20 bytes of SHA1 output */
     /* pseudo elements:
      * char seed[seed_len];
      * char secret[secret_len];
@@ -89,7 +89,7 @@ struct OpcUa_P_OpenSSL_PSHA256_Ctx_
 {
     OpcUa_Int secret_len;
     OpcUa_Int seed_len;
-    OpcUa_SByte A[32]; /* 32 bytes of SHA256 output */
+    OpcUa_Byte A[32]; /* 32 bytes of SHA256 output */
     /* pseudo elements:
      * char seed[seed_len];
      * char secret[secret_len];
@@ -167,7 +167,7 @@ OpcUa_P_OpenSSL_PSHA1_Ctx* OpcUa_P_OpenSSL_PSHA1_Context_Create(
     OpcUa_P_OpenSSL_PSHA1_Ctx*  pCtx;
     OpcUa_Int                   size;
 
-    if(a_pSecret == OpcUa_Null || a_pSeed   == OpcUa_Null)
+    if(a_pSecret == OpcUa_Null || a_pSeed == OpcUa_Null)
         return OpcUa_Null;
 
     pCtx = OpcUa_Null;
@@ -175,7 +175,7 @@ OpcUa_P_OpenSSL_PSHA1_Ctx* OpcUa_P_OpenSSL_PSHA1_Context_Create(
 
     pCtx = (OpcUa_P_OpenSSL_PSHA1_Ctx*) OpcUa_P_Memory_Alloc(size);
 
-    if (pCtx == OpcUa_Null)
+    if(pCtx == OpcUa_Null)
         return OpcUa_Null;
 
     pCtx->secret_len = a_secretLen;
@@ -187,10 +187,11 @@ OpcUa_P_OpenSSL_PSHA1_Ctx* OpcUa_P_OpenSSL_PSHA1_Context_Create(
     /* A(0) = seed */
     /* A(i) = HMAC_SHA1(secret, A(i-1)) */
     /* Calculate A(1) = HMAC_SHA1(secret, seed) */
-    HMAC(EVP_sha1(), a_pSecret, a_secretLen, a_pSeed, a_seedLen, (unsigned char*)pCtx->A, (unsigned int*)OpcUa_Null);
-
-    if(pCtx == OpcUa_Null)
+    if(HMAC(EVP_sha1(), a_pSecret, a_secretLen, a_pSeed, a_seedLen, pCtx->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pCtx);
         return OpcUa_Null;
+    }
 
     return pCtx;
 }
@@ -214,16 +215,23 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA1_Hash_Generate(
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PSHA1_Hash_Generate");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pPsha1Context);
+    OpcUa_ReturnErrorIfArgumentNull(a_pHash);
 
     /* Calculate P_SHA1(n) = HMAC_SHA1(secret, A(n)+seed) */
-    HMAC(EVP_sha1(), OpcUa_P_OpenSSL_PSHA1_SECRET(a_pPsha1Context), a_pPsha1Context->secret_len,
-                     (unsigned char*)a_pPsha1Context->A, sizeof(a_pPsha1Context->A) + a_pPsha1Context->seed_len,
-                     a_pHash, OpcUa_Null);
+    if(HMAC(EVP_sha1(), OpcUa_P_OpenSSL_PSHA1_SECRET(a_pPsha1Context), a_pPsha1Context->secret_len,
+                     a_pPsha1Context->A, sizeof(a_pPsha1Context->A) + a_pPsha1Context->seed_len,
+                     a_pHash, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
     /* Calculate A(n) = HMAC_SHA1(secret, A(n-1)) */
-    HMAC(EVP_sha1(), OpcUa_P_OpenSSL_PSHA1_SECRET(a_pPsha1Context), a_pPsha1Context->secret_len, (const unsigned char*)a_pPsha1Context->A, sizeof(a_pPsha1Context->A), (unsigned char*)a_pPsha1Context->A, (unsigned int*)OpcUa_Null);
-
-    OpcUa_ReturnErrorIfNull(a_pHash, OpcUa_Bad);
+    if(HMAC(EVP_sha1(), OpcUa_P_OpenSSL_PSHA1_SECRET(a_pPsha1Context), a_pPsha1Context->secret_len,
+                     a_pPsha1Context->A, sizeof(a_pPsha1Context->A),
+                     a_pPsha1Context->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 
@@ -278,8 +286,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
     }
     else if(keyLen > MAX_DERIVED_OUTPUT_LEN)
     {
-            uStatus = OpcUa_BadInvalidArgument;
-            OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     if(a_pKey->Key.Data == OpcUa_Null)
@@ -292,14 +300,14 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
 
     /** start creating key **/
 
-    pCtx = (OpcUa_P_OpenSSL_PSHA1_Ctx*)OpcUa_Null;
-
     iterations = keyLen/20 + (keyLen%20?1:0);
     bufferlength = iterations*20;
 
     pBuffer = (OpcUa_Byte *)OpcUa_P_Memory_Alloc(bufferlength * sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(pBuffer);
 
     pCtx = OpcUa_P_OpenSSL_PSHA1_Context_Create(a_secret.Data, a_secret.Length, a_seed.Data, a_seed.Length);
+    OpcUa_GotoErrorIfAllocFailed(pCtx);
 
     for(i=0; i<iterations; i++)
     {
@@ -308,19 +316,11 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
+    uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
 
-    if(pCtx != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(pCtx);
-        pCtx = OpcUa_Null;
-    }
+    OpcUa_P_Memory_Free(pCtx);
 
-    if(pBuffer != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(pBuffer);
-        pBuffer = OpcUa_Null;
-    }
+    OpcUa_P_Memory_Free(pBuffer);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -328,13 +328,11 @@ OpcUa_BeginErrorHandling;
     if(pCtx != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(pCtx);
-        pCtx = OpcUa_Null;
     }
 
     if(pBuffer != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(pBuffer);
-        pBuffer = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -376,8 +374,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_Generate(
     }
     else if(keyLen > MAX_GENERATED_OUTPUT_LEN)
     {
-            uStatus = OpcUa_BadInvalidArgument;
-            OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     a_pKey->Key.Length = keyLen;
@@ -422,7 +420,7 @@ OpcUa_P_OpenSSL_PSHA256_Ctx* OpcUa_P_OpenSSL_PSHA256_Context_Create(
     OpcUa_P_OpenSSL_PSHA256_Ctx*  pCtx;
     OpcUa_Int                   size;
 
-    if(a_pSecret == OpcUa_Null || a_pSeed   == OpcUa_Null)
+    if(a_pSecret == OpcUa_Null || a_pSeed == OpcUa_Null)
         return OpcUa_Null;
 
     pCtx = OpcUa_Null;
@@ -430,7 +428,7 @@ OpcUa_P_OpenSSL_PSHA256_Ctx* OpcUa_P_OpenSSL_PSHA256_Context_Create(
 
     pCtx = (OpcUa_P_OpenSSL_PSHA256_Ctx*) OpcUa_P_Memory_Alloc(size);
 
-    if (pCtx == OpcUa_Null)
+    if(pCtx == OpcUa_Null)
         return OpcUa_Null;
 
     pCtx->secret_len = a_secretLen;
@@ -442,10 +440,11 @@ OpcUa_P_OpenSSL_PSHA256_Ctx* OpcUa_P_OpenSSL_PSHA256_Context_Create(
     /* A(0) = seed */
     /* A(i) = HMAC_SHA256(secret, A(i-1)) */
     /* Calculate A(1) = HMAC_SHA256(secret, seed) */
-    HMAC(EVP_sha256(), a_pSecret, a_secretLen, a_pSeed, a_seedLen, (unsigned char*)pCtx->A, (unsigned int*)OpcUa_Null);
-
-    if(pCtx == OpcUa_Null)
+    if(HMAC(EVP_sha256(), a_pSecret, a_secretLen, a_pSeed, a_seedLen, pCtx->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pCtx);
         return OpcUa_Null;
+    }
 
     return pCtx;
 }
@@ -469,16 +468,23 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA256_Hash_Generate(
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PSHA256_Hash_Generate");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pPsha256Context);
+    OpcUa_ReturnErrorIfArgumentNull(a_pHash);
 
     /* Calculate P_SHA256(n) = HMAC_SHA256(secret, A(n)+seed) */
-    HMAC(EVP_sha256(), OpcUa_P_OpenSSL_PSHA256_SECRET(a_pPsha256Context), a_pPsha256Context->secret_len,
-                     (unsigned char*)a_pPsha256Context->A, sizeof(a_pPsha256Context->A) + a_pPsha256Context->seed_len,
-                     a_pHash, OpcUa_Null);
+    if(HMAC(EVP_sha256(), OpcUa_P_OpenSSL_PSHA256_SECRET(a_pPsha256Context), a_pPsha256Context->secret_len,
+                     a_pPsha256Context->A, sizeof(a_pPsha256Context->A) + a_pPsha256Context->seed_len,
+                     a_pHash, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
     /* Calculate A(n) = HMAC_SHA256(secret, A(n-1)) */
-    HMAC(EVP_sha256(), OpcUa_P_OpenSSL_PSHA256_SECRET(a_pPsha256Context), a_pPsha256Context->secret_len, (const unsigned char*)a_pPsha256Context->A, sizeof(a_pPsha256Context->A), (unsigned char*)a_pPsha256Context->A, (unsigned int*)OpcUa_Null);
-
-    OpcUa_ReturnErrorIfNull(a_pHash, OpcUa_Bad);
+    if(HMAC(EVP_sha256(), OpcUa_P_OpenSSL_PSHA256_SECRET(a_pPsha256Context), a_pPsha256Context->secret_len,
+                     a_pPsha256Context->A, sizeof(a_pPsha256Context->A),
+                     a_pPsha256Context->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
 
 OpcUa_ReturnStatusCode;
 
@@ -547,14 +553,14 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
 
     /** start creating key **/
 
-    pCtx = (OpcUa_P_OpenSSL_PSHA256_Ctx*)OpcUa_Null;
-
     iterations = keyLen/32 + (keyLen%32?1:0);
     bufferlength = iterations*32;
 
     pBuffer = (OpcUa_Byte *)OpcUa_P_Memory_Alloc(bufferlength * sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(pBuffer);
 
     pCtx = OpcUa_P_OpenSSL_PSHA256_Context_Create(a_secret.Data, a_secret.Length, a_seed.Data, a_seed.Length);
+    OpcUa_GotoErrorIfAllocFailed(pCtx);
 
     for(i=0; i<iterations; i++)
     {
@@ -563,19 +569,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
+    uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
 
-    if(pCtx != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(pCtx);
-        pCtx = OpcUa_Null;
-    }
-
-    if(pBuffer != OpcUa_Null)
-    {
-        OpcUa_P_Memory_Free(pBuffer);
-        pBuffer = OpcUa_Null;
-    }
+    OpcUa_P_Memory_Free(pCtx);
+    OpcUa_P_Memory_Free(pBuffer);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -583,13 +580,11 @@ OpcUa_BeginErrorHandling;
     if(pCtx != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(pCtx);
-        pCtx = OpcUa_Null;
     }
 
     if(pBuffer != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(pBuffer);
-        pBuffer = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
