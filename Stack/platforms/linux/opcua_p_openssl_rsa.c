@@ -469,7 +469,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
     OpcUa_UInt32    keySize         = 0;
     OpcUa_Int32     decryptedBytes  = 0;
     OpcUa_UInt32    iCipherText     = 0;
-    /* OpcUa_UInt32 iPlainTextLen   = 0; */
     OpcUa_UInt32    decDataSize     = 0;
 
     const unsigned char *pData;
@@ -493,7 +492,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
     pData = a_privateKey->Key.Data;
     pPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA,OpcUa_Null, &pData, a_privateKey->Key.Length);
 
-    if (pPrivateKey == OpcUa_Null)
+    if(pPrivateKey == OpcUa_Null)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
     }
@@ -553,7 +552,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
                                                     a_padding);                         /* padding mode         */
 
             /* if decryption fails return the same result as if signature check fails */
-            if(decryptedBytes < 0)
+            /* also fail if zero bytes are decoded */
+            if(decryptedBytes <= 0)
             {
                 /* continue decrypting the message in constant time */
                 uStatus = OpcUa_BadSignatureInvalid;
@@ -561,7 +561,11 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Private_Decrypt(
                 /* do not leak timing information by skipping the memcpy */
                 memmove(a_pPlainText + (*a_pPlainTextLen), a_pCipherText + iCipherText, decryptedBytes);
             }
-
+            /* only the last part may be smaller */
+            else if(iCipherText + keySize < a_cipherTextLen && (OpcUa_UInt32)decryptedBytes != decDataSize)
+            {
+                uStatus = OpcUa_BadSignatureInvalid;
+            }
         }
         else
         {
@@ -684,11 +688,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
         OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
     }
 
-    if((a_pSignature->Length%keySize) != 0)
-    {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadSignatureInvalid);
-    }
-
     if(RSA_verify(a_padding, a_data.Data, a_data.Length, a_pSignature->Data, a_pSignature->Length, pPublicKey->pkey.rsa) != 1)
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadSignatureInvalid);
@@ -699,7 +698,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
-    if (pPublicKey != OpcUa_Null)
+    if(pPublicKey != OpcUa_Null)
     {
         EVP_PKEY_free(pPublicKey);
     }
