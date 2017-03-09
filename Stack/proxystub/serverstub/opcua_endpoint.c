@@ -386,7 +386,7 @@ OpcUa_StatusCode OpcUa_Endpoint_OnSecureChannelEvent(   OpcUa_UInt32            
                         a_uSecureChannelId,
                         OpcUa_Null,
                         OpcUa_Null,
-                        0);
+                        a_uMessageSecurityModes);
 
                     break;
                 }

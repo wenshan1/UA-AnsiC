@@ -45,7 +45,8 @@
 #include <opcua_securelistener_policymanager.h>
 
 /** @brief Map enumeration OpcUa_MessageSecurityMode to bitfield */
-#define OPCUA_ENDPOINT_MESSAGESECURITYMODE_FROM_ENUM(xMode) ((OpcUa_UInt16)((xMode == 0) ? 1 : (xMode << 1)))
+#define OPCUA_ENDPOINT_MESSAGESECURITYMODE_FROM_ENUM(xMode) (OpcUa_UInt16)((xMode) == OpcUa_MessageSecurityMode_SignAndEncrypt \
+                                                             ? OPCUA_SECURECHANNEL_MESSAGESECURITYMODE_SIGNANDENCRYPT : (xMode))
 
 /** @brief internal configuration - only for test */
 #define OPCUA_SECURELISTENER_ALLOW_NOPKI OPCUA_CONFIG_NO
@@ -2220,7 +2221,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
             /* update and validate the security mode. */
             switch(pRequest->SecurityMode)
             {
-                default:
                 case OpcUa_MessageSecurityMode_None:
                 {
                     secConfig.uMessageSecurityModes = OPCUA_SECURECHANNEL_MESSAGESECURITYMODE_NONE;
@@ -2237,6 +2237,10 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
                 {
                     secConfig.uMessageSecurityModes = OPCUA_SECURECHANNEL_MESSAGESECURITYMODE_SIGNANDENCRYPT;
                     break;
+                }
+                default:
+                {
+                    OpcUa_GotoErrorWithStatus(OpcUa_BadSecurityModeRejected);
                 }
             }
 
@@ -2356,14 +2360,12 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
     {
         OpcUa_OpenSecureChannelRequest_Clear(pRequest);
         OpcUa_Free(pRequest);
-        pRequest = OpcUa_Null;
     }
 
     if(pSecurityToken != OpcUa_Null)
     {
         OpcUa_ChannelSecurityToken_Clear(pSecurityToken);
         OpcUa_Free(pSecurityToken);
-        pSecurityToken = OpcUa_Null;
     }
 
     if(pSecureStream != OpcUa_Null && pSecureStream->InnerStrm != OpcUa_Null)
@@ -2394,20 +2396,17 @@ OpcUa_BeginErrorHandling;
     {
         OpcUa_OpenSecureChannelRequest_Clear(pRequest);
         OpcUa_Free(pRequest);
-        pRequest = OpcUa_Null;
     }
 
     if(pSecurityToken != OpcUa_Null)
     {
         OpcUa_Free(pSecurityToken);
-        pSecurityToken = OpcUa_Null;
     }
 
     if(pCryptoProvider)
     {
         OPCUA_P_CRYPTOFACTORY_DELETECRYPTOPROVIDER(pCryptoProvider);
         OpcUa_Free(pCryptoProvider);
-        pCryptoProvider = OpcUa_Null;
     }
 
     if(pSecureStream != OpcUa_Null && pSecureStream->InnerStrm != OpcUa_Null)
@@ -2651,7 +2650,6 @@ OpcUa_BeginErrorHandling;
     {
         OpcUa_CloseSecureChannelRequest_Clear(pRequest);
         OpcUa_Free(pRequest);
-        pRequest = OpcUa_Null;
     }
 
     if(a_ppTransportIstrm != OpcUa_Null && (*a_ppTransportIstrm) != OpcUa_Null)
@@ -3048,8 +3046,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "GetSecureChannelSecurityPol
                                 OpcUa_False,
                                 &a_pSecurityPolicyConfiguration->sSecurityPolicy);
 
-    /* the source enum only has values that fit into 16 bit, so this is safe */
-    a_pSecurityPolicyConfiguration->uMessageSecurityModes = (OpcUa_UInt16)pSecureChannel->MessageSecurityMode;
+    a_pSecurityPolicyConfiguration->uMessageSecurityModes = OPCUA_ENDPOINT_MESSAGESECURITYMODE_FROM_ENUM(pSecureChannel->MessageSecurityMode);
     a_pSecurityPolicyConfiguration->pbsClientCertificate = OpcUa_Null;
 
     OpcUa_SecureListener_ChannelManager_ReleaseChannel(

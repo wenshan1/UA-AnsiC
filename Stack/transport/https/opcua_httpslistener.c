@@ -291,7 +291,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "GetSecurityPolicyConfiguratio
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    a_pSecurityPolicyConfiguration->uMessageSecurityModes = OpcUa_MessageSecurityMode_None;
+    a_pSecurityPolicyConfiguration->uMessageSecurityModes = OPCUA_SECURECHANNEL_MESSAGESECURITYMODE_SIGNANDENCRYPT;
     a_pSecurityPolicyConfiguration->pbsClientCertificate  = OpcUa_Null;
 
     OpcUa_HttpsListener_ConnectionManager_ReleaseConnection(    pHttpsListener->pConnectionManager,
