@@ -246,8 +246,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "GenerateSecurityToken");
     /* assign outparameter */
     *a_ppSecurityToken = pSecurityToken;
 
-    pSecurityToken = OpcUa_Null;
-
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
@@ -256,7 +254,6 @@ OpcUa_BeginErrorHandling;
     if(pSecurityToken != OpcUa_Null)
     {
         OpcUa_Free(pSecurityToken);
-        pSecurityToken = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -306,8 +303,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "RenewSecurityToken");
     /* assign outparameter */
     *a_ppSecurityToken  = pSecurityToken;
 
-    pSecurityToken = OpcUa_Null;
-
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
@@ -316,7 +311,6 @@ OpcUa_BeginErrorHandling;
     if(pSecurityToken != OpcUa_Null)
     {
         OpcUa_Free(pSecurityToken);
-        pSecurityToken = OpcUa_Null;
     }
 
 OpcUa_FinishErrorHandling;
@@ -704,9 +698,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureChannel, "Create");
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
-    OpcUa_Free(pTcpSecureChannel);
-    pTcpSecureChannel = OpcUa_Null;
-
     if (*a_ppSecureChannel != OpcUa_Null)
     {
         if((*a_ppSecureChannel)->hSyncAccess != OpcUa_Null)
@@ -722,6 +713,8 @@ OpcUa_BeginErrorHandling;
         OpcUa_Free(*a_ppSecureChannel);
         *a_ppSecureChannel = OpcUa_Null;
     }
+
+    OpcUa_Free(pTcpSecureChannel);
 
 OpcUa_FinishErrorHandling;
 }
