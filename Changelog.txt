@@ -10,6 +10,10 @@ Current Version
 		Use OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON to enable FindServersOnNetwork in discoyery only mode.
 		Note: Always leave this option disabled unless you are building the Stack for use in the LDS.
 	- fixed memory leaks (issue #27, #28, #29)
+	- fixed encoding of uMessageSecurityModes (issue #36):
+		The value returned from OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy
+		used the wrong enumeration type OpcUa_MessageSecurityMode instead of
+		OPCUA_ENDPOINT_MESSAGESECURITYMODE values.
 
 Version 1.03.340
 	
