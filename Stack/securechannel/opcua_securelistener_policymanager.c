@@ -282,6 +282,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OpcUa_SecureListener_Policy
     pPolicyConfiguration = (OpcUa_SecureListener_SecurityPolicyConfiguration*)OpcUa_Alloc(sizeof(OpcUa_SecureListener_SecurityPolicyConfiguration));
     OpcUa_ReturnErrorIfAllocFailed(pPolicyConfiguration);
     OpcUa_MemSet(pPolicyConfiguration, 0, sizeof(OpcUa_SecureListener_SecurityPolicyConfiguration));
+    OpcUa_String_Initialize(&pPolicyConfiguration->sSecurityPolicy);
 
     OpcUa_List_Enter(a_pPolicyManager->SecurityPolicies);
 
@@ -294,6 +295,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "OpcUa_SecureListener_Policy
                                             OpcUa_True,
                                             OpcUa_True,
                                             &pPolicyConfiguration->sSecurityPolicy);
+    OpcUa_GotoErrorIfBad(uStatus);
 
     pPolicyConfiguration->uMessageSecurityModes = a_pPolicyConfiguration->uMessageSecurityModes;
 
@@ -307,6 +309,7 @@ OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
     OpcUa_List_Leave(a_pPolicyManager->SecurityPolicies);
+    OpcUa_String_Clear(&pPolicyConfiguration->sSecurityPolicy);
     OpcUa_Free(pPolicyConfiguration);
 
 OpcUa_FinishErrorHandling;
