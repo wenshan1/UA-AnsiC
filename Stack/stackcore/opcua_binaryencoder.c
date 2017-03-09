@@ -39,7 +39,6 @@ typedef struct _OpcUa_BinaryEncoder
     OpcUa_OutputStream*   Ostrm;
     OpcUa_MessageContext* Context;
     OpcUa_Boolean         Closed;
-    OpcUa_Mutex           Mutex;
 }
 OpcUa_BinaryEncoder;
 
@@ -217,8 +216,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_Open");
 
     OpcUa_ReturnErrorIfArgumentNull((OpcUa_BinaryEncoder*)a_pEncoder->Handle);
 
-    OPCUA_P_MUTEX_LOCK(((OpcUa_BinaryEncoder*)a_pEncoder->Handle)->Mutex);
-
     OpcUa_GotoErrorIfTrue(!((OpcUa_BinaryEncoder*)a_pEncoder->Handle)->Closed, OpcUa_BadInvalidState);
 
     /* create handle */
@@ -233,23 +230,14 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryEncoder_Open");
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Ostrm       = a_pOstrm;
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Context     = a_pContext;
     ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Closed      = OpcUa_False;
-    ((OpcUa_BinaryEncoder*)pEncodeContext->Handle)->Mutex       = OpcUa_Null;
-
-    OPCUA_P_MUTEX_UNLOCK(((OpcUa_BinaryEncoder*)a_pEncoder->Handle)->Mutex);
 
     *a_phEncodeContext = pEncodeContext;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
-    OPCUA_P_MUTEX_UNLOCK(((OpcUa_BinaryEncoder*)a_pEncoder->Handle)->Mutex);
-
     if(pEncodeContext != OpcUa_Null)
     {
-        if(pEncodeContext->Handle != OpcUa_Null)
-        {
-            OpcUa_Free(pEncodeContext->Handle);
-        }
         OpcUa_Free(pEncodeContext);
     }
 
@@ -296,8 +284,6 @@ OpcUa_Void OpcUa_BinaryEncoder_Delete(
     if (a_ppEncoder != OpcUa_Null && *a_ppEncoder != OpcUa_Null)
     {
         OpcUa_BinaryEncoder* pHandle = (OpcUa_BinaryEncoder*)(*a_ppEncoder)->Handle;
-
-        OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
 
         OpcUa_Free(pHandle);
 
@@ -3776,9 +3762,6 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_Create(
     pHandle->Ostrm       = OpcUa_Null;
     pHandle->Context     = OpcUa_Null;
 
-    uStatus = OPCUA_P_MUTEX_CREATE(&pHandle->Mutex);
-    OpcUa_GotoErrorIfBad(uStatus);
-
     *a_ppEncoder = (OpcUa_Encoder*)OpcUa_Alloc(sizeof(OpcUa_Encoder));
     OpcUa_GotoErrorIfAllocFailed(*a_ppEncoder);
     OpcUa_MemSet(*a_ppEncoder, 0, sizeof(OpcUa_Encoder));
@@ -3852,16 +3835,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_Create(
 
     if(pHandle != OpcUa_Null)
     {
-        if(pHandle->Mutex != OpcUa_Null)
-        {
-            OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
-        }
         OpcUa_Free(pHandle);
-    }
-    if(a_ppEncoder != OpcUa_Null)
-    {
-        OpcUa_Free(*a_ppEncoder);
-        *a_ppEncoder = OpcUa_Null;
     }
 
     OpcUa_FinishErrorHandling;

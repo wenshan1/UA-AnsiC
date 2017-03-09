@@ -42,7 +42,6 @@ typedef struct _OpcUa_BinaryDecoder
     OpcUa_InputStream*    Istrm;
     OpcUa_MessageContext* Context;
     OpcUa_Boolean         Closed;
-    OpcUa_Mutex           Mutex;
     OpcUa_UInt32          RecursionDepth;
 }
 OpcUa_BinaryDecoder;
@@ -199,8 +198,6 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryDecoder_Open");
 
     *a_phDecodeContext = OpcUa_Null;
 
-    OPCUA_P_MUTEX_LOCK(((OpcUa_BinaryDecoder*)a_pDecoder->Handle)->Mutex);
-
     OpcUa_GotoErrorIfTrue(!((OpcUa_BinaryDecoder*)a_pDecoder->Handle)->Closed, OpcUa_BadInvalidState);
 
     /* create handle */
@@ -215,24 +212,15 @@ OpcUa_InitializeStatus(OpcUa_Module_Serializer, "OpcUa_BinaryDecoder_Open");
     ((OpcUa_BinaryDecoder*)pDecoderContext->Handle)->Closed         = OpcUa_False;
     ((OpcUa_BinaryDecoder*)pDecoderContext->Handle)->Istrm          = a_pIstrm;
     ((OpcUa_BinaryDecoder*)pDecoderContext->Handle)->Context        = a_pContext;
-    ((OpcUa_BinaryDecoder*)pDecoderContext->Handle)->Mutex          = OpcUa_Null;
     ((OpcUa_BinaryDecoder*)pDecoderContext->Handle)->RecursionDepth = 0;
-
-    OPCUA_P_MUTEX_UNLOCK(((OpcUa_BinaryDecoder*)a_pDecoder->Handle)->Mutex);
 
     *a_phDecodeContext = pDecoderContext;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
-    OPCUA_P_MUTEX_UNLOCK(((OpcUa_BinaryDecoder*)a_pDecoder->Handle)->Mutex);
-
     if(pDecoderContext != OpcUa_Null)
     {
-        if(pDecoderContext->Handle != OpcUa_Null)
-        {
-            OpcUa_Free(pDecoderContext->Handle);
-        }
         OpcUa_Free(pDecoderContext);
     }
 
@@ -280,7 +268,6 @@ OpcUa_Void OpcUa_BinaryDecoder_Delete(
     if (a_ppDecoder != OpcUa_Null && *a_ppDecoder != OpcUa_Null)
     {
         OpcUa_BinaryDecoder* pHandle = (OpcUa_BinaryDecoder*)(*a_ppDecoder)->Handle;
-        OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
         OpcUa_Free(pHandle);
 
         OpcUa_Free(*a_ppDecoder);
@@ -3200,9 +3187,6 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_Create(
     pHandle->Istrm       = OpcUa_Null;
     pHandle->Context     = OpcUa_Null;
 
-    uStatus = OPCUA_P_MUTEX_CREATE(&pHandle->Mutex);
-    OpcUa_GotoErrorIfBad(uStatus);
-
     *a_ppDecoder = (OpcUa_Decoder*)OpcUa_Alloc(sizeof(OpcUa_Decoder));
     OpcUa_GotoErrorIfAllocFailed(*a_ppDecoder);
     OpcUa_MemSet(*a_ppDecoder, 0, sizeof(OpcUa_Decoder));
@@ -3276,16 +3260,7 @@ OpcUa_StatusCode OpcUa_BinaryDecoder_Create(
 
     if(pHandle != OpcUa_Null)
     {
-        if(pHandle->Mutex != OpcUa_Null)
-        {
-            OPCUA_P_MUTEX_DELETE(&pHandle->Mutex);
-        }
         OpcUa_Free(pHandle);
-    }
-    if(a_ppDecoder != OpcUa_Null)
-    {
-        OpcUa_Free(*a_ppDecoder);
-        *a_ppDecoder = OpcUa_Null;
     }
 
     OpcUa_FinishErrorHandling;
