@@ -893,9 +893,9 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "OpcUa_HttpsHeaderCollection_Par
                                               uCharCount,
                                               uCharCount,
 #if OPCUA_HTTPS_COPYHEADERS
-                                          OpcUa_True,
+                                              OpcUa_True,
 #else
-                                          OpcUa_False,
+                                              OpcUa_False,
 #endif
                                               OpcUa_False,
                                               &sSubstring);

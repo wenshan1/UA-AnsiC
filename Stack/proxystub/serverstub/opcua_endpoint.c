@@ -456,12 +456,12 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
     pEndpointInt->State = eOpcUa_Endpoint_State_Open;
 
     /* attach the given url to the endpoint (make copy) */
-    OpcUa_String_AttachToString(    a_sUrl,
-                                    OPCUA_STRINGLENZEROTERMINATED,
-                                    0,
-                                    OpcUa_True,
-                                    OpcUa_False,
-                                    &(pEndpointInt->Url));
+    uStatus = OpcUa_String_AttachToString(    a_sUrl,
+                                              OPCUA_STRINGLENZEROTERMINATED,
+                                              0,
+                                              OpcUa_True,
+                                              OpcUa_False,
+                                              &(pEndpointInt->Url));
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* create the encoder and decoder */

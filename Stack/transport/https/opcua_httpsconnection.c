@@ -1463,6 +1463,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ParseURL");
 
     sUrl = OpcUa_String_GetRawString(a_psUrl);
     uLen = OpcUa_String_StrSize(a_psUrl);
+    OpcUa_ReturnErrorIfArgumentNull(sUrl);
 
     /* create zero terminated version of url */
     uStatus = OpcUa_String_AttachToString(  sUrl,
@@ -1471,10 +1472,14 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "ParseURL");
                                             OpcUa_True,
                                             OpcUa_True,
                                             &sUrlTemp);
+    OpcUa_GotoErrorIfBad(uStatus);
 
-    sUrl = OpcUa_String_GetRawString((&sUrlTemp));
+    sUrl = OpcUa_String_GetRawString(&sUrlTemp);
 
-    OpcUa_ReturnErrorIfArgumentNull(sUrl);
+    if(sUrl == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInternalError);
+    }
 
     /* find start of host name */
     sTemp1 = OpcUa_StrStrA(sUrl, "//");
