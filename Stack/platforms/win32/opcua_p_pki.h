@@ -58,6 +58,9 @@ typedef enum _OpcUa_P_PKI_Types
 #define OPCUA_P_PKI_OPENSSL_ALLOW_PROXY_CERTIFICATES                 0x2000
 #define OPCUA_P_PKI_OPENSSL_OVERRIDE_IS_DHPARAM_FILE                 0x4000
 
+/* Override PKI specific flags */
+#define OPCUA_P_PKI_OVERRIDE_HANDLE_IS_DHPARAM_FILE                  0x4000
+
 /**
   @brief The openssl pki config.
   */

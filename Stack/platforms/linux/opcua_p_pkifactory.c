@@ -183,14 +183,29 @@ OpcUa_StringA OpcUa_P_PKIFactory_GetDHParamFileName(OpcUa_Void* a_pPKIConfig)
 
     pCertificateStoreCfg = (OpcUa_P_OpenSSL_CertificateStore_Config*)a_pPKIConfig;
 
-#if OPCUA_SUPPORT_PKI_OPENSSL
-    if(pCertificateStoreCfg != OpcUa_Null &&
-       pCertificateStoreCfg->PkiType == OpcUa_OpenSSL_PKI &&
-       pCertificateStoreCfg->Flags & OPCUA_P_PKI_OPENSSL_OVERRIDE_IS_DHPARAM_FILE)
+    if(pCertificateStoreCfg != OpcUa_Null)
     {
-        return (OpcUa_StringA)pCertificateStoreCfg->Override;
+#if OPCUA_SUPPORT_PKI
+#if OPCUA_SUPPORT_PKI_OPENSSL
+        if(pCertificateStoreCfg->PkiType == OpcUa_OpenSSL_PKI &&
+           pCertificateStoreCfg->Flags & OPCUA_P_PKI_OPENSSL_OVERRIDE_IS_DHPARAM_FILE)
+        {
+            return (OpcUa_StringA)pCertificateStoreCfg->Override;
+        }
+#endif /* OPCUA_SUPPORT_PKI_OPENSSL */
+#if OPCUA_SUPPORT_PKI_OVERRIDE
+        if(pCertificateStoreCfg->PkiType == OpcUa_Override &&
+           pCertificateStoreCfg->Flags & OPCUA_P_PKI_OVERRIDE_HANDLE_IS_DHPARAM_FILE)
+        {
+            OpcUa_PKIProvider* pOverride = (OpcUa_PKIProvider*)pCertificateStoreCfg->Override;
+            if(pOverride != OpcUa_Null)
+            {
+                return (OpcUa_StringA)pOverride->Handle;
+            }
+        }
+#endif /* OPCUA_SUPPORT_PKI_OVERRIDE */
+#endif /* OPCUA_SUPPORT_PKI */
     }
-#endif
 
     return OpcUa_Null;
 }
