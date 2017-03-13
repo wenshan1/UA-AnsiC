@@ -70,11 +70,17 @@ OpcUa_UInt32 OPCUA_DLLCALL OpcUa_P_GetLastError()
  *===========================================================================*/
 OpcUa_UInt32 OPCUA_DLLCALL OpcUa_P_GetTickCount()
 {
-    struct timeval TimeVal;
+    struct timeval now;
+    OpcUa_UInt32 ticks = 0;
 
-    gettimeofday(&TimeVal, OpcUa_Null);
+    if(gettimeofday(&now, NULL) == 0)
+    {
+        ticks = now.tv_sec;
+        ticks *= 1000;
+        ticks += now.tv_usec / 1000;
+    }
 
-    return (TimeVal.tv_sec * 1000 + TimeVal.tv_usec / 1000);
+    return ticks;
 }
 
 /*============================================================================
