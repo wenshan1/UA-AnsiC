@@ -51,12 +51,6 @@ struct _OpcUa_InternalChannel
     /*! @brief The timeout, in milliseconds, for network operations. */
     OpcUa_UInt32                                NetworkTimeout;
 
-    /*! @brief The client's application certificate. */
-    OpcUa_X509Credential*                       ClientCertificate;
-
-    /*! @brief The server's application certificate (if known). */
-    OpcUa_X509Credential*                       ServerCertificate;
-
     /*! @brief The transport connection to the server. */
     OpcUa_Connection*                           TransportConnection;
 
