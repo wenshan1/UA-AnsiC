@@ -1057,14 +1057,16 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpListener, "ProcessHelloMessage");
     pConnection->SendBufferSize     = (pConnection->SendBufferSize    > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->SendBufferSize;
     pConnection->ReceiveBufferSize  = (pConnection->ReceiveBufferSize > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize)?(OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpListener_DefaultChunkSize:pConnection->ReceiveBufferSize;
 
-    if(     pConnection->MaxMessageSize  == 0
-        ||  pConnection->MaxMessageSize  >  (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxMessageLength)
+    if(OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxMessageLength != 0 &&
+       (pConnection->MaxMessageSize == 0 ||
+        pConnection->MaxMessageSize > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxMessageLength))
     {
         pConnection->MaxMessageSize = (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxMessageLength;
     }
 
-    if(     pConnection->MaxChunkCount  == 0
-        ||  pConnection->MaxChunkCount  >  (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxChunkCount)
+    if(OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxChunkCount != 0 &&
+       (pConnection->MaxChunkCount == 0 ||
+        pConnection->MaxChunkCount > (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxChunkCount))
     {
         pConnection->MaxChunkCount = (OpcUa_UInt32)OpcUa_ProxyStub_g_Configuration.iTcpTransport_MaxChunkCount;
     }

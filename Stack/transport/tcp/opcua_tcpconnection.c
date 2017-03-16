@@ -402,12 +402,9 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ProcessAcknowledgeMessage");
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check the revised max message length */
-    if(uRevisedMessageSize == 0 || uRevisedMessageSize > pTcpConnection->MaxMessageSize)
-    {
-        /*OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);*/
-        /* ignore, server accepts our size and more */
-    }
-    else
+    if(uRevisedMessageSize != 0 &&
+       (pTcpConnection->MaxMessageSize == 0 ||
+        pTcpConnection->MaxMessageSize > uRevisedMessageSize))
     {
         /* accept smaller messages */
         pTcpConnection->MaxMessageSize = uRevisedMessageSize;
@@ -418,12 +415,9 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ProcessAcknowledgeMessage");
     OpcUa_GotoErrorIfBad(uStatus);
 
     /* check the revised chunk count */
-    if(uRevisedMaxChunkCnt == 0 || uRevisedMaxChunkCnt > pTcpConnection->MaxChunkCount)
-    {
-        /*OpcUa_GotoErrorWithStatus(OpcUa_BadConnectionRejected);*/
-        /* ignore, server accepts our size and more */
-    }
-    else
+    if(uRevisedMaxChunkCnt != 0 &&
+       (pTcpConnection->MaxChunkCount == 0 ||
+        pTcpConnection->MaxChunkCount > uRevisedMaxChunkCnt))
     {
         /* accept less chunks */
         pTcpConnection->MaxChunkCount = uRevisedMaxChunkCnt;
