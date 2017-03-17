@@ -116,6 +116,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_AES_CBC_Decrypt(
     OpcUa_ReturnErrorIfArgumentNull(a_key);
     OpcUa_ReturnErrorIfArgumentNull(a_key->Key.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_pInitalVector);
+    OpcUa_ReturnErrorIfArgumentNull(a_pPlainTextLen);
 
     if(a_cipherTextLen % 16 != 0)
     {
