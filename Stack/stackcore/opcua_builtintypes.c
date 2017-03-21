@@ -501,97 +501,92 @@ static OpcUa_Void OpcUa_VariantArrayValue_Clear(
     OpcUa_Int32              a_iLength,
     OpcUa_VariantArrayUnion* a_pValue)
 {
-    OpcUa_Int32 ii = 0;
-
     if (a_pValue == OpcUa_Null)
     {
         return;
     }
 
     /* clear each element in the array */
-    for (ii = 0; ii < a_iLength; ii++)
+    switch (a_uDatatype)
     {
-        switch (a_uDatatype)
+        case OpcUaType_Null:
+        case OpcUaType_Boolean:
+        case OpcUaType_SByte:
+        case OpcUaType_Byte:
+        case OpcUaType_Int16:
+        case OpcUaType_UInt16:
+        case OpcUaType_Int32:
+        case OpcUaType_UInt32:
+        case OpcUaType_Int64:
+        case OpcUaType_UInt64:
+        case OpcUaType_Float:
+        case OpcUaType_Double:
+        case OpcUaType_DateTime:
+        case OpcUaType_Guid:
+        case OpcUaType_StatusCode:
+        default:
         {
-            case OpcUaType_Null:
-            case OpcUaType_Boolean:
-            case OpcUaType_SByte:
-            case OpcUaType_Byte:
-            case OpcUaType_Int16:
-            case OpcUaType_UInt16:
-            case OpcUaType_Int32:
-            case OpcUaType_UInt32:
-            case OpcUaType_Int64:
-            case OpcUaType_UInt64:
-            case OpcUaType_Float:
-            case OpcUaType_Double:
-            case OpcUaType_DateTime:
-            case OpcUaType_Guid:
-            case OpcUaType_StatusCode:
-            default:
-            {
-                break;
-            }
+            break;
+        }
 
-            case OpcUaType_String:
-            {
-                OpcUa_String_Clear(&(a_pValue->StringArray[ii]));
-                break;
-            }
+        case OpcUaType_String:
+        {
+            OpcUa_ClearArray(a_pValue->StringArray, a_iLength, String);
+            break;
+        }
 
-            case OpcUaType_ByteString:
-            {
-                OpcUa_ByteString_Clear(&a_pValue->ByteStringArray[ii]);
-                break;
-            }
+        case OpcUaType_ByteString:
+        {
+            OpcUa_ClearArray(a_pValue->ByteStringArray, a_iLength, ByteString);
+            break;
+        }
 
-            case OpcUaType_XmlElement:
-            {
-                OpcUa_XmlElement_Clear(&a_pValue->XmlElementArray[ii]);
-                break;
-            }
+        case OpcUaType_XmlElement:
+        {
+            OpcUa_ClearArray(a_pValue->XmlElementArray, a_iLength, XmlElement);
+            break;
+        }
 
-            case OpcUaType_NodeId:
-            {
-                OpcUa_NodeId_Clear(&a_pValue->NodeIdArray[ii]);
-                break;
-            }
+        case OpcUaType_NodeId:
+        {
+            OpcUa_ClearArray(a_pValue->NodeIdArray, a_iLength, NodeId);
+            break;
+        }
 
-            case OpcUaType_ExpandedNodeId:
-            {
-                OpcUa_ExpandedNodeId_Clear(&a_pValue->ExpandedNodeIdArray[ii]);
-                break;
-            }
+        case OpcUaType_ExpandedNodeId:
+        {
+            OpcUa_ClearArray(a_pValue->ExpandedNodeIdArray, a_iLength, ExpandedNodeId);
+            break;
+        }
 
-            case OpcUaType_QualifiedName:
-            {
-                OpcUa_QualifiedName_Clear(&a_pValue->QualifiedNameArray[ii]);
-                break;
-            }
+        case OpcUaType_QualifiedName:
+        {
+            OpcUa_ClearArray(a_pValue->QualifiedNameArray, a_iLength, QualifiedName);
+            break;
+        }
 
-            case OpcUaType_LocalizedText:
-            {
-                OpcUa_LocalizedText_Clear(&a_pValue->LocalizedTextArray[ii]);
-                break;
-            }
+        case OpcUaType_LocalizedText:
+        {
+            OpcUa_ClearArray(a_pValue->LocalizedTextArray, a_iLength, LocalizedText);
+            break;
+        }
 
-            case OpcUaType_ExtensionObject:
-            {
-                OpcUa_ExtensionObject_Clear(&a_pValue->ExtensionObjectArray[ii]);
-                break;
-            }
+        case OpcUaType_ExtensionObject:
+        {
+            OpcUa_ClearArray(a_pValue->ExtensionObjectArray, a_iLength, ExtensionObject);
+            break;
+        }
 
-            case OpcUaType_DataValue:
-            {
-                OpcUa_DataValue_Clear(&a_pValue->DataValueArray[ii]);
-                break;
-            }
+        case OpcUaType_DataValue:
+        {
+            OpcUa_DataValue_ClearArray(a_pValue->DataValueArray, a_iLength);
+            break;
+        }
 
-            case OpcUaType_Variant:
-            {
-                OpcUa_Variant_Clear(&a_pValue->VariantArray[ii]);
-                break;
-            }
+        case OpcUaType_Variant:
+        {
+            OpcUa_Variant_ClearArray(a_pValue->VariantArray, a_iLength);
+            break;
         }
     }
 
