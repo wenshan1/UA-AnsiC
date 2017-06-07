@@ -125,12 +125,6 @@ struct _OpcUa_EncodeableTypeTableEntry;
 */
 typedef struct _OpcUa_EncodeableTypeTable
 {
-    /*! @brief The number of entries in the table. */
-    OpcUa_Int32 Count;
-
-    /*! @brief The table of known types. */
-    OpcUa_EncodeableType* Entries;
-
     /*! @brief The number of entries in the index. */
     OpcUa_Int32 IndexCount;
 

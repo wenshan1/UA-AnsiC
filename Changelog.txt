@@ -14,6 +14,9 @@ Current Version
 		The value returned from OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy
 		used the wrong enumeration type OpcUa_MessageSecurityMode instead of
 		OPCUA_ENDPOINT_MESSAGESECURITYMODE values.
+	- fixed OpcUa_EncodeableTypeTable_AddTypes and OpcUa_ProxyStub_AddTypes were potentially moving
+		type entries around.  This rarely used API was changed to not copying the type entries.
+		Therefore the a_pType parameter should always be from the static storage class.
 
 Version 1.03.340
 	
