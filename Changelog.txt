@@ -5,18 +5,21 @@ Current Version
 
 	API changes from the 1.03.340 version:
 
-	- removed OPCUA_SECURELISTENER_SUPPORT_THREADPOOL because of inherent race conditions (issue #32)
-	- added a new configure option to control access in discovery only mode (issue #25):
-		Use OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON to enable FindServersOnNetwork in discoyery only mode.
-		Note: Always leave this option disabled unless you are building the Stack for use in the LDS.
-	- fixed memory leaks (issue #27, #28, #29)
-	- fixed encoding of uMessageSecurityModes (issue #36):
-		The value returned from OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy
-		used the wrong enumeration type OpcUa_MessageSecurityMode instead of
-		OPCUA_ENDPOINT_MESSAGESECURITYMODE values.
-	- fixed OpcUa_EncodeableTypeTable_AddTypes and OpcUa_ProxyStub_AddTypes were potentially moving
-		type entries around.  This rarely used API was changed to not copying the type entries.
-		Therefore the a_pType parameter should always be from the static storage class.
+		- removed OPCUA_SECURELISTENER_SUPPORT_THREADPOOL because of inherent race conditions (issue #32)
+		- added a new configure option to control access in discovery only mode (issue #25):
+			Use OPCUA_SECURELISTENER_DISCOVERY_ALLOW_FSON to enable FindServersOnNetwork in discoyery only mode.
+			Note: Always leave this option disabled unless you are building the Stack for use in the LDS.
+		- fixed memory leaks (issue #27, #28, #29)
+		- fixed encoding of uMessageSecurityModes (issue #36):
+			The value returned from OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy
+			used the wrong enumeration type OpcUa_MessageSecurityMode instead of
+			OPCUA_ENDPOINT_MESSAGESECURITYMODE values.
+		- fixed OpcUa_EncodeableTypeTable_AddTypes and OpcUa_ProxyStub_AddTypes were potentially moving
+			type entries around.  This rarely used API was changed to not copying the type entries.
+			Therefore the a_pType parameter should always be from the static storage class.
+   
+	Other changes:
+		- Added cmake build support for both linux and windows in addition to existing tooling.  
 
 Version 1.03.340
 	

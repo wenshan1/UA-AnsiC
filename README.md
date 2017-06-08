@@ -49,6 +49,10 @@ To force a full build use: ./build_linux.sh clean all
 This is an example how to build with non-standard compiler options:
 ./build_linux.sh CROSS_COMPILE=arm-linux-gnueabi- MACHINE_TYPE=arm MACHINE_OPT="-g -fsanitize=address -fno-omit-frame-pointer"
 
+### CMake
+
+Alternatively, the stack can be built using cmake on both Windows and Linux. 
+To do so, install cmake and openssl, then change to the root of the repo and run ```cmake . && cmake --build .```.
 
 ## Examples
 

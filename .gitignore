@@ -20,6 +20,7 @@
 */VS2013/*
 */Debug/*
 */Release/*
+build/**
 openssl*/*
 *.o
 *.a
