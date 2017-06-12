@@ -592,7 +592,11 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
     /* free X509 certificate, since not needed anymore */
     X509_free(pCertificate);
 
+#if OPENSSL_VERSION_NUMBER >= 0x1000000fL
+    switch(EVP_PKEY_base_id(pPublicKey))
+#else
     switch(EVP_PKEY_type(pPublicKey->type))
+#endif
     {
     case EVP_PKEY_RSA:
 
@@ -695,7 +699,11 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetPrivateKey");
         pPKCS12Cert = OpcUa_Null;
     }
 
+#if OPENSSL_VERSION_NUMBER >= 0x1000000fL
+    switch(EVP_PKEY_base_id(pPrivateKey))
+#else
     switch(EVP_PKEY_type(pPrivateKey->type))
+#endif
     {
     case EVP_PKEY_RSA:
         {
@@ -767,6 +775,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetSignature(
 {
     X509*                   pX509Certificate    = OpcUa_Null;
     const unsigned char*    pTemp               = OpcUa_Null;
+    const ASN1_BIT_STRING*  signature           = OpcUa_Null;
+    const X509_ALGOR*       sig_alg             = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
 
@@ -787,9 +797,16 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    a_pSignature->Signature.Length = pX509Certificate->signature->length;
+#if OPENSSL_VERSION_NUMBER >= 0x1000200fL
+    X509_get0_signature(&signature, &sig_alg, pX509Certificate);
+#else
+    signature = pX509Certificate->signature;
+    sig_alg   = pX509Certificate->sig_alg;
+#endif
 
-    a_pSignature->Algorithm = OBJ_obj2nid(pX509Certificate->sig_alg->algorithm);
+    a_pSignature->Signature.Length = signature->length;
+
+    a_pSignature->Algorithm = OBJ_obj2nid(sig_alg->algorithm);
 
     if(a_pSignature->Algorithm == NID_undef)
     {
@@ -801,8 +818,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
     {
         uStatus = OpcUa_P_Memory_MemCpy(a_pSignature->Signature.Data,
                                         a_pSignature->Signature.Length,
-                                        pX509Certificate->signature->data,
-                                        pX509Certificate->signature->length);
+                                        signature->data,
+                                        signature->length);
 
     }
 
@@ -838,7 +855,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetCertificateThumbprint");
     OpcUa_ReturnErrorIfArgumentNull(a_pCertificateThumbprint);
 
     /* SHA-1 produces 20 bytes */
-    a_pCertificateThumbprint->Length = sizeof(pX509Certificate->sha1_hash);
+    a_pCertificateThumbprint->Length = SHA_DIGEST_LENGTH;
 
     if(a_pCertificateThumbprint->Data == OpcUa_Null)
     {
@@ -856,10 +873,12 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetCertificateThumbprint");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    /* update pX509Certificate->sha1_hash */
-    X509_check_purpose(pX509Certificate, -1, 0);
-    uStatus = OpcUa_P_Memory_MemCpy(a_pCertificateThumbprint->Data, a_pCertificateThumbprint->Length,
-                                    pX509Certificate->sha1_hash, sizeof(pX509Certificate->sha1_hash));
+    if(X509_digest(pX509Certificate, EVP_sha1(), a_pCertificateThumbprint->Data, NULL) <= 0)
+    {
+        uStatus = OpcUa_Bad;
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
     X509_free(pX509Certificate);
 
 OpcUa_ReturnStatusCode;

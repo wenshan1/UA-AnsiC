@@ -37,6 +37,7 @@ if errorlevel 1 goto error
 nmake -f ms\nt.mak install
 if errorlevel 1 goto error
 
+:ossl_done
 cd ..\Stack
 if errorlevel 1 goto error
 
@@ -57,6 +58,20 @@ if errorlevel 1 goto error
 
 cd ..
 goto done
+
+:ossl_build
+perl Configure VC-WIN32 no-shared no-asm no-ec --prefix=%OPENSSL_INSTALDIR% --openssldir=%OPENSSL_INSTALDIR%\ssl
+if errorlevel 1 goto error
+
+nmake
+if errorlevel 1 goto error
+
+nmake install
+if errorlevel 1 goto error
+
+copy ..\openssl\lib\libcrypto.lib ..\openssl\lib\libeay32.lib
+copy ..\openssl\lib\libssl.lib ..\openssl\lib\ssleay32.lib
+goto ossl_done
 
 :testroot
 if "%1" == "%ROOT%" exit /B 0
@@ -79,6 +94,8 @@ echo perl has to be in the path
 goto done
 
 :error3
+cd /D %ROOT%openssl-1.1.?? >NUL 2>&1
+if not errorlevel 1 goto ossl_build
 echo fatal error: cannot continue.
 echo openssl sources must be at %OPENSSL_SOURCEDIR%
 goto done

@@ -128,7 +128,7 @@ static OpcUa_Int OpcUa_P_OpenSSL_CertificateStore_Verify_Callback(int a_ok, X509
         X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
         OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "\nverify error:\n\tnum=%d:%s\n\tdepth=%d\n\t%s\n", err, X509_verify_cert_error_string(err), depth, buf);
 
-        X509_NAME_oneline(X509_get_issuer_name(a_pStore->current_cert), buf, 256);
+        X509_NAME_oneline(X509_get_issuer_name(err_cert), buf, 256);
         OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "\tissuer=%s\n", buf);
 
         switch (err)
@@ -500,7 +500,11 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_ValidateCertificate");
     }
 
     if((pCertificateStoreCfg->Flags & OPCUA_P_PKI_OPENSSL_CHECK_REVOCATION_ALL) == OPCUA_P_PKI_OPENSSL_CHECK_REVOCATION_ALL_EXCEPT_SELF_SIGNED
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+        && !X509_STORE_CTX_get_check_issued(verify_ctx) (verify_ctx, pX509Certificate, pX509Certificate))
+#else
         && !verify_ctx->check_issued(verify_ctx, pX509Certificate, pX509Certificate))
+#endif
     {
         /* set the flags of the store so that CRLs are consulted */
         X509_STORE_CTX_set_flags(verify_ctx, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL);
@@ -510,8 +514,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_ValidateCertificate");
     *a_pValidationCode = X509_V_OK;
     if(X509_verify_cert(verify_ctx) <= 0)
     {
-        *a_pValidationCode = verify_ctx->error;
-        switch(verify_ctx->error)
+        *a_pValidationCode = X509_STORE_CTX_get_error(verify_ctx);
+        switch(X509_STORE_CTX_get_error(verify_ctx))
         {
         case X509_V_ERR_CERT_HAS_EXPIRED:
         case X509_V_ERR_CERT_NOT_YET_VALID:
@@ -980,13 +984,14 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_ExtractCertificateData");
 
     if(a_pCertThumbprint != OpcUa_Null)
     {
-        /* update pX509Cert->sha1_hash */
-        X509_check_purpose(pX509Cert, -1, 0);
-        a_pCertThumbprint->Length = sizeof(pX509Cert->sha1_hash);
+        a_pCertThumbprint->Length = SHA_DIGEST_LENGTH;
         a_pCertThumbprint->Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(a_pCertThumbprint->Length*sizeof(OpcUa_Byte));
         OpcUa_GotoErrorIfAllocFailed(a_pCertThumbprint->Data);
-        uStatus = OpcUa_P_Memory_MemCpy(a_pCertThumbprint->Data, a_pCertThumbprint->Length, pX509Cert->sha1_hash, a_pCertThumbprint->Length);
-        OpcUa_GotoErrorIfBad(uStatus);
+        if(X509_digest(pX509Cert, EVP_sha1(), a_pCertThumbprint->Data, NULL) <= 0)
+        {
+            uStatus = OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
     }
 
     if(a_pSubjectHash != OpcUa_Null)

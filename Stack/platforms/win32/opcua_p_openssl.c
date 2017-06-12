@@ -40,7 +40,7 @@
  *===========================================================================*/
 OpcUa_Void OpcUa_P_ByteString_Clear(OpcUa_ByteString* a_pValue)
 {
-    if (a_pValue == OpcUa_Null)
+    if(a_pValue == OpcUa_Null)
     {
         return;
     }
@@ -73,10 +73,14 @@ static void OpcUa_P_OpenSSL_Lock(int mode, int type, const char *file, int line)
     OpcUa_ReferenceParameter(type);
     OpcUa_ReferenceParameter(file);
     OpcUa_ReferenceParameter(line);
-    if (mode & CRYPTO_LOCK)
+    if(mode & CRYPTO_LOCK)
+    {
         OpcUa_P_Mutex_Lock(OpenSSL_Mutex);
-    if (mode & CRYPTO_UNLOCK)
+    }
+    if(mode & CRYPTO_UNLOCK)
+    {
         OpcUa_P_Mutex_Unlock(OpenSSL_Mutex);
+    }
 }
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
@@ -91,7 +95,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Initialize()
     CRYPTO_set_locking_callback(OpcUa_P_OpenSSL_Lock);
 #endif /* OPCUA_USE_SYNCHRONISATION */
     OpenSSL_add_all_algorithms();
+#if OPENSSL_VERSION_NUMBER < 0x1010000fL
     RAND_screen();
+#endif
 #if OPCUA_P_SOCKETMANAGER_SUPPORT_SSL
     SSL_library_init();
     SSL_load_error_strings();
@@ -110,13 +116,13 @@ void OpcUa_P_OpenSSL_Cleanup()
 #endif
 #endif /* OPCUA_P_SOCKETMANAGER_SUPPORT_SSL */
     EVP_cleanup();
-    CRYPTO_cleanup_all_ex_data ();
-    ERR_remove_state (0);
-    ERR_free_strings ();
+    CRYPTO_cleanup_all_ex_data();
+    ERR_remove_state(0);
+    ERR_free_strings();
 #if OPCUA_USE_SYNCHRONISATION
     CRYPTO_set_locking_callback(OpcUa_Null);
     OpcUa_P_Mutex_Delete(&OpenSSL_Mutex);
-#endif /* OPCUA_P_SOCKETMANAGER_SUPPORT_SSL */
+#endif /* OPCUA_USE_SYNCHRONISATION */
 }
 
 /*============================================================================
@@ -124,7 +130,10 @@ void OpcUa_P_OpenSSL_Cleanup()
  *===========================================================================*/
 void OPCUA_DLLCALL OpcUa_P_OpenSSL_Thread_Cleanup()
 {
-    ERR_remove_state (0);
+    ERR_remove_state(0);
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+    OPENSSL_thread_stop();
+#endif
 }
 
 /*============================================================================
@@ -305,7 +314,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_Decrypt(
 {
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PKCS1_V15_Decrypt");
 
-    uStatus =  OpcUa_P_OpenSSL_RSA_Private_Decrypt(
+    uStatus = OpcUa_P_OpenSSL_RSA_Private_Decrypt(
                                                 a_pProvider,
                                                 a_pCipherText,
                                                 a_cipherTextLen,
@@ -557,9 +566,13 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA256_Verify(
     OpcUa_GotoErrorIfBad(uStatus);
 
     if((OpcUa_MemCmp(mac.Data, a_pSignature->Data, mac.Length))==0)
+    {
         uStatus = OpcUa_Good;
+    }
     else
+    {
         uStatus = OpcUa_BadSignatureInvalid;
+    }
 
     if(mac.Data != OpcUa_Null)
     {
@@ -772,7 +785,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_DeriveChannelKeyset(
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
 
-    if (a_pKeyset->SigningKey.Key.Data == OpcUa_Null)
+    if(a_pKeyset->SigningKey.Key.Data == OpcUa_Null)
     {
         a_pKeyset->SigningKey.Key.Length = a_pCryptoProvider->DerivedSignatureKeyLength;
         bCalculateSizes = OpcUa_True;
@@ -780,7 +793,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
 
     uKeyDataSize += a_pKeyset->SigningKey.Key.Length;
 
-    if (a_pKeyset->EncryptionKey.Key.Data == OpcUa_Null)
+    if(a_pKeyset->EncryptionKey.Key.Data == OpcUa_Null)
     {
         a_pKeyset->EncryptionKey.Key.Length = a_pCryptoProvider->DerivedEncryptionKeyLength;
         bCalculateSizes = OpcUa_True;
@@ -788,7 +801,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
 
     uKeyDataSize += a_pKeyset->EncryptionKey.Key.Length;
 
-    if (a_pKeyset->InitializationVector.Key.Data == OpcUa_Null)
+    if(a_pKeyset->InitializationVector.Key.Data == OpcUa_Null)
     {
         a_pKeyset->InitializationVector.Key.Length = 16;
         bCalculateSizes = OpcUa_True;
@@ -796,7 +809,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
 
     uKeyDataSize += a_pKeyset->InitializationVector.Key.Length;
 
-    if (bCalculateSizes)
+    if(bCalculateSizes)
     {
         OpcUa_ReturnStatusCode;
     }
@@ -808,6 +821,17 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeyset");
     /*MasterKey.fpClearHandle = OpcUa_Null;*/
     MasterKey.Key.Length = -1;
     MasterKey.Key.Data = OpcUa_Null;
+
+    /* check required nonce length */
+    if(a_remoteNonce.Length < a_pCryptoProvider->SymmetricKeyLength)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadNonceInvalid);
+    }
+
+    if(a_localNonce.Length < a_pCryptoProvider->SymmetricKeyLength)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadNonceInvalid);
+    }
 
     /* create the client master key */
     uStatus = a_pCryptoProvider->DeriveKey( a_pCryptoProvider,
@@ -925,10 +949,12 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair(
 
     if(a_type == OpcUa_Crypto_Rsa_Id)
     {
-        OpcUa_P_OpenSSL_RSA_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
+        uStatus = OpcUa_P_OpenSSL_RSA_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
     }
     else
+    {
         uStatus = OpcUa_BadInvalidArgument;
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;

@@ -17,9 +17,15 @@ Current Version
 		- fixed OpcUa_EncodeableTypeTable_AddTypes and OpcUa_ProxyStub_AddTypes were potentially moving
 			type entries around.  This rarely used API was changed to not copying the type entries.
 			Therefore the a_pType parameter should always be from the static storage class.
-   
+
 	Other changes:
-		- Added cmake build support for both linux and windows in addition to existing tooling.  
+		- Added cmake build support for both linux and windows in addition to existing tooling.
+		- Added support for OpenSSL 1.1.x in linux and windows.
+			Linux: build_linux.sh works if openssl-1.1.0f or newer is installed, or the
+			necessary include path and lib path is given with the build command:
+			./build_linux.sh MACHINE_OPT="-I $OSSL_INSTALL/include -L $OSSL_INSTALL/lib"
+			Windows: build_win32.bat and build_win64.bat look for the extracted openssl-1.1.0f
+			or newer and build that if found.  Strawberry perl has to be installed.
 
 Version 1.03.340
 	

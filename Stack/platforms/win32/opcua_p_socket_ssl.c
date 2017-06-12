@@ -501,7 +501,11 @@ OpcUa_FinishErrorHandling;
 static int OpcUa_SslSocket_VerifyCertificate( X509_STORE_CTX *ctx, void *arg)
 {
     OpcUa_InternalSslSocket* pInternalSocket   = (OpcUa_InternalSslSocket*)arg;
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
+    STACK_OF(X509)*          pChain            = X509_STORE_CTX_get0_untrusted(ctx);
+#else
     STACK_OF(X509)*          pChain            = ctx->untrusted;
+#endif
     int                      n;
     unsigned char*           p;
     OpcUa_StatusCode         uStatus;
