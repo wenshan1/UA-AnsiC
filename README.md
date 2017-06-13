@@ -52,7 +52,13 @@ This is an example how to build with non-standard compiler options:
 ### CMake
 
 Alternatively, the stack can be built using cmake on both Windows and Linux. 
-To do so, install cmake and openssl, then change to the root of the repo and run ```cmake . && cmake --build .```.
+To do so, install cmake and openssl, then change to the root of the repo and run 
+```
+mkdir build
+cd build
+cmake .. 
+cmake --build .
+```
 
 ## Examples
 
