@@ -797,7 +797,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetSignature");
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-#if OPENSSL_VERSION_NUMBER >= 0x1000200fL
+#if OPENSSL_VERSION_NUMBER >= 0x1010000fL
     X509_get0_signature(&signature, &sig_alg, pX509Certificate);
 #else
     signature = pX509Certificate->signature;
