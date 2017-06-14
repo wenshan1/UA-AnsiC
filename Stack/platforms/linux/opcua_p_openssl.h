@@ -226,6 +226,50 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_OAEP_Decrypt(
     OpcUa_UInt32*           pPlainTextLen);
 
 /**
+  @brief Encrypts data using (RSA)<NAME> with the public key of the appropriate key pair.
+
+  RSA_PKCS1_OAEP_PADDING
+  synchronous!
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param pPlainText        [in]  The plain text to encrypt.
+  @param plainTextLen      [in]  The length of the plain text to encrypt.
+  @param publicKey         [in]  The public key used to encrypt the plain text.
+
+  @param pCipherText       [out] The encrypted text.
+  @param pCipherTextLen    [out] The length of the encrypted text.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_OAEP_SHA256_Encrypt(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Byte*             pPlainText,
+    OpcUa_UInt32            plainTextLen,
+    OpcUa_Key*              publicKey,
+    OpcUa_Byte*             pCipherText,
+    OpcUa_UInt32*           pCipherTextLen);
+
+/**
+  @brief Decrypts encrypted data using <NAME>(RSA) with the private key of the appropriate key pair.
+
+  RSA_PKCS1_OAEP_PADDING
+  synchonous!
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param pCipherText       [in]  The cipher text to decrypt.
+  @param cipherTextLen     [in]  The length of the cipher text to decrypt.
+  @param privateKey        [in]  The private key used to decrypt the plain text.
+
+  @param pPlainText        [out] The decrypted text.
+  @param pPlainTextLen     [out] The length of the decrypted text.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_OAEP_SHA256_Decrypt(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Byte*             pCipherText,
+    OpcUa_UInt32            cipherTextLen,
+    OpcUa_Key*              privateKey,
+    OpcUa_Byte*             pPlainText,
+    OpcUa_UInt32*           pPlainTextLen);
+
+/**
   @param pProvider        [in]  The crypto provider handle.
   @param pData            [in]  The data for the MAC generation.
   @param dataLen          [in]  The length data for the MAC generation.
@@ -320,6 +364,34 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA1_Verify(
   @param pSignature        [out] The signature of the data.
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PKCS1_V15_SHA256_Sign(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString      data,
+    OpcUa_Key*            privateKey,
+    OpcUa_ByteString*     pSignature);      /* minimum length = key length */
+
+/**
+  @brief Verifies signed data using <NAME>(RSA) with the public key of the appropriate key pair.
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param data                       [in]  The data that was signed.
+  @param publicKey                  [in]  The public key used to verify the signature.
+  @param pSignature                 [in]  The signature of the data that should be verified.
+ */
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_SHA256_Verify(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString      data,
+    OpcUa_Key*            publicKey,
+    OpcUa_ByteString*     pSignature);
+
+/**@brief Signs data using <NAME>(RSA) with the private key of the appropriate key pair.
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param data              [in]  The data to sign.
+  @param privateKey        [in]  The private key used to sign the data.
+
+  @param pSignature        [out] The signature of the data.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_SHA256_Sign(
     OpcUa_CryptoProvider* pProvider,
     OpcUa_ByteString      data,
     OpcUa_Key*            privateKey,
@@ -761,6 +833,76 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_Verify(
     OpcUa_Int16           padding,
     OpcUa_ByteString*     pSignature);
 
+/**
+  @brief Encrypts data using (RSA)<NAME> with the public key of the appropriate key pair.
+
+  synchronous!
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param pPlainText        [in]  The plain text to encrypt.
+  @param plainTextLen      [in]  The length of the plain text to encrypt.
+  @param publicKey         [in]  The public key used to encrypt the plain text.
+
+  @param pCipherText       [out] The encrypted text.
+  @param pCipherTextLen    [out] The length of the encrypted text.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_SHA256_Public_Encrypt(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Byte*             pPlainText,
+    OpcUa_UInt32            plainTextLen,
+    OpcUa_Key*              publicKey,
+    OpcUa_Byte*             pCipherText,
+    OpcUa_UInt32*           pCipherTextLen);
+
+/**
+  @brief Decrypts encrypted data using <NAME>(RSA) with the private key of the appropriate key pair.
+
+  synchonous!
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param pCipherText       [in]  The cipher text to decrypt.
+  @param cipherTextLen     [in]  The length of the cipher text to decrypt.
+  @param privateKey        [in]  The private key used to decrypt the plain text.
+
+  @param pPlainText        [out] The decrypted text.
+  @param pPlainTextLen     [out] The length of the decrypted text.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_SHA256_Private_Decrypt(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Byte*             pCipherText,
+    OpcUa_UInt32            cipherTextLen,
+    OpcUa_Key*              privateKey,
+    OpcUa_Byte*             pPlainText,
+    OpcUa_UInt32*           pPlainTextLen);
+
+/**
+  @brief Signs data using <NAME>(RSA) with the private key of the appropriate key pair.
+
+  @param pProvider         [in]  The crypto provider handle.
+  @param data              [in]  The data to sign.
+  @param privateKey        [in]  The private key used to sign the data.
+
+  @param pSignature        [out] The signature of the data.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_Private_Sign(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString      data,
+    OpcUa_Key*            privateKey,
+    OpcUa_ByteString*     pSignature);
+
+/**
+  @brief Verifies signed data using <NAME>(RSA) with the public key of the appropriate key pair.
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param data                       [in]  The data that was signed.
+  @param publicKey                  [in]  The public key used to verify the signature.
+  @param pSignature                 [in]  The signature of the data that should be verified.
+ */
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_Public_Verify(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString      data,
+    OpcUa_Key*            publicKey,
+    OpcUa_ByteString*     pSignature);
 
 /**
   @brief Generates a session key using secret input data.

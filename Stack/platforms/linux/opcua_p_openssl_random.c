@@ -256,7 +256,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_Derive(
     OpcUa_Int                   i;
     OpcUa_Int                   iterations;
 
-    OpcUa_CryptoProviderConfig* pConfig         = OpcUa_Null;
     OpcUa_Int32                 keyLen          = 0;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
@@ -272,11 +271,9 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
 
     if(keyLen < 0)
     {
-        if(a_pProvider->Handle != OpcUa_Null)
+        if(a_pProvider->SymmetricKeyLength > 0)
         {
-            /* get default configuration */
-            pConfig = (OpcUa_CryptoProviderConfig*)a_pProvider->Handle;
-            keyLen = pConfig->SymmetricKeyLength;
+            keyLen = a_pProvider->SymmetricKeyLength;
         }
         else
         {
@@ -346,7 +343,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_Generate(
     OpcUa_Int32           a_keyLen,
     OpcUa_Key*            a_pKey)
 {
-    OpcUa_CryptoProviderConfig* pConfig = OpcUa_Null;
     OpcUa_Int32                 keyLen  = 0;
 
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Generate");
@@ -360,11 +356,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_Generate(
 
     if(keyLen < 0)
     {
-        if(a_pProvider->Handle != OpcUa_Null)
+        if(a_pProvider->SymmetricKeyLength > 0)
         {
-            /* get default configuration */
-            pConfig = (OpcUa_CryptoProviderConfig*)a_pProvider->Handle;
-            keyLen = pConfig->SymmetricKeyLength;
+            keyLen = a_pProvider->SymmetricKeyLength;
         }
         else
         {
@@ -509,7 +503,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_PSHA256_Derive(
     OpcUa_Int                   i;
     OpcUa_Int                   iterations;
 
-    OpcUa_CryptoProviderConfig* pConfig         = OpcUa_Null;
     OpcUa_Int32                 keyLen          = 0;
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
@@ -525,11 +518,9 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
 
     if(keyLen < 0)
     {
-        if(a_pProvider->Handle != OpcUa_Null)
+        if(a_pProvider->SymmetricKeyLength > 0)
         {
-            /* get default configuration */
-            pConfig = (OpcUa_CryptoProviderConfig*)a_pProvider->Handle;
-            keyLen = pConfig->SymmetricKeyLength;
+            keyLen = a_pProvider->SymmetricKeyLength;
         }
         else
         {
@@ -539,8 +530,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
     }
     else if(keyLen > MAX_DERIVED_OUTPUT_LEN)
     {
-            uStatus = OpcUa_BadInvalidArgument;
-            OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     if(a_pKey->Key.Data == OpcUa_Null)

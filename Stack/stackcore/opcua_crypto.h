@@ -19,9 +19,6 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-/* a handle for crytographic objects created by the provider */
-typedef OpcUa_Void* OpcUa_ProviderHandle;
-
 #define OpcUa_Crypto_Rsa_Name                       L"RSA"
 #define OpcUa_Crypto_Rsa_Id                         19
 
@@ -842,17 +839,18 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_SymmetricVerify(
 typedef struct _OpcUa_CryptoProvider
 {
     OpcUa_StringA                               Name;
-    OpcUa_ProviderHandle                        Handle;
     OpcUa_Int32                                 SymmetricKeyLength;
     OpcUa_UInt32                                MinimumAsymmetricKeyLength;
     OpcUa_UInt32                                MaximumAsymmetricKeyLength;
     OpcUa_UInt32                                DerivedEncryptionKeyLength;
     OpcUa_UInt32                                DerivedSignatureKeyLength;
     OpcUa_UInt32                                SignatureDataLength;
+    OpcUa_UInt32                                AsymmetricEncryptionOverhead;
     OpcUa_UInt32                                AsymmetricSignatureAlgorithmId;
     OpcUa_UInt32                                AsymmetricEncryptionAlgorithmId;
     OpcUa_UInt32                                SymmetricSignatureAlgorithmId;
     OpcUa_UInt32                                SymmetricEncryptionAlgorithmId;
+    OpcUa_UInt32                                SymmetricKeyDeviationAlgorithmId;
 
     OpcUa_Crypto_PfnGenerateKey*                GenerateKey;
     OpcUa_Crypto_PfnDeriveKey*                  DeriveKey;

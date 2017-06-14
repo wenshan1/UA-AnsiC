@@ -35,21 +35,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_CreateCryptoProvider(  OpcU
 */
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_CryptoFactory_DeleteCryptoProvider(  OpcUa_CryptoProvider* pProvider);
 
-/*============================================================================
- * The OpcUa_CryptoProvider interface.
- *===========================================================================*/
-
-typedef struct _OpcUa_CryptoProviderConfig
-{
-    OpcUa_Int32  SymmetricKeyLength;
-    OpcUa_UInt32 MinimumAsymmetricKeyLength;
-    OpcUa_UInt32 MaximumAsymmetricKeyLength;
-    OpcUa_UInt32 DerivedEncryptionKeyLength;
-    OpcUa_UInt32 DerivedSignatureKeyLength;
-}
-OpcUa_CryptoProviderConfig;
-
-
 OPCUA_END_EXTERN_C
 
 #endif

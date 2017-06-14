@@ -708,4 +708,442 @@ OpcUa_BeginErrorHandling;
 OpcUa_FinishErrorHandling;
 }
 
+/*** EVP-BASED RSA OAEP SHA256 ASYMMETRIC ENCRYPTION (requires OpenSSL 1.0.2) ***/
+
+/*===========================================================================*
+OpcUa_P_OpenSSL_RSA_SHA256_Public_Encrypt
+*===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_SHA256_Public_Encrypt(
+    OpcUa_CryptoProvider*   a_pProvider,
+    OpcUa_Byte*             a_pPlainText,
+    OpcUa_UInt32            a_plainTextLen,
+    OpcUa_Key*              a_publicKey,
+    OpcUa_Byte*             a_pCipherText,
+    OpcUa_UInt32*           a_pCipherTextLen)
+{
+#if OPENSSL_VERSION_NUMBER < 0x1000200fL
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_pCipherText);
+    OpcUa_ReferenceParameter(a_pCipherTextLen);
+    OpcUa_ReferenceParameter(a_publicKey);
+    OpcUa_ReferenceParameter(a_pPlainText);
+    OpcUa_ReferenceParameter(a_plainTextLen);
+    return OpcUa_BadNotSupported;
+#else
+    EVP_PKEY_CTX*   pCtx            = OpcUa_Null;
+    EVP_PKEY*       pPublicKey      = OpcUa_Null;
+
+    OpcUa_UInt32    uKeySize            = 0;
+    OpcUa_UInt32    uEncryptedDataSize  = 0;
+    OpcUa_UInt32    uPlainTextPosition  = 0;
+    OpcUa_UInt32    uCipherTextPosition = 0;
+    OpcUa_UInt32    uBytesToEncrypt     = 0;
+    size_t          iEncryptedBytes     = 0;
+    int             ret                 = 0;
+    const unsigned char *pData;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_SHA256_Public_Encrypt");
+
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_publicKey);
+    OpcUa_ReturnErrorIfArgumentNull(a_publicKey->Key.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_pCipherTextLen);
+
+    *a_pCipherTextLen = 0;
+
+    if((OpcUa_Int32)a_plainTextLen < 1)
+    {
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    if(a_publicKey->Type != OpcUa_Crypto_KeyType_Rsa_Public)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    pData = a_publicKey->Key.Data;
+    pPublicKey = d2i_PublicKey(EVP_PKEY_RSA, OpcUa_Null, &pData, a_publicKey->Key.Length);
+
+    if(pPublicKey == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    uKeySize = RSA_size(get_pkey_rsa(pPublicKey));
+
+    if(uKeySize <= 66)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+    uEncryptedDataSize = uKeySize - 66;
+
+    pCtx = EVP_PKEY_CTX_new(pPublicKey, NULL);
+    OpcUa_GotoErrorIfTrue((pCtx == OpcUa_Null), OpcUa_Bad);
+    ret = EVP_PKEY_encrypt_init(pCtx);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_OAEP_PADDING);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_oaep_md(pCtx, EVP_sha256());
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+
+    if(a_plainTextLen < uEncryptedDataSize)
+    {
+        uBytesToEncrypt = a_plainTextLen;
+    }
+    else
+    {
+        uBytesToEncrypt = uEncryptedDataSize;
+    }
+
+    while(uPlainTextPosition < a_plainTextLen)
+    {
+
+        /* the last part could be smaller */
+        if((a_plainTextLen >= uEncryptedDataSize) && ((a_plainTextLen - uPlainTextPosition) < uEncryptedDataSize))
+        {
+            uBytesToEncrypt = a_plainTextLen - uPlainTextPosition;
+        }
+
+        if((a_pCipherText != OpcUa_Null) && (a_pPlainText != OpcUa_Null))
+        {
+            iEncryptedBytes = uKeySize;
+            ret = EVP_PKEY_encrypt(pCtx,
+                                   a_pCipherText + uCipherTextPosition,/* where to encrypt     */
+                                   &iEncryptedBytes,
+                                   a_pPlainText + uPlainTextPosition,  /* what to encrypt      */
+                                   uBytesToEncrypt);                   /* how much to encrypt  */
+
+            if(ret < 0)
+            {
+                uStatus = OpcUa_Bad;
+                OpcUa_GotoError;
+            }
+
+        }
+
+        uCipherTextPosition += uKeySize;
+        uPlainTextPosition  += uBytesToEncrypt;
+    }
+
+    *a_pCipherTextLen = uCipherTextPosition;
+
+    EVP_PKEY_CTX_free(pCtx);
+    EVP_PKEY_free(pPublicKey);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pCtx != OpcUa_Null)
+    {
+        EVP_PKEY_CTX_free(pCtx);
+    }
+
+    if(pPublicKey != OpcUa_Null)
+    {
+        EVP_PKEY_free(pPublicKey);
+    }
+
+    *a_pCipherTextLen = (OpcUa_UInt32)-1;
+
+OpcUa_FinishErrorHandling;
+#endif
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_RSA_SHA256_Private_Decrypt
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_SHA256_Private_Decrypt(
+    OpcUa_CryptoProvider*   a_pProvider,
+    OpcUa_Byte*             a_pCipherText,
+    OpcUa_UInt32            a_cipherTextLen,
+    OpcUa_Key*              a_privateKey,
+    OpcUa_Byte*             a_pPlainText,
+    OpcUa_UInt32*           a_pPlainTextLen)
+{
+#if OPENSSL_VERSION_NUMBER < 0x1000200fL
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_pCipherText);
+    OpcUa_ReferenceParameter(a_cipherTextLen);
+    OpcUa_ReferenceParameter(a_privateKey);
+    OpcUa_ReferenceParameter(a_pPlainText);
+    OpcUa_ReferenceParameter(a_pPlainTextLen);
+    return OpcUa_BadNotSupported;
+#else
+    EVP_PKEY_CTX*   pCtx            = OpcUa_Null;
+    EVP_PKEY*       pPrivateKey     = OpcUa_Null;
+
+    OpcUa_UInt32    keySize         = 0;
+    size_t          decryptedBytes  = 0;
+    OpcUa_UInt32    iCipherText     = 0;
+    OpcUa_UInt32    decDataSize     = 0;
+    int             ret             = 0;
+
+    const unsigned char *pData;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_SHA256_Private_Decrypt");
+
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pCipherText);
+    OpcUa_ReturnErrorIfArgumentNull(a_privateKey);
+    OpcUa_ReturnErrorIfArgumentNull(a_privateKey->Key.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_pPlainTextLen);
+
+    *a_pPlainTextLen = 0;
+
+    if(a_privateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    pData = a_privateKey->Key.Data;
+    pPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA, OpcUa_Null, &pData, a_privateKey->Key.Length);
+
+    if(pPrivateKey == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    keySize = RSA_size(get_pkey_rsa(pPrivateKey));
+
+    if(keySize == 0)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    if((a_cipherTextLen%keySize) != 0)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    /* check padding type */
+    if(keySize <= 66)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+    decDataSize = keySize - 66;
+
+    pCtx = EVP_PKEY_CTX_new(pPrivateKey, NULL);
+    OpcUa_GotoErrorIfTrue((pCtx == OpcUa_Null), OpcUa_Bad);
+    ret = EVP_PKEY_decrypt_init(pCtx);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_OAEP_PADDING);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_oaep_md(pCtx, EVP_sha256());
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+
+    while(iCipherText < a_cipherTextLen)
+    {
+        if(a_pPlainText != OpcUa_Null)
+        {
+            decryptedBytes = keySize; /* actually that's a lie */
+            ret = EVP_PKEY_decrypt(pCtx,
+                                   a_pPlainText + (*a_pPlainTextLen),  /* where to decrypt     */
+                                   &decryptedBytes,
+                                   a_pCipherText + iCipherText,        /* what to decrypt      */
+                                   keySize);
+
+            /* if decryption fails return the same result as if signature check fails */
+            /* also fail if zero bytes are decoded */
+            if(ret <= 0 || decryptedBytes == 0)
+            {
+                /* continue decrypting the message in constant time */
+                uStatus = OpcUa_BadSignatureInvalid;
+                decryptedBytes = decDataSize;
+                /* do not leak timing information by skipping the memcpy */
+                memmove(a_pPlainText + (*a_pPlainTextLen), a_pCipherText + iCipherText, decryptedBytes);
+            }
+            /* only the last part may be smaller */
+            else if(iCipherText + keySize < a_cipherTextLen && decryptedBytes != decDataSize)
+            {
+                uStatus = OpcUa_BadSignatureInvalid;
+            }
+        }
+        else
+        {
+            decryptedBytes = decDataSize;
+        }
+
+        *a_pPlainTextLen = *a_pPlainTextLen + decryptedBytes;
+        iCipherText = iCipherText + keySize;
+    }
+
+    EVP_PKEY_CTX_free(pCtx);
+    EVP_PKEY_free(pPrivateKey);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pCtx != OpcUa_Null)
+    {
+        EVP_PKEY_CTX_free(pCtx);
+    }
+
+    if(pPrivateKey != OpcUa_Null)
+    {
+        EVP_PKEY_free(pPrivateKey);
+    }
+
+    *a_pPlainTextLen = (OpcUa_UInt32)-1;
+
+OpcUa_FinishErrorHandling;
+#endif
+}
+
+/*** EVP-BASED RSA SSA PSS ASYMMETRIC SIGNATURE (requires OpenSSL 1.0.0) ***/
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_RSA_PSS_Private_Sign
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_Private_Sign(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_privateKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+#if OPENSSL_VERSION_NUMBER < 0x1000000fL
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_data);
+    OpcUa_ReferenceParameter(a_privateKey);
+    OpcUa_ReferenceParameter(a_pSignature);
+    return OpcUa_BadNotSupported;
+#else
+    EVP_PKEY_CTX*           pCtx            = OpcUa_Null;
+    EVP_PKEY*               pSSLPrivateKey  = OpcUa_Null;
+    const unsigned char*    pData           = OpcUa_Null;
+    int                     ret             = 0;
+    size_t                  siglen          = 0;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PSS_Private_Sign");
+
+    /* unused parameters */
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    /* check parameters */
+    OpcUa_ReturnErrorIfArgumentNull(a_data.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_privateKey);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature->Data);
+    pData = a_privateKey->Key.Data;
+    OpcUa_ReturnErrorIfArgumentNull(pData);
+    OpcUa_ReturnErrorIfTrue((a_privateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private), OpcUa_BadInvalidArgument);
+
+    /* convert private key and check key length against buffer length */
+    pSSLPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA, OpcUa_Null, &pData, a_privateKey->Key.Length);
+    OpcUa_GotoErrorIfTrue((pSSLPrivateKey == OpcUa_Null), OpcUa_BadUnexpectedError);
+    OpcUa_GotoErrorIfTrue((a_pSignature->Length < RSA_size(get_pkey_rsa(pSSLPrivateKey))), OpcUa_BadInvalidArgument);
+
+    pCtx = EVP_PKEY_CTX_new(pSSLPrivateKey, NULL);
+    OpcUa_GotoErrorIfTrue((pCtx == OpcUa_Null), OpcUa_Bad);
+    ret = EVP_PKEY_sign_init(pCtx);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PSS_PADDING);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_signature_md(pCtx, EVP_sha256());
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_pss_saltlen(pCtx, -1);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    siglen = a_pSignature->Length;
+    ret = EVP_PKEY_sign(pCtx, a_pSignature->Data, &siglen, a_data.Data, a_data.Length);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_BadUnexpectedError);
+    a_pSignature->Length = (OpcUa_Int32)siglen;
+
+    EVP_PKEY_CTX_free(pCtx);
+    EVP_PKEY_free(pSSLPrivateKey);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pCtx != OpcUa_Null)
+    {
+        EVP_PKEY_CTX_free(pCtx);
+    }
+
+    if(pSSLPrivateKey != OpcUa_Null)
+    {
+        EVP_PKEY_free(pSSLPrivateKey);
+    }
+
+OpcUa_FinishErrorHandling;
+#endif
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_RSA_PSS_Public_Verify
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_PSS_Public_Verify(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_publicKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+#if OPENSSL_VERSION_NUMBER < 0x1000000fL
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_data);
+    OpcUa_ReferenceParameter(a_publicKey);
+    OpcUa_ReferenceParameter(a_pSignature);
+    return OpcUa_BadNotSupported;
+#else
+    EVP_PKEY_CTX*        pCtx            = OpcUa_Null;
+    EVP_PKEY*            pPublicKey      = OpcUa_Null;
+    const unsigned char *pData           = OpcUa_Null;
+    int                  ret             = 0;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_PSS_Public_Verify");
+
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_data.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_publicKey);
+    OpcUa_ReturnErrorIfArgumentNull(a_publicKey->Key.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
+
+    if(a_publicKey->Type != OpcUa_Crypto_KeyType_Rsa_Public)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    pData = a_publicKey->Key.Data;
+    pPublicKey = d2i_PublicKey(EVP_PKEY_RSA, OpcUa_Null, &pData, a_publicKey->Key.Length);
+
+    if(pPublicKey == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+    }
+
+    pCtx = EVP_PKEY_CTX_new(pPublicKey, NULL);
+    OpcUa_GotoErrorIfTrue((pCtx == OpcUa_Null), OpcUa_Bad);
+    ret = EVP_PKEY_verify_init(pCtx);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PSS_PADDING);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_signature_md(pCtx, EVP_sha256());
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_CTX_set_rsa_pss_saltlen(pCtx, -1);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
+    ret = EVP_PKEY_verify(pCtx, a_pSignature->Data, a_pSignature->Length, a_data.Data, a_data.Length);
+    OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_BadSignatureInvalid);
+
+    EVP_PKEY_CTX_free(pCtx);
+    EVP_PKEY_free(pPublicKey);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pCtx != OpcUa_Null)
+    {
+        EVP_PKEY_CTX_free(pCtx);
+    }
+
+    if(pPublicKey != OpcUa_Null)
+    {
+        EVP_PKEY_free(pPublicKey);
+    }
+
+OpcUa_FinishErrorHandling;
+#endif
+}
+
 #endif /* OPCUA_REQUIRE_OPENSSL */

@@ -192,21 +192,18 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricEncryptionBlockS
             break;
         }
         case OpcUa_P_RSA_PKCS1_V15_Id:
-        {
-            uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
-            OpcUa_GotoErrorIfBad(uStatus);
-
-            *a_pPlainTextBlockSize  = uSizeInBits/8 - 11;
-            *a_pCipherTextBlockSize = uSizeInBits/8;
-            break;
-        }
-
         case OpcUa_P_RSA_OAEP_Id:
+        case OpcUa_P_RSA_OAEP_SHA256_Id:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);
 
-            *a_pPlainTextBlockSize  = uSizeInBits/8 - 42;
+            if (uSizeInBits/8 <= a_pProvider->AsymmetricEncryptionOverhead)
+            {
+                OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
+            }
+
+            *a_pPlainTextBlockSize = uSizeInBits/8 - a_pProvider->AsymmetricEncryptionOverhead;
             *a_pCipherTextBlockSize = uSizeInBits/8;
             break;
         }
@@ -251,6 +248,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricSignatureSize");
         }
         case OpcUa_P_RSA_PKCS1_V15_Id:
         case OpcUa_P_RSA_OAEP_Id:
+        case OpcUa_P_RSA_OAEP_SHA256_Id:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);

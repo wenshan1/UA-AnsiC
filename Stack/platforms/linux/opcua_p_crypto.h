@@ -27,22 +27,30 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_P_SHA_512 512
 
 /* SecurityPolicies */
-#define OpcUa_SecurityPolicy_None               "http://opcfoundation.org/UA/SecurityPolicy#None"
-#define OpcUa_SecurityPolicy_Basic128Rsa15      "http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15"
-#define OpcUa_SecurityPolicy_Basic256           "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
-#define OpcUa_SecurityPolicy_Basic256Sha256     "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+#define OpcUa_SecurityPolicy_None                   "http://opcfoundation.org/UA/SecurityPolicy#None"
+#define OpcUa_SecurityPolicy_Basic128Rsa15          "http://opcfoundation.org/UA/SecurityPolicy#Basic128Rsa15"
+#define OpcUa_SecurityPolicy_Basic256               "http://opcfoundation.org/UA/SecurityPolicy#Basic256"
+#define OpcUa_SecurityPolicy_Basic256Sha256         "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
+#define OpcUa_SecurityPolicy_Aes128Sha256RsaOaep    "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep"
+#define OpcUa_SecurityPolicy_Aes256Sha256RsaPss     "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_RsaPss"
 
 /* Signature Algorithm Uris */
-#define OpcUa_AlgorithmUri_Signature_RsaSha1    "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
-#define OpcUa_AlgorithmUri_Signature_RsaSha256  "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
-#define OpcUa_AlgorithmUri_Signature_HmacSha1   "http://www.w3.org/2000/09/xmldsig#hmac-sha1"
-#define OpcUa_AlgorithmUri_Signature_HmacSha256 "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
+#define OpcUa_AlgorithmUri_Signature_RsaSha1        "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+#define OpcUa_AlgorithmUri_Signature_RsaSha256      "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
+#define OpcUa_AlgorithmUri_Signature_HmacSha1       "http://www.w3.org/2000/09/xmldsig#hmac-sha1"
+#define OpcUa_AlgorithmUri_Signature_HmacSha256     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
+#define OpcUa_AlgorithmUri_Signature_RsaPssSha256   "http://opcfoundation.org/ua/security/rsassa-pss-sha2-256"
 
 /* Encryption Algorithms Uris */
-#define OpcUa_AlgorithmUri_Ecryption_Aes128Cbc  "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
-#define OpcUa_AlgorithmUri_Ecryption_Aes256Cbc  "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
-#define OpcUa_AlgorithmUri_Encryption_RsaOaep   "http://www.w3.org/2001/04/xmlenc#rsa-oaep"
-#define OpcUa_AlgorithmUri_Encryption_Rsa15     "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
+#define OpcUa_AlgorithmUri_Ecryption_Aes128Cbc      "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
+#define OpcUa_AlgorithmUri_Ecryption_Aes256Cbc      "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
+#define OpcUa_AlgorithmUri_Encryption_RsaOaep       "http://www.w3.org/2001/04/xmlenc#rsa-oaep"
+#define OpcUa_AlgorithmUri_Encryption_Rsa15         "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
+#define OpcUa_AlgorithmUri_Encryption_RsaOaepSha256 "http://opcfoundation.org/ua/security/rsa-oaep-sha2-256"
+
+/* Key Derivation Algorithm Uris */
+#define OpcUa_AlgorithmUri_KeyDerivation_P_Sha1     "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1"
+#define OpcUa_AlgorithmUri_KeyDerivation_P_Sha256   "http://opcfoundation.org/ua/security/p_sha2-256"
 
 /* Encryption Algs */
 #define OpcUa_P_NoEncryption_Name                   ""
@@ -60,6 +68,9 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_RSA_OAEP_Name                       "RSA-OAEP"
 #define OpcUa_P_RSA_OAEP_Id                         4
 
+#define OpcUa_P_RSA_OAEP_SHA256_Name                "RSA-OAEP-SHA256"
+#define OpcUa_P_RSA_OAEP_SHA256_Id                  5
+
 /* Signature Algs */
 #define OpcUa_P_NoSignature_Name                    ""
 #define OpcUa_P_NoSignature_Id                      0
@@ -75,6 +86,9 @@ OPCUA_BEGIN_EXTERN_C
 
 #define OpcUa_P_HMAC_SHA256_Name                    "HMAC-SHA256"
 #define OpcUa_P_HMAC_SHA256_Id                      9
+
+#define OpcUa_P_RSA_PSS_SHA256_Name                 "RSA-PSS-SHA256"
+#define OpcUa_P_RSA_PSS_SHA256_Id                   10
 
 /* PRF Algs */
 #define OpcUa_P_PSHA1_Name                          "P-SHA1"
