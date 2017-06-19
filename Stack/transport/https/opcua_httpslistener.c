@@ -712,7 +712,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpListener, "OpcUa_HttpsListener_AbortSend
 
     pHttpsListener = (OpcUa_HttpsListener*)a_pListener->Handle;
 
-    if(a_ppOutputStream != OpcUa_Null)
+    if(a_ppOutputStream != OpcUa_Null && *a_ppOutputStream != OpcUa_Null)
     {
         /* clean up */
         OpcUa_HttpsStream_GetConnection(*a_ppOutputStream, (OpcUa_Handle*)&pListenerConnection);
