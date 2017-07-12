@@ -39,14 +39,14 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_AlgorithmUri_Signature_RsaSha256      "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
 #define OpcUa_AlgorithmUri_Signature_HmacSha1       "http://www.w3.org/2000/09/xmldsig#hmac-sha1"
 #define OpcUa_AlgorithmUri_Signature_HmacSha256     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
-#define OpcUa_AlgorithmUri_Signature_RsaPssSha256   "http://opcfoundation.org/ua/security/rsassa-pss-sha2-256"
+#define OpcUa_AlgorithmUri_Signature_RsaPssSha256   "http://opcfoundation.org/UA/security/rsa-pss-sha2-256"
 
 /* Encryption Algorithms Uris */
 #define OpcUa_AlgorithmUri_Ecryption_Aes128Cbc      "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
 #define OpcUa_AlgorithmUri_Ecryption_Aes256Cbc      "http://www.w3.org/2001/04/xmlenc#aes256-cbc"
 #define OpcUa_AlgorithmUri_Encryption_RsaOaep       "http://www.w3.org/2001/04/xmlenc#rsa-oaep"
 #define OpcUa_AlgorithmUri_Encryption_Rsa15         "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
-#define OpcUa_AlgorithmUri_Encryption_RsaOaepSha256 "http://opcfoundation.org/ua/security/rsa-oaep-sha2-256"
+#define OpcUa_AlgorithmUri_Encryption_RsaOaepSha256 "http://opcfoundation.org/UA/security/rsa-oaep-sha2-256"
 
 /* Key Derivation Algorithm Uris */
 #define OpcUa_AlgorithmUri_KeyDerivation_P_Sha1     "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1"
