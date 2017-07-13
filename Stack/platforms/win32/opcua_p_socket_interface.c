@@ -592,10 +592,10 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateClient");
                                              | OPCUA_SOCKET_CONNECT_EVENT
                                              | OPCUA_SOCKET_TIMEOUT_EVENT;
 
-    OPCUA_SOCKET_SETVALID(pNewClientSocket);
-
     /* return the new client socket */
     *a_pSocket = pNewClientSocket;
+
+    OPCUA_SOCKET_SETVALID(pNewClientSocket);
 
     /* break loop to add new socket into eventing */
     uStatus = OpcUa_P_SocketManager_InterruptLoop(  a_hSocketManager,
