@@ -48,10 +48,6 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_AlgorithmUri_Encryption_Rsa15         "http://www.w3.org/2001/04/xmlenc#rsa-1_5"
 #define OpcUa_AlgorithmUri_Encryption_RsaOaepSha256 "http://opcfoundation.org/UA/security/rsa-oaep-sha2-256"
 
-/* Key Derivation Algorithm Uris */
-#define OpcUa_AlgorithmUri_KeyDerivation_P_Sha1     "http://docs.oasis-open.org/ws-sx/ws-secureconversation/200512/dk/p_sha1"
-#define OpcUa_AlgorithmUri_KeyDerivation_P_Sha256   "http://opcfoundation.org/ua/security/p_sha2-256"
-
 /* Encryption Algs */
 #define OpcUa_P_NoEncryption_Name                   ""
 #define OpcUa_P_NoEncryption_Id                     0
@@ -90,7 +86,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_RSA_PSS_SHA256_Name                 "RSA-PSS-SHA256"
 #define OpcUa_P_RSA_PSS_SHA256_Id                   10
 
-/* PRF Algs */
+/* Key Derivation Algs */
 #define OpcUa_P_PSHA1_Name                          "P-SHA1"
 #define OpcUa_P_PSHA1_Id                            12
 
