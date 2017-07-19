@@ -532,7 +532,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "InvokeService");
 
     /* allocate the call state object */
     uStatus =  OpcUa_AsyncCallState_Create(a_pChannel, OpcUa_Null, OpcUa_Null, &pAsyncState);
-    OpcUa_ReturnErrorIfBad(uStatus);
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* lock request mutex */
     /* OPCUA_P_MUTEX_LOCK(pAsyncState->WaitMutex); */
