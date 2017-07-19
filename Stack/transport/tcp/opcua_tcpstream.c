@@ -796,15 +796,6 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
     pTcpOutputStream->NotifyDisconnect   = a_pfnDisconnectCB;
     pTcpOutputStream->MaxNoOfFlushes     = a_uMaxNoOfFlushes;
 
-    /* create internal buffer with fixed buffersize. */
-    uStatus = OpcUa_Buffer_Initialize(  &(pTcpOutputStream->Buffer), /* instance           */
-                                        pData,                      /* bufferdata         */
-                                        a_uBufferSize,              /* buffersize         */
-                                        a_uBufferSize,              /* blocksize          */
-                                        a_uBufferSize,              /* maxsize            */
-                                        OpcUa_False);               /* do not free buffer */
-    OpcUa_GotoErrorIfBad(uStatus);
-
     /* now initialize superclass members */
     *a_ppOstrm = (OpcUa_OutputStream*)pTcpOutputStream;
 
@@ -819,6 +810,15 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
     (*a_ppOstrm)->Delete            = OpcUa_TcpStream_Delete;
     (*a_ppOstrm)->Write             = OpcUa_TcpStream_Write;
     (*a_ppOstrm)->Flush             = OpcUa_TcpStream_Flush;
+
+    /* create internal buffer with fixed buffersize. */
+    uStatus = OpcUa_Buffer_Initialize(  &(pTcpOutputStream->Buffer), /* instance           */
+                                        pData,                      /* bufferdata         */
+                                        a_uBufferSize,              /* buffersize         */
+                                        a_uBufferSize,              /* blocksize          */
+                                        a_uBufferSize,              /* maxsize            */
+                                        OpcUa_False);               /* do not free buffer */
+    OpcUa_GotoErrorIfBad(uStatus);
 
 #if OPCUA_TCPSTREAM_PREENCODE_CHUNK_HEADER
 
