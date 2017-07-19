@@ -981,6 +981,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "Flush");
                                                             OpcUa_Null,
                                                             &pSendingKeyset,
                                                             &pCryptoProvider);
+            OpcUa_GotoErrorIfBad(uStatus);
 
             pSigningKey             = &pSendingKeyset->SigningKey;
             pEncryptionKey          = &pSendingKeyset->EncryptionKey;
@@ -2569,14 +2570,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOutput");
 
     *a_ppOstrm = OpcUa_Null;
 
-    /* get security keyset (only CryptoProvider) for calculating flush triggers. */
-    uStatus = a_pSecureChannel->GetCurrentSecuritySet(  a_pSecureChannel,
-                                                        &uTokenId,
-                                                        OpcUa_Null,
-                                                        OpcUa_Null,
-                                                        &pCryptoProvider);
-    OpcUa_GotoErrorIfBad(uStatus);
-
     uSecureChannelId = a_pSecureChannel->SecureChannelId;
 
     /*** create SecureStream ***/
@@ -2629,20 +2622,31 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOutput");
 
     pSecureStream->nAbsolutePosition    = 0;
 
+    /* get security keyset (only CryptoProvider) for calculating flush triggers. */
+    uStatus = a_pSecureChannel->GetCurrentSecuritySet(  a_pSecureChannel,
+                                                        &uTokenId,
+                                                        OpcUa_Null,
+                                                        OpcUa_Null,
+                                                        &pCryptoProvider);
+    OpcUa_GotoErrorIfBad(uStatus);
+
     /* get the encryption block sizes */
     uStatus = OpcUa_SecureStream_GetSymmetricEncryptionBlockSizes(  pCryptoProvider,
                                                                     &pSecureStream->uPlainTextBlockSize,
                                                                     &pSecureStream->uCipherTextBlockSize);
-    OpcUa_GotoErrorIfBad(uStatus);
 
-    /* get the signature size */
-    uStatus = OpcUa_SecureStream_GetSymmetricSignatureSize( pCryptoProvider,
-                                                            &pSecureStream->uSignatureSize);
-    OpcUa_GotoErrorIfBad(uStatus);
+    if(OpcUa_IsGood(uStatus))
+    {
+        /* get the signature size */
+        uStatus = OpcUa_SecureStream_GetSymmetricSignatureSize( pCryptoProvider,
+                                                                &pSecureStream->uSignatureSize);
+    }
 
     /* release reference to security set */
     a_pSecureChannel->ReleaseSecuritySet(   a_pSecureChannel,
                                             uTokenId);
+
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* Calculate flush trigger */
     uStatus = OpcUa_SecureStream_CalculateFlushTrigger( pSecureStream,
