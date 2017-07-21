@@ -1057,7 +1057,13 @@ OpcUa_BeginErrorHandling;
     }
 
     OpcUa_Encoder_Close(pEncoder, &hEncodeContext);
-    OpcUa_Stream_Delete((OpcUa_Stream**)&pOstrm);
+
+    if(pOstrm != OpcUa_Null)
+    {
+        OpcUa_Stream_Delete(&((OpcUa_SecureStream*)pOstrm->Handle)->InnerStrm);
+        OpcUa_Stream_Delete((OpcUa_Stream**)&pOstrm);
+    }
+
     OpcUa_MessageContext_Clear(&cContext);
 
     OpcUa_ByteString_Clear(&serverCertificateThumbprint);
