@@ -28,6 +28,7 @@ Current Version
 			or newer and build that if found.  Strawberry perl has to be installed.
 		- added new security profiles Aes128_Sha256_RsaOaep and Aes256_Sha256_RsaPss.
 			Note: Aes256_Sha256_RsaPss requires OpenSSL 1.0.2 or newer.
+		- added new API function OpcUa_DestroySecretData.
 
 Version 1.03.340
 	
