@@ -401,26 +401,20 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Public_Encrypt");
         }
     }
 
-    if(a_plainTextLen < uEncryptedDataSize)
-    {
-        uBytesToEncrypt = a_plainTextLen;
-    }
-    else
-    {
-        uBytesToEncrypt = uEncryptedDataSize;
-    }
+    uPlainTextPosition  = a_plainTextLen;
+    uCipherTextPosition = ((uPlainTextPosition - 1) / uEncryptedDataSize + 1) * uKeySize;
+    uBytesToEncrypt     = (uPlainTextPosition - 1) % uEncryptedDataSize + 1;
+    *a_pCipherTextLen   = uCipherTextPosition;
 
-    while(uPlainTextPosition < a_plainTextLen)
+    if((a_pCipherText != OpcUa_Null) && (a_pPlainText != OpcUa_Null))
     {
 
-        /* the last part could be smaller */
-        if((a_plainTextLen >= uEncryptedDataSize) && ((a_plainTextLen - uPlainTextPosition) < uEncryptedDataSize))
+        /* encrypt in reverse order so that a_pCipherText may alias a_pPlainText */
+        while(uPlainTextPosition > 0)
         {
-            uBytesToEncrypt = a_plainTextLen - uPlainTextPosition;
-        }
+            uCipherTextPosition -= uKeySize;
+            uPlainTextPosition  -= uBytesToEncrypt;
 
-        if((a_pCipherText != OpcUa_Null) && (a_pPlainText != OpcUa_Null))
-        {
             iEncryptedBytes = RSA_public_encrypt(   uBytesToEncrypt,                    /* how much to encrypt  */
                                                     a_pPlainText + uPlainTextPosition,  /* what to encrypt      */
                                                     a_pCipherText + uCipherTextPosition,/* where to encrypt     */
@@ -432,13 +426,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Public_Encrypt");
                 OpcUa_GotoError;
             }
 
+            uBytesToEncrypt = uEncryptedDataSize;
         }
 
-        uCipherTextPosition += uKeySize;
-        uPlainTextPosition  += uBytesToEncrypt;
     }
-
-    *a_pCipherTextLen = uCipherTextPosition;
 
     EVP_PKEY_free(pPublicKey);
 
@@ -486,6 +477,12 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Private_Decrypt");
     OpcUa_ReturnErrorIfArgumentNull(a_pPlainTextLen);
 
     *a_pPlainTextLen = 0;
+
+    if((OpcUa_Int32)a_cipherTextLen < 1)
+    {
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
 
     if(a_privateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private)
     {
@@ -788,26 +785,20 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_SHA256_Public_Encrypt");
     ret = EVP_PKEY_CTX_set_rsa_oaep_md(pCtx, EVP_sha256());
     OpcUa_GotoErrorIfTrue((ret <= 0), OpcUa_Bad);
 
-    if(a_plainTextLen < uEncryptedDataSize)
-    {
-        uBytesToEncrypt = a_plainTextLen;
-    }
-    else
-    {
-        uBytesToEncrypt = uEncryptedDataSize;
-    }
+    uPlainTextPosition  = a_plainTextLen;
+    uCipherTextPosition = ((uPlainTextPosition - 1) / uEncryptedDataSize + 1) * uKeySize;
+    uBytesToEncrypt     = (uPlainTextPosition - 1) % uEncryptedDataSize + 1;
+    *a_pCipherTextLen   = uCipherTextPosition;
 
-    while(uPlainTextPosition < a_plainTextLen)
+    if((a_pCipherText != OpcUa_Null) && (a_pPlainText != OpcUa_Null))
     {
 
-        /* the last part could be smaller */
-        if((a_plainTextLen >= uEncryptedDataSize) && ((a_plainTextLen - uPlainTextPosition) < uEncryptedDataSize))
+        /* encrypt in reverse order so that a_pCipherText may alias a_pPlainText */
+        while(uPlainTextPosition > 0)
         {
-            uBytesToEncrypt = a_plainTextLen - uPlainTextPosition;
-        }
+            uCipherTextPosition -= uKeySize;
+            uPlainTextPosition  -= uBytesToEncrypt;
 
-        if((a_pCipherText != OpcUa_Null) && (a_pPlainText != OpcUa_Null))
-        {
             iEncryptedBytes = uKeySize;
             ret = EVP_PKEY_encrypt(pCtx,
                                    a_pCipherText + uCipherTextPosition,/* where to encrypt     */
@@ -821,13 +812,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_SHA256_Public_Encrypt");
                 OpcUa_GotoError;
             }
 
+            uBytesToEncrypt = uEncryptedDataSize;
         }
 
-        uCipherTextPosition += uKeySize;
-        uPlainTextPosition  += uBytesToEncrypt;
     }
-
-    *a_pCipherTextLen = uCipherTextPosition;
 
     EVP_PKEY_CTX_free(pCtx);
     EVP_PKEY_free(pPublicKey);
@@ -892,6 +880,12 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_SHA256_Private_Decrypt");
     OpcUa_ReturnErrorIfArgumentNull(a_pPlainTextLen);
 
     *a_pPlainTextLen = 0;
+
+    if((OpcUa_Int32)a_cipherTextLen < 1)
+    {
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
 
     if(a_privateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private)
     {
