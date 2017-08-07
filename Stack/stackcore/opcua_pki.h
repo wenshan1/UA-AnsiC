@@ -188,19 +188,6 @@ typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnLoadPrivateKeyFromFile)(
     OpcUa_ByteString*           pPrivateKey);
 
 /**
-  @brief frees a certificate store object.
-
-  @param pProvider             [in]  The crypto provider handle.
-
-  @param pCertificateStore     [out] The certificate store object.
-*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_LoadPrivateKeyFromFile(
-    OpcUa_StringA               privateKeyFile,
-    OpcUa_P_FileFormat          fileFormat,
-    OpcUa_StringA               password,
-    OpcUa_ByteString*           pPrivateKey);
-
-/**
   @brief Extracts data from a certificate store object.
 
   @param pCertificate          [in] The certificate to examine.
@@ -215,31 +202,6 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_LoadPrivateKeyFromFile(
                                can be smaller than the total length of pCertificate in case of chain certificate or garbage follow.
 */
 typedef OpcUa_StatusCode (OpcUa_PKIProvider_PfnExtractCertificateData)(
-    OpcUa_ByteString*           pCertificate,
-    OpcUa_ByteString*           pIssuer,
-    OpcUa_ByteString*           pSubject,
-    OpcUa_ByteString*           pSubjectUri,
-    OpcUa_ByteString*           pSubjectIP,
-    OpcUa_ByteString*           pSubjectDNS,
-    OpcUa_ByteString*           pCertThumbprint,
-    OpcUa_UInt32*               pSubjectHash,
-    OpcUa_UInt32*               pCertRawLength);
-
-/**
-  @brief Extracts data from a certificate store object.
-
-  @param pCertificate          [in] The certificate to examine.
-  @param pIssuer               [out, optional] The issuer name of the certificate.
-  @param pSubject              [out, optional] The subject name of the certificate.
-  @param pSubjectUri           [out, optional] The subject's URI of the certificate.
-  @param pSubjectIP            [out, optional] The subject's IP of the certificate.
-  @param pSubjectDNS           [out, optional] The subject's DNS name of the certificate.
-  @param pCertThumbprint       [out, optional] The thumbprint of the certificate.
-  @param pSubjectHash          [out, optional] The hash code of the certificate.
-  @param pCertRawLength        [out, optional] The length of the DER encoded data.
-                               can be smaller than the total length of pCertificate in case of chain certificate or garbage follow.
-*/
-OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_ExtractCertificateData(
     OpcUa_ByteString*           pCertificate,
     OpcUa_ByteString*           pIssuer,
     OpcUa_ByteString*           pSubject,
