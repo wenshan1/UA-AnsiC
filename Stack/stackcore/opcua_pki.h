@@ -177,7 +177,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_CloseCertificateStore(
 
   @param privateKeyFile        [in]  The file name.
   @param fileFormat            [in]  The file format.
-  @param password              [in]  The excryption passwword.
+  @param password              [in]  The encryption password.
 
   @param pPrivateKey           [out] The private key (in DER format).
 */
