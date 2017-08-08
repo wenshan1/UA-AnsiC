@@ -477,10 +477,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
         if(a_pPublicKey->Key.Data == OpcUa_Null)
         {
             RSA_free(pRsaPublicKey);
-            pRsaPublicKey = OpcUa_Null;
-
             EVP_PKEY_free(pPublicKey);
-            pPublicKey = OpcUa_Null;
 
             OpcUa_ReturnStatusCode;
         }
@@ -492,7 +489,6 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
 
         /* free memory for RSA key */
         RSA_free(pRsaPublicKey);
-        pRsaPublicKey = OpcUa_Null;
 
         break;
 
@@ -505,13 +501,11 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
 
     /*** clean up ***/
     EVP_PKEY_free(pPublicKey);
-    pPublicKey = OpcUa_Null;
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
     EVP_PKEY_free(pPublicKey);
-    pPublicKey = OpcUa_Null;
 
 OpcUa_FinishErrorHandling;
 }
