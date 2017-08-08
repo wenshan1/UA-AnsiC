@@ -191,9 +191,14 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_LoadCertificate(
 /**
   @brief loads a private key object, usually from an encrypted file.
 
+  Note: fileFormat == OpcUa_Crypto_Encoding_DER needs a keyType != OpcUa_Crypto_KeyType_Any
+        e.g. OpcUa_Crypto_KeyType_Rsa_Public.
+        Other formats can use keyType == OpcUa_Crypto_KeyType_Any as a wildcard.
+
   @param privateKeyFile           [in]  The file name.
   @param fileFormat               [in]  The file format.
   @param password                 [in]  The encryption password.
+  @param keyType                  [in]  The expected key type.
 
   @param pPrivateKey              [out] The private key (in DER format).
 */
@@ -201,7 +206,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_NoSecurity_LoadPrivateKeyFromFile(
     OpcUa_StringA               privateKeyFile,
     OpcUa_P_FileFormat          fileFormat,
     OpcUa_StringA               password,
-    OpcUa_ByteString*           pPrivateKey);
+    OpcUa_UInt                  keyType,
+    OpcUa_Key*                  pPrivateKey);
 
 /**
   @brief Extracts data from a certificate store object.

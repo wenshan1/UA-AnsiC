@@ -122,7 +122,8 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_LoadPrivateKeyFromFile(
     OpcUa_StringA           a_privateKeyFile,
     OpcUa_P_FileFormat      a_fileFormat,
     OpcUa_StringA           a_password,         /* optional: just needed encrypted PEM */
-    OpcUa_ByteString*       a_pPrivateKey)
+    OpcUa_UInt              a_keyType,
+    OpcUa_Key*              a_pPrivateKey)
 {
     BIO*            pPrivateKeyFile     = OpcUa_Null;
     RSA*            pRsaPrivateKey      = OpcUa_Null;
@@ -140,8 +141,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_LoadPrivateKeyFromFile");
         return OpcUa_BadInvalidArgument;
     }
 
-    OpcUa_ReferenceParameter(a_password);
-
     /* open file */
     pPrivateKeyFile = BIO_new_file((const char*)a_privateKeyFile, "rb");
     OpcUa_ReturnErrorIfArgumentNull(pPrivateKeyFile);
@@ -156,16 +155,11 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_LoadPrivateKeyFromFile");
                                                 NULL,               /* key struct           */
                                                 0,                  /* password callback    */
                                                 a_password);        /* default passphrase or arbitrary handle */
-            OpcUa_GotoErrorIfNull(pEvpKey, OpcUa_Bad);
-            pRsaPrivateKey = EVP_PKEY_get1_RSA(pEvpKey);
-            OpcUa_GotoErrorIfNull(pRsaPrivateKey, OpcUa_Bad);
-            EVP_PKEY_free(pEvpKey);
-            pEvpKey = NULL;
             break;
         }
     case OpcUa_Crypto_Encoding_PKCS12:
         {
-            int iResult = 0;
+            int i;
 
             /* read from file. */
             PKCS12* pPkcs12 = d2i_PKCS12_bio(pPrivateKeyFile, NULL);
@@ -176,25 +170,76 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_LoadPrivateKeyFromFile");
             }
 
             /* parse the certificate. */
-            iResult = PKCS12_parse(pPkcs12, a_password, &pEvpKey, NULL, NULL);
+            if(a_keyType == OpcUa_Crypto_KeyType_Asymmetric)
+            {
+                X509 *pCert;
+                STACK_OF(X509) *pCA = sk_X509_new_null();
+                OpcUa_GotoErrorIfNull(pCA, OpcUa_Bad);
+                i = PKCS12_parse(pPkcs12, a_password, &pEvpKey, &pCert, &pCA);
+                PKCS12_free(pPkcs12);
+
+                if(i <= 0)
+                {
+                    OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+                }
+
+                if(pCert == NULL)
+                {
+                    sk_X509_pop_free(pCA, X509_free);
+                    OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+                }
+
+                a_pPrivateKey->Key.Length = i2d_X509(pCert, NULL);
+                for(i = 0; i < sk_X509_num(pCA); i++)
+                {
+                    a_pPrivateKey->Key.Length += i2d_X509(sk_X509_value(pCA, i), NULL);
+                }
+
+                a_pPrivateKey->Key.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(a_pPrivateKey->Key.Length);
+                if(a_pPrivateKey->Key.Data == OpcUa_Null)
+                {
+                    sk_X509_pop_free(pCA, X509_free);
+                    X509_free(pCert);
+                    OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+                }
+
+                pData = a_pPrivateKey->Key.Data;
+                i2d_X509(pCert, &pData);
+                for(i = 0; i < sk_X509_num(pCA); i++)
+                {
+                    i2d_X509(sk_X509_value(pCA, i), &pData);
+                }
+
+                a_pPrivateKey->Type = OpcUa_Crypto_KeyType_Asymmetric;
+
+                sk_X509_pop_free(pCA, X509_free);
+                X509_free(pCert);
+                EVP_PKEY_free(pEvpKey);
+                BIO_free(pPrivateKeyFile);
+                OpcUa_ReturnStatusCode;
+            }
+
+            i = PKCS12_parse(pPkcs12, a_password, &pEvpKey, NULL, NULL);
             PKCS12_free(pPkcs12);
 
-            if(iResult <= 0)
+            if(i <= 0)
             {
                 OpcUa_GotoErrorWithStatus(OpcUa_Bad);
             }
-
-            /* convert to intermediary openssl struct */
-            pRsaPrivateKey = EVP_PKEY_get1_RSA(pEvpKey);
-            OpcUa_GotoErrorIfNull(pRsaPrivateKey, OpcUa_Bad);
-            EVP_PKEY_free(pEvpKey);
-            pEvpKey = NULL;
             break;
         }
     case OpcUa_Crypto_Encoding_DER:
         {
-            pRsaPrivateKey = d2i_RSAPrivateKey_bio(pPrivateKeyFile, OpcUa_Null);
-            OpcUa_GotoErrorIfNull(pRsaPrivateKey, OpcUa_Bad);
+            switch(a_keyType)
+            {
+            case OpcUa_Crypto_KeyType_Rsa_Private:
+                pRsaPrivateKey = d2i_RSAPrivateKey_bio(pPrivateKeyFile, OpcUa_Null);
+                break;
+
+            default:
+                uStatus = OpcUa_BadNotSupported;
+                OpcUa_GotoError;
+            }
             break;
         }
     default:
@@ -204,20 +249,49 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_LoadPrivateKeyFromFile");
         }
     }
 
-    /* get required length */
-    a_pPrivateKey->Length = i2d_RSAPrivateKey(pRsaPrivateKey, OpcUa_Null);
-    OpcUa_GotoErrorIfTrue((a_pPrivateKey->Length <= 0), OpcUa_Bad);
+    if(pEvpKey != NULL)
+    {
+        /* convert to intermediary openssl struct */
+        switch(a_keyType)
+        {
+        case OpcUa_Crypto_KeyType_Any:
+        case OpcUa_Crypto_KeyType_Rsa_Private:
+            pRsaPrivateKey = EVP_PKEY_get1_RSA(pEvpKey);
+            break;
 
-    /* allocate target buffer */
-    a_pPrivateKey->Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(a_pPrivateKey->Length);
-    OpcUa_GotoErrorIfAllocFailed(a_pPrivateKey->Data);
+        default:
+            uStatus = OpcUa_BadNotSupported;
+            OpcUa_GotoError;
+        }
 
-    /* do real conversion */
-    pData = a_pPrivateKey->Data;
-    a_pPrivateKey->Length = i2d_RSAPrivateKey(pRsaPrivateKey, &pData);
-    OpcUa_GotoErrorIfTrue((a_pPrivateKey->Length <= 0), OpcUa_Bad);
+        EVP_PKEY_free(pEvpKey);
+        pEvpKey = NULL;
+    }
 
-    RSA_free(pRsaPrivateKey);
+    if(pRsaPrivateKey != NULL)
+    {
+        /* get required length */
+        a_pPrivateKey->Key.Length = i2d_RSAPrivateKey(pRsaPrivateKey, OpcUa_Null);
+        OpcUa_GotoErrorIfTrue((a_pPrivateKey->Key.Length <= 0), OpcUa_Bad);
+
+        /* allocate target buffer */
+        a_pPrivateKey->Key.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(a_pPrivateKey->Key.Length);
+        OpcUa_GotoErrorIfAllocFailed(a_pPrivateKey->Key.Data);
+
+        /* do real conversion */
+        pData = a_pPrivateKey->Key.Data;
+        a_pPrivateKey->Key.Length = i2d_RSAPrivateKey(pRsaPrivateKey, &pData);
+        OpcUa_GotoErrorIfTrue((a_pPrivateKey->Key.Length <= 0), OpcUa_Bad);
+
+        a_pPrivateKey->Type = OpcUa_Crypto_KeyType_Rsa_Private;
+
+        RSA_free(pRsaPrivateKey);
+    }
+    else
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
+
     BIO_free(pPrivateKeyFile);
 
 OpcUa_ReturnStatusCode;
@@ -230,11 +304,11 @@ OpcUa_BeginErrorHandling;
 
     if(a_pPrivateKey != OpcUa_Null)
     {
-        if(a_pPrivateKey->Data != OpcUa_Null)
+        if(a_pPrivateKey->Key.Data != OpcUa_Null)
         {
-            OpcUa_P_Memory_Free(a_pPrivateKey->Data);
-            a_pPrivateKey->Data = OpcUa_Null;
-            a_pPrivateKey->Length = -1;
+            OpcUa_P_Memory_Free(a_pPrivateKey->Key.Data);
+            a_pPrivateKey->Key.Data = OpcUa_Null;
+            a_pPrivateKey->Key.Length = -1;
         }
     }
 
