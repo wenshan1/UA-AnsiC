@@ -106,15 +106,6 @@ typedef enum _OpcUa_P_FileFormat
 OpcUa_P_FileFormat;
 
 /**
-  @brief Loads a X.509 certificate from the specified file.
-  */
-OpcUa_StatusCode OpcUa_P_OpenSSL_X509_LoadFromFile(
-    OpcUa_StringA               fileName,
-    OpcUa_P_FileFormat          fileFormat,
-    OpcUa_StringA               sPassword,      /* optional: just for OpcUa_PKCS12 */
-    OpcUa_ByteString*           pCertificate);
-
-/**
   @brief Loads a RSA private key from the specified file.
   */
 OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_LoadPrivateKeyFromFile(
