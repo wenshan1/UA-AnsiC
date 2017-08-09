@@ -215,42 +215,30 @@ OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy(
 {
     OpcUa_EndpointInternal* pEndpointInt    = (OpcUa_EndpointInternal*)a_hEndpoint;
     OpcUa_EndpointContext*  pContext        = (OpcUa_EndpointContext*)a_hContext;
-    OpcUa_SecureListener_SecurityPolicyConfiguration securityPolicy;
-
-OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "GetMessageSecureChannelSecurityPolicy");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hEndpoint);
     OpcUa_ReturnErrorIfArgumentNull(a_hContext);
     OpcUa_ReturnErrorIfArgumentNull(a_pSecurityPolicy);
 
-    OpcUa_MemSet(&securityPolicy, 0, sizeof(securityPolicy));
+    OpcUa_MemSet(a_pSecurityPolicy, 0, sizeof(OpcUa_Endpoint_SecurityPolicyConfiguration));
 
 #ifdef OPCUA_HAVE_HTTPS
     /* In case of HTTPS, the transport listener is not set. */
     if(pEndpointInt->TransportListener == OpcUa_Null)
     {
-        uStatus = OpcUa_HttpsListener_GetSecurityPolicyConfiguration(
+        return OpcUa_HttpsListener_GetSecurityPolicyConfiguration(
                         pEndpointInt->SecureListener,
                         pContext->pOstrm,
-                        &securityPolicy);
-        OpcUa_GotoErrorIfBad(uStatus);
+                        a_pSecurityPolicy);
     }
     else
 #endif /* OPCUA_HAVE_HTTPS */
     {
-        uStatus = OpcUa_SecureListener_GetSecureChannelSecurityPolicyConfiguration(
+        return OpcUa_SecureListener_GetSecureChannelSecurityPolicyConfiguration(
                         pEndpointInt->SecureListener,
                         pContext->uSecureChannelId,
-                        &securityPolicy);
-        OpcUa_GotoErrorIfBad(uStatus);
+                        a_pSecurityPolicy);
     }
-
-    uStatus = OpcUa_MemCpy(a_pSecurityPolicy, sizeof(*a_pSecurityPolicy),
-                           &securityPolicy, sizeof(securityPolicy));
-
-OpcUa_ReturnStatusCode;
-OpcUa_BeginErrorHandling;
-OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
@@ -514,7 +502,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
                                                 a_pServerPrivateKey,
                                                 a_pPKIConfig,
                                                 a_nNoOfSecurityPolicies,
-                                                (OpcUa_SecureListener_SecurityPolicyConfiguration*)a_pSecurityPolicies,
+                                                a_pSecurityPolicies,
                                                 OpcUa_Endpoint_OnSecureChannelEvent,
                                                 (OpcUa_Void*)pEndpointInt,
                                                 &pEndpointInt->SecureListener);
