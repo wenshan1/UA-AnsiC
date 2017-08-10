@@ -241,16 +241,16 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricSignatureSize");
 
     *a_pSignatureSize = 0;
 
-    switch (a_pProvider->AsymmetricEncryptionAlgorithmId)
+    switch (a_pProvider->AsymmetricSignatureAlgorithmId)
     {
         case OpcUa_P_NoSignature_Id:
         {
             *a_pSignatureSize = 0;
             break;
         }
-        case OpcUa_P_RSA_PKCS1_V15_Id:
-        case OpcUa_P_RSA_OAEP_Id:
-        case OpcUa_P_RSA_OAEP_SHA256_Id:
+        case OpcUa_P_RSA_PKCS1_V15_SHA1_Id:
+        case OpcUa_P_RSA_PKCS1_V15_SHA256_Id:
+        case OpcUa_P_RSA_PSS_SHA256_Id:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);
