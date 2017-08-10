@@ -618,7 +618,7 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_SymmetricSign(
     OpcUa_Byte*           pData,
     OpcUa_UInt32          dataLen,
     OpcUa_Key*            key,
-    OpcUa_ByteString*    ppSignature);
+    OpcUa_ByteString*     ppSignature);
 
 /**
   @brief
