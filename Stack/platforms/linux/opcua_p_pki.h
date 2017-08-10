@@ -105,16 +105,6 @@ typedef enum _OpcUa_P_FileFormat
 }
 OpcUa_P_FileFormat;
 
-/**
-  @brief Loads a RSA private key from the specified file.
-  */
-OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_LoadPrivateKeyFromFile(
-    OpcUa_StringA           privateKeyFile,
-    OpcUa_P_FileFormat      fileFormat,
-    OpcUa_StringA           password,
-    OpcUa_UInt              keyType,
-    OpcUa_Key*              pPrivateKey);
-
 OPCUA_END_EXTERN_C
 
 #endif
