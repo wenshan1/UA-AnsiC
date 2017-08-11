@@ -52,8 +52,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_GenerateKeys");
     OpcUa_ReturnErrorIfArgumentNull(a_pPublicKey);
     OpcUa_ReturnErrorIfArgumentNull(a_pPrivateKey);
 
-    OpcUa_ReferenceParameter(a_pProvider);
-
     a_pPublicKey->Key.Data      = OpcUa_Null;
     a_pPrivateKey->Key.Data     = OpcUa_Null;
 
@@ -126,8 +124,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_RSA_Public_GetKeyLength(
 
 OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "RSA_Public_GetKeyLength");
 
-    OpcUa_ReferenceParameter(a_pProvider);
-
+    OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
     OpcUa_ReturnErrorIfArgumentNull(a_publicKey.Key.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_pKeyLen);
 
