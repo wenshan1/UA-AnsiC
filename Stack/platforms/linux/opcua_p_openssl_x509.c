@@ -167,6 +167,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     X509*               pCert               = OpcUa_Null;
     EVP_PKEY*           pSubjectPublicKey   = OpcUa_Null;
     EVP_PKEY*           pIssuerPrivateKey   = OpcUa_Null;
+    OpcUa_Byte*         pBuffer             = OpcUa_Null;
 
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_SelfSigned_Custom_Create");
 
@@ -362,6 +363,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     {
         /* conversion to DER not possible */
         uStatus = OpcUa_Bad;
+        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     /* allocate conversion target buffer */
@@ -369,22 +371,12 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     OpcUa_GotoErrorIfAllocFailed(a_pCertificate->Data);
 
     /* convert into DER */
-    a_pCertificate->Length = i2d_X509(pCert, &(a_pCertificate->Data));
-    if(a_pCertificate->Length <= 0)
-    {
-        /* conversion to DER not possible */
-        uStatus = OpcUa_Bad;
-    }
-    else
-    {
-        /* correct pointer incrementation by i2d_X509() */
-        a_pCertificate->Data -= a_pCertificate->Length;
-    }
+    pBuffer = a_pCertificate->Data;
+    a_pCertificate->Length = i2d_X509(pCert, &pBuffer);
 
     X509_free(pCert);
 
 OpcUa_ReturnStatusCode;
-
 OpcUa_BeginErrorHandling;
 
     X509_free(pCert);
@@ -416,11 +408,11 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
     OpcUa_StringA               a_password,             /* this could be optional */
     OpcUa_Key*                  a_pPublicKey)
 {
-    EVP_PKEY*           pPublicKey      = OpcUa_Null;
-    RSA*                pRsaPublicKey   = OpcUa_Null;
-    X509*               pCertificate    = OpcUa_Null;
-    OpcUa_Byte*         pBuffer         = OpcUa_Null;
-    BIO*                bi;
+    EVP_PKEY*               pPublicKey      = OpcUa_Null;
+    RSA*                    pRsaPublicKey   = OpcUa_Null;
+    X509*                   pCertificate    = OpcUa_Null;
+    OpcUa_Byte*             pBuffer         = OpcUa_Null;
+    const unsigned char*    pTemp           = OpcUa_Null;
 
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetPublicKey");
 
@@ -431,12 +423,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
     OpcUa_ReturnErrorIfArgumentNull(a_pCertificate->Data);
     OpcUa_ReturnErrorIfArgumentNull(a_pPublicKey);
 
-    bi = BIO_new(BIO_s_mem());
-    BIO_write(bi, a_pCertificate->Data, a_pCertificate->Length);
+    pTemp = a_pCertificate->Data;
 
-    pCertificate = d2i_X509_bio(bi, NULL);
-
-    BIO_free(bi);
+    d2i_X509(&pCertificate, &pTemp, a_pCertificate->Length);
 
     if(pCertificate == OpcUa_Null)
     {
@@ -617,7 +606,6 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "X509_GetCertificateThumbprint");
     if(X509_digest(pX509Certificate, EVP_sha1(), a_pCertificateThumbprint->Data, NULL) <= 0)
     {
         uStatus = OpcUa_Bad;
-        OpcUa_GotoErrorIfBad(uStatus);
     }
 
     X509_free(pX509Certificate);

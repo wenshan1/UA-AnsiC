@@ -1067,37 +1067,37 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_ExtractCertificateData");
     if(a_pIssuer != OpcUa_Null)
     {
         a_pIssuer->Data = OpcUa_Null;
-        a_pIssuer->Length = 0;
+        a_pIssuer->Length = -1;
     }
 
     if(a_pSubject != OpcUa_Null)
     {
         a_pSubject->Data = OpcUa_Null;
-        a_pSubject->Length = 0;
+        a_pSubject->Length = -1;
     }
 
     if(a_pSubjectUri != OpcUa_Null)
     {
         a_pSubjectUri->Data = OpcUa_Null;
-        a_pSubjectUri->Length = 0;
+        a_pSubjectUri->Length = -1;
     }
 
     if(a_pSubjectIP != OpcUa_Null)
     {
         a_pSubjectIP->Data = OpcUa_Null;
-        a_pSubjectIP->Length = 0;
+        a_pSubjectIP->Length = -1;
     }
 
     if(a_pSubjectDNS != OpcUa_Null)
     {
         a_pSubjectDNS->Data = OpcUa_Null;
-        a_pSubjectDNS->Length = 0;
+        a_pSubjectDNS->Length = -1;
     }
 
     if(a_pCertThumbprint != OpcUa_Null)
     {
         a_pCertThumbprint->Data = OpcUa_Null;
-        a_pCertThumbprint->Length = 0;
+        a_pCertThumbprint->Length = -1;
     }
 
     if(a_pSubjectHash != OpcUa_Null)
@@ -1225,42 +1225,42 @@ OpcUa_BeginErrorHandling;
     {
         OpcUa_P_Memory_Free(a_pIssuer->Data);
         a_pIssuer->Data = OpcUa_Null;
-        a_pIssuer->Length = 0;
+        a_pIssuer->Length = -1;
     }
 
     if(a_pSubject != OpcUa_Null && a_pSubject->Data != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(a_pSubject->Data);
         a_pSubject->Data = OpcUa_Null;
-        a_pSubject->Length = 0;
+        a_pSubject->Length = -1;
     }
 
     if(a_pSubjectUri != OpcUa_Null && a_pSubjectUri->Data != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(a_pSubjectUri->Data);
         a_pSubjectUri->Data = OpcUa_Null;
-        a_pSubjectUri->Length = 0;
+        a_pSubjectUri->Length = -1;
     }
 
     if(a_pSubjectIP != OpcUa_Null && a_pSubjectIP->Data != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(a_pSubjectIP->Data);
         a_pSubjectIP->Data = OpcUa_Null;
-        a_pSubjectIP->Length = 0;
+        a_pSubjectIP->Length = -1;
     }
 
     if(a_pSubjectDNS != OpcUa_Null && a_pSubjectDNS->Data != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(a_pSubjectDNS->Data);
         a_pSubjectDNS->Data = OpcUa_Null;
-        a_pSubjectDNS->Length = 0;
+        a_pSubjectDNS->Length = -1;
     }
 
     if(a_pCertThumbprint != OpcUa_Null && a_pCertThumbprint->Data != OpcUa_Null)
     {
         OpcUa_P_Memory_Free(a_pCertThumbprint->Data);
         a_pCertThumbprint->Data = OpcUa_Null;
-        a_pCertThumbprint->Length = 0;
+        a_pCertThumbprint->Length = -1;
     }
 
     if (pName != OpcUa_Null)

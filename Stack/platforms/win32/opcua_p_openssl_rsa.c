@@ -21,7 +21,6 @@
 #if OPCUA_REQUIRE_OPENSSL
 
 /* System Headers */
-#include <openssl/pem.h>
 #include <openssl/rsa.h>
 #include <openssl/evp.h>
 
