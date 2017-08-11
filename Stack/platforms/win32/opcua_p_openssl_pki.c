@@ -935,12 +935,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_LoadPrivateKeyFromFile");
                 i = PKCS12_parse(pPkcs12, a_password, &pEvpKey, &pCert, &pCA);
                 PKCS12_free(pPkcs12);
 
-                if(i <= 0)
-                {
-                    OpcUa_GotoErrorWithStatus(OpcUa_Bad);
-                }
-
-                if(pCert == NULL)
+                if(i <= 0 || pCert == NULL)
                 {
                     sk_X509_pop_free(pCA, X509_free);
                     OpcUa_GotoErrorWithStatus(OpcUa_Bad);
