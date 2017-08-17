@@ -363,3 +363,36 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetAsymmetricKeyLength(
     return OpcUa_BadNotSupported;
 }
 
+/*============================================================================
+ * OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey(
+    OpcUa_CryptoProvider*   a_pProvider,
+    OpcUa_Key*              a_publicKey,
+    OpcUa_ByteString*       a_pNonce)
+{
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_publicKey);
+    OpcUa_ReferenceParameter(a_pNonce);
+
+    return OpcUa_BadNotSupported;
+}
+
+/*============================================================================
+ * OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce(
+    OpcUa_CryptoProvider*   a_pProvider,
+    OpcUa_ByteString*       a_pNonce,
+    OpcUa_Key*              a_privateKey,
+    OpcUa_ByteString*       a_pX,
+    OpcUa_ByteString*       a_pY)
+{
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_pNonce);
+    OpcUa_ReferenceParameter(a_privateKey);
+    OpcUa_ReferenceParameter(a_pX);
+    OpcUa_ReferenceParameter(a_pY);
+
+    return OpcUa_BadNotSupported;
+}

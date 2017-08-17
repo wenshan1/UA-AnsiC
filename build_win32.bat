@@ -21,7 +21,7 @@ if errorlevel 1 goto error2
 cd /D %OPENSSL_SOURCEDIR% >NUL 2>&1
 if errorlevel 1 goto error3
 
-perl Configure VC-WIN32 no-asm no-ec --prefix=%OPENSSL_INSTALDIR%
+perl Configure VC-WIN32 no-asm --prefix=%OPENSSL_INSTALDIR%
 if errorlevel 1 goto error
 
 sed -i "/perl/ s/\\\\/\\//g" ms/do_ms.bat 
@@ -60,7 +60,7 @@ cd ..
 goto done
 
 :ossl_build
-perl Configure VC-WIN32 no-shared no-asm no-ec --prefix=%OPENSSL_INSTALDIR% --openssldir=%OPENSSL_INSTALDIR%\ssl
+perl Configure VC-WIN32 no-shared no-asm --prefix=%OPENSSL_INSTALDIR% --openssldir=%OPENSSL_INSTALDIR%\ssl
 if errorlevel 1 goto error
 
 nmake

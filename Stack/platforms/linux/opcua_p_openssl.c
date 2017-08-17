@@ -918,6 +918,93 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
+ * OpcUa_P_OpenSSL_ECDSA_SHA256_Sign
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA256_Sign(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_privateKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
+
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "ECDSA_SHA256_Sign");
+
+    messageDigest.Length = 32; /* 256 bit */
+
+    if(a_data.Data != OpcUa_Null)
+    {
+        messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
+        OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
+
+        uStatus = OpcUa_P_OpenSSL_SHA2_256_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    uStatus = OpcUa_P_OpenSSL_ECDSA_Private_Sign(
+                                                a_pProvider,
+                                                messageDigest,
+                                                a_privateKey,
+                                                a_pSignature);
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_ECDSA_SHA256_Verify
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA256_Verify(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_publicKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
+
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "ECDSA_SHA256_Verify");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
+
+    messageDigest.Length = 32; /* 256 bit */
+    messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
+
+    uStatus = OpcUa_P_OpenSSL_SHA2_256_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    uStatus = OpcUa_P_OpenSSL_ECDSA_Public_Verify(
+                                                a_pProvider,
+                                                messageDigest,
+                                                a_publicKey,
+                                                a_pSignature);
+
+    OpcUa_P_Memory_Free(messageDigest.Data);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * OpcUa_P_OpenSSL_DeriveChannelKeyset
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_OpenSSL_DeriveChannelKeyset(
@@ -1057,26 +1144,28 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "DeriveChannelKeysets");
     OpcUa_ReturnErrorIfArgumentNull(a_pCryptoProvider);
     OpcUa_ReturnErrorIfArgumentNull(a_clientNonce.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_serverNonce.Data);
-    OpcUa_ReturnErrorIfArgumentNull(a_pClientKeyset);
-    OpcUa_ReturnErrorIfArgumentNull(a_pServerKeyset);
 
     OpcUa_ReferenceParameter(a_keySize);
 
-    uStatus = OpcUa_P_OpenSSL_DeriveChannelKeyset(
-        a_pCryptoProvider,
-        a_serverNonce,
-        a_clientNonce,
-        a_pClientKeyset);
+    if(a_pClientKeyset != OpcUa_Null)
+    {
+        uStatus = OpcUa_P_OpenSSL_DeriveChannelKeyset(
+            a_pCryptoProvider,
+            a_serverNonce,
+            a_clientNonce,
+            a_pClientKeyset);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
 
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    uStatus = OpcUa_P_OpenSSL_DeriveChannelKeyset(
-        a_pCryptoProvider,
-        a_clientNonce,
-        a_serverNonce,
-        a_pServerKeyset);
-
-    OpcUa_GotoErrorIfBad(uStatus);
+    if(a_pServerKeyset != OpcUa_Null)
+    {
+        uStatus = OpcUa_P_OpenSSL_DeriveChannelKeyset(
+            a_pCryptoProvider,
+            a_clientNonce,
+            a_serverNonce,
+            a_pServerKeyset);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -1095,13 +1184,19 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair(
 {
     OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "GenerateAsymmetricKeyPair");
 
-    if(a_type == OpcUa_Crypto_Rsa_Id)
+    switch(a_type)
     {
-        uStatus = OpcUa_P_OpenSSL_RSA_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
-    }
-    else
-    {
-        uStatus = OpcUa_BadInvalidArgument;
+        case OpcUa_Crypto_Rsa_Id:
+            uStatus = OpcUa_P_OpenSSL_RSA_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
+            break;
+
+        case OpcUa_Crypto_Ec_Id:
+            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
+            break;
+
+        default:
+            uStatus = OpcUa_BadInvalidArgument;
+            break;
     }
 
 OpcUa_ReturnStatusCode;

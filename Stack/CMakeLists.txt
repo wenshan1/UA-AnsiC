@@ -90,6 +90,7 @@ if(WIN32)
         platforms/win32/opcua_p_mutex.c
         platforms/win32/opcua_p_openssl.c
         platforms/win32/opcua_p_openssl_aes.c
+        platforms/win32/opcua_p_openssl_ecc.c
         platforms/win32/opcua_p_openssl_hmac_sha.c
         platforms/win32/opcua_p_openssl_nosecurity.c
         platforms/win32/opcua_p_openssl_pki.c
@@ -126,6 +127,7 @@ else()
         platforms/linux/opcua_p_mutex.c
         platforms/linux/opcua_p_openssl.c
         platforms/linux/opcua_p_openssl_aes.c
+        platforms/linux/opcua_p_openssl_ecc.c
         platforms/linux/opcua_p_openssl_hmac_sha.c
         platforms/linux/opcua_p_openssl_nosecurity.c
         platforms/linux/opcua_p_openssl_pki.c

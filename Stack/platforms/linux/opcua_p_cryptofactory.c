@@ -76,6 +76,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricEncryptionAlgorithmId   = 0;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = 0;
 
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
+
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_Crypto_NoSecurity_GenerateAsymmetricKeyPair;
 
@@ -110,6 +112,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_Crypto_NoSecurity_GetPublicKeyFromCert;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_Crypto_NoSecurity_GetSignatureFromCert;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_Crypto_NoSecurity_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_NONE */
 #if OPCUA_SUPPORT_SECURITYPOLICY_BASIC128RSA15
@@ -132,6 +138,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA1_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_128_CBC_Id;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA1_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
 
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
@@ -167,6 +175,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_BASIC128RSA15 */
 #if OPCUA_SUPPORT_SECURITYPOLICY_AES128SHA256RSAOAEP
@@ -189,6 +201,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA256_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_128_CBC_Id;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA256_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
 
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
@@ -224,6 +238,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_AES128SHA256RSAOAEP */
 #if OPCUA_SUPPORT_SECURITYPOLICY_AES256SHA256RSAPSS
@@ -246,6 +264,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA256_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_256_CBC_Id;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA256_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
 
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
@@ -281,6 +301,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_AES256SHA256RSAPSS */
 #if OPCUA_SUPPORT_SECURITYPOLICY_BASIC256SHA256
@@ -303,6 +327,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA256_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_256_CBC_Id;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA256_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
 
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
@@ -338,6 +364,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_BASIC256SHA256 */
 #if OPCUA_SUPPORT_SECURITYPOLICY_BASIC256
@@ -360,6 +390,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA1_Id;
         a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_256_CBC_Id;
         a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA1_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = 0;
 
         /* asymmetric key generation */
         a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
@@ -395,8 +427,75 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
         a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
         a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce;
     }
 #endif /* OPCUA_SUPPORT_SECURITYPOLICY_BASIC256 */
+#if OPCUA_SUPPORT_SECURITYPOLICY_AES256SHA256ECCP256
+    else if(OpcUa_P_String_strncmp( OpcUa_SecurityPolicy_Aes256Sha256EccP256,
+                                    a_Uri,
+                                    OpcUa_P_String_strlen(OpcUa_SecurityPolicy_Aes256Sha256EccP256))==0)
+    {
+        a_pProvider->SymmetricKeyLength               = 32;
+        a_pProvider->DerivedEncryptionKeyLength       = 32;
+        a_pProvider->DerivedSignatureKeyLength        = 32;
+        a_pProvider->SignatureDataLength              = 32;
+
+        a_pProvider->MaximumAsymmetricKeyLength       = 256;
+        a_pProvider->MinimumAsymmetricKeyLength       = 32;
+
+        a_pProvider->AsymmetricEncryptionOverhead     = 0;
+
+        a_pProvider->AsymmetricSignatureAlgorithmId   = OpcUa_P_ECDSA_SHA256_Id;
+        a_pProvider->AsymmetricEncryptionAlgorithmId  = OpcUa_P_NoEncryption_Id;
+        a_pProvider->SymmetricSignatureAlgorithmId    = OpcUa_P_HMAC_SHA256_Id;
+        a_pProvider->SymmetricEncryptionAlgorithmId   = OpcUa_P_AES_256_CBC_Id;
+        a_pProvider->SymmetricKeyDeviationAlgorithmId = OpcUa_P_PSHA256_Id;
+
+        a_pProvider->EphemeralDhEncryptionKeyType     = OpcUa_Crypto_Ec_Id;
+
+        /* asymmetric key generation */
+        a_pProvider->GenerateAsymmetricKeypair  = OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair;
+
+        /* get the length of an asymmetric key */
+        a_pProvider->GetAsymmetricKeyLength     = OpcUa_P_OpenSSL_EC_Public_GetKeyLength;
+
+        /* symmetric signature algorithm */
+        a_pProvider->SymmetricSign              = OpcUa_P_OpenSSL_HMAC_SHA256_Sign;
+        a_pProvider->SymmetricVerify            = OpcUa_P_OpenSSL_HMAC_SHA256_Verify;
+
+        /* symmetric encryption algorithm */
+        a_pProvider->SymmetricEncrypt           = OpcUa_P_OpenSSL_AES_256_CBC_Encrypt;
+        a_pProvider->SymmetricDecrypt           = OpcUa_P_OpenSSL_AES_256_CBC_Decrypt;
+
+        /* asymmetric signature algorithm */
+        a_pProvider->AsymmetricSign             = OpcUa_P_OpenSSL_ECDSA_SHA256_Sign;
+        a_pProvider->AsymmetricVerify           = OpcUa_P_OpenSSL_ECDSA_SHA256_Verify;
+
+        /* asymmetric encryption algorithm */
+        a_pProvider->AsymmetricEncrypt          = OpcUa_P_Crypto_NoSecurity_AsymmetricEncrypt;
+        a_pProvider->AsymmetricDecrypt          = OpcUa_P_Crypto_NoSecurity_AsymmetricDecrypt;
+
+        /* key derivation algorithm */
+        a_pProvider->DeriveChannelKeysets       = OpcUa_P_OpenSSL_DeriveChannelKeysets;
+        a_pProvider->DeriveKey                  = OpcUa_P_OpenSSL_Random_Key_Derive;
+
+        /* random key generation */
+        a_pProvider->GenerateKey                = OpcUa_P_OpenSSL_Random_Key_Generate;
+
+        /* certificate functions */
+        a_pProvider->CreateCertificate          = OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create;
+        a_pProvider->GetPublicKeyFromCert       = OpcUa_P_OpenSSL_X509_GetPublicKey;
+        a_pProvider->GetSignatureFromCert       = OpcUa_P_OpenSSL_X509_GetSignature;
+        a_pProvider->GetCertificateThumbprint   = OpcUa_P_OpenSSL_X509_GetCertificateThumbprint;
+
+        /* DH encryption support functions */
+        a_pProvider->ComputeNonceFromPublicKey  = OpcUa_P_Crypto_EC_ComputeNonceFromPublicKey;
+        a_pProvider->ComputeSecretsFromNonce    = OpcUa_P_Crypto_EC_ComputeSecretsFromNonce;
+    }
+#endif /* OPCUA_SUPPORT_SECURITYPOLICY_AES256SHA256ECCP256 */
     else
     {
         OpcUa_GotoErrorWithStatus(OpcUa_BadSecurityPolicyRejected);

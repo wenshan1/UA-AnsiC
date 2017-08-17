@@ -251,6 +251,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricSignatureSize");
         case OpcUa_P_RSA_PKCS1_V15_SHA1_Id:
         case OpcUa_P_RSA_PKCS1_V15_SHA256_Id:
         case OpcUa_P_RSA_PSS_SHA256_Id:
+        case OpcUa_P_ECDSA_SHA256_Id:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);
@@ -832,6 +833,7 @@ static OpcUa_StatusCode OpcUa_SecureStream_EncodeAsymmetricSecurityHeader(  OpcU
 
             break;
         }
+    case OpcUa_MessageSecurityMode_Sign:
     case OpcUa_MessageSecurityMode_SignAndEncrypt:
         {
             /* SenderCert */
@@ -2514,6 +2516,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOpenSecureChannelOutput
 
     /* store postion of stream */
     uStatus = OpcUa_Buffer_GetPosition(&pSecureStream->Buffers[0], &pSecureStream->uBeginOfRequestBody);
+    OpcUa_GotoErrorIfBad(uStatus);
 
     /* Flush trigger must be recalculated after encoding the header */
     uStatus = OpcUa_SecureStream_CalculateFlushTrigger(pSecureStream, uChunkLength);
@@ -2534,7 +2537,11 @@ OpcUa_BeginErrorHandling;
             OpcUa_Key_Clear(pSecureStream->pReceiverPublicKey);
             OpcUa_Free(pSecureStream->pReceiverPublicKey);
         }
-        OpcUa_Free(pSecureStream->Buffers);
+        if(pSecureStream->Buffers != OpcUa_Null)
+        {
+            OpcUa_Buffer_Clear(&pSecureStream->Buffers[0]);
+            OpcUa_Free(pSecureStream->Buffers);
+        }
         OpcUa_Free(pSecureStream);
     }
 
@@ -2691,18 +2698,16 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOutput");
     uStatus = OpcUa_SecureStream_CalculateFlushTrigger(pSecureStream, uChunkLength);
     OpcUa_GotoErrorIfBad(uStatus);
 
-#if 0
-    /* shrink data buffer */
-    pSecureStream->Buffers[0].Data = OpcUa_ReAlloc(pSecureStream->Buffers[0].Data,pSecureStream->uBeginOfRequestBody);
-    pSecureStream->Buffers[0].Size = pSecureStream->uBeginOfRequestBody;
-#endif
-
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
 
     if(pSecureStream != OpcUa_Null)
     {
-        OpcUa_Free(pSecureStream->Buffers);
+        if(pSecureStream->Buffers != OpcUa_Null)
+        {
+            OpcUa_Buffer_Clear(&pSecureStream->Buffers[0]);
+            OpcUa_Free(pSecureStream->Buffers);
+        }
         OpcUa_Free(pSecureStream);
     }
 

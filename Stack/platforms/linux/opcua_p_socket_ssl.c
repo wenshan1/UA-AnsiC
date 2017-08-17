@@ -588,6 +588,7 @@ static int OpcUa_SslSocket_VerifyCertificate( X509_STORE_CTX *ctx, void *arg)
  *===========================================================================*/
 static OpcUa_StatusCode OpcUa_SslSocket_InitializeSslContext( OpcUa_InternalSslSocket* pInternalSocket)
 {
+    int                  type;
     EVP_PKEY*            pKey;
     X509*                pCert;
     const unsigned char* p;
@@ -595,8 +596,24 @@ static OpcUa_StatusCode OpcUa_SslSocket_InitializeSslContext( OpcUa_InternalSslS
 
 OpcUa_InitializeStatus(OpcUa_Module_Socket, "InitializeSslContext");
 
+    switch(pInternalSocket->pServerPrivateKey->Type)
+    {
+        case OpcUa_Crypto_KeyType_Rsa_Private:
+            type = EVP_PKEY_RSA;
+            break;
+
+#ifndef OPENSSL_NO_EC
+        case OpcUa_Crypto_KeyType_Ec_Private:
+            type = EVP_PKEY_EC;
+            break;
+#endif
+
+        default:
+            OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
+    }
+
     p = pInternalSocket->pServerPrivateKey->Key.Data;
-    pKey = d2i_PrivateKey(EVP_PKEY_RSA, OpcUa_Null, &p,
+    pKey = d2i_PrivateKey(type, OpcUa_Null, &p,
                           pInternalSocket->pServerPrivateKey->Key.Length);
     if(pKey == OpcUa_Null)
     {
@@ -934,13 +951,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateSslServer");
     OpcUa_GotoErrorIfArgumentNull(a_pServerPrivateKey);
     OpcUa_GotoErrorIfArgumentNull(a_pfnSocketCallBack);
     OpcUa_GotoErrorIfArgumentNull(a_pSocket);
-
-    if(a_pServerPrivateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private
-       || a_pServerPrivateKey->Key.Data == OpcUa_Null
-       || a_pServerCertificate->Data == OpcUa_Null)
-    {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
-    }
+    OpcUa_GotoErrorIfArgumentNull(a_pServerPrivateKey->Key.Data);
+    OpcUa_GotoErrorIfArgumentNull(a_pServerCertificate->Data);
 
     *a_pSocket = OpcUa_Null;
     pInternalSocket = (OpcUa_InternalSslSocket*)OpcUa_P_Memory_Alloc(sizeof(OpcUa_InternalSslSocket));
@@ -1040,13 +1052,8 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "CreateSslClient");
     OpcUa_GotoErrorIfArgumentNull(a_pClientPrivateKey);
     OpcUa_GotoErrorIfArgumentNull(a_pfnSocketCallBack);
     OpcUa_GotoErrorIfArgumentNull(a_pSocket);
-
-    if(a_pClientPrivateKey->Type != OpcUa_Crypto_KeyType_Rsa_Private
-       || a_pClientPrivateKey->Key.Data == OpcUa_Null
-       || a_pClientCertificate->Data == OpcUa_Null)
-    {
-        OpcUa_GotoErrorWithStatus(OpcUa_BadInvalidArgument);
-    }
+    OpcUa_GotoErrorIfArgumentNull(a_pClientPrivateKey->Key.Data);
+    OpcUa_GotoErrorIfArgumentNull(a_pClientCertificate->Data);
 
     *a_pSocket = OpcUa_Null;
     pInternalSocket = (OpcUa_InternalSslSocket*)OpcUa_P_Memory_Alloc(sizeof(OpcUa_InternalSslSocket));

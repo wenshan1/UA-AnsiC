@@ -410,6 +410,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
 {
     EVP_PKEY*               pPublicKey      = OpcUa_Null;
     RSA*                    pRsaPublicKey   = OpcUa_Null;
+#ifndef OPENSSL_NO_EC
+    EC_KEY*                 pEcPublicKey    = OpcUa_Null;
+#endif
     X509*                   pCertificate    = OpcUa_Null;
     OpcUa_Byte*             pBuffer         = OpcUa_Null;
     const unsigned char*    pTemp           = OpcUa_Null;
@@ -477,9 +480,36 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_GetPublicKey(
 
         break;
 
+#ifndef OPENSSL_NO_EC
     case EVP_PKEY_EC:
-    case EVP_PKEY_DSA:
-    case EVP_PKEY_DH:
+
+        /* allocate memory for EC key */
+
+        /* get EC public key from EVP_PKEY */
+        pEcPublicKey = EVP_PKEY_get1_EC_KEY(pPublicKey);
+
+        /* allocate memory for DER encoded bytestring */
+        a_pPublicKey->Key.Length = i2d_EC_PUBKEY(pEcPublicKey, OpcUa_Null);
+
+        if(a_pPublicKey->Key.Data == OpcUa_Null)
+        {
+            EC_KEY_free(pEcPublicKey);
+            EVP_PKEY_free(pPublicKey);
+
+            OpcUa_ReturnStatusCode;
+        }
+
+        /* convert RSA key to DER encoded bytestring */
+        pBuffer = a_pPublicKey->Key.Data;
+        a_pPublicKey->Key.Length = i2d_EC_PUBKEY(pEcPublicKey, &pBuffer);
+        a_pPublicKey->Type = OpcUa_Crypto_KeyType_Ec_Public;
+
+        /* free memory for EC key */
+        EC_KEY_free(pEcPublicKey);
+
+        break;
+#endif
+
     default:
         OpcUa_GotoErrorWithStatus(OpcUa_BadNotSupported);
     }

@@ -390,7 +390,7 @@ OpcUa_StatusCode OpcUa_Endpoint_OnSecureChannelEvent(   OpcUa_UInt32            
                         a_uSecureChannelId,
                         OpcUa_Null,
                         OpcUa_Null,
-                        a_uMessageSecurityModes);
+                        0);
 
                     break;
                 }
@@ -403,9 +403,9 @@ OpcUa_StatusCode OpcUa_Endpoint_OnSecureChannelEvent(   OpcUa_UInt32            
                         eOpcUa_Endpoint_Event_SecureChannelRenewed,
                         a_uStatus,
                         a_uSecureChannelId,
-                        OpcUa_Null,
-                        OpcUa_Null,
-                        0);
+                        a_pbsClientCertificate,
+                        a_sSecurityPolicy,
+                        a_uMessageSecurityModes);
 
                     break;
                 }

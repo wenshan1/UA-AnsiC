@@ -90,6 +90,7 @@ OBJECTS = \
 	$(ODIR)\opcua_p_mutex.obj \
 	$(ODIR)\opcua_p_openssl.obj \
 	$(ODIR)\opcua_p_openssl_aes.obj \
+	$(ODIR)\opcua_p_openssl_ecc.obj \
 	$(ODIR)\opcua_p_openssl_hmac_sha.obj \
 	$(ODIR)\opcua_p_openssl_nosecurity.obj \
 	$(ODIR)\opcua_p_openssl_pki.obj \

@@ -364,6 +364,46 @@ OpcUa_StatusCode OpcUa_Crypto_SymmetricVerify(
 }
 
 /*============================================================================
+ * OpcUa_Crypto_ComputeNonceFromPublicKey
+ *============================================================================*/
+OpcUa_StatusCode OpcUa_Crypto_ComputeNonceFromPublicKey(
+    struct _OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_Key*                    a_publicKey,
+    OpcUa_ByteString*             a_pNonce)
+{
+    OpcUa_DeclareErrorTraceModule(OpcUa_Module_Crypto);
+    OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
+    OpcUa_ReturnErrorIfNull(a_pProvider->ComputeNonceFromPublicKey, OpcUa_BadNotSupported);
+
+    return a_pProvider->ComputeNonceFromPublicKey(
+        a_pProvider,
+        a_publicKey,
+        a_pNonce);
+}
+
+/*============================================================================
+ * OpcUa_Crypto_ComputeSecretsFromNonce
+ *============================================================================*/
+OpcUa_StatusCode OpcUa_Crypto_ComputeSecretsFromNonce(
+    struct _OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString*             a_pNonce,
+    OpcUa_Key*                    a_privateKey,
+    OpcUa_ByteString*             a_pX,
+    OpcUa_ByteString*             a_pY)
+{
+    OpcUa_DeclareErrorTraceModule(OpcUa_Module_Crypto);
+    OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
+    OpcUa_ReturnErrorIfNull(a_pProvider->ComputeSecretsFromNonce, OpcUa_BadNotSupported);
+
+    return a_pProvider->ComputeSecretsFromNonce(
+        a_pProvider,
+        a_pNonce,
+        a_privateKey,
+        a_pX,
+        a_pY);
+}
+
+/*============================================================================
  * OpcUa_Key_Initialize
  *===========================================================================*/
 OpcUa_Void OpcUa_Key_Initialize(OpcUa_Key* a_pKey)

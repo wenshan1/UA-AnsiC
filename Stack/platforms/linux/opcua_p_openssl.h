@@ -562,17 +562,18 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GenerateAsymmetricKeyPair(
   @brief
 */
 OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_DeriveChannelKeysets(
-    struct _OpcUa_CryptoProvider*   pCryptoProvider,
+    OpcUa_CryptoProvider*           pCryptoProvider,
     OpcUa_ByteString                clientNonce,
     OpcUa_ByteString                serverNonce,
     OpcUa_Int32                     keySize,
-    struct _OpcUa_SecurityKeyset*   pClientKeyset,
-    struct _OpcUa_SecurityKeyset*   pServerKeyset);
+    OpcUa_SecurityKeyset*           pClientKeyset,
+    OpcUa_SecurityKeyset*           pServerKeyset);
 
 /**
   @brief
 */
-OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_DeriveKey(OpcUa_CryptoProvider* a_pProvider,
+OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_DeriveKey(
+    OpcUa_CryptoProvider* pProvider,
     OpcUa_ByteString      secret,
     OpcUa_ByteString      seed,
     OpcUa_Int32           keyLen,
@@ -674,9 +675,9 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_AsymmetricVerify(
   @brief
 */
 OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetCertificateThumbprint(
-    OpcUa_CryptoProvider*       a_pProvider,
-    OpcUa_ByteString*           a_pCertificate,
-    OpcUa_ByteString*           a_pCertificateThumbprint);
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString*       pCertificate,
+    OpcUa_ByteString*       pCertificateThumbprint);
 
 /**
   @brief
@@ -685,6 +686,24 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_GetAsymmetricKeyLength(
     OpcUa_CryptoProvider*   pProvider,
     OpcUa_Key               publicKey,
     OpcUa_UInt32*           pKeyLen);
+
+/**
+  @brief
+*/
+OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeNonceFromPublicKey(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Key*              publicKey,
+    OpcUa_ByteString*       pNonce);
+
+/**
+  @brief
+*/
+OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString*       pNonce,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pX,
+    OpcUa_ByteString*       pY);
 
 /*** AES SYMMETRIC ENCRYPTION ***/
 
@@ -993,7 +1012,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA1_Generate(
     OpcUa_Byte*                   pMessageDigest);
 
 /**
-  @brief Generates variant bytes message digest of the given input buffer.
+  @brief Generates a 28 Bytes message digest of the given input buffer.
 
   SHA-2: 224 Bits output
 
@@ -1012,7 +1031,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_224_Generate(
     OpcUa_Byte*                   pMessageDigest);
 
 /**
-  @brief Generates variant bytes message digest of the given input buffer.
+  @brief Generates a 32 Bytes message digest of the given input buffer.
 
   SHA-2: 256 Bits output
 
@@ -1031,7 +1050,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_256_Generate(
     OpcUa_Byte*                   pMessageDigest);
 
 /**
-  @brief Generates variant bytes message digest of the given input buffer.
+  @brief Generates a 48 Bytes message digest of the given input buffer.
 
   SHA-2: 384 Bits output
 
@@ -1050,7 +1069,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_384_Generate(
     OpcUa_Byte*                   pMessageDigest);
 
 /**
-  @brief Generates variant bytes message digest of the given input buffer.
+  @brief Generates a 64 Bytes message digest of the given input buffer.
 
   SHA-2: 512 Bits output
 
@@ -1072,7 +1091,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_512_Generate(
 /*** MESSAGE AUTHENTICATION CODE ***/
 
 /**
-  @brief Generates s 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   HMAC-SHA-1: 160 Bits output
 
@@ -1093,7 +1112,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
     OpcUa_ByteString*     pMac);
 
 /**
-  @brief Generates s variant Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a 28 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   HMAC-SHA-2: 224 Bits output
 
@@ -1114,7 +1133,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_224_Generate(
     OpcUa_ByteString*     pMac);
 
 /**
-  @brief Generates s variant Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a 32 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   HMAC-SHA-2: 256 Bits output
 
@@ -1135,7 +1154,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
     OpcUa_ByteString*     pMac);
 
 /**
-  @brief Generates s variant Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a 48 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   HMAC-SHA-2: 384 Bits output
 
@@ -1156,7 +1175,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
     OpcUa_ByteString*     pMac);
 
 /**
-  @brief Generates s variant Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a 64 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   HMAC-SHA-2: 512 Bits output
 
@@ -1176,6 +1195,78 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_512_Generate(
     OpcUa_Key*            key,
     OpcUa_ByteString*     pMac);
 
+/*** EC CRYPTO ***/
+
+/**
+  @brief Generate a EC Key Pair.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_EC_GenerateKeys(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_UInt32            bits,
+    OpcUa_Key*              pPublicKey,
+    OpcUa_Key*              pPrivateKey);
+
+/**
+  @brief Get the key length from a public EC key.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_EC_Public_GetKeyLength(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Key               publicKey,
+    OpcUa_UInt32*           pKeyLen);
+
+/**
+  @brief Create an ECDSA signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_Private_Sign(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
+  @brief Verify an ECDSA signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_Public_Verify(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              publicKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
+  @brief Create an ECDSA SHA256 signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA256_Sign(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
+  @brief Verify an ECDSA SHA256 signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA256_Verify(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              publicKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
+  @brief Compute the nonce from the public key.
+*/
+OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeNonceFromPublicKey(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_Key*              publicKey,
+    OpcUa_ByteString*       pNonce);
+
+/**
+  @brief Compute the secrets from the nonce.
+*/
+OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeSecretsFromNonce(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString*       pNonce,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pX,
+    OpcUa_ByteString*       pY);
 
 OPCUA_END_EXTERN_C
 

@@ -21,6 +21,8 @@ OPCUA_BEGIN_EXTERN_C
 
 #define OpcUa_Crypto_Rsa_Name                       L"RSA"
 #define OpcUa_Crypto_Rsa_Id                         19
+#define OpcUa_Crypto_Ec_Name                        L"id-ecPublicKey"
+#define OpcUa_Crypto_Ec_Id                          408
 
 /* @brief Key Types; If Handle, Data points to an opaque key handle and Length must be interpreted as boolean. */
 #define OpcUa_Crypto_KeyType_Invalid                0
@@ -31,6 +33,8 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_Crypto_KeyType_Any                    4
 #define OpcUa_Crypto_KeyType_Rsa_Private            5
 #define OpcUa_Crypto_KeyType_Rsa_Public             6
+#define OpcUa_Crypto_KeyType_Ec_Private             7
+#define OpcUa_Crypto_KeyType_Ec_Public              8
 
 /* keys as handles instead of encodings */
 #define OpcUa_Crypto_KeyType_Handle_Offset          20
@@ -40,6 +44,8 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_Crypto_KeyType_Asymmetric_Handle      OpcUa_Crypto_KeyType_Asymmetric  + OpcUa_Crypto_KeyType_Handle_Offset
 #define OpcUa_Crypto_KeyType_Rsa_Private_Handle     OpcUa_Crypto_KeyType_Rsa_Private + OpcUa_Crypto_KeyType_Handle_Offset
 #define OpcUa_Crypto_KeyType_Rsa_Public_Handle      OpcUa_Crypto_KeyType_Rsa_Public  + OpcUa_Crypto_KeyType_Handle_Offset
+#define OpcUa_Crypto_KeyType_Ec_Private_Handle      OpcUa_Crypto_KeyType_Ec_Private  + OpcUa_Crypto_KeyType_Handle_Offset
+#define OpcUa_Crypto_KeyType_Ec_Public_Handle       OpcUa_Crypto_KeyType_Ec_Public   + OpcUa_Crypto_KeyType_Handle_Offset
 
 /* @brief decide wether a keytype is a handle or not */
 #define OPCUA_CRYPTO_KEY_ISHANDLE(xKey)             (xKey->Type > (OpcUa_UInt)OpcUa_Crypto_KeyType_Handle_Offset)
@@ -116,10 +122,10 @@ struct _OpcUa_SecurityKeyset
     /** @brief The initialization vector. */
     OpcUa_Key      InitializationVector;
 };
-
 typedef struct _OpcUa_SecurityKeyset OpcUa_SecurityKeyset;
-OpcUa_Void OpcUa_SecurityKeyset_Initialize(OpcUa_SecurityKeyset* pSecurityKeyset);
-OpcUa_Void OpcUa_SecurityKeyset_Clear(OpcUa_SecurityKeyset* pSecurityKeyset);
+
+OPCUA_EXPORT OpcUa_Void OpcUa_SecurityKeyset_Initialize(OpcUa_SecurityKeyset* pSecurityKeyset);
+OPCUA_EXPORT OpcUa_Void OpcUa_SecurityKeyset_Clear(OpcUa_SecurityKeyset* pSecurityKeyset);
 
 /**
   @brief Name entry structure for an X509 certificate. Used to build the X.509 Subject/Issuer name.
@@ -748,7 +754,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_SymmetricDecrypt(
     OpcUa_UInt32*                   pPlainTextLen);
 
 /**
-  @brief Generates s 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   Function Pointer!
 
@@ -769,7 +775,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnSymmetricSign)(
     OpcUa_ByteString*             pSignature);
 
 /**
-  @brief Generates s 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Generates a Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   Abstract!
 
@@ -780,17 +786,17 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnSymmetricSign)(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pSignature      [out] The resulting Signature (messsage authentication code).
+  @param pSignature       [out] The resulting Signature (messsage authentication code).
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_SymmetricSign(
     struct _OpcUa_CryptoProvider* pProvider,
     OpcUa_Byte*                   pData,
     OpcUa_UInt32                  dataLen,
-    OpcUa_Key*                     key,
+    OpcUa_Key*                    key,
     OpcUa_ByteString*             pSignature);
 
 /**
-  @brief Generates s 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Verifies a Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   Function Pointer!
 
@@ -811,7 +817,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnSymmetricVerify)(
     OpcUa_ByteString*             pSignature);
 
 /**
-  @brief Generates s 20 Bytes Message Authentication Code (MAC) of the given input buffer and a secret key.
+  @brief Verifies a Message Authentication Code (MAC) of the given input buffer and a secret key.
 
   Abstract!
 
@@ -830,6 +836,82 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_SymmetricVerify(
     OpcUa_UInt32                  dataLen,
     OpcUa_Key*                    key,
     OpcUa_ByteString*             pSignature);
+
+/**
+  @brief Computes a nonce from the given public key.
+
+  Function Pointer!
+
+  synchronous!
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param publicKey                  [in]  The public key.
+  @param pNonce                     [out] The resulting nonce.
+
+*/
+typedef OpcUa_StatusCode (OpcUa_Crypto_PfnComputeNonceFromPublicKey)(
+    struct _OpcUa_CryptoProvider* pProvider,
+    OpcUa_Key*                    publicKey,
+    OpcUa_ByteString*             pNonce);
+
+/**
+  @brief Computes a nonce from the given public key.
+
+  Abstract!
+
+  synchronous!
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param publicKey                  [in]  The public key.
+  @param pNonce                     [out] The resulting nonce.
+
+*/
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_ComputeNonceFromPublicKey(
+    struct _OpcUa_CryptoProvider* pProvider,
+    OpcUa_Key*                    publicKey,
+    OpcUa_ByteString*             pNonce);
+
+/**
+  @brief Computes the secret from the received nonce and the private key.
+
+  Function Pointer!
+
+  synchronous!
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param pNonce                     [in]  The received nonce.
+  @param privateKey                 [in]  The private key.
+  @param pX                         [out] The resulting nonce.
+  @param pY                         [out] The resulting nonce.
+
+*/
+typedef OpcUa_StatusCode (OpcUa_Crypto_PfnComputeSecretsFromNonce)(
+    struct _OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString*             pNonce,
+    OpcUa_Key*                    privateKey,
+    OpcUa_ByteString*             pX,
+    OpcUa_ByteString*             pY);
+
+/**
+  @brief Computes the secret from the received nonce and the private key.
+
+  Abstract!
+
+  synchronous!
+
+  @param pProvider                  [in]  The crypto provider handle.
+  @param pNonce                     [in]  The received nonce.
+  @param privateKey                 [in]  The private key.
+  @param pX                         [out] The resulting nonce.
+  @param pY                         [out] The resulting nonce.
+
+*/
+OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_ComputeSecretsFromNonce(
+    struct _OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString*             pNonce,
+    OpcUa_Key*                    privateKey,
+    OpcUa_ByteString*             pX,
+    OpcUa_ByteString*             pY);
 
 /*============================================================================
  * The OpcUa_CryptoProvider interface.
@@ -850,6 +932,7 @@ typedef struct _OpcUa_CryptoProvider
     OpcUa_UInt32                                SymmetricSignatureAlgorithmId;
     OpcUa_UInt32                                SymmetricEncryptionAlgorithmId;
     OpcUa_UInt32                                SymmetricKeyDeviationAlgorithmId;
+    OpcUa_UInt32                                EphemeralDhEncryptionKeyType;
 
     OpcUa_Crypto_PfnGenerateKey*                GenerateKey;
     OpcUa_Crypto_PfnDeriveKey*                  DeriveKey;
@@ -868,6 +951,8 @@ typedef struct _OpcUa_CryptoProvider
     OpcUa_Crypto_PfnSymmetricVerify*            SymmetricVerify;
     OpcUa_Crypto_PfnAsymmetricSign*             AsymmetricSign;
     OpcUa_Crypto_PfnAsymmetricVerify*           AsymmetricVerify;
+    OpcUa_Crypto_PfnComputeNonceFromPublicKey*  ComputeNonceFromPublicKey;
+    OpcUa_Crypto_PfnComputeSecretsFromNonce*    ComputeSecretsFromNonce;
 }
 OpcUa_CryptoProvider;
 

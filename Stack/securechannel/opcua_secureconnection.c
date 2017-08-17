@@ -323,6 +323,18 @@ OpcUa_SecureConnection;
 
 
 /*============================================================================
+ * OpcUa_OpenSecureChannelContext
+ *===========================================================================*/
+/** @brief Contains the ClientNonce and the SecurityMode the OpenSecureChannel request.  */
+typedef struct _OpcUa_OpenSecureChannelContext
+{
+    OpcUa_MessageSecurityMode       SecurityMode;
+    OpcUa_Key                       privKey;
+}
+OpcUa_OpenSecureChannelContext;
+
+
+/*============================================================================
  * PROTOTYPES
  *===========================================================================*/
 /*============================================================================
@@ -803,7 +815,7 @@ OpcUa_StatusCode OpcUa_SecureConnection_OnOpenSecureChannelResponse(
     OpcUa_StatusCode          a_uRequestStatus,
     OpcUa_InputStream**       a_ppIstrm)
 {
-    OpcUa_OpenSecureChannelRequest* pRequest = OpcUa_Null;
+    OpcUa_OpenSecureChannelContext* pRequest = OpcUa_Null;
 
 OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "OnOpenSecureChannelResponse");
 
@@ -811,11 +823,11 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "OnOpenSecureChannelRespon
     OpcUa_ReferenceParameter(a_uRequestStatus);
     OpcUa_ReferenceParameter(a_ppIstrm);
 
-    pRequest = (OpcUa_OpenSecureChannelRequest*)a_pCallbackData;
+    pRequest = (OpcUa_OpenSecureChannelContext*)a_pCallbackData;
 
     if(pRequest != OpcUa_Null)
     {
-        OpcUa_OpenSecureChannelRequest_Clear(pRequest);
+        OpcUa_Key_Clear(&pRequest->privKey);
         OpcUa_Free(pRequest);
     }
 
@@ -837,12 +849,14 @@ static OpcUa_StatusCode OpcUa_SecureConnection_BeginOpenSecureChannel(OpcUa_Conn
     OpcUa_Handle                        hEncodeContext                  = OpcUa_Null;
 
     OpcUa_SecureConnection*             pSecureConnection               = OpcUa_Null;
+    OpcUa_OpenSecureChannelContext*     pOpenSecureChannelContext       = OpcUa_Null;
     OpcUa_OpenSecureChannelRequest*     pOpenSecureChannelRequest       = OpcUa_Null;
 
     OpcUa_UInt32                        uTimeout                        = OPCUA_INFINITE;
     OpcUa_UInt32                        uSecureChannelId                = 0;
 
-    OpcUa_Key                           clientNonce                     = {0, {0, OpcUa_Null}, OpcUa_Null};
+    OpcUa_Key                           pubKey                          = {0, {0, OpcUa_Null}, OpcUa_Null};
+    OpcUa_ByteString                    clientNonce                     = OPCUA_BYTESTRING_STATICINITIALIZER;
     OpcUa_ByteString                    serverCertificateThumbprint     = OPCUA_BYTESTRING_STATICINITIALIZER;
     OpcUa_MessageSecurityMode           eMessageSecurityMode            = OpcUa_MessageSecurityMode_None;
     OpcUa_Boolean                       bIsLocked                       = OpcUa_False;
@@ -861,6 +875,12 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
     OpcUa_OpenSecureChannelRequest_Initialize(pOpenSecureChannelRequest);
 
     pEncoder = pSecureConnection->Encoder;
+
+    pOpenSecureChannelContext = (OpcUa_OpenSecureChannelContext*)OpcUa_Alloc(sizeof(OpcUa_OpenSecureChannelContext));
+    OpcUa_GotoErrorIfAllocFailed(pOpenSecureChannelContext);
+
+    OpcUa_MessageSecurityMode_Initialize(&pOpenSecureChannelContext->SecurityMode);
+    OpcUa_Key_Initialize(&pOpenSecureChannelContext->privKey);
 
     OPCUA_SECURECONNECTION_LOCK_REQUEST(pSecureConnection);
     bIsLocked = OpcUa_True;
@@ -951,7 +971,9 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
 
     if(eMessageSecurityMode != OpcUa_MessageSecurityMode_None)
     {
-        eMessageSecurityMode = OpcUa_MessageSecurityMode_SignAndEncrypt;
+        eMessageSecurityMode = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->EphemeralDhEncryptionKeyType
+                                   ? OpcUa_MessageSecurityMode_Sign
+                                   : OpcUa_MessageSecurityMode_SignAndEncrypt;
     }
 
     /* create output stream through connection */
@@ -965,37 +987,77 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
         &pOstrm);
     OpcUa_GotoErrorIfBad(uStatus);
 
+    /*** fill request header ***/
+    pOpenSecureChannelRequest->RequestHeader.Timestamp      = OPCUA_P_DATETIME_UTCNOW();
+
+    /*** fill request body ***/
+    pOpenSecureChannelRequest->RequestType           = a_eTokenRequestType;
+    pOpenSecureChannelRequest->ClientProtocolVersion = 0;
+    pOpenSecureChannelRequest->SecurityMode          = pSecureConnection->MessageSecurityMode;
+    pOpenSecureChannelRequest->RequestedLifetime     = pSecureConnection->nLifetime;
+
+    pOpenSecureChannelContext->SecurityMode          = pSecureConnection->MessageSecurityMode;
+
     /* check MessageSecurityMode */
-    switch(pSecureConnection->MessageSecurityMode)
+    switch(eMessageSecurityMode)
     {
     case OpcUa_MessageSecurityMode_None:
         {
             /* generate fake client nonce that is sent to the server */
-            clientNonce.Type          = OpcUa_Crypto_KeyType_Random;
-            clientNonce.Key.Length    = -1;
-            clientNonce.Key.Data      = OpcUa_Null;
-            clientNonce.fpClearHandle = OpcUa_Null;
+            pOpenSecureChannelRequest->ClientNonce.Length    = -1;
+            pOpenSecureChannelRequest->ClientNonce.Data      = OpcUa_Null;
 
             break;
         }
     case OpcUa_MessageSecurityMode_Sign:
+        {
+            uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->GenerateAsymmetricKeypair(
+                pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
+                pSecureConnection->pSecureChannel->pCurrentCryptoProvider->EphemeralDhEncryptionKeyType,
+                pSecureConnection->pSecureChannel->pCurrentCryptoProvider->SymmetricKeyLength * 8,
+                &pubKey,
+                &pOpenSecureChannelContext->privKey);
+            OpcUa_GotoErrorIfBad(uStatus);
+
+            uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->ComputeNonceFromPublicKey(
+                pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
+                &pubKey,
+                &clientNonce);
+            OpcUa_GotoErrorIfBad(uStatus);
+
+            clientNonce.Data = (OpcUa_Byte*)OpcUa_Alloc(clientNonce.Length);
+            OpcUa_GotoErrorIfAllocFailed(clientNonce.Data);
+
+            uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->ComputeNonceFromPublicKey(
+                pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
+                &pubKey,
+                &clientNonce);
+
+            pOpenSecureChannelRequest->ClientNonce.Length    = clientNonce.Length;
+            pOpenSecureChannelRequest->ClientNonce.Data      = clientNonce.Data;
+
+            break;
+        }
     case OpcUa_MessageSecurityMode_SignAndEncrypt:
         {
             /* use settings from the cryptoprovider for the keylength */
             uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->GenerateKey(
                 pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
                 -1,
-                &clientNonce);
+                &pOpenSecureChannelContext->privKey);
 
             OpcUa_GotoErrorIfBad(uStatus);
 
-            clientNonce.Key.Data = (OpcUa_Byte*)OpcUa_Alloc(clientNonce.Key.Length);
-            OpcUa_GotoErrorIfAllocFailed(clientNonce.Key.Data);
+            pOpenSecureChannelContext->privKey.Key.Data = (OpcUa_Byte*)OpcUa_Alloc(pOpenSecureChannelContext->privKey.Key.Length);
+            OpcUa_GotoErrorIfAllocFailed(pOpenSecureChannelContext->privKey.Key.Data);
 
             uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->GenerateKey(
                 pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
                 -1,
-                &clientNonce);
+                &pOpenSecureChannelContext->privKey);
+
+            pOpenSecureChannelRequest->ClientNonce.Length    = pOpenSecureChannelContext->privKey.Key.Length;
+            pOpenSecureChannelRequest->ClientNonce.Data      = pOpenSecureChannelContext->privKey.Key.Data;
 
             break;
         }
@@ -1006,17 +1068,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
     }
 
     OpcUa_GotoErrorIfBad(uStatus);
-
-    /*** fill request header ***/
-    pOpenSecureChannelRequest->RequestHeader.Timestamp      = OPCUA_P_DATETIME_UTCNOW();
-
-    /*** fill request body ***/
-    pOpenSecureChannelRequest->RequestType           = a_eTokenRequestType;
-    pOpenSecureChannelRequest->ClientProtocolVersion = 0;
-    pOpenSecureChannelRequest->SecurityMode          = pSecureConnection->MessageSecurityMode;
-    pOpenSecureChannelRequest->ClientNonce.Length    = clientNonce.Key.Length;
-    pOpenSecureChannelRequest->ClientNonce.Data      = clientNonce.Key.Data;
-    pOpenSecureChannelRequest->RequestedLifetime     = pSecureConnection->nLifetime;
 
     /*** encode the OpenSecureChannelRequest ***/
 
@@ -1036,7 +1087,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
     /*** secure and send the OpenSecureChannelRequest ***/
     uStatus = OpcUa_SecureConnection_EndSendOpenSecureChannelRequest(   a_pConnection,
                                                                         &pOstrm,
-                                                                        pOpenSecureChannelRequest,
+                                                                        pOpenSecureChannelContext,
                                                                         uTimeout,
                                                                         OpcUa_SecureConnection_OnOpenSecureChannelResponse,  /* callback */
                                                                         OpcUa_Null);
@@ -1046,6 +1097,12 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
     OpcUa_MessageContext_Clear(&cContext);
 
     OpcUa_ByteString_Clear(&serverCertificateThumbprint);
+
+    OpcUa_ByteString_Clear(&clientNonce);
+
+    OpcUa_Key_Clear(&pubKey);
+
+    OpcUa_Free(pOpenSecureChannelRequest);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -1068,9 +1125,16 @@ OpcUa_BeginErrorHandling;
 
     OpcUa_ByteString_Clear(&serverCertificateThumbprint);
 
-    OpcUa_Key_Clear(&clientNonce);
+    OpcUa_ByteString_Clear(&clientNonce);
 
-    /* OpcUa_OpenSecureChannelRequest_Clear(pOpenSecureChannelRequest); */
+    OpcUa_Key_Clear(&pubKey);
+
+    if(pOpenSecureChannelContext != OpcUa_Null)
+    {
+        OpcUa_Key_Clear(&pOpenSecureChannelContext->privKey);
+        OpcUa_Free(pOpenSecureChannelContext);
+    }
+
     OpcUa_Free(pOpenSecureChannelRequest);
 
 OpcUa_FinishErrorHandling;
@@ -2865,7 +2929,7 @@ OpcUa_StatusCode OpcUa_SecureConnection_ProcessOpenSecureChannelResponse(
     OpcUa_StatusCode                    a_uResponseStatus,
     OpcUa_Boolean                       a_bResponseComplete)
 {
-    OpcUa_OpenSecureChannelRequest*     pRequest                = OpcUa_Null;
+    OpcUa_OpenSecureChannelContext*     pRequest                = OpcUa_Null;
     OpcUa_OpenSecureChannelResponse*    pResponse               = OpcUa_Null;
     OpcUa_SecureConnection*             pSecureConnection       = OpcUa_Null;
 
@@ -2898,6 +2962,11 @@ OpcUa_StatusCode OpcUa_SecureConnection_ProcessOpenSecureChannelResponse(
     OpcUa_Key*                          pInitializationVector   = OpcUa_Null;
 
     OpcUa_Boolean                       bSecureChannelLocked    = OpcUa_False;
+
+    OpcUa_ByteString                    clientSecret            = OPCUA_BYTESTRING_STATICINITIALIZER;
+    OpcUa_ByteString                    serverSecret            = OPCUA_BYTESTRING_STATICINITIALIZER;
+    OpcUa_ByteString*                   pClientSecret           = &clientSecret;
+    OpcUa_ByteString*                   pServerSecret           = &serverSecret;
 
 OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelResponse");
 
@@ -2960,7 +3029,9 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
         /* if security is turned on then the sender and receiver certificates must be specified. */
         if((SenderCertificate.Data != OpcUa_Null) && (recvCertThumbprint.Data != OpcUa_Null))
         {
-            eRevisedSecurityMode = OpcUa_MessageSecurityMode_SignAndEncrypt;
+            eRevisedSecurityMode = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->EphemeralDhEncryptionKeyType
+                                       ? OpcUa_MessageSecurityMode_Sign
+                                       : OpcUa_MessageSecurityMode_SignAndEncrypt;
         }
 
         /* if security is turned off then the sender and receiver certificates must be null. */
@@ -2977,7 +3048,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
         /* check that the message has been properly secured */
         if(pSecureConnection->MessageSecurityMode != OpcUa_MessageSecurityMode_None)
         {
-            if(eRevisedSecurityMode != OpcUa_MessageSecurityMode_SignAndEncrypt)
+            if(eRevisedSecurityMode == OpcUa_MessageSecurityMode_None)
             {
                 OpcUa_GotoErrorWithStatus(OpcUa_BadSecurityChecksFailed);
             }
@@ -3118,7 +3189,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
                 OpcUa_GotoErrorWithStatus(OpcUa_BadUnknownResponse);
             }
 
-            pRequest = (OpcUa_OpenSecureChannelRequest*)pSecureRequest->CallbackData;
+            pRequest = (OpcUa_OpenSecureChannelContext*)pSecureRequest->CallbackData;
             OpcUa_GotoErrorIfArgumentNull(pRequest);
 
             /* reset buffer index to start reading from the first buffer */
@@ -3156,10 +3227,40 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
             OpcUa_GotoErrorIfBad(uStatus);
 
             /* derive the keys from the nonces */
+            if(eRevisedSecurityMode == OpcUa_MessageSecurityMode_Sign)
+            {
+                uStatus = pSecureChannel->pCurrentCryptoProvider->ComputeSecretsFromNonce(
+                                                            pSecureChannel->pCurrentCryptoProvider,
+                                                            &pResponse->ServerNonce,
+                                                            &pRequest->privKey,
+                                                            &clientSecret,
+                                                            &serverSecret);
+                OpcUa_GotoErrorIfBad(uStatus);
+
+                clientSecret.Data = (OpcUa_Byte*)OpcUa_Alloc(clientSecret.Length);
+                OpcUa_GotoErrorIfAllocFailed(clientSecret.Data);
+
+                serverSecret.Data = (OpcUa_Byte*)OpcUa_Alloc(serverSecret.Length);
+                OpcUa_GotoErrorIfAllocFailed(serverSecret.Data);
+
+                uStatus = pSecureChannel->pCurrentCryptoProvider->ComputeSecretsFromNonce(
+                                                            pSecureChannel->pCurrentCryptoProvider,
+                                                            &pResponse->ServerNonce,
+                                                            &pRequest->privKey,
+                                                            &clientSecret,
+                                                            &serverSecret);
+                OpcUa_GotoErrorIfBad(uStatus);
+            }
+            else
+            {
+                pClientSecret = &pRequest->privKey.Key;
+                pServerSecret = &pResponse->ServerNonce;
+            }
+
             uStatus = OpcUa_SecureChannel_DeriveKeys(   pRequest->SecurityMode,
                                                         pSecureChannel->pCurrentCryptoProvider,
-                                                        &pRequest->ClientNonce,
-                                                        &pResponse->ServerNonce,
+                                                        pClientSecret,
+                                                        pServerSecret,
                                                         &pSendingKeyset,
                                                         &pReceivingKeyset);
             OpcUa_GotoErrorIfBad(uStatus);
@@ -3244,7 +3345,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
                                                             &pSecureRequest);
         if(pSecureRequest != OpcUa_Null)
         {
-            pRequest = (OpcUa_OpenSecureChannelRequest*)pSecureRequest->CallbackData;
+            pRequest = (OpcUa_OpenSecureChannelContext*)pSecureRequest->CallbackData;
         }
 
         /*** invoke callback function ***/
@@ -3268,7 +3369,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
 
     if(pRequest != OpcUa_Null)
     {
-        OpcUa_OpenSecureChannelRequest_Clear(pRequest);
+        OpcUa_Key_Clear(&pRequest->privKey);
         OpcUa_Free(pRequest);
     }
 
@@ -3283,8 +3384,20 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "ProcessOpenSecureChannelR
         OpcUa_SecureRequest_Delete(&pSecureRequest);
     }
 
+    if(clientSecret.Data != OpcUa_Null && clientSecret.Length > 0)
+    {
+        OpcUa_DestroySecretData(clientSecret.Data, clientSecret.Length);
+    }
+
+    if(serverSecret.Data != OpcUa_Null && serverSecret.Length > 0)
+    {
+        OpcUa_DestroySecretData(serverSecret.Data, serverSecret.Length);
+    }
+
     OpcUa_String_Clear(&sSecurityPolicyUri);
     OpcUa_ByteString_Clear(&clientCertThumbprint);
+    OpcUa_ByteString_Clear(&clientSecret);
+    OpcUa_ByteString_Clear(&serverSecret);
 
 OpcUa_ReturnStatusCode;
 OpcUa_BeginErrorHandling;
@@ -3304,7 +3417,7 @@ OpcUa_BeginErrorHandling;
 
     if(pSecureRequest != OpcUa_Null)
     {
-        pRequest = (OpcUa_OpenSecureChannelRequest*)pSecureRequest->CallbackData;
+        pRequest = (OpcUa_OpenSecureChannelContext*)pSecureRequest->CallbackData;
     }
 
     /*** invoke callback function ***/
@@ -3329,7 +3442,7 @@ OpcUa_BeginErrorHandling;
 
     if(pRequest != OpcUa_Null)
     {
-        OpcUa_OpenSecureChannelRequest_Clear(pRequest);
+        OpcUa_Key_Clear(&pRequest->privKey);
         OpcUa_Free(pRequest);
     }
 
@@ -3346,6 +3459,8 @@ OpcUa_BeginErrorHandling;
 
     OpcUa_String_Clear(&sSecurityPolicyUri);
     OpcUa_ByteString_Clear(&clientCertThumbprint);
+    OpcUa_ByteString_Clear(&clientSecret);
+    OpcUa_ByteString_Clear(&serverSecret);
 
 OpcUa_FinishErrorHandling;
 }

@@ -832,6 +832,9 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PKI_LoadPrivateKeyFromFile(
 {
     BIO*            pPrivateKeyFile     = OpcUa_Null;
     RSA*            pRsaPrivateKey      = OpcUa_Null;
+#ifndef OPENSSL_NO_EC
+    EC_KEY*         pEcPrivateKey       = OpcUa_Null;
+#endif
     EVP_PKEY*       pEvpKey             = OpcUa_Null;
     unsigned char*  pData;
 
@@ -936,6 +939,12 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_LoadPrivateKeyFromFile");
                 pRsaPrivateKey = d2i_RSAPrivateKey_bio(pPrivateKeyFile, OpcUa_Null);
                 break;
 
+#ifndef OPENSSL_NO_EC
+            case OpcUa_Crypto_KeyType_Ec_Private:
+                pEcPrivateKey = d2i_ECPrivateKey_bio(pPrivateKeyFile, OpcUa_Null);
+                break;
+#endif
+
             default:
                 uStatus = OpcUa_BadNotSupported;
                 OpcUa_GotoError;
@@ -957,7 +966,19 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_LoadPrivateKeyFromFile");
         case OpcUa_Crypto_KeyType_Any:
         case OpcUa_Crypto_KeyType_Rsa_Private:
             pRsaPrivateKey = EVP_PKEY_get1_RSA(pEvpKey);
+#ifndef OPENSSL_NO_EC
+            if(pRsaPrivateKey == NULL && a_keyType == OpcUa_Crypto_KeyType_Any)
+            {
+                pEcPrivateKey = EVP_PKEY_get1_EC_KEY(pEvpKey);
+            }
+#endif
             break;
+
+#ifndef OPENSSL_NO_EC
+        case OpcUa_Crypto_KeyType_Ec_Private:
+            pEcPrivateKey = EVP_PKEY_get1_EC_KEY(pEvpKey);
+            break;
+#endif
 
         default:
             uStatus = OpcUa_BadNotSupported;
@@ -987,6 +1008,27 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PKI_LoadPrivateKeyFromFile");
 
         RSA_free(pRsaPrivateKey);
     }
+#ifndef OPENSSL_NO_EC
+    else if(pEcPrivateKey != NULL)
+    {
+        /* get required length */
+        a_pPrivateKey->Key.Length = i2d_ECPrivateKey(pEcPrivateKey, OpcUa_Null);
+        OpcUa_GotoErrorIfTrue((a_pPrivateKey->Key.Length <= 0), OpcUa_Bad);
+
+        /* allocate target buffer */
+        a_pPrivateKey->Key.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(a_pPrivateKey->Key.Length);
+        OpcUa_GotoErrorIfAllocFailed(a_pPrivateKey->Key.Data);
+
+        /* do real conversion */
+        pData = a_pPrivateKey->Key.Data;
+        a_pPrivateKey->Key.Length = i2d_ECPrivateKey(pEcPrivateKey, &pData);
+        OpcUa_GotoErrorIfTrue((a_pPrivateKey->Key.Length <= 0), OpcUa_Bad);
+
+        a_pPrivateKey->Type = OpcUa_Crypto_KeyType_Ec_Private;
+
+        EC_KEY_free(pEcPrivateKey);
+    }
+#endif
     else
     {
         OpcUa_GotoErrorWithStatus(OpcUa_Bad);
@@ -1021,6 +1063,13 @@ OpcUa_BeginErrorHandling;
     {
         RSA_free(pRsaPrivateKey);
     }
+
+#ifndef OPENSSL_NO_EC
+    if(pEcPrivateKey != NULL)
+    {
+        EC_KEY_free(pEcPrivateKey);
+    }
+#endif
 
 OpcUa_FinishErrorHandling;
 }
