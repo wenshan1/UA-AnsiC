@@ -440,7 +440,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
         a_pProvider->SignatureDataLength              = 32;
 
         a_pProvider->MaximumAsymmetricKeyLength       = 256;
-        a_pProvider->MinimumAsymmetricKeyLength       = 32;
+        a_pProvider->MinimumAsymmetricKeyLength       = 48;
 
         a_pProvider->AsymmetricEncryptionOverhead     = 0;
 
@@ -476,7 +476,7 @@ OpcUa_InitializeStatus(OpcUa_Module_P_CryptoFactory, "CreateCryptoProvider");
 
         /* key derivation algorithm */
         a_pProvider->DeriveChannelKeysets       = OpcUa_P_OpenSSL_DeriveChannelKeysets;
-        a_pProvider->DeriveKey                  = OpcUa_P_OpenSSL_Random_Key_Derive;
+        a_pProvider->DeriveKey                  = OpcUa_P_OpenSSL_Random_Key_PSHA256_Derive;
 
         /* random key generation */
         a_pProvider->GenerateKey                = OpcUa_P_OpenSSL_Random_Key_Generate;
