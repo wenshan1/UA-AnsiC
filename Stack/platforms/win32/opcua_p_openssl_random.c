@@ -315,8 +315,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_Derive");
 
     uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
 
-    OpcUa_P_Memory_Free(pCtx);
+    OpcUa_P_OpenSSL_DestroySecretData(pCtx, sizeof(OpcUa_P_OpenSSL_PSHA1_Ctx) + a_secret.Length + a_seed.Length);
+    OpcUa_P_OpenSSL_DestroySecretData(pBuffer, bufferlength * sizeof(OpcUa_Byte));
 
+    OpcUa_P_Memory_Free(pCtx);
     OpcUa_P_Memory_Free(pBuffer);
 
 OpcUa_ReturnStatusCode;
@@ -561,6 +563,9 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
     }
 
     uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
+
+    OpcUa_P_OpenSSL_DestroySecretData(pCtx, sizeof(OpcUa_P_OpenSSL_PSHA256_Ctx) + a_secret.Length + a_seed.Length);
+    OpcUa_P_OpenSSL_DestroySecretData(pBuffer, bufferlength * sizeof(OpcUa_Byte));
 
     OpcUa_P_Memory_Free(pCtx);
     OpcUa_P_Memory_Free(pBuffer);
