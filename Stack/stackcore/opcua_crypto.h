@@ -19,9 +19,9 @@
 
 OPCUA_BEGIN_EXTERN_C
 
-#define OpcUa_Crypto_Rsa_Name                       L"RSA"
+#define OpcUa_Crypto_Rsa_Name                       "RSA"
 #define OpcUa_Crypto_Rsa_Id                         19
-#define OpcUa_Crypto_Ec_Name                        L"id-ecPublicKey"
+#define OpcUa_Crypto_Ec_Name                        "id-ecPublicKey"
 #define OpcUa_Crypto_Ec_Id                          408
 
 /* @brief Key Types; If Handle, Data points to an opaque key handle and Length must be interpreted as boolean. */
@@ -52,25 +52,45 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_CRYPTO_KEY_ISNOHANDLE(xKey)           (xKey->Type < (OpcUa_UInt)OpcUa_Crypto_KeyType_Handle_Offset)
 
 /* algorithm codes */
-#define OpcUa_Crypto_sha1WithRSAEncryption_Name     L"sha1WithRSAEncryption"
+#define OpcUa_Crypto_sha1WithRSAEncryption_Name     "sha1WithRSAEncryption"
 #define OpcUa_Crypto_sha1WithRSAEncryption_Id       65
 #define OpcUa_Crypto_Sig_sha1WithRSAEncryption      OpcUa_Crypto_sha1WithRSAEncryption_Id
 
-#define OpcUa_Crypto_sha224WithRSAEncryption_Name   L"sha224WithRSAEncryption"
+#define OpcUa_Crypto_sha224WithRSAEncryption_Name   "sha224WithRSAEncryption"
 #define OpcUa_Crypto_sha224WithRSAEncryption_Id     671
 #define OpcUa_Crypto_Sig_sha224WithRSAEncryption    OpcUa_Crypto_sha224WithRSAEncryption_Id
 
-#define OpcUa_Crypto_sha256WithRSAEncryption_Name   L"sha256WithRSAEncryption"
+#define OpcUa_Crypto_sha256WithRSAEncryption_Name   "sha256WithRSAEncryption"
 #define OpcUa_Crypto_sha256WithRSAEncryption_Id     668
 #define OpcUa_Crypto_Sig_sha256WithRSAEncryption    OpcUa_Crypto_sha256WithRSAEncryption_Id
 
-#define OpcUa_Crypto_sha384WithRSAEncryption_Name   L"sha384WithRSAEncryption"
+#define OpcUa_Crypto_sha384WithRSAEncryption_Name   "sha384WithRSAEncryption"
 #define OpcUa_Crypto_sha384WithRSAEncryption_Id     669
 #define OpcUa_Crypto_Sig_sha384WithRSAEncryption    OpcUa_Crypto_sha384WithRSAEncryption_Id
 
-#define OpcUa_Crypto_sha512WithRSAEncryption_Name   L"sha512WithRSAEncryption"
+#define OpcUa_Crypto_sha512WithRSAEncryption_Name   "sha512WithRSAEncryption"
 #define OpcUa_Crypto_sha512WithRSAEncryption_Id     670
 #define OpcUa_Crypto_Sig_sha512WithRSAEncryption    OpcUa_Crypto_sha512WithRSAEncryption_Id
+
+#define OpcUa_Crypto_ecdsaWithSHA1_Name             "ecdsa-with-SHA1"
+#define OpcUa_Crypto_ecdsaWithSHA1_Id               416
+#define OpcUa_Crypto_Sig_ecdsaWithSHA1              OpcUa_Crypto_ecdsaWithSHA1_Id
+
+#define OpcUa_Crypto_ecdsaWithSHA224_Name           "ecdsa-with-SHA224"
+#define OpcUa_Crypto_ecdsaWithSHA224_Id             793
+#define OpcUa_Crypto_Sig_ecdsaWithSHA224            OpcUa_Crypto_ecdsaWithSHA224_Id
+
+#define OpcUa_Crypto_ecdsaWithSHA256_Name           "ecdsa-with-SHA256"
+#define OpcUa_Crypto_ecdsaWithSHA256_Id             794
+#define OpcUa_Crypto_Sig_ecdsaWithSHA256            OpcUa_Crypto_ecdsaWithSHA256_Id
+
+#define OpcUa_Crypto_ecdsaWithSHA384_Name           "ecdsa-with-SHA384"
+#define OpcUa_Crypto_ecdsaWithSHA384_Id             795
+#define OpcUa_Crypto_Sig_ecdsaWithSHA384            OpcUa_Crypto_ecdsaWithSHA384_Id
+
+#define OpcUa_Crypto_ecdsaWithSHA512_Name           "ecdsa-with-SHA512"
+#define OpcUa_Crypto_ecdsaWithSHA512_Id             796
+#define OpcUa_Crypto_Sig_ecdsaWithSHA512            OpcUa_Crypto_ecdsaWithSHA512_Id
 
 
 struct _OpcUa_SecurityKeyset;
