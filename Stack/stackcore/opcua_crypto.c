@@ -388,8 +388,8 @@ OpcUa_StatusCode OpcUa_Crypto_ComputeSecretsFromNonce(
     struct _OpcUa_CryptoProvider* a_pProvider,
     OpcUa_ByteString*             a_pNonce,
     OpcUa_Key*                    a_privateKey,
-    OpcUa_ByteString*             a_pX,
-    OpcUa_ByteString*             a_pY)
+    OpcUa_ByteString*             a_pClientSecret,
+    OpcUa_ByteString*             a_pServerSecret)
 {
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_Crypto);
     OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
@@ -399,8 +399,8 @@ OpcUa_StatusCode OpcUa_Crypto_ComputeSecretsFromNonce(
         a_pProvider,
         a_pNonce,
         a_privateKey,
-        a_pX,
-        a_pY);
+        a_pClientSecret,
+        a_pServerSecret);
 }
 
 /*============================================================================

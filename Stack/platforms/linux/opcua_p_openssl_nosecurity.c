@@ -385,14 +385,14 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce(
     OpcUa_CryptoProvider*   a_pProvider,
     OpcUa_ByteString*       a_pNonce,
     OpcUa_Key*              a_privateKey,
-    OpcUa_ByteString*       a_pX,
-    OpcUa_ByteString*       a_pY)
+    OpcUa_ByteString*       a_pClientSecret,
+    OpcUa_ByteString*       a_pServerSecret)
 {
     OpcUa_ReferenceParameter(a_pProvider);
     OpcUa_ReferenceParameter(a_pNonce);
     OpcUa_ReferenceParameter(a_privateKey);
-    OpcUa_ReferenceParameter(a_pX);
-    OpcUa_ReferenceParameter(a_pY);
+    OpcUa_ReferenceParameter(a_pClientSecret);
+    OpcUa_ReferenceParameter(a_pServerSecret);
 
     return OpcUa_BadNotSupported;
 }

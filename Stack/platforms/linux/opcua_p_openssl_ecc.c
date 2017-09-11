@@ -492,15 +492,15 @@ OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeSecretsFromNonce(
     OpcUa_CryptoProvider*   a_pProvider,
     OpcUa_ByteString*       a_pNonce,
     OpcUa_Key*              a_privateKey,
-    OpcUa_ByteString*       a_pX,
-    OpcUa_ByteString*       a_pY)
+    OpcUa_ByteString*       a_pClientSecret,
+    OpcUa_ByteString*       a_pServerSecret)
 {
 #ifdef OPENSSL_NO_EC
     OpcUa_ReferenceParameter(a_pProvider);
     OpcUa_ReferenceParameter(a_pNonce);
     OpcUa_ReferenceParameter(a_privateKey);
-    OpcUa_ReferenceParameter(a_pX);
-    OpcUa_ReferenceParameter(a_pY);
+    OpcUa_ReferenceParameter(a_pClientSecret);
+    OpcUa_ReferenceParameter(a_pServerSecret);
     return OpcUa_BadNotSupported;
 #else
     EC_KEY*                 pEcPrivateKey   = OpcUa_Null;
@@ -519,8 +519,8 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "EC_ComputeSecretsFromNonce");
     OpcUa_ReturnErrorIfArgumentNull(a_pNonce);
     OpcUa_ReturnErrorIfArgumentNull(a_pNonce->Data);
     OpcUa_ReturnErrorIfArgumentNull(a_privateKey);
-    OpcUa_ReturnErrorIfArgumentNull(a_pX);
-    OpcUa_ReturnErrorIfArgumentNull(a_pY);
+    OpcUa_ReturnErrorIfArgumentNull(a_pClientSecret);
+    OpcUa_ReturnErrorIfArgumentNull(a_pServerSecret);
 
     pData = a_privateKey->Key.Data;
     OpcUa_ReturnErrorIfArgumentNull(pData);
@@ -538,10 +538,10 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "EC_ComputeSecretsFromNonce");
     keySize = (keySize + 7) / 8;
     OpcUa_GotoErrorIfTrue((a_pNonce->Length != 2 * keySize), OpcUa_BadInvalidArgument);
 
-    if(a_pX->Data == OpcUa_Null || a_pY->Data == OpcUa_Null)
+    if(a_pClientSecret->Data == OpcUa_Null || a_pServerSecret->Data == OpcUa_Null)
     {
-       a_pX->Length = keySize;
-       a_pY->Length = keySize;
+       a_pClientSecret->Length = keySize;
+       a_pServerSecret->Length = keySize;
        EC_KEY_free(pEcPrivateKey);
        OpcUa_ReturnStatusCode;
     }
@@ -589,11 +589,11 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "EC_ComputeSecretsFromNonce");
         OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
     }
 
-    bn2bin_pad(x, a_pX->Data, keySize);
-    a_pX->Length = keySize;
+    bn2bin_pad(x, a_pClientSecret->Data, keySize);
+    a_pClientSecret->Length = keySize;
 
-    bn2bin_pad(y, a_pY->Data, keySize);
-    a_pY->Length = keySize;
+    bn2bin_pad(y, a_pServerSecret->Data, keySize);
+    a_pServerSecret->Length = keySize;
 
     EC_POINT_free(p1);
     EC_POINT_clear_free(p2);

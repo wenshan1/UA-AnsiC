@@ -881,16 +881,16 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_ComputeNonceFromPublicKey(
   @param pProvider                  [in]  The crypto provider handle.
   @param pNonce                     [in]  The received nonce.
   @param privateKey                 [in]  The private key.
-  @param pX                         [out] The resulting nonce.
-  @param pY                         [out] The resulting nonce.
+  @param pClientSecret              [out] The resulting client secret.
+  @param pServerSecret              [out] The resulting server secret.
 
 */
 typedef OpcUa_StatusCode (OpcUa_Crypto_PfnComputeSecretsFromNonce)(
     struct _OpcUa_CryptoProvider* pProvider,
     OpcUa_ByteString*             pNonce,
     OpcUa_Key*                    privateKey,
-    OpcUa_ByteString*             pX,
-    OpcUa_ByteString*             pY);
+    OpcUa_ByteString*             pClientSecret,
+    OpcUa_ByteString*             pServerSecret);
 
 /**
   @brief Computes the secret from the received nonce and the private key.
@@ -902,16 +902,16 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnComputeSecretsFromNonce)(
   @param pProvider                  [in]  The crypto provider handle.
   @param pNonce                     [in]  The received nonce.
   @param privateKey                 [in]  The private key.
-  @param pX                         [out] The resulting nonce.
-  @param pY                         [out] The resulting nonce.
+  @param pClientSecret              [out] The resulting client secret.
+  @param pServerSecret              [out] The resulting server secret.
 
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_ComputeSecretsFromNonce(
     struct _OpcUa_CryptoProvider* pProvider,
     OpcUa_ByteString*             pNonce,
     OpcUa_Key*                    privateKey,
-    OpcUa_ByteString*             pX,
-    OpcUa_ByteString*             pY);
+    OpcUa_ByteString*             pClientSecret,
+    OpcUa_ByteString*             pServerSecret);
 
 /*============================================================================
  * The OpcUa_CryptoProvider interface.

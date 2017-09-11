@@ -702,8 +702,8 @@ OpcUa_StatusCode OpcUa_P_Crypto_NoSecurity_ComputeSecretsFromNonce(
     OpcUa_CryptoProvider*   pProvider,
     OpcUa_ByteString*       pNonce,
     OpcUa_Key*              privateKey,
-    OpcUa_ByteString*       pX,
-    OpcUa_ByteString*       pY);
+    OpcUa_ByteString*       pClientSecret,
+    OpcUa_ByteString*       pServerSecret);
 
 /*** AES SYMMETRIC ENCRYPTION ***/
 
@@ -1265,8 +1265,8 @@ OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeSecretsFromNonce(
     OpcUa_CryptoProvider*   pProvider,
     OpcUa_ByteString*       pNonce,
     OpcUa_Key*              privateKey,
-    OpcUa_ByteString*       pX,
-    OpcUa_ByteString*       pY);
+    OpcUa_ByteString*       pClientSecret,
+    OpcUa_ByteString*       pServerSecret);
 
 OPCUA_END_EXTERN_C
 
