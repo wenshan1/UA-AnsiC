@@ -69,6 +69,7 @@ namespace EccTestClient
             }
 
             tester.Cleanup();
+            Console.ReadLine();
         }
 
         static bool AreEqual(IList<byte> value1, IList<byte> value2)
@@ -225,7 +226,7 @@ namespace EccTestClient
 
             ECDiffieHellmanCng receiverECDH = new ECDiffieHellmanCng(ECCurve.NamedCurves.nistP256);
             receiverECDH.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-            receiverECDH.HashAlgorithm = CngAlgorithm.Sha256;
+            receiverECDH.HashAlgorithm = CngAlgorithm.Sha512;
 
             byte[] sharedKey = receiverECDH.DeriveKeyMaterial(senderKeyData);
 

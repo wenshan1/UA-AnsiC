@@ -604,8 +604,6 @@ bool ComputeSecret(
 		return false;
 	}
 
-	PrintHexString("NONCE EKEY", *pNonce);
-
 	auto pCtx = BN_CTX_new();
 
 	if (pCtx == nullptr)

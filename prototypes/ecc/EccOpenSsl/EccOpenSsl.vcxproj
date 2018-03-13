@@ -23,7 +23,7 @@
     <ProjectGuid>{C0109CB3-BA15-482B-A3E9-FDD29E8A27F6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>EccOpenSsl</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
     <TargetFrameworkVersion>4.7.1</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
