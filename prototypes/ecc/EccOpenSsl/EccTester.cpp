@@ -31,11 +31,16 @@ struct _OpcUa_Key
 
 typedef struct _OpcUa_Key OpcUa_Key;
 
-static String^ FormatHexString(OpcUa_ByteString& bytes)
+static String^ FormatHexString(OpcUa_ByteString& bytes, int offset = 0, int length = -1)
 {
+	if (length < 0)
+	{
+		length = bytes.Length;
+	}
+
 	auto buffer = gcnew System::Text::StringBuilder();
 
-	for (unsigned int ii = 0; ii < bytes.Length; ii++)
+	for (int ii = offset; ii < offset + length; ii++)
 	{
 		buffer->AppendFormat("{0:X2}", bytes.Data[ii]);
 	}
@@ -43,9 +48,9 @@ static String^ FormatHexString(OpcUa_ByteString& bytes)
 	return buffer->ToString();
 }
 
-static void PrintHexString(String^ text, OpcUa_ByteString& bytes)
+static void PrintHexString(String^ text, OpcUa_ByteString& bytes, int offset = 0, int length = -1)
 {
-	Console::WriteLine(text + " {0}", FormatHexString(bytes));
+	Console::WriteLine(text + " {0}", FormatHexString(bytes, offset, length));
 }
 
 bool LoadCertificate(const char* filePath, OpcUa_ByteString* pCertificate)
@@ -338,9 +343,9 @@ static unsigned int DecodeUInt32(unsigned char* data, unsigned int offset, unsig
 
 static void EncodeUInt32(unsigned int value, unsigned char* data, unsigned int offset, unsigned int length)
 {
-	if (data == nullptr || length < offset + 4)
+	if (data == nullptr || length < 4)
 	{
-		return;
+		throw gcnew ArgumentException("length");
 	}
 
 	data[offset] = (unsigned char)(value & 0x000000FF);
@@ -363,27 +368,45 @@ static bool Decode(
 	unsigned int offset, 
 	unsigned int length, 
 	OpcUa_ByteString* pSenderCertificate, 
-	OpcUa_ByteString* pSenderEphemeralKey)
+	OpcUa_ByteString* pSenderEphemeralKey,
+	OpcUa_ByteString* pSenderNonce)
 {
 	auto totalLength = DecodeUInt32(data, offset, length);
-
-	auto signingCertificateLength = DecodeUInt32(data, offset + 4, length);
-	auto pSigningCertificate = data + offset + 8;
-
+	
 	OpcUa_ByteString message;
 	message.Data = data + offset;
 	message.Length = totalLength;
+	offset += 4;
+
+	auto signingCertificateLength = DecodeUInt32(data, offset, length - offset);
+	offset += 4;
+
+	auto pSigningCertificateData = data + offset;
+	offset += signingCertificateLength;
 
 	OpcUa_ByteString certificate;
-	certificate.Data = pSigningCertificate;
 	certificate.Length = signingCertificateLength;
+	certificate.Data = pSigningCertificateData;
 
-	auto senderKeyLength = DecodeUInt32(data, offset + 8 + signingCertificateLength, length);
-	auto pSenderKey = data + offset + 12;
+	auto senderKeyLength = DecodeUInt32(data, offset, length - offset);
+	offset += 4;
+
+	auto pSenderKeyData = data + offset;
+	offset += senderKeyLength;
 
 	OpcUa_ByteString senderKey;
-	senderKey.Data = pSenderKey;
 	senderKey.Length = senderKeyLength;
+	senderKey.Data = pSenderKeyData;
+
+	auto senderNonceLength = DecodeUInt32(data, offset, length - offset);
+	offset += 4;
+
+	auto pSenderNonceData = data + offset;
+	offset += senderNonceLength;
+
+	OpcUa_ByteString senderNonce;
+	senderNonce.Length = senderNonceLength;
+	senderNonce.Data = pSenderNonceData;
 
 	if (!VerifySignature(&message, &certificate))
 	{
@@ -392,8 +415,9 @@ static bool Decode(
 
 	*pSenderCertificate = Copy(certificate);
 	*pSenderEphemeralKey = Copy(senderKey);
+	*pSenderNonce = Copy(senderNonce);
 
-	PrintHexString("CLIENT EKEY", *pSenderEphemeralKey);
+	// PrintHexString("CLIENT EKEY", *pSenderEphemeralKey);
 	return true;
 }
 
@@ -401,33 +425,41 @@ static bool Encode(
 	OpcUa_ByteString* pSenderCertificate,
 	OpcUa_ByteString* pSenderPrivateKey,
 	OpcUa_ByteString* pSenderEphemeralKey,
+	OpcUa_ByteString* pSenderNonce,
 	OpcUa_ByteString* pMessage)
 {
-	auto totalLength = 12;
+	auto totalLength = 16;
 	totalLength += pSenderCertificate->Length;
 	totalLength += pSenderEphemeralKey->Length;
+	totalLength += pSenderNonce->Length;
 	totalLength += GetSignatureSize(pSenderPrivateKey);
 
 	pMessage->Length = totalLength;
 	pMessage->Data = new unsigned char[totalLength];
 
 	auto offset = 0;
-	EncodeUInt32(totalLength, pMessage->Data, offset, pMessage->Length);
+	EncodeUInt32(totalLength, pMessage->Data, offset, pMessage->Length - offset);
 
 	offset += 4;
-	EncodeUInt32(pSenderCertificate->Length, pMessage->Data, offset, pMessage->Length);
+	EncodeUInt32(pSenderCertificate->Length, pMessage->Data, offset, pMessage->Length - offset);
 
 	offset += 4;
 	memcpy(pMessage->Data + offset, pSenderCertificate->Data, pSenderCertificate->Length);
 
 	offset += pSenderCertificate->Length;
-	EncodeUInt32(pSenderEphemeralKey->Length, pMessage->Data, offset, pMessage->Length);
+	EncodeUInt32(pSenderEphemeralKey->Length, pMessage->Data, offset, pMessage->Length - offset);
 
 	offset += 4;
 	memcpy(pMessage->Data + offset, pSenderEphemeralKey->Data, pSenderEphemeralKey->Length);
 
 	offset += pSenderEphemeralKey->Length;
-	PrintHexString("SERVER EKEY", *pSenderEphemeralKey);
+	EncodeUInt32(pSenderNonce->Length, pMessage->Data, offset, pMessage->Length - offset);
+
+	offset += 4;
+	memcpy(pMessage->Data + offset, pSenderNonce->Data, pSenderNonce->Length);
+
+	offset += pSenderNonce->Length;
+	// PrintHexString("SERVER EKEY", *pSenderEphemeralKey);
 
 	OpcUa_ByteString message;
 	message.Data = pMessage->Data;
@@ -575,6 +607,22 @@ bool GenerateKeys(
 	return true;
 }
 
+bool CreateNonce(unsigned int length, OpcUa_ByteString* pNonce)
+{
+	pNonce->Length = length;
+	pNonce->Data = new unsigned char[length];
+
+	if (RAND_bytes(pNonce->Data, length) <= 0)
+	{
+		delete[] pNonce->Data;
+		pNonce->Length = 0;
+		pNonce->Data = nullptr;
+		return false;
+	}
+
+	return true;
+}
+
 bool ComputeSecret(
 	OpcUa_ByteString* pNonce,
 	OpcUa_ByteString* pPrivateKey,
@@ -677,32 +725,14 @@ bool ComputeSecret(
 		return false;
 	}
 
-	auto pBuffer = new unsigned char[keySize];
+	auto pBuffer = new unsigned char[keySize*2];
 	memset(pBuffer, 0, keySize);
 	bn2bin_pad(x, pBuffer, keySize);
-	// bn2bin_pad(y, pBuffer + keySize, keySize);
 	    
-	pSharedSecret->Length = SHA512_DIGEST_LENGTH;
-	pSharedSecret->Data = new unsigned char[SHA512_DIGEST_LENGTH];
+	pSharedSecret->Length = SHA256_DIGEST_LENGTH;
+	pSharedSecret->Data = new unsigned char[SHA256_DIGEST_LENGTH];
 
-	/*
-	unsigned char key = 1;
-
-	if (::HMAC(EVP_sha512(), &key, 1, pBuffer, keySize, pSharedSecret->Data, (unsigned int*)&pSharedSecret->Length) == nullptr)
-	{
-		delete[] pSharedSecret->Data;
-		pSharedSecret->Data = nullptr;
-		pSharedSecret->Length = 0;
-		delete[] pBuffer;
-		EC_POINT_free(p1);
-		EC_POINT_free(p2);
-		BN_CTX_free(pCtx);
-		EC_KEY_free(pEcPrivateKey);
-		return false;
-	}
-	*/
-
-	if (::SHA512(pBuffer, keySize, pSharedSecret->Data) == nullptr)
+	if (::SHA256(pBuffer, keySize, pSharedSecret->Data) == nullptr)
 	{
 		delete[] pSharedSecret->Data;
 		pSharedSecret->Data = nullptr;
@@ -720,6 +750,76 @@ bool ComputeSecret(
 	EC_POINT_free(p2);
 	BN_CTX_free(pCtx);
 	EC_KEY_free(pEcPrivateKey);
+
+	return true;
+}
+
+static bool DeriveKeys(OpcUa_ByteString* pSecret, OpcUa_ByteString* pSeed, unsigned int length, OpcUa_ByteString* pKeys)
+{
+	//PrintHexString("SSL: SECRET: ", *pSecret);
+	//PrintHexString("SSL: SEED: ", *pSeed);
+
+	unsigned int hashLength = SHA256_DIGEST_LENGTH;
+	auto hash = new unsigned char[hashLength];
+
+	if (::HMAC(EVP_sha256(), pSecret->Data, pSecret->Length, pSeed->Data, pSeed->Length, hash, nullptr) == nullptr)
+	{
+		delete[] hash;
+		return false;
+	}
+
+	//OpcUa_ByteString x;
+	//x.Data = hash;
+	//x.Length = hashLength;
+	//PrintHexString("SSL: A(1): ", x);
+
+	auto dataLength = SHA256_DIGEST_LENGTH + pSeed->Length;
+	auto data = new unsigned char[dataLength];
+	memcpy(data, hash, hashLength);
+	memcpy(data + hashLength, pSeed->Data, pSeed->Length);
+
+	//x.Data = data;
+	//x.Length = dataLength;
+	//PrintHexString("SSL: S(1): ", x);
+
+	// create buffer with requested size.
+	auto output = new unsigned char[length];
+
+	unsigned int position = 0;
+
+	do
+	{
+		if (::HMAC(EVP_sha256(), pSecret->Data, pSecret->Length, data, dataLength, hash, nullptr) == nullptr)
+		{
+			delete[] hash;
+			delete[] data;
+			return false;
+		}
+
+		//x.Data = hash;
+		//x.Length = hashLength;
+		//PrintHexString("SSL: R(1): ", x);
+
+		for (unsigned int ii = 0; position < length && ii < hashLength; ii++)
+		{
+			output[position++] = hash[ii];
+		}
+
+		if (::HMAC(EVP_sha256(), pSecret->Data, pSecret->Length, data, hashLength, hash, nullptr) == nullptr)
+		{
+			delete[] hash;
+			delete[] data;
+			return false;
+		}
+
+		memcpy(data, hash, hashLength);
+	} 
+	while (position < length);
+
+	delete[] hash;
+
+	pKeys->Data = output;
+	pKeys->Length = length;
 
 	return true;
 }
@@ -819,16 +919,20 @@ namespace EccOpenSsl {
 		auto bytes = File::ReadAllBytes(requestPath);
 
 		auto message = new unsigned char[bytes->Length];
-		OpcUa_ByteString senderCertificate;
-		OpcUa_ByteString senderEphemeralPublicKey;
-		OpcUa_ByteString response;
-		OpcUa_ByteString sharedSecret;
+
+		OpcUa_ByteString clientCertificate = { 0, 0 };
+		OpcUa_ByteString clientEphemeralPublicKey = { 0, 0 };
+		OpcUa_ByteString clientNonce = { 0, 0 };
+		OpcUa_ByteString response = { 0, 0 };
+		OpcUa_ByteString sharedSecret = { 0, 0 };
+		OpcUa_ByteString serverNonce = { 0, 0 };
+		OpcUa_ByteString derivedKeys = { 0, 0 };
 
 		try
 		{
 			Marshal::Copy(bytes, 0, (IntPtr)message, bytes->Length);
 
-			if (!::Decode(message, 0, bytes->Length, &senderCertificate, &senderEphemeralPublicKey))
+			if (!::Decode(message, 0, bytes->Length, &clientCertificate, &clientEphemeralPublicKey, &clientNonce))
 			{
 				throw gcnew ArgumentException("messagePath");
 			}
@@ -838,42 +942,37 @@ namespace EccOpenSsl {
 				throw gcnew ArgumentException("generateKeys");
 			}
 
-			if (!ComputeSecret(&senderEphemeralPublicKey, &m_p->EphemeralPrivateKey, &sharedSecret))
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &sharedSecret))
 			{
 				throw gcnew ArgumentException("computeSecret");
 			}
 
-			// do a sanity check by deriving key using OpenSSL APIs. They match.
+			if (!CreateNonce(m_p->EphemeralPublicKey.Length/2, &serverNonce))
 			{
-				OpcUa_ByteString sanityPublicKey;
-				OpcUa_ByteString sanityPrivateKy;
-
-				if (!GenerateKeys(SN_X9_62_prime256v1, &sanityPublicKey, &sanityPrivateKy))
-				{
-					throw gcnew ArgumentException("generateKeys");
-				}
-
-				OpcUa_ByteString sharedKey3;
-
-				if (!ComputeSecret(&m_p->EphemeralPublicKey, &sanityPrivateKy, &sharedKey3))
-				{
-					throw gcnew ArgumentException("computeSecret");
-				}
-
-				OpcUa_ByteString sharedKey4;
-
-				if (!ComputeSecret(&sanityPublicKey, &m_p->EphemeralPrivateKey, &sharedKey4))
-				{
-					throw gcnew ArgumentException("computeSecret");
-				}
-
-				if (!AreEqual(sharedKey3, sharedKey4))
-				{
-					throw gcnew ArgumentException("sanityCkeckFailed");
-				}
+				throw gcnew ArgumentException("createNonce");
 			}
 
-			if (!::Encode(&m_p->Certificate, &m_p->PrivateKey, &m_p->EphemeralPublicKey, &response))
+			if (!DeriveKeys(&sharedSecret, &serverNonce, 80, &derivedKeys))
+			{
+				throw gcnew ArgumentException("deriveKeys");
+			}
+
+			PrintHexString("SSL: ServerSigningKey: ", derivedKeys, 0, 32);
+			PrintHexString("SSL: ServerEncryptingKey: ", derivedKeys, 32, 32);
+			PrintHexString("SSL: ServerInitializationVector: ", derivedKeys, 64, 16);
+
+			delete [] derivedKeys.Data;
+
+			if (!DeriveKeys(&sharedSecret, &clientNonce, 80, &derivedKeys))
+			{
+				throw gcnew ArgumentException("deriveKeys");
+			}
+
+			PrintHexString("SSL: ClientSigningKey: ", derivedKeys, 0, 32);
+			PrintHexString("SSL: ClientEncryptingKey: ", derivedKeys, 32, 32);
+			PrintHexString("SSL: ClientInitializationVector: ", derivedKeys, 64, 16);
+			
+			if (!::Encode(&m_p->Certificate, &m_p->PrivateKey, &m_p->EphemeralPublicKey, &serverNonce, &response))
 			{
 				throw gcnew ArgumentException("encode");
 			}
@@ -889,9 +988,11 @@ namespace EccOpenSsl {
 		finally
 		{
 			delete[] message;
-			delete[] senderCertificate.Data;
-			delete[] senderEphemeralPublicKey.Data;
+			delete[] clientCertificate.Data;
+			delete[] clientEphemeralPublicKey.Data;
+			delete[] clientNonce.Data;
 			delete[] sharedSecret.Data;
+			delete[] serverNonce.Data;
 		}
 	}
 
