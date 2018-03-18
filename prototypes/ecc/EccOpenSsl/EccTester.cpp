@@ -626,6 +626,7 @@ bool CreateNonce(unsigned int length, OpcUa_ByteString* pNonce)
 bool ComputeSecret(
 	OpcUa_ByteString* pNonce,
 	OpcUa_ByteString* pPrivateKey,
+	OpcUa_ByteString* pSeed,
 	OpcUa_ByteString* pSharedSecret)
 {
 	const unsigned char* pData = pPrivateKey->Data;
@@ -732,6 +733,20 @@ bool ComputeSecret(
 	pSharedSecret->Length = SHA256_DIGEST_LENGTH;
 	pSharedSecret->Data = new unsigned char[SHA256_DIGEST_LENGTH];
 
+	if (::HMAC(EVP_sha256(), pSeed->Data, pSeed->Length, pBuffer, keySize, pSharedSecret->Data, nullptr) == nullptr)
+	{
+		delete[] pSharedSecret->Data;
+		pSharedSecret->Data = nullptr;
+		pSharedSecret->Length = 0;
+		delete[] pBuffer;
+		EC_POINT_free(p1);
+		EC_POINT_free(p2);
+		BN_CTX_free(pCtx);
+		EC_KEY_free(pEcPrivateKey);
+		return false;
+	}
+
+	/*
 	if (::SHA256(pBuffer, keySize, pSharedSecret->Data) == nullptr)
 	{
 		delete[] pSharedSecret->Data;
@@ -744,6 +759,7 @@ bool ComputeSecret(
 		EC_KEY_free(pEcPrivateKey);
 		return false;
 	}
+	*/
 
 	delete[] pBuffer;
 	EC_POINT_free(p1);
@@ -914,7 +930,7 @@ namespace EccOpenSsl {
 		}
 	}
 
-	array<unsigned char>^ EccTester::Decode(String^ requestPath, String^ responsePath)
+	void EccTester::Decode(String^ requestPath, String^ responsePath, array<unsigned char>^% clientSecret, array<unsigned char>^% serverSecret)
 	{
 		auto bytes = File::ReadAllBytes(requestPath);
 
@@ -924,7 +940,8 @@ namespace EccOpenSsl {
 		OpcUa_ByteString clientEphemeralPublicKey = { 0, 0 };
 		OpcUa_ByteString clientNonce = { 0, 0 };
 		OpcUa_ByteString response = { 0, 0 };
-		OpcUa_ByteString sharedSecret = { 0, 0 };
+		OpcUa_ByteString localClientSecret = { 0, 0 };
+		OpcUa_ByteString localServerSecret = { 0, 0 };
 		OpcUa_ByteString serverNonce = { 0, 0 };
 		OpcUa_ByteString derivedKeys = { 0, 0 };
 
@@ -942,28 +959,41 @@ namespace EccOpenSsl {
 				throw gcnew ArgumentException("generateKeys");
 			}
 
-			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &sharedSecret))
-			{
-				throw gcnew ArgumentException("computeSecret");
-			}
-
-			if (!CreateNonce(m_p->EphemeralPublicKey.Length/2, &serverNonce))
+			if (!CreateNonce(m_p->EphemeralPublicKey.Length / 2, &serverNonce))
 			{
 				throw gcnew ArgumentException("createNonce");
 			}
 
-			if (!DeriveKeys(&sharedSecret, &serverNonce, 80, &derivedKeys))
+			//PrintHexString("SSL: ClientNonce: ", clientNonce);
+
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &clientNonce, &localClientSecret))
+			{
+				throw gcnew ArgumentException("computeSecret");
+			}
+
+			//PrintHexString("SSL: ClientSecret: ", localClientSecret);
+			//PrintHexString("SSL: ServerNonce: ", serverNonce);
+
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &serverNonce, &localServerSecret))
+			{
+				throw gcnew ArgumentException("computeSecret");
+			}
+
+			//PrintHexString("SSL: ServerSecret: ", localServerSecret);
+
+			if (!DeriveKeys(&localServerSecret, &localClientSecret, 80, &derivedKeys))
 			{
 				throw gcnew ArgumentException("deriveKeys");
 			}
 
+			Console::WriteLine("==== SSL Derived Keys ====");
 			PrintHexString("SSL: ServerSigningKey: ", derivedKeys, 0, 32);
 			PrintHexString("SSL: ServerEncryptingKey: ", derivedKeys, 32, 32);
 			PrintHexString("SSL: ServerInitializationVector: ", derivedKeys, 64, 16);
 
 			delete [] derivedKeys.Data;
 
-			if (!DeriveKeys(&sharedSecret, &clientNonce, 80, &derivedKeys))
+			if (!DeriveKeys(&localClientSecret, &localServerSecret, 80, &derivedKeys))
 			{
 				throw gcnew ArgumentException("deriveKeys");
 			}
@@ -981,9 +1011,11 @@ namespace EccOpenSsl {
 			Marshal::Copy((IntPtr)response.Data, bytes, 0, bytes->Length);
 			File::WriteAllBytes(responsePath, bytes);
 
-			bytes = gcnew array<unsigned char>(sharedSecret.Length);
-			Marshal::Copy((IntPtr)sharedSecret.Data, bytes, 0, bytes->Length);
-			return bytes;
+			clientSecret = gcnew array<unsigned char>(localClientSecret.Length);
+			Marshal::Copy((IntPtr)localClientSecret.Data, clientSecret, 0, clientSecret->Length);
+
+			serverSecret = gcnew array<unsigned char>(localServerSecret.Length);
+			Marshal::Copy((IntPtr)localServerSecret.Data, serverSecret, 0, serverSecret->Length);
 		}
 		finally
 		{
@@ -991,7 +1023,8 @@ namespace EccOpenSsl {
 			delete[] clientCertificate.Data;
 			delete[] clientEphemeralPublicKey.Data;
 			delete[] clientNonce.Data;
-			delete[] sharedSecret.Data;
+			delete[] localClientSecret.Data;
+			delete[] localServerSecret.Data;
 			delete[] serverNonce.Data;
 		}
 	}

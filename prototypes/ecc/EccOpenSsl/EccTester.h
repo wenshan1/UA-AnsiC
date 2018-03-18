@@ -18,7 +18,7 @@ namespace EccOpenSsl {
 		void Cleanup();
 
 		void Encode(String^ certificateFilePath, String^ privateKeyFilePath, String^ password);
-		array<unsigned char>^ Decode(String^ requestPath, String^ responsePath);
+		void Decode(String^ requestPath, String^ responsePath, array<unsigned char>^% clientSecret, array<unsigned char>^% serverSecret);
 		void SetLocalCertificate(String^ certificateFilePath, String^ privateKeyFilePath, String^ password);
 	};
 }
