@@ -15,6 +15,9 @@ using namespace System::Security::Cryptography;
 using namespace System::Security::Cryptography::X509Certificates;
 using namespace System::Runtime::InteropServices;
 
+// #define EC_CURVE_NAME SN_X9_62_prime256v1
+#define EC_CURVE_NAME SN_brainpoolP256r1
+
 struct _OpcUa_ByteString
 {
 	unsigned int Length;
@@ -496,10 +499,8 @@ bool GenerateKeys(
 
 	int curveId = 0;
 
-	if (strcmp(SN_X9_62_prime256v1, curveName) == 0)
-	{
-		curveId = NID_X9_62_prime256v1;
-	}
+	if (strcmp(SN_X9_62_prime256v1, curveName) == 0) { curveId = NID_X9_62_prime256v1; }
+	if (strcmp(SN_brainpoolP256r1, curveName) == 0) { curveId = NID_brainpoolP256r1; }
 
 	auto pEcKey = EC_KEY_new_by_curve_name(curveId);
 
@@ -726,19 +727,26 @@ bool ComputeSecret(
 		return false;
 	}
 
-	auto pBuffer = new unsigned char[keySize*2];
-	memset(pBuffer, 0, keySize);
-	bn2bin_pad(x, pBuffer, keySize);
+	auto pHmacKey = new unsigned char[keySize*2];
+	memset(pHmacKey, 0, keySize);
+	bn2bin_pad(x, pHmacKey, keySize);
+
+	unsigned int hmacSeedSize = keySize + pSeed->Length;
+	auto pHmacSeed = new unsigned char[hmacSeedSize];
+	memset(pHmacSeed, 0, hmacSeedSize);
+	memcpy(pHmacSeed, pSeed->Data, pSeed->Length);
+	memcpy(pHmacSeed + pSeed->Length, pHmacKey, keySize);
 	    
 	pSharedSecret->Length = SHA256_DIGEST_LENGTH;
 	pSharedSecret->Data = new unsigned char[SHA256_DIGEST_LENGTH];
 
-	if (::HMAC(EVP_sha256(), pSeed->Data, pSeed->Length, pBuffer, keySize, pSharedSecret->Data, nullptr) == nullptr)
+	if (::HMAC(EVP_sha256(), pHmacKey, keySize, pHmacSeed, hmacSeedSize, pSharedSecret->Data, nullptr) == nullptr)
 	{
 		delete[] pSharedSecret->Data;
 		pSharedSecret->Data = nullptr;
 		pSharedSecret->Length = 0;
-		delete[] pBuffer;
+		delete[] pHmacKey;
+		delete[] pHmacSeed;
 		EC_POINT_free(p1);
 		EC_POINT_free(p2);
 		BN_CTX_free(pCtx);
@@ -761,7 +769,8 @@ bool ComputeSecret(
 	}
 	*/
 
-	delete[] pBuffer;
+	delete[] pHmacKey;
+	delete[] pHmacSeed;
 	EC_POINT_free(p1);
 	EC_POINT_free(p2);
 	BN_CTX_free(pCtx);
@@ -954,7 +963,7 @@ namespace EccOpenSsl {
 				throw gcnew ArgumentException("messagePath");
 			}
 
-			if (!GenerateKeys(SN_X9_62_prime256v1, &m_p->EphemeralPublicKey, &m_p->EphemeralPrivateKey))
+			if (!GenerateKeys(EC_CURVE_NAME, &m_p->EphemeralPublicKey, &m_p->EphemeralPrivateKey))
 			{
 				throw gcnew ArgumentException("generateKeys");
 			}
@@ -964,22 +973,31 @@ namespace EccOpenSsl {
 				throw gcnew ArgumentException("createNonce");
 			}
 
-			//PrintHexString("SSL: ClientNonce: ", clientNonce);
 
-			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &clientNonce, &localClientSecret))
+			OpcUa_ByteString nonce;
+			static const char* client = "client";
+			nonce.Data = (unsigned char*)client;
+			nonce.Length = 6;
+			PrintHexString("SSL: ClientNonce: ", nonce);
+
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &nonce, &localClientSecret))
 			{
 				throw gcnew ArgumentException("computeSecret");
 			}
 
-			//PrintHexString("SSL: ClientSecret: ", localClientSecret);
-			//PrintHexString("SSL: ServerNonce: ", serverNonce);
+			PrintHexString("SSL: ClientSecret: ", localClientSecret);
 
-			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &serverNonce, &localServerSecret))
+			static const char* server = "server";
+			nonce.Data = (unsigned char*)server;
+			nonce.Length = 6;
+			PrintHexString("SSL: ServerNonce: ", nonce);
+
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &nonce, &localServerSecret))
 			{
 				throw gcnew ArgumentException("computeSecret");
 			}
 
-			//PrintHexString("SSL: ServerSecret: ", localServerSecret);
+			PrintHexString("SSL: ServerSecret: ", localServerSecret);
 
 			if (!DeriveKeys(&localServerSecret, &localClientSecret, 80, &derivedKeys))
 			{

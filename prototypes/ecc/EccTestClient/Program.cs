@@ -1,4 +1,7 @@
-﻿using System;
+﻿// #define nistP256
+#define brainpoolP256r1
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,22 +17,195 @@ namespace EccTestClient
 {
     class Program
     {
+        #if nistP256
+        static ECCurve CurveToUse = ECCurve.NamedCurves.nistP256;
+        static string ClientCertificate = "Charlie";
+        static string ServerCertificate = "Diana";
+        # elif brainpoolP256r1
+        static ECCurve CurveToUse = ECCurve.NamedCurves.brainpoolP256r1;
+        static string ClientCertificate = "Cindy";
+        static string ServerCertificate = "Derek";
+        #endif
+
+        static BigInteger ToBigIntegerFromHex(string text)
+        {
+            if (text == null || text.Length == 0)
+            {
+                return new BigInteger();
+            }
+
+            return BigInteger.Parse(text, System.Globalization.NumberStyles.HexNumber | System.Globalization.NumberStyles.AllowHexSpecifier);
+
+            /*
+            byte[] bytes = new byte[text.Length / 2];
+
+            for (int ii = text.Length - 2; ii >= 0; ii -= 2)
+            {
+                bytes[(text.Length - 1 - ii)/2] = Convert.ToByte(text.Substring(ii, 2), 16); 
+            }
+
+            return new BigInteger(bytes);
+            */
+        }
+
+        static BigInteger ToBigIntegerFromDecimal(string text)
+        {
+            if (text == null || text.Length == 0)
+            {
+                return new BigInteger();
+            }
+
+            var value = new BigInteger();
+
+            for (int ii = 0; ii < text.Length; ii++)
+            {
+                value *= 10;
+                value += Convert.ToByte(text[ii]);
+            }
+
+            return value;
+        }
+
+        static BigInteger ToBigIntegerFromNumber(byte[] number, int offset = 0, int length = -1)
+        {
+            if (number == null || number.Length == 0)
+            {
+                return new BigInteger();
+            }
+
+            if (length == -1)
+            {
+                length = number.Length;
+            }
+
+            StringBuilder text = new StringBuilder();
+
+            for (int ii = 0; ii < length; ii++)
+            {
+                text.AppendFormat("{0:X2}", number[offset + ii]);
+            }
+
+            return BigInteger.Parse(text.ToString(), System.Globalization.NumberStyles.HexNumber | System.Globalization.NumberStyles.AllowHexSpecifier);
+        }
+
+        private static ECDsa GetManualECDsaPublicKey(X509Certificate2 cert)
+        {
+            if (cert.GetKeyAlgorithm() != "1.2.840.10045.2.1")
+            {
+                return null;
+            }
+
+            const X509KeyUsageFlags SufficientFlags =
+                X509KeyUsageFlags.KeyAgreement |
+                X509KeyUsageFlags.DigitalSignature |
+                X509KeyUsageFlags.NonRepudiation |
+                X509KeyUsageFlags.CrlSign |
+                X509KeyUsageFlags.KeyCertSign;
+
+            foreach (X509Extension extension in cert.Extensions)
+            {
+                if (extension.Oid.Value == "2.5.29.15")
+                {
+                    X509KeyUsageExtension kuExt = (X509KeyUsageExtension)extension;
+
+                    if ((kuExt.KeyUsages & SufficientFlags) == 0)
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            PublicKey encodedPublicKey = cert.PublicKey;
+            string keyParameters = BitConverter.ToString(encodedPublicKey.EncodedParameters.RawData);
+            byte[] keyValue = encodedPublicKey.EncodedKeyValue.RawData;
+
+            ECParameters ecParameters = default(ECParameters);
+
+            if (keyValue[0] != 0x04)
+            {
+                throw new InvalidOperationException("Only uncompressed points are supported");
+            }
+
+            byte[] x = new byte[(keyValue.Length - 1) / 2];
+            byte[] y = new byte[x.Length];
+
+            Buffer.BlockCopy(keyValue, 1, x, 0, x.Length);
+            Buffer.BlockCopy(keyValue, 1 + x.Length, y, 0, y.Length);
+
+            ecParameters.Q.X = x;
+            ecParameters.Q.Y = y;
+
+            // New values can be determined by running the dotted-decimal OID value
+            // through BitConverter.ToString(CryptoConfig.EncodeOID(dottedDecimal));
+
+            switch (keyParameters)
+            {
+                case "06-08-2A-86-48-CE-3D-03-01-07":
+                    ecParameters.Curve = ECCurve.NamedCurves.nistP256;
+                    break;
+                case "06-09-2B-24-03-03-02-08-01-01-07":
+                    ecParameters.Curve = ECCurve.NamedCurves.brainpoolP256r1;
+                    break;
+                default:
+                    throw new NotImplementedException(keyParameters);
+            }
+
+            return ECDsa.Create(ecParameters);
+        }
+
+        static void CalculateY_NistP256()
+        {
+            try
+            {
+                var key = ECDiffieHellmanCng.Create(ECCurve.NamedCurves.nistP256);
+
+                BigInteger a = ToBigIntegerFromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC");
+                BigInteger m = ToBigIntegerFromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF");
+                BigInteger b = ToBigIntegerFromHex("5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B");
+
+                var xy = key.PublicKey.ToByteArray();
+                BigInteger x = ToBigIntegerFromNumber(xy, 8, 32);
+                BigInteger y1 = ToBigIntegerFromNumber(xy, 40, 32);
+
+                // y2 = (pow(x, 3, m) + a * x + b) % m
+                var r1 = BigInteger.ModPow(x, 3, m);
+                var r2 = BigInteger.Multiply(a, x);
+                var r3 = r1 + r2 + b;
+                var r4 = r3 % m;
+
+                // y = pow(y2, (m + 1) / 4, m)
+                var r5 = BigInteger.Divide(m + 1, 4);
+                var y2 = BigInteger.ModPow(r4, r5, m);
+
+                if (!AreEqual(y1.ToByteArray(), y2.ToByteArray()))
+                {
+                    Console.WriteLine("CalculateY Failed");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("CalculateY Failed. " + e.Message);
+            }
+        }
+
         static void Main(string[] args)
         {
             EccOpenSsl.EccTester tester = new EccOpenSsl.EccTester();
             tester.Initialize();
 
-            // certs are generated with openssl and use the NIST p256 curve.
-            string senderCertificateFilePath = Path.Combine("..\\..\\..\\..\\pki\\certs\\", "Charlie.der");
-            string senderKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", "Charlie.pem");
+            CalculateY_NistP256();
 
-            string receiverCertificateFilePath = Path.Combine("..\\..\\..\\..\\pki\\certs\\", "Diana.der");
-            string receiverKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", "Diana.pem");
+            // certs are generated with openssl and use the NIST p256 curve.
+            string senderCertificateFilePath = Path.Combine("..\\..\\..\\..\\pki\\certs\\", ClientCertificate + ".der");
+            string senderKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", ClientCertificate + ".pem");
+
+            string receiverCertificateFilePath = Path.Combine("..\\..\\..\\..\\pki\\certs\\", ServerCertificate + ".der");
+            string receiverKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", ServerCertificate + ".pem");
 
             // set the certificate used by the openssl side.
             tester.SetLocalCertificate(receiverCertificateFilePath, receiverKeyFilePath, null);
 
-            senderKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", "Charlie.pfx");
+            senderKeyFilePath = Path.Combine("..\\..\\..\\..\\pki\\private\\", ClientCertificate + ".pfx");
             X509Certificate2 sender = new X509Certificate2(senderKeyFilePath, "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.UserKeySet);
 
             // create a 'open secure channel request' that includes an ephermal key generated in .NET.
@@ -48,24 +224,27 @@ namespace EccTestClient
             // The shared key is created by .NET (private) * .OpenSSL (public).
             // sharedKey1 and sharedKey2 are supposed to be the same - they aren't.
             byte[] serverNonce = null;
-            ECDiffieHellmanPublicKey serverEmpheralKey = ProcessOpenSecureChannelResponse(clientEmpheralKey, "response.uabinary", out serverNonce);
+            ECDiffieHellman serverEmpheralKey = ProcessOpenSecureChannelResponse(sender, clientEmpheralKey, "response.uabinary", out serverNonce);
 
             clientEmpheralKey.Seed = null;
             clientEmpheralKey.SecretAppend = null;
             clientEmpheralKey.SecretPrepend = null;
 
-            //Console.WriteLine("NET: ClientNonce: {0}", FormatHexString(clientNonce));
-            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey, HashAlgorithmName.SHA256, clientNonce);
-            //Console.WriteLine("NET: ClientSecret: {0}", FormatHexString(clientSecret2));
+            var nonce = new UTF8Encoding().GetBytes("client");
+            Console.WriteLine("NET: ClientNonce: {0}", FormatHexString(nonce));
+            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, null, nonce, null);
+            Console.WriteLine("NET: ClientSecret: {0}", FormatHexString(clientSecret2));
 
             if (!AreEqual(clientSecret1, clientSecret2))
             {
                 Console.WriteLine("CLIENT KEYS DO NOT MATCH!");
             }
 
-            //Console.WriteLine("NET: ServerNonce: {0}", FormatHexString(serverNonce));
-            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey, HashAlgorithmName.SHA256, serverNonce);
-            //Console.WriteLine("NET: ServerSecret: {0}", FormatHexString(serverSecret2));
+            nonce = new UTF8Encoding().GetBytes("server");
+            Console.WriteLine("NET: ServerNonce: {0}", FormatHexString(nonce));
+
+            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, null, nonce, null);
+            Console.WriteLine("NET: ServerSecret: {0}", FormatHexString(serverSecret2));
 
             if (!AreEqual(serverSecret1, serverSecret2))
             {
@@ -176,7 +355,7 @@ namespace EccTestClient
                 ostrm.Write(signature, 0, signature.Length);
                 ostrm.Close();
 
-                using (ECDsa ecdsa = publicKey.GetECDsaPublicKey())
+                using (ECDsa ecdsa = GetManualECDsaPublicKey(publicKey))
                 {
                     if (!ecdsa.VerifyData(buffer, 0, length - signature.Length, signature, HashAlgorithmName.SHA256))
                     {
@@ -188,7 +367,7 @@ namespace EccTestClient
             }
         }
 
-        static ECDiffieHellmanPublicKey Decode(byte[] data, out byte[] senderNonce)
+        static ECDiffieHellman Decode(ECCurve curve, byte[] data, out byte[] senderNonce)
         {
             var length = BitConverter.ToInt32(data, 0);
 
@@ -197,8 +376,9 @@ namespace EccTestClient
             Buffer.BlockCopy(data, 8, signingCertificate, 0, signingCertificateLength);
 
             var publicKey = new X509Certificate2(signingCertificate);
+            ECParameters parameters;
 
-            using (ECDsa ecdsa = publicKey.GetECDsaPublicKey())
+            using (ECDsa ecdsa = GetManualECDsaPublicKey(publicKey))
             {
                 var signature = new byte[ecdsa.KeySize / 4];
                 Buffer.BlockCopy(data, length - signature.Length, signature, 0, signature.Length);
@@ -212,6 +392,8 @@ namespace EccTestClient
                 {
                     throw new Exception("Received signature not valid.");
                 }
+
+                parameters = ecdsa.ExportParameters(false);
             }
 
             int start = 8 + signingCertificateLength;
@@ -224,16 +406,18 @@ namespace EccTestClient
 
             using (var ostrm = new System.IO.MemoryStream())
             {
-                ostrm.WriteByte(0x45);
-                ostrm.WriteByte(0x43);
-                ostrm.WriteByte(0x4B);
-                ostrm.WriteByte(0x31);
-                ostrm.Write(BitConverter.GetBytes(keyLength / 2), 0, 4);
-                ostrm.Write(data, start, keyLength);
-                ostrm.Close();
+                byte[] qx = new byte[keyLength/2];
+                byte[] qy = new byte[keyLength / 2];
+                Buffer.BlockCopy(data, start, qx, 0, keyLength / 2);
+                Buffer.BlockCopy(data, start + keyLength / 2, qy, 0, keyLength / 2);
 
-                var ephemeralKey = ostrm.ToArray();
-                return ECDiffieHellmanCngPublicKey.FromByteArray(ephemeralKey, CngKeyBlobFormat.EccPublicBlob);
+                var ecdhParameters = new ECParameters
+                {
+                    Curve = parameters.Curve,
+                    Q = { X = qx, Y = qy }
+                };
+
+                return ECDiffieHellman.Create(ecdhParameters);
             }
         }
 
@@ -272,10 +456,11 @@ namespace EccTestClient
             X509Certificate2 senderPublicKey = new X509Certificate2(sender.RawData);
             var senderPrivateKey = sender.GetECDsaPrivateKey() as ECDsaCng;
 
-            senderECDH = (ECDiffieHellmanCng)ECDiffieHellmanCng.Create(ECCurve.NamedCurves.nistP256);
+            var parameters = sender.GetECDsaPrivateKey().ExportParameters(false);
+            senderECDH = (ECDiffieHellmanCng)ECDiffieHellmanCng.Create(parameters.Curve);
             senderECDH.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hmac;
             senderECDH.HashAlgorithm = CngAlgorithm.Sha256;
-
+            
             senderNonce = new byte[senderECDH.KeySize / 8];
             new RNGCryptoServiceProvider().GetBytes(senderNonce);
             senderECDH.Seed = senderNonce;
@@ -289,13 +474,14 @@ namespace EccTestClient
         {
             var request = System.IO.File.ReadAllBytes(requestFilePath);
 
+            var parameters = receiver.GetECDsaPublicKey().ExportParameters(false);
             byte[] senderNonce = null;
-            var senderKeyData = Decode(request, out senderNonce);
+            var senderKeyData = Decode(parameters.Curve, request, out senderNonce);
 
             X509Certificate2 receiverPublicKey = new X509Certificate2(receiver.RawData);
             var receiverPrivateKey = receiver.GetECDsaPrivateKey() as ECDsaCng;
 
-            ECDiffieHellmanCng receiverECDH = new ECDiffieHellmanCng(ECCurve.NamedCurves.nistP256);
+            ECDiffieHellmanCng receiverECDH = new ECDiffieHellmanCng(parameters.Curve);
             receiverECDH.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hmac;
             receiverECDH.HashAlgorithm = CngAlgorithm.Sha256;
 
@@ -303,17 +489,18 @@ namespace EccTestClient
             new RNGCryptoServiceProvider().GetBytes(receiverNonce);
             receiverECDH.Seed = receiverNonce;
 
-            byte[] receiverSecret = receiverECDH.DeriveKeyFromHmac(senderKeyData, HashAlgorithmName.SHA256, receiverNonce);
+            byte[] receiverSecret = receiverECDH.DeriveKeyFromHmac(senderKeyData.PublicKey, HashAlgorithmName.SHA256, receiverNonce);
 
             var response = Encode(receiverPublicKey, receiverPrivateKey, receiverECDH, receiverNonce);
             System.IO.File.WriteAllBytes(responseFilePath, response);
             return response;
         }
 
-        static ECDiffieHellmanPublicKey ProcessOpenSecureChannelResponse(ECDiffieHellmanCng senderECDH, string responseFilePath, out byte[] serverNonce)
+        static ECDiffieHellman ProcessOpenSecureChannelResponse(X509Certificate2 receiver, ECDiffieHellmanCng senderECDH, string responseFilePath, out byte[] serverNonce)
         {
             var response = System.IO.File.ReadAllBytes(responseFilePath);;
-            return Decode(response, out serverNonce);
+            var parameters = receiver.GetECDsaPrivateKey().ExportParameters(false);
+            return Decode(parameters.Curve, response, out serverNonce);
         }
     }
 }
