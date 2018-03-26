@@ -1203,9 +1203,15 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair(
             uStatus = OpcUa_P_OpenSSL_RSA_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
             break;
 
-        case OpcUa_Crypto_Ec_Id:
-            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, a_bits, a_pPublicKey, a_pPrivateKey);
+        case OpcUa_P_prime256v1_Id:
+            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_X9_62_prime256v1, a_pPublicKey, a_pPrivateKey);
             break;
+
+#if OPENSSL_VERSION_NUMBER >= 0x1000200fL
+        case OpcUa_P_brainpoolP256r1_Id:
+            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_brainpoolP256r1, a_pPublicKey, a_pPrivateKey);
+            break;
+#endif
 
         default:
             uStatus = OpcUa_BadInvalidArgument;

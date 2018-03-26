@@ -1215,7 +1215,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_512_Generate(
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_EC_GenerateKeys(
     OpcUa_CryptoProvider*   pProvider,
-    OpcUa_UInt32            bits,
+    OpcUa_UInt32            curve,
     OpcUa_Key*              pPublicKey,
     OpcUa_Key*              pPrivateKey);
 

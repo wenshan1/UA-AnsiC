@@ -1014,7 +1014,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "BeginOpenSecureChannel");
             uStatus = pSecureConnection->pSecureChannel->pCurrentCryptoProvider->GenerateAsymmetricKeypair(
                 pSecureConnection->pSecureChannel->pCurrentCryptoProvider,
                 pSecureConnection->pSecureChannel->pCurrentCryptoProvider->EphemeralDhEncryptionKeyType,
-                pSecureConnection->pSecureChannel->pCurrentCryptoProvider->SymmetricKeyLength * 8,
+                0,
                 &pubKey,
                 &pOpenSecureChannelContext->privKey);
             OpcUa_GotoErrorIfBad(uStatus);

@@ -47,6 +47,7 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_SecurityPolicy_Aes128Sha256RsaOaep    "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep"
 #define OpcUa_SecurityPolicy_Aes256Sha256RsaPss     "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_RsaPss"
 #define OpcUa_SecurityPolicy_Aes256Sha256EccP256    "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_EccP256"
+#define OpcUa_SecurityPolicy_Aes256Sha256EccBP256r1 "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_EccBP256r1"
 
 /* Signature Algorithm Uris */
 #define OpcUa_AlgorithmUri_Signature_RsaSha1        "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
@@ -110,6 +111,13 @@ OPCUA_BEGIN_EXTERN_C
 
 #define OpcUa_P_PSHA256_Name                        "P-SHA256"
 #define OpcUa_P_PSHA256_Id                          13
+
+/* Elliptic Curves */
+#define OpcUa_P_prime256v1_Name                     "prime256v1"
+#define OpcUa_P_prime256v1_Id                       14
+
+#define OpcUa_P_brainpoolP256r1_Name                "brainpoolP256r1"
+#define OpcUa_P_brainpoolP256r1_Id                  15
 
 OPCUA_END_EXTERN_C
 

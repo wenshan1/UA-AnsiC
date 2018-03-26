@@ -2288,7 +2288,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
                 uStatus = pCryptoProvider->GenerateAsymmetricKeypair(
                     pCryptoProvider,
                     pCryptoProvider->EphemeralDhEncryptionKeyType,
-                    pCryptoProvider->SymmetricKeyLength * 8,
+                    0,
                     &pubKey,
                     &privKey);
                 OpcUa_GotoErrorIfBad(uStatus);

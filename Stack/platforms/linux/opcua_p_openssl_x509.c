@@ -191,29 +191,43 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_X509_SelfSigned_Custom_Create(
     OpcUa_ReturnErrorIfArgumentNull(a_pIssuerPrivateKey.Key.Data);
     OpcUa_ReturnErrorIfArgumentNull(a_pCertificate);
 
-    if(a_pSubjectPublicKey.Type != OpcUa_Crypto_KeyType_Rsa_Public)
+    if(a_pSubjectPublicKey.Type == OpcUa_Crypto_KeyType_Rsa_Public && a_pIssuerPrivateKey.Type == OpcUa_Crypto_KeyType_Rsa_Private)
+    {
+        pSubjectPublicKey = d2i_PublicKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pSubjectPublicKey.Key.Data)),a_pSubjectPublicKey.Key.Length);
+        if(pSubjectPublicKey == OpcUa_Null)
+        {
+            uStatus =  OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+
+        pIssuerPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pIssuerPrivateKey.Key.Data)),a_pIssuerPrivateKey.Key.Length);
+        if(pIssuerPrivateKey == OpcUa_Null)
+        {
+            uStatus =  OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+    }
+#ifndef OPENSSL_NO_EC
+    else if(a_pSubjectPublicKey.Type == OpcUa_Crypto_KeyType_Ec_Public && a_pIssuerPrivateKey.Type == OpcUa_Crypto_KeyType_Ec_Private)
+    {
+        pSubjectPublicKey = d2i_PublicKey(EVP_PKEY_EC,OpcUa_Null,((const unsigned char**)&(a_pSubjectPublicKey.Key.Data)),a_pSubjectPublicKey.Key.Length);
+        if(pSubjectPublicKey == OpcUa_Null)
+        {
+            uStatus =  OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+
+        pIssuerPrivateKey = d2i_PrivateKey(EVP_PKEY_EC,OpcUa_Null,((const unsigned char**)&(a_pIssuerPrivateKey.Key.Data)),a_pIssuerPrivateKey.Key.Length);
+        if(pIssuerPrivateKey == OpcUa_Null)
+        {
+            uStatus =  OpcUa_Bad;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+    }
+#endif
+    else
     {
         uStatus =  OpcUa_BadInvalidArgument;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    if(a_pIssuerPrivateKey.Type != OpcUa_Crypto_KeyType_Rsa_Private)
-    {
-        uStatus =  OpcUa_BadInvalidArgument;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    pSubjectPublicKey = d2i_PublicKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pSubjectPublicKey.Key.Data)),a_pSubjectPublicKey.Key.Length);
-    if(pSubjectPublicKey == OpcUa_Null)
-    {
-        uStatus =  OpcUa_Bad;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    pIssuerPrivateKey = d2i_PrivateKey(EVP_PKEY_RSA,OpcUa_Null,((const unsigned char**)&(a_pIssuerPrivateKey.Key.Data)),a_pIssuerPrivateKey.Key.Length);
-    if(pIssuerPrivateKey == OpcUa_Null)
-    {
-        uStatus =  OpcUa_Bad;
         OpcUa_GotoErrorIfBad(uStatus);
     }
 

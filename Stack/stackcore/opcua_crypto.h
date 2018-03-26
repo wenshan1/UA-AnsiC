@@ -21,8 +21,6 @@ OPCUA_BEGIN_EXTERN_C
 
 #define OpcUa_Crypto_Rsa_Name                       "RSA"
 #define OpcUa_Crypto_Rsa_Id                         19
-#define OpcUa_Crypto_Ec_Name                        "id-ecPublicKey"
-#define OpcUa_Crypto_Ec_Id                          408
 
 /* @brief Key Types; If Handle, Data points to an opaque key handle and Length must be interpreted as boolean. */
 #define OpcUa_Crypto_KeyType_Invalid                0
