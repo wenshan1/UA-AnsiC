@@ -193,9 +193,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricEncryptionBlockS
             *a_pPlainTextBlockSize = *a_pCipherTextBlockSize = 1;
             break;
         }
-        case OpcUa_P_RSA_PKCS1_V15_Id:
-        case OpcUa_P_RSA_OAEP_Id:
-        case OpcUa_P_RSA_OAEP_SHA256_Id:
+        default:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);
@@ -207,11 +205,6 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricEncryptionBlockS
 
             *a_pPlainTextBlockSize = uSizeInBits/8 - a_pProvider->AsymmetricEncryptionOverhead;
             *a_pCipherTextBlockSize = uSizeInBits/8;
-            break;
-        }
-        default:
-        {
-            uStatus = OpcUa_BadNotSupported;
             break;
         }
     }
@@ -248,20 +241,12 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetAsymmetricSignatureSize");
             *a_pSignatureSize = 0;
             break;
         }
-        case OpcUa_P_RSA_PKCS1_V15_SHA1_Id:
-        case OpcUa_P_RSA_PKCS1_V15_SHA256_Id:
-        case OpcUa_P_RSA_PSS_SHA256_Id:
-        case OpcUa_P_ECDSA_SHA256_Id:
+        default:
         {
             uStatus = OpcUa_Crypto_GetAsymmetricKeyLength(a_pProvider, *a_pPublicKey, &uSizeInBits);
             OpcUa_GotoErrorIfBad(uStatus);
 
             *a_pSignatureSize = uSizeInBits/8;
-            break;
-        }
-        default:
-        {
-            uStatus = OpcUa_BadNotSupported;
             break;
         }
     }
@@ -295,20 +280,9 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "GetSymmetricSignatureSize");
             *a_pSignatureSize = 0;
             break;
         }
-        case OpcUa_P_HMAC_SHA1_Id:
-        {
-            *a_pSignatureSize = 20;
-            break;
-        }
-
-        case OpcUa_P_HMAC_SHA256_Id:
-        {
-            *a_pSignatureSize = 32;
-            break;
-        }
         default:
         {
-            uStatus = OpcUa_BadNotSupported;
+            *a_pSignatureSize = a_pProvider->SignatureDataLength;
             break;
         }
     }

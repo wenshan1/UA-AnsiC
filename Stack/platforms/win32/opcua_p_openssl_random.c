@@ -142,6 +142,55 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA256_Hash_Generate(
     OpcUa_P_OpenSSL_PSHA256_Ctx* pPsha256Context,
     OpcUa_Byte*              pHash);
 
+/* offset macros */
+#define OpcUa_P_OpenSSL_PSHA384_SEED(ctx)   ((ctx)->A+48)
+#define OpcUa_P_OpenSSL_PSHA384_SECRET(ctx) ((ctx)->A+48+(ctx)->seed_len)
+
+/** P_SHA384 Context */
+struct OpcUa_P_OpenSSL_PSHA384_Ctx_
+{
+    OpcUa_Int secret_len;
+    OpcUa_Int seed_len;
+    OpcUa_Byte A[48]; /* 48 bytes of SHA384 output */
+    /* pseudo elements:
+     * char seed[seed_len];
+     * char secret[secret_len];
+     */
+};
+
+typedef struct OpcUa_P_OpenSSL_PSHA384_Ctx_ OpcUa_P_OpenSSL_PSHA384_Ctx;
+
+/**
+  @brief Initializes the pseudo-random function.
+
+  -  returns a PRF context.
+
+  internal!
+
+  @param pSecret          [in]  The secret information for the PRF to create a PRF context.
+  @param secretLen        [in]  The length of the secret information for the PRF to create a PRF context.
+  @param pSeed            [in]  The seed to create the PRF context.
+  @param secretLen        [in]  The length seed to create the PRF context.
+*/
+OpcUa_P_OpenSSL_PSHA384_Ctx* OpcUa_P_OpenSSL_PSHA384_Context_Create(
+    OpcUa_Byte*         pSecret,
+    OpcUa_UInt32        secretLen,
+    OpcUa_Byte*         pSeed,
+    OpcUa_Int32         seedLen);
+
+/**
+  @brief Add bytes of random data to the destination buffer.
+
+  internal!
+
+  @param pPsha1Context     [in]  The PRF context.
+
+  @param pHash             [out] The destination buffer.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA384_Hash_Generate(
+    OpcUa_P_OpenSSL_PSHA384_Ctx* pPsha384Context,
+    OpcUa_Byte*              pHash);
+
 /*============================================================================
  * OpcUa_P_OpenSSL_SeedPRNG
  *===========================================================================*/
@@ -578,6 +627,197 @@ OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA256_Derive");
     uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
 
     OpcUa_P_OpenSSL_DestroySecretData(pCtx, sizeof(OpcUa_P_OpenSSL_PSHA256_Ctx) + a_secret.Length + a_seed.Length);
+    OpcUa_P_OpenSSL_DestroySecretData(pBuffer, bufferlength * sizeof(OpcUa_Byte));
+
+    OpcUa_P_Memory_Free(pCtx);
+    OpcUa_P_Memory_Free(pBuffer);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pCtx != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pCtx);
+    }
+
+    if(pBuffer != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pBuffer);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_PSHA384_Context_Create
+ *===========================================================================*/
+/** Implements P_SHA384 according to RFC 2246, section 5
+* using OpenSSL HMAC function.
+* P_SHA384_init creates a P_SHA384 context and initializes it with secret and seed.
+* Use OpcUa_OpcUa_P_Memory_Free to clear the context.
+* A(1) is calculated to use with OpcUa_P_OpenSSL_P_SHA384_update.
+* @see OpcUa_P_OpenSSL_P_SHA384_update
+*/
+
+/* internal function */
+OpcUa_P_OpenSSL_PSHA384_Ctx* OpcUa_P_OpenSSL_PSHA384_Context_Create(
+    OpcUa_Byte*     a_pSecret,
+    OpcUa_UInt32    a_secretLen,
+    OpcUa_Byte*     a_pSeed,
+    OpcUa_Int32     a_seedLen)
+{
+    OpcUa_P_OpenSSL_PSHA384_Ctx*  pCtx;
+    OpcUa_Int                   size;
+
+    if(a_pSecret == OpcUa_Null || a_pSeed == OpcUa_Null)
+        return OpcUa_Null;
+
+    pCtx = OpcUa_Null;
+    size = sizeof(OpcUa_P_OpenSSL_PSHA384_Ctx) + a_secretLen + a_seedLen;
+
+    pCtx = (OpcUa_P_OpenSSL_PSHA384_Ctx*) OpcUa_P_Memory_Alloc(size);
+
+    if(pCtx == OpcUa_Null)
+        return OpcUa_Null;
+
+    pCtx->secret_len = a_secretLen;
+    pCtx->seed_len = a_seedLen;
+
+    OpcUa_P_Memory_MemCpy(OpcUa_P_OpenSSL_PSHA384_SECRET(pCtx), a_secretLen, a_pSecret, a_secretLen);
+    OpcUa_P_Memory_MemCpy(OpcUa_P_OpenSSL_PSHA384_SEED(pCtx), a_seedLen, a_pSeed, a_seedLen);
+
+    /* A(0) = seed */
+    /* A(i) = HMAC_SHA384(secret, A(i-1)) */
+    /* Calculate A(1) = HMAC_SHA384(secret, seed) */
+    if(HMAC(EVP_sha384(), a_pSecret, a_secretLen, a_pSeed, a_seedLen, pCtx->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pCtx);
+        return OpcUa_Null;
+    }
+
+    return pCtx;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_PSHA384_Hash_Generate
+ *===========================================================================*/
+/** Implements P_SHA384 according to RFC 2246, section 5
+* using OpenSSL HMAC function.
+* P_SHA384_update calculates P_SHA384(n) and writes it to pDst.
+* Call this function as often as you need to get the desired size of data.
+* A(n+1) is caculated for the next run.
+* @see OpcUa_P_OpenSSL_P_SHA384_init
+*/
+
+/* internal function */
+OpcUa_StatusCode OpcUa_P_OpenSSL_PSHA384_Hash_Generate(
+    OpcUa_P_OpenSSL_PSHA384_Ctx* a_pPsha384Context,
+    OpcUa_Byte*              a_pHash)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "PSHA384_Hash_Generate");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pPsha384Context);
+    OpcUa_ReturnErrorIfArgumentNull(a_pHash);
+
+    /* Calculate P_SHA384(n) = HMAC_SHA384(secret, A(n)+seed) */
+    if(HMAC(EVP_sha384(), OpcUa_P_OpenSSL_PSHA384_SECRET(a_pPsha384Context), a_pPsha384Context->secret_len,
+                     a_pPsha384Context->A, sizeof(a_pPsha384Context->A) + a_pPsha384Context->seed_len,
+                     a_pHash, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
+
+    /* Calculate A(n) = HMAC_SHA384(secret, A(n-1)) */
+    if(HMAC(EVP_sha384(), OpcUa_P_OpenSSL_PSHA384_SECRET(a_pPsha384Context), a_pPsha384Context->secret_len,
+                     a_pPsha384Context->A, sizeof(a_pPsha384Context->A),
+                     a_pPsha384Context->A, OpcUa_Null) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_Bad);
+    }
+
+OpcUa_ReturnStatusCode;
+
+OpcUa_BeginErrorHandling;
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_Random_Key_PSHA384_Derive
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_PSHA384_Derive(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_secret, /* clientnonce | servernonce, servernonce | clientnonce */
+    OpcUa_ByteString      a_seed,
+    OpcUa_Int32           a_keyLen, /* output len */
+    OpcUa_Key*            a_pKey)
+{
+    OpcUa_P_OpenSSL_PSHA384_Ctx*pCtx            = OpcUa_Null;
+    OpcUa_Byte*                 pBuffer         = OpcUa_Null;
+
+    OpcUa_Int                   bufferlength;
+    OpcUa_Int                   i;
+    OpcUa_Int                   iterations;
+
+    OpcUa_Int32                 keyLen          = 0;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "Random_Key_PSHA384_Derive");
+
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pProvider);
+    OpcUa_ReturnErrorIfArgumentNull(a_secret.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_seed.Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_pKey);
+
+    keyLen = a_keyLen;
+
+    if(keyLen < 0)
+    {
+        if(a_pProvider->SymmetricKeyLength > 0)
+        {
+            keyLen = a_pProvider->SymmetricKeyLength;
+        }
+        else
+        {
+            uStatus = OpcUa_BadInvalidArgument;
+            OpcUa_GotoErrorIfBad(uStatus);
+        }
+    }
+    else if(keyLen > MAX_DERIVED_OUTPUT_LEN)
+    {
+        uStatus = OpcUa_BadInvalidArgument;
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    if(a_pKey->Key.Data == OpcUa_Null)
+    {
+        a_pKey->Key.Length = keyLen;
+        OpcUa_ReturnStatusCode;
+    }
+
+    a_pKey->Type = OpcUa_Crypto_KeyType_Random;
+
+    /** start creating key **/
+
+    iterations = keyLen/48 + (keyLen%48?1:0);
+    bufferlength = iterations*48;
+
+    pBuffer = (OpcUa_Byte *)OpcUa_P_Memory_Alloc(bufferlength * sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(pBuffer);
+
+    pCtx = OpcUa_P_OpenSSL_PSHA384_Context_Create(a_secret.Data, a_secret.Length, a_seed.Data, a_seed.Length);
+    OpcUa_GotoErrorIfAllocFailed(pCtx);
+
+    for(i=0; i<iterations; i++)
+    {
+        /* SHA384 produces 48 Bytes of output for every iteration */
+        uStatus = OpcUa_P_OpenSSL_PSHA384_Hash_Generate(pCtx, pBuffer + (i*48));
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    uStatus = OpcUa_P_Memory_MemCpy(a_pKey->Key.Data, a_pKey->Key.Length, pBuffer, keyLen);
+
+    OpcUa_P_OpenSSL_DestroySecretData(pCtx, sizeof(OpcUa_P_OpenSSL_PSHA384_Ctx) + a_secret.Length + a_seed.Length);
     OpcUa_P_OpenSSL_DestroySecretData(pBuffer, bufferlength * sizeof(OpcUa_Byte));
 
     OpcUa_P_Memory_Free(pCtx);

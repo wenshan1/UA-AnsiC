@@ -495,42 +495,15 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA1_Verify(
     OpcUa_ReturnErrorIfArgumentNull(a_key);
     OpcUa_ReturnErrorIfArgumentNull(a_key->Key.Data);
 
-    if(a_key->Key.Length < 1)
-    {
-        uStatus = OpcUa_BadInvalidArgument;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
     if(a_pSignature->Length != 20)
     {
         uStatus = OpcUa_BadInvalidArgument;
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    if((OpcUa_Int32)a_dataLen < 1)
-    {
-        uStatus = OpcUa_BadInvalidArgument;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
-
-    uStatus = OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
-                                                a_pProvider,
-                                                a_pData,
-                                                a_dataLen,
-                                                a_key,
-                                                &mac);
-    OpcUa_GotoErrorIfBad(uStatus);
-
-    if(mac.Length > 0)
-    {
-        mac.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(mac.Length*sizeof(OpcUa_Byte));
-        OpcUa_GotoErrorIfAllocFailed(mac.Data);
-    }
-    else
-    {
-        uStatus = OpcUa_Bad;
-        OpcUa_GotoErrorIfBad(uStatus);
-    }
+    mac.Length = 20;
+    mac.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(mac.Length*sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(mac.Data);
 
     uStatus = OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
                                                 a_pProvider,
@@ -566,7 +539,7 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_P_OpenSSL_HMAC_SHA1_Sign
+ * OpcUa_P_OpenSSL_HMAC_SHA256_Sign
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA256_Sign(
     OpcUa_CryptoProvider* a_pProvider,
@@ -611,6 +584,10 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA256_Verify(
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
+    mac.Length = 32;
+    mac.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(mac.Length*sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(mac.Data);
+
     uStatus = OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
                                                     a_pProvider,
                                                     a_pData,
@@ -619,18 +596,82 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA256_Verify(
                                                     &mac);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    if(mac.Length > 0)
+    if((OpcUa_MemCmp(mac.Data, a_pSignature->Data, mac.Length))==0)
     {
-        mac.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(mac.Length*sizeof(OpcUa_Byte));
-        OpcUa_GotoErrorIfAllocFailed(mac.Data);
+        uStatus = OpcUa_Good;
     }
     else
     {
-        uStatus = OpcUa_Bad;
+        uStatus = OpcUa_BadSignatureInvalid;
+    }
+
+    if(mac.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(mac.Data);
+    }
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(mac.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(mac.Data);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_HMAC_SHA384_Sign
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA384_Sign(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_Byte*           a_pData,
+    OpcUa_UInt32          a_dataLen,
+    OpcUa_Key*            a_key,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "HMAC_SHA384_Sign");
+
+    uStatus = OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
+                                                    a_pProvider,
+                                                    a_pData,
+                                                    a_dataLen,
+                                                    a_key,
+                                                    a_pSignature);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_HMAC_SHA384_Verify
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA384_Verify(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_Byte*           a_pData,
+    OpcUa_UInt32          a_dataLen,
+    OpcUa_Key*            a_key,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_ByteString mac = OPCUA_BYTESTRING_STATICINITIALIZER;
+
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "HMAC_SHA384_Verify");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
+
+    if(a_pSignature->Length != 48)
+    {
+        uStatus = OpcUa_BadInvalidArgument;
         OpcUa_GotoErrorIfBad(uStatus);
     }
 
-    uStatus = OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
+    mac.Length = 48;
+    mac.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(mac.Length*sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(mac.Data);
+
+    uStatus = OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
                                                     a_pProvider,
                                                     a_pData,
                                                     a_dataLen,
@@ -1018,6 +1059,93 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
+ * OpcUa_P_OpenSSL_ECDSA_SHA384_Sign
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA384_Sign(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_privateKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
+
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "ECDSA_SHA384_Sign");
+
+    messageDigest.Length = 48; /* 384 bit */
+
+    if(a_data.Data != OpcUa_Null)
+    {
+        messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
+        OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
+
+        uStatus = OpcUa_P_OpenSSL_SHA2_384_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    uStatus = OpcUa_P_OpenSSL_ECDSA_Private_Sign(
+                                                a_pProvider,
+                                                messageDigest,
+                                                a_privateKey,
+                                                a_pSignature);
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * OpcUa_P_OpenSSL_ECDSA_SHA384_Verify
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA384_Verify(
+    OpcUa_CryptoProvider* a_pProvider,
+    OpcUa_ByteString      a_data,
+    OpcUa_Key*            a_publicKey,
+    OpcUa_ByteString*     a_pSignature)
+{
+    OpcUa_ByteString messageDigest = OPCUA_BYTESTRING_STATICINITIALIZER;
+
+    OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "ECDSA_SHA384_Verify");
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pSignature);
+
+    messageDigest.Length = 48; /* 384 bit */
+    messageDigest.Data = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(messageDigest.Length*sizeof(OpcUa_Byte));
+    OpcUa_GotoErrorIfAllocFailed(messageDigest.Data);
+
+    uStatus = OpcUa_P_OpenSSL_SHA2_384_Generate(a_pProvider, a_data.Data, a_data.Length, messageDigest.Data);
+    OpcUa_GotoErrorIfBad(uStatus);
+
+    uStatus = OpcUa_P_OpenSSL_ECDSA_Public_Verify(
+                                                a_pProvider,
+                                                messageDigest,
+                                                a_publicKey,
+                                                a_pSignature);
+
+    OpcUa_P_Memory_Free(messageDigest.Data);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(messageDigest.Data != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(messageDigest.Data);
+    }
+
+OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
  * OpcUa_P_OpenSSL_DeriveChannelKeyset
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_P_OpenSSL_DeriveChannelKeyset(
@@ -1207,9 +1335,17 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_GenerateAsymmetricKeyPair(
             uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_X9_62_prime256v1, a_pPublicKey, a_pPrivateKey);
             break;
 
+        case OpcUa_P_secp384r1_Id:
+            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_secp384r1, a_pPublicKey, a_pPrivateKey);
+            break;
+
 #if OPENSSL_VERSION_NUMBER >= 0x1000200fL
         case OpcUa_P_brainpoolP256r1_Id:
             uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_brainpoolP256r1, a_pPublicKey, a_pPrivateKey);
+            break;
+
+        case OpcUa_P_brainpoolP384r1_Id:
+            uStatus = OpcUa_P_OpenSSL_EC_GenerateKeys(a_pProvider, NID_brainpoolP384r1, a_pPublicKey, a_pPrivateKey);
             break;
 #endif
 

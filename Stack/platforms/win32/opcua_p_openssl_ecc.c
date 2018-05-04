@@ -657,4 +657,162 @@ OpcUa_FinishErrorHandling;
 #endif
 }
 
+/*============================================================================
+ * OpcUa_P_Crypto_EC_Compute384bitSecretsFromNonce
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_Crypto_EC_Compute384bitSecretsFromNonce(
+    OpcUa_CryptoProvider*   a_pProvider,
+    OpcUa_ByteString*       a_pNonce,
+    OpcUa_Key*              a_privateKey,
+    OpcUa_ByteString*       a_pClientSecret,
+    OpcUa_ByteString*       a_pServerSecret)
+{
+#ifdef OPENSSL_NO_EC
+    OpcUa_ReferenceParameter(a_pProvider);
+    OpcUa_ReferenceParameter(a_pNonce);
+    OpcUa_ReferenceParameter(a_privateKey);
+    OpcUa_ReferenceParameter(a_pClientSecret);
+    OpcUa_ReferenceParameter(a_pServerSecret);
+    return OpcUa_BadNotSupported;
+#else
+    EC_KEY*                 pEcPrivateKey   = OpcUa_Null;
+    BN_CTX*                 pCtx            = OpcUa_Null;
+    EC_POINT*               p1              = OpcUa_Null;
+    EC_POINT*               p2              = OpcUa_Null;
+    OpcUa_Byte*             pSecret         = OpcUa_Null;
+    const EC_GROUP*         pEcGroup;
+    OpcUa_Int32             keySize;
+    BIGNUM*                 x;
+    BIGNUM*                 y;
+    const unsigned char*    pData;
+
+OpcUa_InitializeStatus(OpcUa_Module_P_OpenSSL, "EC_Compute384bitSecretsFromNonce");
+
+    OpcUa_ReferenceParameter(a_pProvider);
+
+    OpcUa_ReturnErrorIfArgumentNull(a_pNonce);
+    OpcUa_ReturnErrorIfArgumentNull(a_pNonce->Data);
+    OpcUa_ReturnErrorIfArgumentNull(a_privateKey);
+    OpcUa_ReturnErrorIfArgumentNull(a_pClientSecret);
+    OpcUa_ReturnErrorIfArgumentNull(a_pServerSecret);
+
+    if(a_pClientSecret->Data == OpcUa_Null || a_pServerSecret->Data == OpcUa_Null)
+    {
+        a_pClientSecret->Length = 48;
+        a_pServerSecret->Length = 48;
+        OpcUa_ReturnStatusCode;
+    }
+
+    pData = a_privateKey->Key.Data;
+    OpcUa_ReturnErrorIfArgumentNull(pData);
+    OpcUa_ReturnErrorIfTrue((a_privateKey->Type != OpcUa_Crypto_KeyType_Ec_Private), OpcUa_BadInvalidArgument);
+
+    pEcPrivateKey = d2i_ECPrivateKey(OpcUa_Null, &pData, a_privateKey->Key.Length);
+    OpcUa_GotoErrorIfTrue((pEcPrivateKey == OpcUa_Null), OpcUa_BadInvalidArgument);
+
+    pEcGroup = EC_KEY_get0_group(pEcPrivateKey);
+    keySize = EC_GROUP_get_degree(pEcGroup);
+    if(keySize == 0)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    keySize = (keySize + 7) / 8;
+    OpcUa_GotoErrorIfTrue((a_pNonce->Length != 2 * keySize), OpcUa_BadInvalidArgument);
+
+    pCtx = BN_CTX_new();
+    OpcUa_GotoErrorIfTrue((pCtx == OpcUa_Null), OpcUa_BadUnexpectedError);
+
+    x = BN_CTX_get(pCtx);
+    y = BN_CTX_get(pCtx);
+    OpcUa_GotoErrorIfTrue((y == OpcUa_Null), OpcUa_BadUnexpectedError);
+
+    x = BN_bin2bn(a_pNonce->Data, keySize, x);
+    if(x == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    y = BN_bin2bn(a_pNonce->Data + keySize, keySize, y);
+    if(y == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    p1 = EC_POINT_new(pEcGroup);
+    OpcUa_GotoErrorIfTrue((p1 == OpcUa_Null), OpcUa_BadUnexpectedError);
+
+    if(!EC_POINT_set_affine_coordinates_GFp(pEcGroup, p1, x, y, pCtx))
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    p2 = EC_POINT_new(pEcGroup);
+    OpcUa_GotoErrorIfTrue((p2 == OpcUa_Null), OpcUa_BadUnexpectedError);
+
+    if(!EC_POINT_mul(pEcGroup, p2, NULL, p1, EC_KEY_get0_private_key(pEcPrivateKey), pCtx))
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    if(!EC_POINT_get_affine_coordinates_GFp(pEcGroup, p2, x, y, pCtx))
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    pSecret = (OpcUa_Byte*)OpcUa_P_Memory_Alloc(6 + keySize);
+    OpcUa_GotoErrorIfAllocFailed(pSecret);
+
+    bn2bin_pad(x, pSecret + 6, keySize);
+    memcpy(pSecret, "client", 6);
+    if(HMAC(EVP_sha384(), pSecret + 6, keySize, pSecret, 6 + keySize, a_pClientSecret->Data, (unsigned int*)&(a_pClientSecret->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    memcpy(pSecret, "server", 6);
+    if(HMAC(EVP_sha384(), pSecret + 6, keySize, pSecret, 6 + keySize, a_pServerSecret->Data, (unsigned int*)&(a_pServerSecret->Length)) == OpcUa_Null)
+    {
+        OpcUa_GotoErrorWithStatus(OpcUa_BadUnexpectedError);
+    }
+
+    OpcUa_P_OpenSSL_DestroySecretData(pSecret, 6 + keySize);
+    OpcUa_P_Memory_Free(pSecret);
+    EC_POINT_free(p1);
+    EC_POINT_clear_free(p2);
+    BN_CTX_free(pCtx);
+    EC_KEY_free(pEcPrivateKey);
+
+OpcUa_ReturnStatusCode;
+OpcUa_BeginErrorHandling;
+
+    if(pSecret != OpcUa_Null)
+    {
+        OpcUa_P_Memory_Free(pSecret);
+    }
+
+    if(p1 != OpcUa_Null)
+    {
+        EC_POINT_free(p1);
+    }
+
+    if(p2 != OpcUa_Null)
+    {
+        EC_POINT_free(p2);
+    }
+
+    if(pCtx != OpcUa_Null)
+    {
+        BN_CTX_free(pCtx);
+    }
+
+    if(pEcPrivateKey != OpcUa_Null)
+    {
+        EC_KEY_free(pEcPrivateKey);
+    }
+
+OpcUa_FinishErrorHandling;
+#endif
+}
+
 #endif /* OPCUA_REQUIRE_OPENSSL */

@@ -46,16 +46,18 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_SecurityPolicy_Basic256Sha256         "http://opcfoundation.org/UA/SecurityPolicy#Basic256Sha256"
 #define OpcUa_SecurityPolicy_Aes128Sha256RsaOaep    "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_RsaOaep"
 #define OpcUa_SecurityPolicy_Aes256Sha256RsaPss     "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_RsaPss"
-#define OpcUa_SecurityPolicy_Aes256Sha256EccP256    "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_EccP256"
-#define OpcUa_SecurityPolicy_Aes256Sha256EccBP256r1 "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha256_EccBP256r1"
+#define OpcUa_SecurityPolicy_Aes128Sha256nistP256   "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_nistP256"
+#define OpcUa_SecurityPolicy_Aes256Sha384nistP384   "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha384_nistP384"
+#define OpcUa_SecurityPolicy_Aes128Sha256brainpoolP256r1 "http://opcfoundation.org/UA/SecurityPolicy#Aes128_Sha256_brainpoolP256r1"
+#define OpcUa_SecurityPolicy_Aes256Sha384brainpoolP384r1 "http://opcfoundation.org/UA/SecurityPolicy#Aes256_Sha384_brainpoolP384r1"
 
 /* Signature Algorithm Uris */
 #define OpcUa_AlgorithmUri_Signature_RsaSha1        "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
 #define OpcUa_AlgorithmUri_Signature_RsaSha256      "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
 #define OpcUa_AlgorithmUri_Signature_HmacSha1       "http://www.w3.org/2000/09/xmldsig#hmac-sha1"
 #define OpcUa_AlgorithmUri_Signature_HmacSha256     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256"
+#define OpcUa_AlgorithmUri_Signature_HmacSha384     "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384"
 #define OpcUa_AlgorithmUri_Signature_RsaPssSha256   "http://opcfoundation.org/UA/security/rsa-pss-sha2-256"
-#define OpcUa_AlgorithmUri_Signature_EcdsaSha256    "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha256"
 
 /* Encryption Algorithms Uris */
 #define OpcUa_AlgorithmUri_Ecryption_Aes128Cbc      "http://www.w3.org/2001/04/xmlenc#aes128-cbc"
@@ -99,11 +101,17 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_HMAC_SHA256_Name                    "HMAC-SHA256"
 #define OpcUa_P_HMAC_SHA256_Id                      9
 
+#define OpcUa_P_HMAC_SHA384_Name                    "HMAC-SHA384"
+#define OpcUa_P_HMAC_SHA384_Id                      11
+
 #define OpcUa_P_RSA_PSS_SHA256_Name                 "RSA-PSS-SHA256"
 #define OpcUa_P_RSA_PSS_SHA256_Id                   10
 
 #define OpcUa_P_ECDSA_SHA256_Name                   "ECDSA-SHA256"
-#define OpcUa_P_ECDSA_SHA256_Id                     11
+#define OpcUa_P_ECDSA_SHA256_Id                     14
+
+#define OpcUa_P_ECDSA_SHA384_Name                   "ECDSA-SHA384"
+#define OpcUa_P_ECDSA_SHA384_Id                     15
 
 /* Key Derivation Algs */
 #define OpcUa_P_PSHA1_Name                          "P-SHA1"
@@ -112,12 +120,21 @@ OPCUA_BEGIN_EXTERN_C
 #define OpcUa_P_PSHA256_Name                        "P-SHA256"
 #define OpcUa_P_PSHA256_Id                          13
 
+#define OpcUa_P_PSHA384_Name                        "P-SHA384"
+#define OpcUa_P_PSHA384_Id                          16
+
 /* Elliptic Curves */
 #define OpcUa_P_prime256v1_Name                     "prime256v1"
-#define OpcUa_P_prime256v1_Id                       14
+#define OpcUa_P_prime256v1_Id                       20
+
+#define OpcUa_P_secp384r1_Name                      "secp384r1"
+#define OpcUa_P_secp384r1_Id                        21
 
 #define OpcUa_P_brainpoolP256r1_Name                "brainpoolP256r1"
-#define OpcUa_P_brainpoolP256r1_Id                  15
+#define OpcUa_P_brainpoolP256r1_Id                  22
+
+#define OpcUa_P_brainpoolP384r1_Name                "brainpoolP384r1"
+#define OpcUa_P_brainpoolP384r1_Id                  23
 
 OPCUA_END_EXTERN_C
 

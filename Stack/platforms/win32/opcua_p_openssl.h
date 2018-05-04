@@ -345,6 +345,35 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA256_Verify(
     OpcUa_Key*            key,
     OpcUa_ByteString*     pSignature);
 
+/**
+  @param pProvider        [in]  The crypto provider handle.
+  @param pData            [in]  The data for the MAC generation.
+  @param dataLen          [in]  The length data for the MAC generation.
+  @param key              [in]  The key for the MAC generation.
+
+  @param pSignature       [out] The resulting signature (MAC).
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA384_Sign(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_Byte*           pData,
+    OpcUa_UInt32          dataLen,
+    OpcUa_Key*            key,
+    OpcUa_ByteString*     pSignature);
+
+/**
+  @param pProvider              [in]  The crypto provider handle.
+  @param pData                  [in]  The data for the MAC generation.
+  @param dataLen                [in]  The length data for the MAC generation.
+  @param key                    [in]  The key for the MAC generation.
+  @param pSignature             [in]  The resulting signature (MAC).
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA384_Verify(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_Byte*           pData,
+    OpcUa_UInt32          dataLen,
+    OpcUa_Key*            key,
+    OpcUa_ByteString*     pSignature);
+
 /**@brief Signs data using <NAME>(RSA) with the private key of the appropriate key pair.
 
   @param pProvider         [in]  The crypto provider handle.
@@ -984,6 +1013,27 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_PSHA256_Derive(
     OpcUa_Key*            pKey);
 
 /**
+  @brief Generates a session key using secret input data. Use PSHA384.
+
+    if keyLen > 0 then random data of the given length is generated.
+    if keyLen == 0 then nothing will be generated.
+    if keyLen < 0 then default setting from the CryptoProvider is used.
+
+  @param pProvider        [in]  The crypto provider handle.
+  @param secret           [in]  The secret information to create a random key. (clientnonce | servernonce, servernonce | clientnonce)
+  @param seed             [in]  The seed to create a random key. (seed)
+  @param keyLen           [in]  The desired length of the random key. (output len)
+
+  @param pKey             [out] The derived random key.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_Random_Key_PSHA384_Derive(
+    OpcUa_CryptoProvider* pProvider,
+    OpcUa_ByteString      secret,
+    OpcUa_ByteString      seed,
+    OpcUa_Int32           keyLen,
+    OpcUa_Key*            pKey);
+
+/**
   @brief Adds random data to the destination buffer..
 
     if keyLen > 0 then random data of the given length is generated.
@@ -1264,6 +1314,24 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA256_Verify(
     OpcUa_ByteString*       pSignature);
 
 /**
+  @brief Create an ECDSA SHA384 signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA384_Sign(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
+  @brief Verify an ECDSA SHA384 signature.
+*/
+OpcUa_StatusCode OpcUa_P_OpenSSL_ECDSA_SHA384_Verify(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString        data,
+    OpcUa_Key*              publicKey,
+    OpcUa_ByteString*       pSignature);
+
+/**
   @brief Compute the nonce from the public key.
 */
 OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeNonceFromPublicKey(
@@ -1275,6 +1343,16 @@ OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeNonceFromPublicKey(
   @brief Compute the secrets from the nonce.
 */
 OpcUa_StatusCode OpcUa_P_Crypto_EC_ComputeSecretsFromNonce(
+    OpcUa_CryptoProvider*   pProvider,
+    OpcUa_ByteString*       pNonce,
+    OpcUa_Key*              privateKey,
+    OpcUa_ByteString*       pClientSecret,
+    OpcUa_ByteString*       pServerSecret);
+
+/**
+  @brief Compute 384 bit secrets from the nonce.
+*/
+OpcUa_StatusCode OpcUa_P_Crypto_EC_Compute384bitSecretsFromNonce(
     OpcUa_CryptoProvider*   pProvider,
     OpcUa_ByteString*       pNonce,
     OpcUa_Key*              privateKey,
