@@ -820,7 +820,7 @@ OpcUa_StatusCode my_ActivateSession(
 	if(OpcUa_IsBad(uStatus))
 	{
 #ifndef NO_DEBUGGING_
-		MY_TRACE("\nAuthentication Token ungültig.\n"); 
+		MY_TRACE("\nAuthentication Token invalid.\n");
 #endif /*_DEBUGGING_*/
 		uStatus = OpcUa_BadSecurityChecksFailed;
 		OpcUa_GotoError;
