@@ -3,6 +3,11 @@ OPC Foundation OPC UA ANSI C-Stack
 
 Current Version
 
+Version 1.04.342
+
+	Highlights:
+		- added V1.04 Nodeset definitions.
+
 Version 1.03.341
 
 	Highlights:
