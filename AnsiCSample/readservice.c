@@ -503,6 +503,7 @@ OpcUa_StatusCode  fill_Variant_for_value_attribute(_VariableNode_*  p_Node, OpcU
 
 				for(i=0;i<(all_ValueAttribute_of_VariableTypeNodes_VariableNodes[p_Node->ValueIndex].Value.Array.Length);i++)
 				{
+					OpcUa_String_Initialize((p_Results->Value.Value.Array.Value.StringArray)+i);
 					uStatus= OpcUa_String_AttachCopy((p_Results->Value.Value.Array.Value.StringArray)+i,*(all_ValueAttribute_of_VariableTypeNodes_VariableNodes[p_Node->ValueIndex].Value.Array.Value.StringArray+i));
 					if(OpcUa_IsBad(uStatus))
 						OpcUa_GotoError

@@ -1505,6 +1505,7 @@ OpcUa_StatusCode fill_server_variable(OpcUa_ApplicationDescription* p_Server)
 	p_Server->DiscoveryUrls=OpcUa_Memory_Alloc(sizeof(OpcUa_String));
 	OpcUa_GotoErrorIfAllocFailed(p_Server->DiscoveryUrls)
 	/* p_Server->DiscoveryProfileUri */
+	OpcUa_String_Initialize(p_Server->DiscoveryUrls);
 	OpcUa_String_AttachCopy(p_Server->DiscoveryUrls, UATESTSERVER_ENDPOINT_URL);
 	p_Server->NoOfDiscoveryUrls=1;
     
