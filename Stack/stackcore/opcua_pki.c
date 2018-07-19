@@ -51,7 +51,7 @@ OPCUA_EXPORT OpcUa_StatusCode OpcUa_PKIProvider_OpenCertificateStore(
 }
 
 /*============================================================================
- * OpcUa_PKIProvider_SaveCertificate
+ * OpcUa_PKIProvider_LoadCertificate
  *===========================================================================*/
 OpcUa_StatusCode OpcUa_PKIProvider_LoadCertificate(
     struct _OpcUa_PKIProvider*  a_pPKI,
@@ -61,7 +61,7 @@ OpcUa_StatusCode OpcUa_PKIProvider_LoadCertificate(
 {
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_PkiProvider);
     OpcUa_ReturnErrorIfArgumentNull(a_pPKI);
-    OpcUa_ReturnErrorIfNull(a_pPKI->SaveCertificate, OpcUa_BadNotSupported);
+    OpcUa_ReturnErrorIfNull(a_pPKI->LoadCertificate, OpcUa_BadNotSupported);
 
     return a_pPKI->LoadCertificate(a_pPKI, a_pLoadHandle, a_pCertificateStore, a_pCertificate);
 }
