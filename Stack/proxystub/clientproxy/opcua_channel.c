@@ -69,7 +69,7 @@ OpcUa_StatusCode OpcUa_Channel_Create(  OpcUa_Channel*                  a_phChan
 {
     OpcUa_InternalChannel* pInternalChannel = OpcUa_Null;
 
-    OpcUa_InitializeStatus(OpcUa_Module_Channel, "OpcUa_Channel_Create");
+    OpcUa_InitializeStatus(OpcUa_Module_Channel, "Create");
 
     OpcUa_ReturnErrorIfArgumentNull(a_phChannel);
 
@@ -185,7 +185,7 @@ static OpcUa_StatusCode OpcUa_Channel_ReadResponse(
     OpcUa_InternalChannel* pChannel = OpcUa_Null;
     OpcUa_Handle hDecodeContext = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_Channel, "OpcUa_Channel_ReadResponse");
+OpcUa_InitializeStatus(OpcUa_Module_Channel, "ReadResponse");
 
     OpcUa_ReturnErrorIfArgumentNull(a_pChannel);
     OpcUa_ReturnErrorIfArgumentNull(a_pIstrm);
@@ -370,7 +370,7 @@ OpcUa_StatusCode OpcUa_Channel_BeginInvokeService(  OpcUa_Channel               
     OpcUa_AsyncCallState*   pAsyncState     = OpcUa_Null;
     OpcUa_Handle            hEncodeContext  = OpcUa_Null;
 
-OpcUa_InitializeStatus(OpcUa_Module_Channel, "OpcUa_Channel_BeginInvokeService");
+OpcUa_InitializeStatus(OpcUa_Module_Channel, "BeginInvokeService");
 
     OpcUa_ReturnErrorIfArgumentNull(a_hChannel);
     OpcUa_ReturnErrorIfArgumentNull(a_pRequest);
@@ -768,7 +768,7 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_Channel_DisconnectComplete
+ * OpcUa_Channel_InternalDisconnectComplete
  *===========================================================================*/
 static OpcUa_StatusCode OpcUa_Channel_InternalDisconnectComplete(OpcUa_Channel      a_hChannel,
                                                                 OpcUa_Void*         a_pCallbackData,
@@ -802,7 +802,7 @@ OpcUa_FinishErrorHandling;
 }
 
 /*============================================================================
- * OpcUa_Channel_Disconnect
+ * OpcUa_Channel_BeginDisconnect
  *===========================================================================*/
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Channel_BeginDisconnect(OpcUa_Channel                               a_pChannel,
                                                             OpcUa_Channel_PfnConnectionStateChanged*    a_pfCallback,
@@ -917,7 +917,7 @@ static OpcUa_StatusCode OpcUa_Channel_InternalConnectComplete(  OpcUa_Channel   
 }
 
 /*============================================================================
- * OpcUa_Channel_InternalBeginConnect
+ * OpcUa_Channel_BeginConnect
  *===========================================================================*/
 /* initiates an asynchronous connect process */
 OpcUa_StatusCode OpcUa_Channel_BeginConnect(OpcUa_Channel                               a_pChannel,
