@@ -215,7 +215,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Utilities, "P_ParseUrl");
         nIndex1 = (OpcUa_Int)(pcCursor - a_psUrl);
     }
 
-    /* skip protocol prefix and store beginning of ip adress */
+    /* skip protocol prefix and store beginning of ip address */
     nIpStart = nIndex1;
 
     /* skip host address (IPv6 address can contain colons!) */

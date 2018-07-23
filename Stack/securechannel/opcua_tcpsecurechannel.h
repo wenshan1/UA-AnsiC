@@ -32,7 +32,7 @@ typedef struct _OpcUa_TcpSecureChannel OpcUa_TcpSecureChannel;
 /**
   @brief Creates a new securechannel object.
 
-  A secure connection is always layed on top of a regular connection.
+  A secure connection is always layered on top of a regular connection.
 
   @param ppSecureChannel           [out] The new securechannel.
 */
@@ -41,7 +41,7 @@ OpcUa_StatusCode OpcUa_TcpSecureChannel_Create(OpcUa_SecureChannel**   ppSecureC
 /**
   @brief Deletes a securechannel object.
 
-  A secure connection is always layed on top of a regular connection.
+  A secure connection is always layered on top of a regular connection.
 
   @param ppSecureChannel [in]  The securechannel to delete.
 */

@@ -1096,7 +1096,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_SHA2_512_Generate(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pMac             [out] The resulting messsage authentication code (MAC).
+  @param pMac             [out] The resulting message authentication code (MAC).
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
     OpcUa_CryptoProvider* pProvider,
@@ -1117,7 +1117,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA1_Generate(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pMac             [out] The resulting messsage authentication code (MAC).
+  @param pMac             [out] The resulting message authentication code (MAC).
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_224_Generate(
     OpcUa_CryptoProvider* pProvider,
@@ -1138,7 +1138,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_224_Generate(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pMac             [out] The resulting messsage authentication code (MAC).
+  @param pMac             [out] The resulting message authentication code (MAC).
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
     OpcUa_CryptoProvider* pProvider,
@@ -1159,7 +1159,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_256_Generate(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pMac             [out] The resulting messsage authentication code (MAC).
+  @param pMac             [out] The resulting message authentication code (MAC).
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
     OpcUa_CryptoProvider* pProvider,
@@ -1180,7 +1180,7 @@ OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_384_Generate(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pMac             [out] The resulting messsage authentication code (MAC).
+  @param pMac             [out] The resulting message authentication code (MAC).
 */
 OpcUa_StatusCode OpcUa_P_OpenSSL_HMAC_SHA2_512_Generate(
     OpcUa_CryptoProvider* pProvider,

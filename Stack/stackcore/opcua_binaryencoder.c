@@ -1059,7 +1059,7 @@ OpcUa_StatusCode OpcUa_BinaryEncoder_WriteXmlElement(
 /*============================================================================
  * OpcUa_NodeId_GetEncodingType
  *===========================================================================*/
-/** @brief Returns the 8-bit identifer that precedes a UA binary encoded node id. */
+/** @brief Returns the 8-bit identifier that precedes a UA binary encoded node id. */
 static OpcUa_NodeEncoding OpcUa_NodeId_GetEncodingType(OpcUa_NodeId* a_pNodeId)
 {
     OpcUa_NodeEncoding encodingType = (OpcUa_NodeEncoding)0;

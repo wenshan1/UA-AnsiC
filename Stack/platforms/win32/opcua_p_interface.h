@@ -70,7 +70,7 @@ typedef OpcUa_Void (OPCUA_DLLCALL *OpcUa_P_TraceHook)(OpcUa_CharA* sMessage);
 #define OPCUA_SOCKET_READ_EVENT         0x0001 /* socket ready for receiving */
 #define OPCUA_SOCKET_WRITE_EVENT        0x0002 /* socket ready for writing */
 #define OPCUA_SOCKET_CLOSE_EVENT        0x0004 /* socket has been closed */
-#define OPCUA_SOCKET_EXCEPT_EVENT       0x0008 /* an exception ocurred on a socket */
+#define OPCUA_SOCKET_EXCEPT_EVENT       0x0008 /* an exception occurred on a socket */
 #define OPCUA_SOCKET_TIMEOUT_EVENT      0x0010 /* the connection on a socket timed out */
 #define OPCUA_SOCKET_SHUTDOWN_EVENT     0x0020 /* server shuts down */
 #define OPCUA_SOCKET_CONNECT_EVENT      0x0040 /* the socket has connected to the remote node (client) */
@@ -86,7 +86,7 @@ typedef OpcUa_Void (OPCUA_DLLCALL *OpcUa_P_TraceHook)(OpcUa_CharA* sMessage);
 #define OPCUA_SOCKET_NO_FLAG                    0   /* standard behaviour */
 #define OPCUA_SOCKET_REJECT_ON_NO_THREAD        1   /* thread pooling; reject connection if no worker thread i available */
 #define OPCUA_SOCKET_DONT_CLOSE_ON_EXCEPT       2   /* don't close a socket if an except event occurred */
-#define OPCUA_SOCKET_SPAWN_THREAD_ON_ACCEPT     4   /* assing each accepted socket a new thread */
+#define OPCUA_SOCKET_SPAWN_THREAD_ON_ACCEPT     4   /* assign each accepted socket a new thread */
 
 /** @brief PeerInfo settings */
 #define OPCUA_P_SOCKETGETPEERINFO_V2                OPCUA_CONFIG_YES
@@ -566,7 +566,7 @@ struct S_OpcUa_Port_CallTable
                                                                     OpcUa_UInt32                BufferSize,
                                                                     OpcUa_UInt32*               puintBytesRead);
 
-    /** @brief Write BufferSize bytes from pBuffer to the given Socket and dont return until all data is copied if bBlock is OpcUa_True.
+    /** @brief Write BufferSize bytes from pBuffer to the given Socket and don't return until all data is copied if bBlock is OpcUa_True.
      *  @ingroup opcua_platformlayer_interface
      */
     OpcUa_Int32         (OPCUA_DLLCALL* SocketWrite)              ( OpcUa_Socket                hSocket,

@@ -626,7 +626,7 @@ static OpcUa_Int32 OpcUa_SocketManager_GetSocketManagerSlot(OpcUa_InternalSocket
 {
     OpcUa_Int32 iSocketManagerSlot;
 
-    /* we are syncronized via the pStartupSemaphore... */
+    /* we are synchronized via the pStartupSemaphore... */
 
     for(iSocketManagerSlot = 0; iSocketManagerSlot < OPCUA_SOCKET_MAXMANAGERS; iSocketManagerSlot++)
     {
@@ -1126,7 +1126,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_ServeLoop");
 #endif /* OPCUA_USE_SYNCHRONISATION */
 
         /* handle errors in select, excluding timeout */
-        /* "good" errors result from timeout and closeing the signal socket; the rest is bad... */
+        /* "good" errors result from timeout and closing the signal socket; the rest is bad... */
         if(OpcUa_IsBad(selectStatus))
         {
             uStatus = OpcUa_BadCommunicationError;

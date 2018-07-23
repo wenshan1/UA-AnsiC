@@ -2357,7 +2357,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOpenSecureChannelOutput
                                                                     a_pReceiverCertificateThumbprint);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    /* store postion of stream */
+    /* store position of stream */
     uStatus = OpcUa_Buffer_GetPosition(&pSecureStream->Buffers[0], &pSecureStream->uBeginOfRequestBody);
 
     /* Flush trigger must be recalculated after encoding the header */
@@ -2528,7 +2528,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureStream, "CreateOutput");
                                                                 uTokenId);
     OpcUa_GotoErrorIfBad(uStatus);
 
-    /* store postion */
+    /* store position */
     uStatus = OpcUa_Buffer_GetPosition(&pSecureStream->Buffers[0], &pSecureStream->uBeginOfRequestBody);
     OpcUa_GotoErrorIfBad(uStatus);
 

@@ -116,7 +116,7 @@ OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_vsnprintf(OpcUa_StringA sDest, OpcUa_UI
 /*============================================================================
  * Write Values to a OpcUa_String
  *===========================================================================*/
-/* OPCUA_DLLCALL with varglist wont work ... -> vsnprintf */
+/* OPCUA_DLLCALL with varglist won't work ... -> vsnprintf */
 OpcUa_Int32 OPCUA_DLLCALL OpcUa_P_String_snprintf(  OpcUa_StringA a_sTarget,
                                                     OpcUa_UInt32  a_nCount,
                                                     OpcUa_StringA a_sFormat,

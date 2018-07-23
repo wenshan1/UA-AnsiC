@@ -49,7 +49,7 @@ OpcUa_SecureStream_Type;
 #define OPCUA_SECURESTREAM_MESSAGETYPE_MSG "MSGF0000"
 #define OPCUA_SECURESTREAM_MESSAGETYPE_CLO "CLOF0000"
 
-/** @brief Lentgh of the message types. */
+/** @brief Length of the message types. */
 #define OPCUA_SECURESTREAM_MESSAGETYPE_LEN 8
 
 /** @brief Stores state information for a secure stream. */
@@ -68,7 +68,7 @@ typedef struct _OpcUa_SecureStream
     /** @brief An array of buffers that store incoming multipart data in the stream. */
     OpcUa_Buffer*               Buffers;
     /** @brief The current count of buffers used in the stream. Must not exceed nMaxBuffers! Also index for writing.
-               nBuffers is 1-based, index is 0 based. Last buffer is adressed by nBuffers-1 ( = nCurrentReadBuffer) */
+               nBuffers is 1-based, index is 0 based. Last buffer is addressed by nBuffers-1 ( = nCurrentReadBuffer) */
     OpcUa_UInt32                nBuffers;
     /** @brief The maximum number of buffers in the stream (aka chunks per message). */
     OpcUa_UInt32                nMaxBuffers;

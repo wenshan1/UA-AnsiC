@@ -216,7 +216,7 @@ OpcUa_P_OpenSSL_PSHA1_Ctx* OpcUa_P_OpenSSL_PSHA1_Context_Create(
 * using OpenSSL HMAC function.
 * P_SHA1_update calculates P_SHA1(n) and writes it to pDst.
 * Call this function as often as you need to get the desired size of data.
-* A(n+1) is caculated for the next run.
+* A(n+1) is calculated for the next run.
 * @see OpcUa_P_OpenSSL_P_SHA1_init
 */
 
@@ -463,7 +463,7 @@ OpcUa_P_OpenSSL_PSHA256_Ctx* OpcUa_P_OpenSSL_PSHA256_Context_Create(
 * using OpenSSL HMAC function.
 * P_SHA256_update calculates P_SHA256(n) and writes it to pDst.
 * Call this function as often as you need to get the desired size of data.
-* A(n+1) is caculated for the next run.
+* A(n+1) is calculated for the next run.
 * @see OpcUa_P_OpenSSL_P_SHA256_init
 */
 

@@ -780,7 +780,7 @@ typedef OpcUa_StatusCode (OpcUa_Crypto_PfnSymmetricSign)(
   @param dataLen          [in]  The length data for the MAC generation.
   @param key              [in]  The key for the MAC generation.
 
-  @param pSignature      [out] The resulting Signature (messsage authentication code).
+  @param pSignature      [out] The resulting Signature (message authentication code).
 */
 OPCUA_EXPORT OpcUa_StatusCode OpcUa_Crypto_SymmetricSign(
     struct _OpcUa_CryptoProvider* pProvider,

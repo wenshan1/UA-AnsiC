@@ -558,7 +558,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Channel, "InvokeService");
     /* release request mutex */
     /* OPCUA_P_MUTEX_UNLOCK(pAsyncState->WaitMutex); */
 
-    /* wait for notification on the socket ; timeout is handled in the layer below, hence we wait for "infinit" time */
+    /* wait for notification on the socket ; timeout is handled in the layer below, hence we wait for "infinite" time */
     uStatus = OpcUa_AsyncCallState_WaitForCompletion(pAsyncState, OPCUA_INFINITE);
     if(OpcUa_IsBad(uStatus))
     {

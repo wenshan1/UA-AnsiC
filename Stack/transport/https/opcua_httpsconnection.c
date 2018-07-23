@@ -1663,7 +1663,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "Connect");
                                                     OpcUa_HttpsConnection_SocketCallback,  /* callback function */
                                                     OpcUa_HttpsConnection_SslEventHandler, /* certificate validation */
                                                     (OpcUa_Void*)pRequest,                 /* callback data */
-                                                    &(pRequest->Socket));                  /* retreiving socket handle */
+                                                    &(pRequest->Socket));                  /* retrieving socket handle */
 #else /* OPCUA_MULTITHREADED */
     uStatus = OPCUA_P_SOCKETMANAGER_CREATESSLCLIENT(OpcUa_Null,                          /* socketmanager handle */
                                                     OpcUa_String_GetRawString(a_sUrl),   /* remote address */
@@ -1679,7 +1679,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "Connect");
                                                     OpcUa_HttpsConnection_SocketCallback,  /* callback function */
                                                     OpcUa_HttpsConnection_SslEventHandler, /* certificate validation */
                                                     (OpcUa_Void*)pRequest,                 /* callback data */
-                                                    &(pRequest->Socket));                  /* retreiving socket handle */
+                                                    &(pRequest->Socket));                  /* retrieving socket handle */
 #endif /* OPCUA_MULTITHREADED */
     OpcUa_GotoErrorIfBad(uStatus);
 
@@ -1994,7 +1994,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
                                                             OpcUa_HttpsConnection_SocketCallback, /* callback function */
                                                             OpcUa_HttpsConnection_SslEventHandler,/* certificate validation */
                                                             (OpcUa_Void*)pRequest,                /* callback data */
-                                                            &(pRequest->Socket));                 /* retreiving socket handle */
+                                                            &(pRequest->Socket));                 /* retrieving socket handle */
 #else /* OPCUA_MULTITHREADED */
             uStatus = OPCUA_P_SOCKETMANAGER_CREATESSLCLIENT(OpcUa_Null,                          /* socketmanager handle */
                                                             OpcUa_String_GetRawString(&pHttpConnection->sURL),   /* remote address */
@@ -2010,7 +2010,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpConnection, "EndSendRequest");
                                                             OpcUa_HttpsConnection_SocketCallback, /* callback function */
                                                             OpcUa_HttpsConnection_SslEventHandler,/* certificate validation */
                                                             (OpcUa_Void*)pRequest,                /* callback data */
-                                                            &(pRequest->Socket));                 /* retreiving socket handle */
+                                                            &(pRequest->Socket));                 /* retrieving socket handle */
 #endif /* OPCUA_MULTITHREADED */
 
             if(OpcUa_IsBad(uStatus))

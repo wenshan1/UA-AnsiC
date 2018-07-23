@@ -132,7 +132,7 @@
 /*============================================================================
  * serializer checks
  *===========================================================================*/
-/** @brief OpcUa_True or OpcUa_False; switches checks on or off; dont use with chunking enabled. */
+/** @brief OpcUa_True or OpcUa_False; switches checks on or off; don't use with chunking enabled. */
 #define OPCUA_SERIALIZER_CHECKLENGTHS               OpcUa_False
 
 /*============================================================================

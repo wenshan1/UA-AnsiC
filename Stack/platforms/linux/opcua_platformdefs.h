@@ -32,7 +32,7 @@
 #ifndef _OpcUa_PlatformDefs_H_
 #define _OpcUa_PlatformDefs_H_ 1
 
-/* Detect endianess of this unix system */
+/* Detect endianness of this unix system */
 #if defined(__sun) || defined(sun)
 # define BIG_ENDIAN 4321
 # define LITTLE_ENDIAN 1234
@@ -53,7 +53,7 @@
 
 #define OPCUA_EXPORT_SYNC_SERVER_API OPCUA_EXPORT
 
-/* calling convention used by stack functions that explicitely use cdecl */
+/* calling convention used by stack functions that explicitly use cdecl */
 #define OPCUA_CDECL
 
 /* used ie. for unlimited timespans */

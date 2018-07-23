@@ -28,7 +28,7 @@ OPCUA_BEGIN_EXTERN_C
 /**
   @brief Creates a new secure connection object.
 
-  A secure connection is always layed on top of a regular connection.
+  A secure connection is always layered on top of a regular connection.
 
   @param pInnerConnection [in]  The connection to layer on top of.
   @param pEncoder         [in]  The encoder used by the channel.

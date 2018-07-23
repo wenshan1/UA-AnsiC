@@ -265,7 +265,7 @@ OpcUa_StatusCode OpcUa_Thread_WaitForShutdown(  OpcUa_Thread a_Thread,
 }
 
 /*============================================================================
- * Let the thread sleep for a certian amount of time
+ * Let the thread sleep for a certain amount of time
  *===========================================================================*/
 OpcUa_Void OpcUa_Thread_Sleep(OpcUa_UInt32 a_msecTimeout)
 {

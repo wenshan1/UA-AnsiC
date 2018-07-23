@@ -84,7 +84,7 @@ OPCUA_BEGIN_EXTERN_C
   #define OPCUA_DLLCALL __stdcall
 #endif
 
-/* calling convention used by stack functions that explicitely use cdecl */
+/* calling convention used by stack functions that explicitly use cdecl */
 #define OPCUA_CDECL __cdecl
 
 /* used ie. for unlimited timespans */

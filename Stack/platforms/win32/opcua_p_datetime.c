@@ -379,7 +379,7 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_DateTime_GetDateTimeFromString(OpcUa_Stri
         else if(tmpVar < 0)
         {
             tm_hour = tmpVar + 24;
-            tm_mday--;    /* substract one day from date */
+            tm_mday--;    /* subtract one day from date */
         }
         else
         {

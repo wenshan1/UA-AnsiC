@@ -47,7 +47,7 @@ struct _OpcUa_HttpsListener_Connection
     OpcUa_InputStream*          pInputStream;
     /** @brief Holds a reference to a not fully sent stream message. */
     OpcUa_OutputStream*         pOutputStream;
-    /** @brief Mutex for granting mutually exlcusive access to the connection object */
+    /** @brief Mutex for granting mutually exclusive access to the connection object */
     OpcUa_Mutex                 Mutex;
     /** @brief Number of request being issued over this connection. */
     OpcUa_UInt32                uNoOfRequestsTotal;

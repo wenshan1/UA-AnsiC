@@ -665,7 +665,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "RemoveSecureRequestByType
 
     pSecureConnection = (OpcUa_SecureConnection*)a_pConnection->Handle;
 
-    /* get the SecureRequest from the list of pending reuqests */
+    /* get the SecureRequest from the list of pending requests */
     OpcUa_List_Enter(pSecureConnection->PendingRequests); /****************************************/
     OpcUa_List_ResetCurrent(pSecureConnection->PendingRequests);
     pSecureRequest = (OpcUa_SecureRequest*)OpcUa_List_GetCurrentElement(pSecureConnection->PendingRequests);
@@ -710,7 +710,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "RemoveSecureRequestById")
 
     pSecureConnection = (OpcUa_SecureConnection*)a_pConnection->Handle;
 
-    /* get the SecureRequest from the list of pending reuqests */
+    /* get the SecureRequest from the list of pending requests */
     OpcUa_List_Enter(pSecureConnection->PendingRequests); /****************************************/
     OpcUa_List_ResetCurrent(pSecureConnection->PendingRequests);
     pSecureRequest = (OpcUa_SecureRequest*)OpcUa_List_GetCurrentElement(pSecureConnection->PendingRequests);
@@ -2085,7 +2085,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "Disconnect");
 
                 OpcUa_Trace(OPCUA_TRACE_LEVEL_INFO, "OpcUa_SecureConnection_Disconnect: Disconnecting transport.\n");
                 pSecureConnection->TransportConnection->Disconnect( pSecureConnection->TransportConnection,
-                                                                    OpcUa_False); /* dont notify */
+                                                                    OpcUa_False); /* don't notify */
 
                 /*** invoke callback function ***/
                 if((pSecureConnection->Callback != OpcUa_Null) && (a_bNotifyOnComplete != OpcUa_False))
@@ -2126,7 +2126,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureConnection, "Disconnect");
             }
 
             pSecureConnection->TransportConnection->Disconnect( pSecureConnection->TransportConnection,
-                                                                OpcUa_False); /* dont notify */
+                                                                OpcUa_False); /* don't notify */
 
             /*** invoke callback function ***/
             if((pSecureConnection->Callback != OpcUa_Null) && (a_bNotifyOnComplete != OpcUa_False))
@@ -2190,7 +2190,7 @@ OpcUa_BeginErrorHandling;
     OpcUa_Trace(OPCUA_TRACE_LEVEL_WARNING, "OpcUa_SecureConnection_Disconnect: Could NOT close securechannel remotely, disconnecting transport\n");
 
     pSecureConnection->TransportConnection->Disconnect( pSecureConnection->TransportConnection,
-                                                        OpcUa_False); /* dont notify */
+                                                        OpcUa_False); /* don't notify */
 
     /*** invoke callback function ***/
     if((pSecureConnection->Callback != OpcUa_Null) && (a_bNotifyOnComplete != OpcUa_False))

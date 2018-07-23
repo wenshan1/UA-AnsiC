@@ -25,7 +25,7 @@ typedef enum _OpcUa_SecureMessageType
     OpcUa_SecureMessageType_SO, /* SecureChannelOpen */
     OpcUa_SecureMessageType_SC, /* SecureChannelClose */
     OpcUa_SecureMessageType_SM, /* SecureMessage */
-    OpcUa_SecureMessageType_UN  /* Unkown Message */
+    OpcUa_SecureMessageType_UN  /* Unknown Message */
 } OpcUa_SecureMessageType;
 
 #define OPCUA_SECURECHANNEL_MESSAGESECURITYMODE_INVALID         0x00

@@ -1121,7 +1121,7 @@ OpcUa_BeginErrorHandling;
 
     if(pConnection != OpcUa_Null)
     {
-        /* ignore result; it doesnt matter, if it was not yet registered */
+        /* ignore result; it doesn't matter, if it was not yet registered */
         OpcUa_TcpListener_ConnectionManager_RemoveConnection(pTcpListener->ConnectionManager, pConnection);
         OpcUa_TcpListener_Connection_Delete(&pConnection);
     }

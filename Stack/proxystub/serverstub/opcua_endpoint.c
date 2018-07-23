@@ -49,7 +49,7 @@
 #define OPCUA_ENDPOINT_PREALLOCATE_RESPONSESTREAM OPCUA_CONFIG_YES
 
 /**
- * @brief Processes a request recieved on an endpoint.
+ * @brief Processes a request received on an endpoint.
  *
  * @param hEndpoint   [in] The endpoint which received the request.
  * @param pConnection [in] The connection which is the source of the request.

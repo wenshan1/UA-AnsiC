@@ -54,7 +54,7 @@ typedef enum _OpcUa_ConnectionEvent
     /** @brief A message currently being sent was finished. */
     OpcUa_ConnectionEvent_RefillSendQueue,
 
-    /** @brief An unexpected error occurred and the connection is no longer useable. */
+    /** @brief An unexpected error occurred and the connection is no longer usable. */
     OpcUa_ConnectionEvent_UnexpectedError
 }
 OpcUa_ConnectionEvent;
@@ -177,7 +177,7 @@ typedef OpcUa_StatusCode (OpcUa_Connection_PfnEndSendRequest)(
     OpcUa_Void*                     pCallbackData);
 
 /**
-  @brief Aborts the a request that was partialy sent to the server.
+  @brief Aborts the a request that was partially sent to the server.
 
   @param pConnection [in] The connection.
   @param uStatus     [in] The numeric code for the error.
@@ -198,7 +198,7 @@ typedef OpcUa_StatusCode (OpcUa_Connection_PfnAbortSendRequest)(
 
 
 /**
-  @brief Retrive the recieve buffer size of a particular connection.
+  @brief Retrieve the receive buffer size of a particular connection.
 
   @param pConnection [in] The connection.
   @param pBufferSize [in] Pointer to OpcUa_UInt32 for storing the buffer size.
@@ -280,13 +280,13 @@ struct _OpcUa_Connection
     /*! @brief Aborts writing an outgoing message. */
     OpcUa_Connection_PfnAbortSendRequest* AbortSendRequest;
 
-    /*! @brief Retrive the recieve buffer size of a particular connection. */
+    /*! @brief Retrieve the receive buffer size of a particular connection. */
     OpcUa_Connection_PfnGetReceiveBufferSize* GetReceiveBufferSize;
 
     /*! @brief Frees the structure. */
     OpcUa_Connection_PfnDelete* Delete;
 
-    /*! @brief Retrive the recieve buffer size of a particular connection. */
+    /*! @brief Retrieve the receive buffer size of a particular connection. */
     OpcUa_Connection_PfnAddToSendQueue* AddToSendQueue;
 
     /*! @brief Check the server protocol version of a particular connection. */

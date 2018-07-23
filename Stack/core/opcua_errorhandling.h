@@ -103,7 +103,7 @@ typedef struct _OpcUa_StatusCodeString
 #define OpcUa_Good 0x00000000
 
 /*============================================================================
- * Something unexpected occurred but the results still maybe useable.
+ * Something unexpected occurred but the results still maybe usable.
  *===========================================================================*/
 #define OpcUa_Uncertain 0x40000000
 

@@ -229,7 +229,7 @@ Error:
 /*==============================================================================*/
 /* Delete all connections                                                       */
 /*==============================================================================*/
-/* Iterates over all connections, closes and deletes each. The given callback is called everytime. */
+/* Iterates over all connections, closes and deletes each. The given callback is called every time. */
 OpcUa_StatusCode OpcUa_TcpListener_ConnectionManager_RemoveConnections(
     OpcUa_TcpListener_ConnectionManager* a_pConnectionManager,
     OpcUa_TcpListener_ConnectionDeleteCB a_fConnectionDeleteCB)

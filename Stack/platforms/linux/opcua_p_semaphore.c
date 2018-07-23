@@ -97,13 +97,13 @@ OpcUa_Void OpcUa_P_Semaphore_Delete(OpcUa_Semaphore* pRawSemaphore)
     *pRawSemaphore = OpcUa_Null;
 }
 
-/** Aquires a resource.
- * This function blocks until a resource could be aquired.
- * Use OpcUa_P_Semaphore_TimedWait if you don't wont to block forever.
+/** Acquires a resource.
+ * This function blocks until a resource could be acquired.
+ * Use OpcUa_P_Semaphore_TimedWait if you don't want to block forever.
  * This function handles interruptions due to signals and automatically
  * restarts the wait operation.
  * @param RawSemaphore Handle to semaphore.
- * @return OpcUa_Good if the resource was successfully aquired,
+ * @return OpcUa_Good if the resource was successfully acquired,
  * OpcUa_BadInternalError in case of a system call error.
  */
 OpcUa_StatusCode OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemaphore)
@@ -126,12 +126,12 @@ OpcUa_StatusCode OpcUa_P_Semaphore_Wait(OpcUa_Semaphore RawSemaphore)
     return OpcUa_Good;
 }
 
-/** Aquires a resource.
+/** Acquires a resource.
  * This function behaves like OpcUa_P_Semaphore_Wait, but does not block forever.
  * In case of a timeout the function returns OpcUa_GoodNonCriticalTimeout.
  * @param RawSemaphore Handle to semaphore.
- * @param msecTimeout Maximum time to wait to aquire the resource.
- * @return OpcUa_Good if the resource was successfully aquired, OpcUa_GoodNonCriticalTimeout in case of a timeout,
+ * @param msecTimeout Maximum time to wait to acquire the resource.
+ * @return OpcUa_Good if the resource was successfully acquired, OpcUa_GoodNonCriticalTimeout in case of a timeout,
  * OpcUa_BadInternalError in case of a system call error.
  */
 OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa_UInt32 msecTimeout)
@@ -195,7 +195,7 @@ OpcUa_StatusCode OpcUa_P_Semaphore_TimedWait(OpcUa_Semaphore RawSemaphore, OpcUa
     return OpcUa_Good;
 }
 
-/** Gives back a number of aquired resources.
+/** Gives back a number of acquired resources.
  * This means it unblocks other blocking OpcUa_P_Semaphore_Wait or OpcUa_P_Semaphore_TimedWait calls.
  * @param RawSemaphore Handle to semaphore.
  * @param uReleaseCount Gives back uReleaseCount resources.

@@ -75,7 +75,7 @@ struct _OpcUa_HttpsInputStream
     OpcUa_Int32                             iContentLength;
     /** @brief The recent message line. */
     OpcUa_String                            MessageLine;
-    /** @brief The current count of buffers used in the stream. nBuffers is 1-based, index is 0 based. Last buffer is adressed by nBuffers-1 ( = nCurrentReadBuffer) */
+    /** @brief The current count of buffers used in the stream. nBuffers is 1-based, index is 0 based. Last buffer is addressed by nBuffers-1 ( = nCurrentReadBuffer) */
     OpcUa_UInt32                            nBuffers;
     /** @brief The absolute position spanning all included buffers. Returned in GetPosition. */
     OpcUa_UInt32                            nAbsolutePosition;
@@ -127,7 +127,7 @@ struct _OpcUa_HttpsOutputStream
 #endif /* OPCUA_HTTPSSTREAM_OUTPUT_HAS_HEADERCOLLECTION */
     /** @brief Counts the number of chunks already send. (index of next buffer to send) */
     OpcUa_UInt32                            nChunksSend;
-    /** @brief The current count of buffers used in the stream. nBuffers is 1-based, index is 0 based. Last buffer is adressed by nBuffers-1 ( = nCurrentReadBuffer) */
+    /** @brief The current count of buffers used in the stream. nBuffers is 1-based, index is 0 based. Last buffer is addressed by nBuffers-1 ( = nCurrentReadBuffer) */
     OpcUa_UInt32                            nBuffers;
     /** @brief The absolute position spanning all included buffers. Returned in GetPosition. */
     OpcUa_UInt32                            nAbsolutePosition;
@@ -449,7 +449,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "Read");
                     OpcUa_GotoErrorWithStatus(OpcUa_BadEndOfStream);
                 }
 
-                /* substract the number of chunk delimiters */
+                /* subtract the number of chunk delimiters */
                 pHttpInputStream->nCurrentChunkCharactersLeft = (OpcUa_UInt32)pHttpInputStream->iCurrentChunkLength;
             }
             else
@@ -1196,7 +1196,7 @@ OpcUa_InitializeStatus(OpcUa_Module_HttpStream, "Close");
         }
 
         /* TODO: closing a stream before the end of the message could screw things up.
-           Need to read rest of message from stream before closing. Thats complex,
+           Need to read rest of message from stream before closing. That's complex,
            because the rest of the message may be delayed, so we would have to block here,
            what we don't want. Handle this stream like before, but mark it as abandoned!
            If the stream is complete, it will not be handled but deleted immediately.
@@ -2559,7 +2559,7 @@ OpcUa_FinishErrorHandling;
 /** @brief Called if data is available for reading on a socket attached to a stream.
   *
   * This is kind of a read event handler of the pHttpInputStream. The Listener
-  * calls this function, if new data is available on the socket. Dependend of
+  * calls this function, if new data is available on the socket. Dependent on
   * the stream state, it starts handling the http stream relevant data and
   * gives feedback to the listener, which takes further action, ie. calls
   * the handler.

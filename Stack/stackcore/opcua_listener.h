@@ -59,7 +59,7 @@ typedef enum _OpcUa_ListenerEvent
     /** @brief A message currently being sent was finished. */
     OpcUa_ListenerEvent_RefillSendQueue,
 
-    /*! @brief An unexpected error occurred and the listener is no longer useable. */
+    /*! @brief An unexpected error occurred and the listener is no longer usable. */
     OpcUa_ListenerEvent_UnexpectedError
 }
 OpcUa_ListenerEvent;
@@ -180,7 +180,7 @@ typedef OpcUa_StatusCode (OpcUa_Listener_PfnAbortSendResponse)(
     OpcUa_OutputStream**    pOstrm);
 
 /**
-  @brief Retrive the recieve buffer size of a particular connection.
+  @brief Retrieve the receive buffer size of a particular connection.
 
   @param pListener   [in] The listener.
   @param hConnection [in] The handle of the connection whose buffer size is requested.
@@ -197,7 +197,7 @@ typedef OpcUa_StatusCode (OpcUa_Listener_PfnGetReceiveBufferSize)(
     OpcUa_UInt32*           pBufferSize);
 
 /**
-  @brief Retrive the peer info of a particular connection.
+  @brief Retrieve the peer info of a particular connection.
 
   @param pListener   [in] The listener.
   @param hConnection [in] The handle of the connection whose buffer size is requested.
@@ -300,7 +300,7 @@ typedef struct _OpcUa_Listener
     /*! @brief Aborts a response. */
     OpcUa_Listener_PfnAbortSendResponse* AbortSendResponse;
 
-    /*! @brief Retrive the recieve buffer size of a particular connection. */
+    /*! @brief Retrieve the receive buffer size of a particular connection. */
     OpcUa_Listener_PfnGetReceiveBufferSize* GetReceiveBufferSize;
 
     /*! @brief Close a particular connection. */
@@ -312,7 +312,7 @@ typedef struct _OpcUa_Listener
     /*! @brief Forward a buffer list to the transport for sending. */
     OpcUa_Listener_PfnAddToSendQueue* AddToSendQueue;
 
-    /*! @brief Retrive the peer information of a particular connection. */
+    /*! @brief Retrieve the peer information of a particular connection. */
     OpcUa_Listener_PfnGetPeerInfo* GetPeerInfo;
 
     /*! @brief Check the client protocol version of a particular connection. */

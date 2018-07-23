@@ -29,7 +29,7 @@
 #define OpcUa_TcpOutputStream_SanityCheck 0x5B5941A2
 #define OpcUa_TcpInputStream_SanityCheck 0x5B5941A6
 
-/* only for testing, dont deactivate. may get removed. */
+/* only for testing, don't deactivate. may get removed. */
 #define OPCUA_TCPSTREAM_PREENCODE_CHUNK_HEADER OPCUA_CONFIG_YES
 
 #if !OPCUA_TCPSTREAM_PREENCODE_CHUNK_HEADER
@@ -198,7 +198,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "Read");
     OpcUa_ReturnErrorIfArgumentNull(a_puCount);
     OpcUa_ReturnErrorIfInvalidStream(a_pIstrm, Read);
 
-    /* HINTS: we dont want to trigger a socket recv for every element, so the
+    /* HINTS: we don't want to trigger a socket recv for every element, so the
               data gets buffered internally in the stream to read "as much as
               possible" (well, not really, trying to predict message borders
               implicitly through buffer sizes.) in one api call for performance
@@ -256,14 +256,14 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "Write");
             OpcUa_GotoErrorWithStatus(OpcUa_BadEndOfStream);
         }
 
-        /* data wouldnt fit into the buffer -> flush to network. */
-        /* curser will be reset by flush. */
+        /* data wouldn't fit into the buffer -> flush to network. */
+        /* cursor will be reset by flush. */
         uStatus = OpcUa_TcpStream_Flush(    a_pOstrm,
                                             OpcUa_False);
         OpcUa_ReturnErrorIfBad(uStatus);
 
         /* HINT: This should never happen by the secure channel layer. */
-        /*       It will alway know, when to flush by itself. */
+        /*       It will always know, when to flush by itself. */
         /*       To be safe, check the current position after a write. */
     }
 
@@ -447,7 +447,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "Close");
         }
 
         /* TODO: closing a stream before the end of the message could screw things up.
-           Need to read rest of message from stream before closing. Thats complex,
+           Need to read rest of message from stream before closing. That's complex,
            because the rest of the message may be delayed, so we would have to block here,
            what we don't want. Handle this stream like before, but mark it as abandoned!
            If the stream is complete, it will not be handled but deleted immediately.
@@ -744,7 +744,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpStream, "CreateOutput");
 
     if(a_ppAttachBuffer != OpcUa_Null)
     {
-        /* if the caller wants the stream to be attached, dont alloc it */
+        /* if the caller wants the stream to be attached, don't alloc it */
         OpcUa_ReturnErrorIfArgumentNull(*a_ppAttachBuffer);
 
         /* allocate tcp out stream */
@@ -1096,7 +1096,7 @@ static OpcUa_StatusCode OpcUa_TcpStream_CheckHeader(OpcUa_InputStream* a_InputSt
 /** @brief Called if data is available for reading on a socket attached to a stream.
   *
   * This is kind of a read event handler of the pTcpInputStream. The Listener
-  * calls this function, if new data is available on the socket. Dependend of
+  * calls this function, if new data is available on the socket. Dependent on
   * the stream state, it starts handling the tcpstream relevant data and
   * gives feedback to the listener, which takes further action, ie. calls
   * the handler.

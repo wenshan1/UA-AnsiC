@@ -638,7 +638,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ExceptEventHandler");
         pTcpConnection->NotifyCallback(
             a_pConnection,
             pTcpConnection->CallbackData,
-            OpcUa_ConnectionEvent_UnexpectedError, /* TODO: See if theres a better method. Secure layer also needs to be prepared for this. */
+            OpcUa_ConnectionEvent_UnexpectedError, /* TODO: See if there's a better method. Secure layer also needs to be prepared for this. */
             OpcUa_Null, /* no stream for this event */
             OpcUa_BadCommunicationError);
     }
@@ -718,7 +718,7 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "ReadEventHandler");
 
     /******************************************************************************************/
 
-    /* notify target stream about newly avaiable data */
+    /* notify target stream about newly available data */
     uStatus = OpcUa_TcpStream_DataReady(pTcpConnection->IncomingStream);
 
     /******************************************************************************************/
@@ -1104,14 +1104,14 @@ OpcUa_InitializeStatus(OpcUa_Module_TcpConnection, "Connect");
                                                     0,                                  /* local port */
                                                     OpcUa_TcpConnection_SocketCallback, /* callback function */
                                                     (OpcUa_Void*)a_pConnection,         /* callback data */
-                                                    &(pTcpConnection->Socket));         /* retreiving socket handle */
+                                                    &(pTcpConnection->Socket));         /* retrieving socket handle */
 #else /* OPCUA_MULTITHREADED */
     uStatus = OPCUA_P_SOCKETMANAGER_CREATECLIENT(   OpcUa_Null,                         /* socketmanager handle */
                                                     OpcUa_String_GetRawString(a_sUrl),  /* remote address */
                                                     0,                                  /* local port */
                                                     OpcUa_TcpConnection_SocketCallback, /* callback function */
                                                     (OpcUa_Void*)a_pConnection,         /* callback data */
-                                                    &(pTcpConnection->Socket));         /* retreiving socket handle */
+                                                    &(pTcpConnection->Socket));         /* retrieving socket handle */
 #endif /* OPCUA_MULTITHREADED */
     OpcUa_GotoErrorIfBad(uStatus);
 

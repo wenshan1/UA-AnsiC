@@ -81,7 +81,7 @@ struct _OpcUa_InternalSocket
         OpcUa_UInt               EventMask:11;       /* mask and unmask eventhandling */
         OpcUa_UInt               bClosedSocket:1;    /* is the socket closed */
         OpcUa_UInt               bOwnThread:1;       /* if this socket is handled by an own thread */
-        OpcUa_UInt               bFromApplication:1; /* Application is explicitely waiting for an event on this socket. */
+        OpcUa_UInt               bFromApplication:1; /* Application is explicitly waiting for an event on this socket. */
     } Flags;
     OpcUa_UInt32                 uintTimeout;        /* interval until connection is considered timed out */
     OpcUa_UInt32                 uintLastAccess;     /* system tick count in seconds when last action on this socket took place */

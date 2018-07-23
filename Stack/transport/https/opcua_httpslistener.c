@@ -1530,7 +1530,7 @@ OpcUa_BeginErrorHandling;
 
     if(pListenerConnection != OpcUa_Null)
     {
-        /* ignore result; it doesnt matter, if it was not yet registered */
+        /* ignore result; it doesn't matter, if it was not yet registered */
         OpcUa_HttpsListener_Connection_Delete(&pListenerConnection);
     }
 

@@ -599,7 +599,7 @@ OpcUa_FinishErrorHandling;
  * OpcUa_SecureListener_OpenChannel
  *===========================================================================*/
 /** @brief Create and initialize a new secure channel. Close the underlying
-           connection on error. This is the handler for channel openend messages. */
+           connection on error. This is the handler for channel opened messages. */
 static OpcUa_StatusCode OpcUa_SecureListener_OpenChannel(
     OpcUa_Listener*         a_pSecureListenerInterface,
     OpcUa_Handle            a_hTransportConnection,
@@ -1934,7 +1934,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessOpenSecureChannelReq
 
         if(OpcUa_IsBad(uStatus))
         {
-            /* check if a discovery only channel can be openned */
+            /* check if a discovery only channel can be opened */
             OpcUa_Boolean discoveryOnly = OpcUa_False;
 
             if(OpcUa_String_IsNull(&pSecureChannel->SecurityPolicyUri))
@@ -2860,7 +2860,7 @@ OpcUa_InitializeStatus(OpcUa_Module_SecureListener, "ProcessSessionCallRequest")
 
         OpcUa_Trace(OPCUA_TRACE_LEVEL_DEBUG, "OpcUa_SecureListener_ProcessSessionCallRequest: Waiting for more chunks!\n");
 
-        /* buffer has been saved; transport stream wont be used again; release it */
+        /* buffer has been saved; transport stream won't be used again; release it */
         (*a_ppTransportIstrm)->Delete((OpcUa_Stream**)a_ppTransportIstrm);
     }
     else /* preprocess the stream */

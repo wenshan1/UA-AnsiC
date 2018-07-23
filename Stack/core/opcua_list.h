@@ -348,7 +348,7 @@ OpcUa_Void*         OpcUa_List_RemoveFirstElement(  OpcUa_List*     pList);
   @brief Deletes the current element performing all necessary list management
   However, the list element is added to a temporary list and must be removed manually
 
-  QueueFirst and QueueLast have to be initialzed to null before first use
+  QueueFirst and QueueLast have to be initialized to null before first use
 
   Takes no action if a_pList is null
   Takes no action if a_pList->currtElement is null

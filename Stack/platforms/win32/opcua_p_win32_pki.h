@@ -180,7 +180,7 @@ OpcUa_StatusCode OpcUa_P_Win32_PKI_LoadCertificate(
     OpcUa_ByteString*           pCertificate);
 
 /**
-  @brief Loads the private key of a certain certificate from the certificat store. The exported key will be provided as a
+  @brief Loads the private key of a certain certificate from the certificate store. The exported key will be provided as a
          DER encoded string of bytes.
 
         TODO: Currently only private keys from "My" folder of the system store can be loaded since this function does not have
@@ -188,7 +188,7 @@ OpcUa_StatusCode OpcUa_P_Win32_PKI_LoadCertificate(
               the function. This should be discussed and changed!
 
         TODO: Currently the private keys are exported to a unsecured string of DER encoded bytes and are loaded into the memory.
-              There's the risk that other malicious applications could copy it. However, this requires the malicious appliction
+              There's the risk that other malicious applications could copy it. However, this requires the malicious application
               to exactly know where the key, what algorithm was used to create the key and how long it is. But if a malicious application
               manages to access the memory then a fundamental security problem is the whole system exists anyway.
               Nevertheless a mitigation strategy addressing that risk should be provided. One approach that reduces the risk is to not to

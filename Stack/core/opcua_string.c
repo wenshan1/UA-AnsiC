@@ -323,7 +323,7 @@ OpcUa_Void OpcUa_String_Delete(/* bi */ OpcUa_String** a_ppString)
     /* cast to internal representation */
     pStringInt = (OpcUa_pStringInternal)*a_ppString;
 
-    /* if it isnt a OpcUa_String object, leave... */
+    /* if it isn't a OpcUa_String object, leave... */
     if(_OpcUa_IsUaString(pStringInt) == OpcUa_False)
     {
         return;
@@ -543,7 +543,7 @@ OpcUa_StatusCode OpcUa_String_StrnCat(/* bi */ OpcUa_String*       a_pDestString
     OpcUa_P_String_StrnCat( strRawDest, /* target */
                             uiTempLen,  /* length of target buffer (max for operation) */
                             strRawSrc,  /* source */
-                            a_uLength); /* lenght of source to append */
+                            a_uLength); /* length of source to append */
 
     pStringInt->uLength = a_uLength + uiDestLen;
 
