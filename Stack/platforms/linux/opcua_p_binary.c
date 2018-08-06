@@ -51,7 +51,7 @@ OpcUa_StatusCode OpcUa_Boolean_P_NativeToWire(OpcUa_Boolean_Wire* wire, OpcUa_Bo
 /*============================================================================
  * OpcUa_Boolean_P_WireToNative
  *===========================================================================*/
-OpcUa_StatusCode OpcUa_Boolean_P_WireToNative(OpcUa_Boolean_Wire* native, OpcUa_Boolean_Wire* wire)
+OpcUa_StatusCode OpcUa_Boolean_P_WireToNative(OpcUa_Boolean* native, OpcUa_Boolean_Wire* wire)
 {
     OpcUa_DeclareErrorTraceModule(OpcUa_Module_BinarySerializer);
     OpcUa_ReturnErrorIfArgumentNull(wire);
