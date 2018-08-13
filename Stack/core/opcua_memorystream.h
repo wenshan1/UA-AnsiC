@@ -258,8 +258,12 @@ OpcUa_StatusCode OpcUa_##Type##_Compare(OpcUa_##Type *pInput1, OpcUa_##Type *pIn
    pOutputStream1->Close((OpcUa_Stream*)pOutputStream1); \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream1, &pBuffer1, &uBufferSize1); \
    if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)pOutputStream1, &uBufferSize1); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
    pOutputStream2->Close((OpcUa_Stream*)pOutputStream2); \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream2, &pBuffer2, &uBufferSize2); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)pOutputStream2, &uBufferSize2); \
    if (OpcUa_IsBad(uStatus)) goto err4; \
    if (uBufferSize1 == uBufferSize2) \
        *pResult = OpcUa_MemCmp(pBuffer1, pBuffer2, uBufferSize1); \
@@ -323,8 +327,12 @@ OpcUa_StatusCode OpcUa_##Type##_Compare(OpcUa_##Type *pInput1, OpcUa_##Type *pIn
    pOutputStream1->Close((OpcUa_Stream*)pOutputStream1); \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream1, &pBuffer1, &uBufferSize1); \
    if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)pOutputStream1, &uBufferSize1); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
    pOutputStream2->Close((OpcUa_Stream*)pOutputStream2); \
    uStatus = OpcUa_MemoryStream_GetBuffer(pOutputStream2, &pBuffer2, &uBufferSize2); \
+   if (OpcUa_IsBad(uStatus)) goto err4; \
+   uStatus = OpcUa_Stream_GetPosition((OpcUa_Stream*)pOutputStream2, &uBufferSize2); \
    if (OpcUa_IsBad(uStatus)) goto err4; \
    if (uBufferSize1 == uBufferSize2) \
        *pResult = OpcUa_MemCmp(pBuffer1, pBuffer2, uBufferSize1); \
