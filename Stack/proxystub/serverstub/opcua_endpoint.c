@@ -32,7 +32,7 @@
 #include <opcua_securelistener.h>
 #include <opcua_tcplistener.h>
 
-#ifdef OPCUA_HAVE_HTTPS
+#if OPCUA_HAVE_HTTPS
 #include <opcua_httpslistener.h>
 #endif /* OPCUA_HAVE_HTTPS */
 
@@ -222,7 +222,7 @@ OpcUa_StatusCode OpcUa_Endpoint_GetMessageSecureChannelSecurityPolicy(
 
     OpcUa_MemSet(a_pSecurityPolicy, 0, sizeof(OpcUa_Endpoint_SecurityPolicyConfiguration));
 
-#ifdef OPCUA_HAVE_HTTPS
+#if OPCUA_HAVE_HTTPS
     /* In case of HTTPS, the transport listener is not set. */
     if(pEndpointInt->TransportListener == OpcUa_Null)
     {
@@ -510,7 +510,7 @@ OpcUa_InitializeStatus(OpcUa_Module_Endpoint, "Open");
                                                 &pEndpointInt->SecureListener);
         OpcUa_GotoErrorIfBad(uStatus);
     }
-#ifdef OPCUA_HAVE_HTTPS
+#if OPCUA_HAVE_HTTPS
     else if(!OpcUa_String_StrnCmp(  &(pEndpointInt->Url),
                                     OpcUa_String_FromCString("https:"),
                                     (OpcUa_UInt32)6,
@@ -1186,7 +1186,7 @@ OpcUa_StatusCode OpcUa_Endpoint_GetPeerInfo( OpcUa_Endpoint           a_hEndpoin
     /* get the context */
     pContext = (OpcUa_EndpointContext*)a_hContext;
 
-#ifdef OPCUA_HAVE_HTTPS
+#if OPCUA_HAVE_HTTPS
     /* In case of HTTPS, the transport listener is not set. */
     if(pEndpointInt->TransportListener == OpcUa_Null)
     {

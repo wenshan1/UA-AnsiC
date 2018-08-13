@@ -44,26 +44,13 @@
 #define OPCUA_HAVE_SERVERAPI                        1
 /** @brief define or undefine to enable or disable the memory stream module. */
 #define OPCUA_HAVE_MEMORYSTREAM                     1
-/** @brief define or undefine to enable or disable the soap and http support. */
-/*#define OPCUA_HAVE_SOAPHTTP                         1*/
-/** @brief define or undefine to enable or disable the https support. */
-#define OPCUA_HAVE_HTTPS                            1
 
-
-/* * @brief AUTOMATIC; activate additional modules required by soap/http */
-#ifdef OPCUA_HAVE_SOAPHTTP
-# define OPCUA_HAVE_HTTPAPI                         1
-# define OPCUA_HAVE_XMLPARSER                       1
-# define OPCUA_HAVE_BASE64                          1
-# ifndef OPCUA_HAVE_MEMORYSTREAM
-#  error SOAP/HTTP UA-SC transport profile requires memory stream!
-# endif /* OPCUA_HAVE_MEMORYSTREAM */
-#endif /* OPCUA_HAVE_SOAPHTTP */
+/** @brief Enable or disable the https support. */
+#define OPCUA_HAVE_HTTPS                            OPCUA_CONFIG_YES
 
 /* * @brief AUTOMATIC; activate additional modules required by https */
-#ifdef OPCUA_HAVE_HTTPS
+#if OPCUA_HAVE_HTTPS
 # define OPCUA_HAVE_HTTPSAPI                        1
-# define OPCUA_HAVE_BASE64                          1
 #endif /* OPCUA_HAVE_HTTPS */
 
 /*============================================================================

@@ -93,11 +93,7 @@ typedef OpcUa_Void (OPCUA_DLLCALL *OpcUa_P_TraceHook)(OpcUa_CharA* sMessage);
 #define OPCUA_P_PEERINFO_MIN_SIZE                   64
 
 /** @brief Toggle SSL support in the socket manager class. */
-#ifdef OPCUA_HAVE_HTTPS
 #define OPCUA_P_SOCKETMANAGER_SUPPORT_SSL           OPCUA_CONFIG_YES
-#else
-#define OPCUA_P_SOCKETMANAGER_SUPPORT_SSL           OPCUA_CONFIG_NO
-#endif
 
 /** @brief How SSL verifies certificates. */
 #define OPCUA_P_SOCKETMANAGER_SSL_VERIFY_OPTION     (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)

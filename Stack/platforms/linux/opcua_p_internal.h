@@ -99,8 +99,12 @@
 # error OpenSSL required; globally define OPCUA_HAVE_OPENSSL if OpenSSL is available or disable security!
 #endif
 
-#if defined(OPCUA_HAVE_HTTPS) && !OPCUA_SUPPORT_PKI
-# error PKI support is required for HTTPS; globally define OPCUA_SUPPORT_PKI
+#if OPCUA_HAVE_HTTPS && !OPCUA_P_SOCKETMANAGER_SUPPORT_SSL
+# error SSL support is required for HTTPS; globally define OPCUA_P_SOCKETMANAGER_SUPPORT_SSL
+#endif
+
+#if OPCUA_P_SOCKETMANAGER_SUPPORT_SSL && !OPCUA_SUPPORT_PKI
+# error PKI support is required for SSL; globally define OPCUA_SUPPORT_PKI
 #endif
 
 /**********************************************************************************/
