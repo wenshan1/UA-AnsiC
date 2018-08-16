@@ -75,6 +75,9 @@ endif()
         transport/tcp/opcua_tcplistener.c
         transport/tcp/opcua_tcplistener_connectionmanager.c
         transport/tcp/opcua_tcpstream.c
+        pubsub/opcua_pubsub_connection.c
+        pubsub/opcua_uadp_binarydecoder.c
+        pubsub/opcua_uadp_binaryencoder.c
     )
 
 if(WIN32)
@@ -103,6 +106,7 @@ if(WIN32)
         platforms/win32/opcua_p_socket_interface.c
         platforms/win32/opcua_p_socket_internal.c
         platforms/win32/opcua_p_socket_ssl.c
+        platforms/win32/opcua_p_socket_udp.c
         platforms/win32/opcua_p_string.c
         platforms/win32/opcua_p_thread.c
         platforms/win32/opcua_p_timer.c
@@ -139,6 +143,7 @@ else()
         platforms/linux/opcua_p_socket_interface.c
         platforms/linux/opcua_p_socket_internal.c
         platforms/linux/opcua_p_socket_ssl.c
+        platforms/linux/opcua_p_socket_udp.c
         platforms/linux/opcua_p_string.c
         platforms/linux/opcua_p_thread.c
         platforms/linux/opcua_p_timer.c
@@ -159,6 +164,7 @@ endif()
         PUBLIC stackcore
         PUBLIC transport/https
         PUBLIC transport/tcp
+        PUBLIC pubsub
         PUBLIC ${OPENSSL_INCLUDE_DIR}
     )
     option(trace_enable "set to OFF to disable stack tracing." ON)

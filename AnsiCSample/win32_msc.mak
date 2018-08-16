@@ -37,7 +37,7 @@ OPENSSLINC = $(OPENSSLDIR)\include
 
 CFLAGS = /MT /Ox /W3 /Gs0 /GF /Gy /nologo /Zi /Fd$(TARGET).pdb \
          /I$(ROOT)\Stack\core /I$(ROOT)\Stack\stackcore /I$(ROOT)\Stack\securechannel \
-         /I$(ROOT)\Stack\proxystub\clientproxy /I$(ROOT)\Stack\proxystub\serverstub /I$(ROOT)\Stack\platforms\win32 /I$(OPENSSLINC)
+         /I$(ROOT)\Stack\proxystub\clientproxy /I$(ROOT)\Stack\proxystub\serverstub /I$(ROOT)\Stack\pubsub /I$(ROOT)\Stack\platforms\win32 /I$(OPENSSLINC)
 
 LIBS = $(ROOT)\lib\$(ODIR)\uastack.lib $(OPENSSLDIR)\lib\ssleay32.lib $(OPENSSLDIR)\lib\libeay32.lib \
        rpcrt4.lib ws2_32.lib gdi32.lib advapi32.lib crypt32.lib user32.lib

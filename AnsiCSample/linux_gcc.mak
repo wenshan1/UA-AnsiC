@@ -41,7 +41,7 @@ LIB_FLAGS = $(patsubst %,-l%,$(UA_LIBS))
 TARGET = $(ROOT)/bin/$(BIN_PATH)/$(CC)/$(BUILD_TARGET)/AnsiCServer
 
 STACK_DIRS = core stackcore securechannel \
-       proxystub/clientproxy proxystub/serverstub platforms/linux
+       proxystub/clientproxy proxystub/serverstub pubsub platforms/linux
 
 INCLUDE_DIRS = $(patsubst %,../Stack/%,$(STACK_DIRS))
 

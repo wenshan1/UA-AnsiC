@@ -53,7 +53,6 @@
 #include <opcua_p_socket_internal.h>
 #include <opcua_p_socket_interface.h>
 
-
 #if OPCUA_MULTITHREADED
 /*============================================================================
  * This function serves a single socket manager in multithreading configuration.
@@ -716,14 +715,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_GetPeerInfo(  OpcUa_Socket a_pSock
     OpcUa_ReturnErrorIfArgumentNull(a_pSocket);
 
     return (*ppSocketServiceTable)->SocketGetPeerInfo(a_pSocket, a_achPeerInfoBuffer, a_uiPeerInfoBufferSize);
-}
-
-/*============================================================================
- * Convert OpcUa_StringA into binary ip address
- *===========================================================================*/
-OpcUa_UInt32 OPCUA_DLLCALL OpcUa_P_Socket_InetAddr(OpcUa_StringA a_sRemoteAddress)
-{
-    return OpcUa_P_RawSocket_InetAddr(a_sRemoteAddress);
 }
 
 /*============================================================================

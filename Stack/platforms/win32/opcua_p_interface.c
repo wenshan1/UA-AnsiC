@@ -44,6 +44,7 @@
 #include <opcua_p_semaphore.h>
 #include <opcua_p_socket_interface.h>
 #include <opcua_p_socket_ssl.h>
+#include <opcua_p_socket_udp.h>
 #include <opcua_p_string.h>
 #include <opcua_p_thread.h>
 #include <opcua_p_trace.h>
@@ -121,7 +122,6 @@ OpcUa_Port_CallTable g_OpcUa_Port_CallTable =
     OpcUa_P_CharAToInt,
 
     /* Network */
-    OpcUa_P_Socket_InetAddr,
     OpcUa_P_SocketManager_Create,
     OpcUa_P_SocketManager_Delete,
     OpcUa_P_SocketManager_CreateServer,
@@ -135,6 +135,8 @@ OpcUa_Port_CallTable g_OpcUa_Port_CallTable =
 #endif
     OpcUa_P_SocketManager_SignalEvent,
     OpcUa_P_SocketManager_ServeLoop,
+    OpcUa_P_SocketUdp_CreateSender,
+    OpcUa_P_SocketUdp_CreateReceiver,
     OpcUa_P_Socket_Read,
     OpcUa_P_Socket_Write,
     OpcUa_P_Socket_Close,

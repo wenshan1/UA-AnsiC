@@ -376,6 +376,42 @@ OpcUa_Boolean OpcUa_P_RawSocket_FD_Isset(   OpcUa_RawSocket         a_RawSocket,
                                             OpcUa_P_Socket_Array*   a_pFdSet);
 
 
-OpcUa_UInt32 OpcUa_P_RawSocket_InetAddr(    OpcUa_StringA   sRemoteAddress);
+/*!
+ * @brief Create a connected UDP system socket for multicast traffic.
+ *
+ * @param pRawSocket       [out]   Pointer to a system socket to store the new one.
+ * @param bSender          [in]    True for sending socket, False for receiving socket.
+ * @param LocalIpAddress   [in]    Local interface IP address.
+ * @param RemoteIpAddress  [in]    Remote IP address (multicast).
+ * @param RemotePort       [in]    Remote port number address.
+ * @param TimeToLive       [in]    Time to live for sent packets.
+ *
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
+ */
+OpcUa_StatusCode OpcUa_P_RawSocket_CreateUdp(   OpcUa_RawSocket* pRawSocket,
+                                                OpcUa_Boolean    bSender,
+                                                OpcUa_StringA    LocalIpAddress,
+                                                OpcUa_StringA    RemoteIpAddress,
+                                                OpcUa_Int16      RemotePort,
+                                                OpcUa_Byte       TimeToLive);
+
+/*!
+ * @brief Create a connected UDPv6 system socket for multicast traffic.
+ *
+ * @param pRawSocket       [out]   Pointer to a system socket to store the new one.
+ * @param bSender          [in]    True for sending socket, False for receiving socket.
+ * @param LocalIpAddress   [in]    Local interface IP address.
+ * @param RemoteIpAddress  [in]    Remote IP address (multicast).
+ * @param RemotePort       [in]    Remote port number address.
+ * @param TimeToLive       [in]    Time to live for sent packets.
+ *
+ * @return A "Good" status code if no error occurred, a "Bad" status code otherwise.
+ */
+OpcUa_StatusCode OpcUa_P_RawSocket_CreateUdpV6( OpcUa_RawSocket* pRawSocket,
+                                                OpcUa_Boolean    bSender,
+                                                OpcUa_StringA    LocalIpAddress,
+                                                OpcUa_StringA    RemoteIpAddress,
+                                                OpcUa_Int16      RemotePort,
+                                                OpcUa_Byte       TimeToLive);
 
 #endif /* _OpcUa_P_Socket_H_ */

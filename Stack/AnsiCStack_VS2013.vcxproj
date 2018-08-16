@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../include/$(Platform);./proxystub/serverstub/;./core/;./platforms/win32/;./stackcore;./securechannel;./transport/https;./transport/tcp;./proxystub/clientproxy;../openssl/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include/$(Platform);./proxystub/serverstub/;./core/;./platforms/win32/;./stackcore;./securechannel;./transport/https;./transport/tcp;./proxystub/clientproxy;./pubsub;../openssl/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;STRICT;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -95,7 +95,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../include/$(Platform);./proxystub/serverstub/;./core/;./platforms/win32/;./stackcore;./securechannel;./transport/https;./transport/tcp;./proxystub/clientproxy;../openssl/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../include/$(Platform);./proxystub/serverstub/;./core/;./platforms/win32/;./stackcore;./securechannel;./transport/https;./transport/tcp;./proxystub/clientproxy;./pubsub;../openssl/include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -170,6 +170,7 @@
     <ClInclude Include="platforms\win32\opcua_p_socket_interface.h" />
     <ClInclude Include="platforms\win32\opcua_p_socket_internal.h" />
     <ClInclude Include="platforms\win32\opcua_p_socket_ssl.h" />
+    <ClInclude Include="platforms\win32\opcua_p_socket_udp.h" />
     <ClInclude Include="platforms\win32\opcua_p_string.h" />
     <ClInclude Include="platforms\win32\opcua_p_thread.h" />
     <ClInclude Include="platforms\win32\opcua_p_timer.h" />
@@ -226,6 +227,8 @@
     <ClInclude Include="proxystub\clientproxy\opcua_channel_internal.h" />
     <ClInclude Include="proxystub\clientproxy\opcua_clientapi.h" />
     <ClInclude Include="proxystub\clientproxy\opcua_clientproxy.h" />
+    <ClInclude Include="pubsub\opcua_pubsub_connection.h" />
+    <ClInclude Include="pubsub\opcua_uadp_networkmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\opcua_buffer.c">
@@ -445,6 +448,12 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="platforms\win32\opcua_p_socket_ssl.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="platforms\win32\opcua_p_socket_udp.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -719,6 +728,24 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="proxystub\clientproxy\opcua_clientapi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_pubsub_connection.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_uadp_binarydecoder.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_uadp_binaryencoder.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -27,6 +27,8 @@ OPCUA_BEGIN_EXTERN_C
 #define OPCUA_P_SOCKETMANAGER_CREATESSLCLIENT  OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketManagerCreateSslClient
 #define OPCUA_P_SOCKETMANAGER_SIGNALEVENT   OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketManagerSignalEvent
 #define OPCUA_P_SOCKETMANAGER_SERVELOOP     OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketManagerServeLoop
+#define OPCUA_P_SOCKETUDP_CREATESENDER      OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketUdpCreateSender
+#define OPCUA_P_SOCKETUDP_CREATERECEIVER    OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketUdpCreateReceiver
 
 #define OPCUA_P_SOCKET_READ                 OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketRead
 #define OPCUA_P_SOCKET_WRITE                OpcUa_ProxyStub_g_PlatformLayerCalltable->SocketWrite
@@ -42,4 +44,3 @@ OPCUA_BEGIN_EXTERN_C
 OPCUA_END_EXTERN_C
 
 #endif /* _OpcUa_Socket_H_ */
-

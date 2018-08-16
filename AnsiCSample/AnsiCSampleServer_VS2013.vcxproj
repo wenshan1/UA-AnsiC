@@ -63,7 +63,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../Stack/core;../Stack/stackcore;../Stack/proxystub/clientproxy;../Stack/proxystub/serverstub;../Stack/platforms/win32;../Stack/securechannel</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Stack/core;../Stack/stackcore;../Stack/proxystub/clientproxy;../Stack/proxystub/serverstub;../Stack/platforms/win32;../Stack/securechannel;../Stack/pubsub</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;STRICT;_CRTDBG_MAP_ALLOC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -105,7 +105,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../Stack/core;../Stack/stackcore;../Stack/proxystub/clientproxy;../Stack/proxystub/serverstub;../Stack/platforms/win32;../Stack/securechannel</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Stack/core;../Stack/stackcore;../Stack/proxystub/clientproxy;../Stack/proxystub/serverstub;../Stack/platforms/win32;../Stack/securechannel;../Stack/pubsub</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>HAVE_MEMMOVE;WIN32;NDEBUG;_LIB;STRICT;_UA_STACK_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

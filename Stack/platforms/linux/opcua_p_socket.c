@@ -983,14 +983,210 @@ OpcUa_Int32 OpcUa_P_RawSocket_GetLastError( OpcUa_RawSocket a_RawSocket)
 }
 
 /*============================================================================
- * Initialize the platform network interface
+ * Create a UDP socket
  *===========================================================================*/
-OpcUa_UInt32 OpcUa_P_RawSocket_InetAddr(OpcUa_StringA sRemoteAddress)
+OpcUa_StatusCode OpcUa_P_RawSocket_CreateUdp(   OpcUa_RawSocket* a_pRawSocket,
+                                                OpcUa_Boolean    a_bSender,
+                                                OpcUa_StringA    a_LocalIpAddress,
+                                                OpcUa_StringA    a_RemoteIpAddress,
+                                                OpcUa_Int16      a_RemotePort,
+                                                OpcUa_Byte       a_TimeToLive)
 {
-    if(sRemoteAddress != OpcUa_Null)
+    int                 rawSocket   = OPCUA_P_SOCKET_INVALID;
+    int                 flag        = 1;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_CreateUdp");
+    OpcUa_GotoErrorIfArgumentNull(a_pRawSocket);
+    OpcUa_GotoErrorIfArgumentNull(a_RemoteIpAddress);
+
+    /* create socket through platform API */
+    rawSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+    /* check if socket creation was successful */
+    if(rawSocket == OPCUA_P_SOCKET_INVALID)
     {
-        return (OpcUa_UInt32)inet_addr(sRemoteAddress);
+        uStatus = OpcUa_BadCommunicationError;
+        goto Error;
     }
 
-    return 0;
+    if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, SOL_SOCKET,  SO_REUSEADDR, (char*)&flag, sizeof(int)))
+    {
+        uStatus = OpcUa_BadCommunicationError;
+        goto Error;
+    }
+
+    if(a_bSender)
+    {
+        /* A sender shall (try) to reduce receive buffer size - possible errors are ignored */
+        setsockopt(rawSocket, SOL_SOCKET,  SO_RCVBUF, (char*)&flag, sizeof(int));
+        uStatus = OpcUa_P_RawSocket_BindEx(rawSocket, a_LocalIpAddress, a_RemotePort);
+        OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_P_RawSocket_Connect(rawSocket, a_RemotePort, a_RemoteIpAddress);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+    else
+    {
+        uStatus = OpcUa_P_RawSocket_BindEx(rawSocket, a_RemoteIpAddress, a_RemotePort);
+        OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_P_RawSocket_SetBlockMode(rawSocket, OpcUa_False);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    if(a_bSender)
+    {
+        if(a_TimeToLive > 0)
+        {
+            flag = a_TimeToLive;
+            if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&flag, sizeof(int)))
+            {
+                OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+            }
+        }
+        if(a_LocalIpAddress != OpcUa_Null)
+        {
+            struct in_addr if_ip;
+            if_ip.s_addr = inet_addr(a_LocalIpAddress);
+            if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IP, IP_MULTICAST_IF, (char*)&if_ip, sizeof(if_ip)))
+            {
+                OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+            }
+        }
+    }
+    else
+    {
+        struct ip_mreq if_mr;
+        if_mr.imr_multiaddr.s_addr = inet_addr(a_RemoteIpAddress);
+        if_mr.imr_interface.s_addr = INADDR_ANY;
+        if(a_LocalIpAddress != OpcUa_Null)
+        {
+            if_mr.imr_interface.s_addr = inet_addr(a_LocalIpAddress);
+        }
+        if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char*)&if_mr, sizeof(if_mr)))
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+        }
+    }
+
+    *a_pRawSocket = rawSocket;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    if(rawSocket != OPCUA_P_SOCKET_INVALID)
+    {
+        OpcUa_P_RawSocket_Close(rawSocket);
+        *a_pRawSocket = OPCUA_P_SOCKET_INVALID;
+    }
+
+    OpcUa_FinishErrorHandling;
+}
+
+/*============================================================================
+ * Create a UDPv6 socket
+ *===========================================================================*/
+OpcUa_StatusCode OpcUa_P_RawSocket_CreateUdpV6( OpcUa_RawSocket* a_pRawSocket,
+                                                OpcUa_Boolean    a_bSender,
+                                                OpcUa_StringA    a_LocalIpAddress,
+                                                OpcUa_StringA    a_RemoteIpAddress,
+                                                OpcUa_Int16      a_RemotePort,
+                                                OpcUa_Byte       a_TimeToLive)
+{
+    int                 rawSocket   = OPCUA_P_SOCKET_INVALID;
+    int                 flag        = 1;
+    char                *pScopeId;
+    int                 apiResult;
+
+    OpcUa_InitializeStatus(OpcUa_Module_Socket, "P_CreateUdpV6");
+    OpcUa_GotoErrorIfArgumentNull(a_pRawSocket);
+    OpcUa_GotoErrorIfArgumentNull(a_RemoteIpAddress);
+
+    /* create socket through platform API */
+    rawSocket = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+
+    /* check if socket creation was successful */
+    if(rawSocket == OPCUA_P_SOCKET_INVALID)
+    {
+        uStatus = OpcUa_BadCommunicationError;
+        goto Error;
+    }
+
+    if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, SOL_SOCKET,  SO_REUSEADDR, (char*)&flag, sizeof(int)))
+    {
+        uStatus = OpcUa_BadCommunicationError;
+        goto Error;
+    }
+
+    if(a_bSender)
+    {
+        /* A sender shall (try) to reduce receive buffer size - possible errors are ignored */
+        setsockopt(rawSocket, SOL_SOCKET,  SO_RCVBUF, (char*)&flag, sizeof(int));
+        uStatus = OpcUa_P_RawSocket_BindV6(rawSocket, a_LocalIpAddress, a_RemotePort);
+        OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_P_RawSocket_ConnectV6(rawSocket, a_RemotePort, a_RemoteIpAddress);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+    else
+    {
+        uStatus = OpcUa_P_RawSocket_BindV6(rawSocket, a_RemoteIpAddress, a_RemotePort);
+        OpcUa_GotoErrorIfBad(uStatus);
+        uStatus = OpcUa_P_RawSocket_SetBlockMode(rawSocket, OpcUa_False);
+        OpcUa_GotoErrorIfBad(uStatus);
+    }
+
+    pScopeId = strchr(a_RemoteIpAddress, '%');
+    if(a_bSender)
+    {
+        if(a_TimeToLive > 0)
+        {
+            flag = a_TimeToLive - 1;
+            if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, (char*)&flag, sizeof(int)))
+            {
+                OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+            }
+        }
+        if(pScopeId != NULL)
+        {
+            flag = OpcUa_P_CharAToInt(pScopeId+1);
+            if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IPV6, IPV6_MULTICAST_IF, (char*)&flag, sizeof(int)))
+            {
+                OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+            }
+        }
+    }
+    else
+    {
+        struct ipv6_mreq if_mr;
+        if_mr.ipv6mr_interface = 0;
+        if(pScopeId != NULL)
+        {
+            if_mr.ipv6mr_interface = OpcUa_P_CharAToInt(pScopeId+1);
+            *pScopeId = 0;
+        }
+        apiResult = inet_pton(AF_INET6, a_RemoteIpAddress, (void*)&if_mr.ipv6mr_multiaddr);
+        if(pScopeId != NULL)
+        {
+            *pScopeId = '%';
+        }
+        if(apiResult <= 0)
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+        }
+        if(OPCUA_P_SOCKET_SOCKETERROR == setsockopt(rawSocket, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP, (char*)&if_mr, sizeof(if_mr)))
+        {
+            OpcUa_GotoErrorWithStatus(OpcUa_BadCommunicationError);
+        }
+    }
+
+    *a_pRawSocket = rawSocket;
+
+    OpcUa_ReturnStatusCode;
+    OpcUa_BeginErrorHandling;
+
+    if(rawSocket != OPCUA_P_SOCKET_INVALID)
+    {
+        OpcUa_P_RawSocket_Close(rawSocket);
+        *a_pRawSocket = OPCUA_P_SOCKET_INVALID;
+    }
+
+    OpcUa_FinishErrorHandling;
 }

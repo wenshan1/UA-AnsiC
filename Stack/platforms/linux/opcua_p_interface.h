@@ -456,12 +456,6 @@ struct S_OpcUa_Port_CallTable
     /**@name Network Functions */
     /**@{*/
 
-    /** @brief Convert the given IPv4 network address into its binary representation.
-     *         No longer required by the stack. Can be ignored and may be removed in future versions.
-     *  @ingroup opcua_platformlayer_interface
-     */
-    OpcUa_UInt32        (OPCUA_DLLCALL* InetAddr)                 ( OpcUa_StringA               sRemoteAddress);
-
     /** @brief Create a socket manager with the ability to host nSockets sockets and use the given runtime behavior flags.
      *  @ingroup opcua_platformlayer_interface
      */
@@ -557,6 +551,23 @@ struct S_OpcUa_Port_CallTable
     OpcUa_StatusCode    (OPCUA_DLLCALL* SocketManagerServeLoop)   ( OpcUa_SocketManager         pSocketManager,
                                                                     OpcUa_UInt32                msecTimeout,
                                                                     OpcUa_Boolean               bRunOnce);
+
+    /** @brief Create a UDP Socket for sending to a given multicast address / port.  LocalIpAddress may be NULL.
+     *  @ingroup opcua_platformlayer_interface
+     */
+    OpcUa_StatusCode    (OPCUA_DLLCALL* SocketUdpCreateSender)    ( OpcUa_StringA               LocalIpAddress,
+                                                                    OpcUa_StringA               RemoteIpAddress,
+                                                                    OpcUa_Int16                 RemotePort,
+                                                                    OpcUa_Byte                  TimeToLive,
+                                                                    OpcUa_Socket*               pSocket);
+
+    /** @brief Create a UDP Socket for receiving from a given multicast address / port.  LocalIpAddress may be NULL.
+     *  @ingroup opcua_platformlayer_interface
+     */
+    OpcUa_StatusCode    (OPCUA_DLLCALL* SocketUdpCreateReceiver)  ( OpcUa_StringA               LocalIpAddress,
+                                                                    OpcUa_StringA               RemoteIpAddress,
+                                                                    OpcUa_Int16                 RemotePort,
+                                                                    OpcUa_Socket*               pSocket);
 
     /** @brief Copy a maximum of BufferSize bytes from the socket into pBuffer and store the actual number bytes copied in puintBytesRead.
      *         A *puintBytesRead is interpreted as a shutdown of the inbound direction by the peer.

@@ -140,11 +140,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_InitializeNetwork(    void);
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_CleanupNetwork(       void);
 
 /*============================================================================
- * Convert a text encoded internet address to its binary representation.
- *===========================================================================*/
-OpcUa_UInt32 OPCUA_DLLCALL OpcUa_P_Socket_InetAddr(                 OpcUa_StringA sRemoteAddress);
-
-/*============================================================================
  * Get the name of the local host.
  *===========================================================================*/
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_GetHostName(          OpcUa_CharA* pBuffer,

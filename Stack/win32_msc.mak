@@ -24,7 +24,7 @@ OPENSSLINC = $(OPENSSLDIR)\include
 
 CFLAGS = /MT /Ox /W3 /Gs0 /GF /Gy /nologo /Zl /Zi /Fd$(TARGET).pdb \
          /Icore /Istackcore /Isecurechannel /Itransport\tcp /Itransport\https \
-         /Iproxystub\clientproxy /Iproxystub\serverstub /Iplatforms\win32 /I$(OPENSSLINC)
+         /Iproxystub\clientproxy /Iproxystub\serverstub /Ipubsub /Iplatforms\win32 /I$(OPENSSLINC)
 
 OBJECTS = \
 	$(ODIR)\opcua_buffer.obj \
@@ -79,6 +79,9 @@ OBJECTS = \
 	$(ODIR)\opcua_httpslistener.obj \
 	$(ODIR)\opcua_httpslistener_connectionmanager.obj \
 	$(ODIR)\opcua_httpsstream.obj \
+	$(ODIR)\opcua_pubsub_connection.obj \
+	$(ODIR)\opcua_uadp_binarydecoder.obj \
+	$(ODIR)\opcua_uadp_binaryencoder.obj \
 	$(ODIR)\opcua_p_binary.obj \
 	$(ODIR)\opcua_p_cryptofactory.obj \
 	$(ODIR)\opcua_p_datetime.obj \
@@ -103,6 +106,7 @@ OBJECTS = \
 	$(ODIR)\opcua_p_socket_interface.obj \
 	$(ODIR)\opcua_p_socket_internal.obj \
 	$(ODIR)\opcua_p_socket_ssl.obj \
+	$(ODIR)\opcua_p_socket_udp.obj \
 	$(ODIR)\opcua_p_string.obj \
 	$(ODIR)\opcua_p_thread.obj \
 	$(ODIR)\opcua_p_timer.obj \
@@ -146,6 +150,9 @@ $(TARGET): $(TARGET_DIR) $(ODIR) $(OBJECTS)
 	$(CC) $(CFLAGS) /Fo$@ /c $<
 
 {transport\https}.c{$(ODIR)}.obj:
+	$(CC) $(CFLAGS) /Fo$@ /c $<
+
+{pubsub}.c{$(ODIR)}.obj:
 	$(CC) $(CFLAGS) /Fo$@ /c $<
 
 {platforms\win32}.c{$(ODIR)}.obj:

@@ -55,6 +55,7 @@ typedef struct _OpcUa_StatusCodeString
 #define OpcUa_Module_Listener           0x00000006
 #define OpcUa_Module_MemoryStream       0x00000007
 #define OpcUa_Module_PkiProvider        0x00000008
+#define OpcUa_Module_PubSub             0x00000009
 
 /* transport modules */
 #define OpcUa_Module_TcpListener        0x00000101
@@ -66,7 +67,7 @@ typedef struct _OpcUa_StatusCodeString
 #define OpcUa_Module_SecureStream       0x00000107
 #define OpcUa_Module_SecureChannel      0x00000108
 #define OpcUa_Module_HttpStream         0x00000109
-#define OpcUa_Module_HttpConnection     0x00000110
+#define OpcUa_Module_HttpConnection     0x0000010A
 
 /* core modules */
 #define OpcUa_Module_Mutex              0x00000201

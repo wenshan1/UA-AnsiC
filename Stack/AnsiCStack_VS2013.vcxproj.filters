@@ -34,6 +34,9 @@
     <Filter Include="transport\https">
       <UniqueIdentifier>{cbba7259-5d01-4bdf-804e-927370e6f92d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pubsub">
+      <UniqueIdentifier>{9fd50fa8-d081-401c-9cf6-d6b749b31d10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\opcua.h">
@@ -330,6 +333,15 @@
     <ClInclude Include="platforms\win32\opcua_p_socket_ssl.h">
       <Filter>platforms\win32</Filter>
     </ClInclude>
+    <ClInclude Include="platforms\win32\opcua_p_socket_udp.h">
+      <Filter>platforms\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="pubsub\opcua_pubsub_connection.h">
+      <Filter>pubsub</Filter>
+    </ClInclude>
+    <ClInclude Include="pubsub\opcua_uadp_networkmessage.h">
+      <Filter>pubsub</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\opcua_buffer.c">
@@ -577,6 +589,18 @@
     </ClCompile>
     <ClCompile Include="platforms\win32\opcua_p_socket_ssl.c">
       <Filter>platforms\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="platforms\win32\opcua_p_socket_udp.c">
+      <Filter>platforms\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_pubsub_connection.c">
+      <Filter>pubsub</Filter>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_uadp_binarydecoder.c">
+      <Filter>pubsub</Filter>
+    </ClCompile>
+    <ClCompile Include="pubsub\opcua_uadp_binaryencoder.c">
+      <Filter>pubsub</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

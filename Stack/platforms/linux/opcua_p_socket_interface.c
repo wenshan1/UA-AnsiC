@@ -792,14 +792,6 @@ OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_GetPeerInfo(  OpcUa_Socket a_pSock
 }
 
 /*============================================================================
- * Convert OpcUa_StringA into binary ip address
- *===========================================================================*/
-OpcUa_UInt32 OPCUA_DLLCALL OpcUa_P_Socket_InetAddr(OpcUa_StringA a_sRemoteAddress)
-{
-    return OpcUa_P_RawSocket_InetAddr(a_sRemoteAddress);
-}
-
-/*============================================================================
  * Get the name of the local host.
  *===========================================================================*/
 OpcUa_StatusCode OPCUA_DLLCALL OpcUa_P_Socket_GetHostName( OpcUa_CharA* a_pBuffer,

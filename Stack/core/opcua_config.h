@@ -48,6 +48,9 @@
 /** @brief Enable or disable the https support. */
 #define OPCUA_HAVE_HTTPS                            OPCUA_CONFIG_YES
 
+/** @brief Enable or disable the PubSub support. */
+#define OPCUA_HAVE_PUBSUB                           OPCUA_CONFIG_YES
+
 /* * @brief AUTOMATIC; activate additional modules required by https */
 #if OPCUA_HAVE_HTTPS
 # define OPCUA_HAVE_HTTPSAPI                        1
