@@ -40,30 +40,6 @@ typedef struct _OpcUa_StringInternal
 
 
 /*============================================================================
-* Get a pointer to the first character of the content.
-*===========================================================================*/
-#define _OpcUa_String_GetRawString(x)   ( (((OpcUa_StringA)x)[0]=='\0')?(OpcUa_StringA)(((OpcUa_pStringInternal)x)->strContent):((OpcUa_StringA)x))
-
-/*============================================================================
-* Cast a C string into a OpcUa_String.
-*===========================================================================*/
-#if !OPCUA_PREFERINLINE
-    OpcUa_String* OpcUa_String_FromCString( OpcUa_StringA   a_strCString )
-    {
-        if(a_strCString == OpcUa_Null)
-        {
-            return OpcUa_Null;
-        }
-        if(a_strCString[0]==0x00)
-        {
-            return OpcUa_Null;
-        }
-        return (OpcUa_String*) a_strCString;
-    }
-#endif /* OPCUA_PREFERINLINE */
-
-
-/*============================================================================
 * Check if argument is OpcUa_String instance.
 *===========================================================================*/
 #if OPCUA_PREFERINLINE

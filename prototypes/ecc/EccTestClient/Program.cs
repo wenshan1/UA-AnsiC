@@ -230,9 +230,8 @@ namespace EccTestClient
             clientEmpheralKey.SecretAppend = null;
             clientEmpheralKey.SecretPrepend = null;
 
-            var nonce = new UTF8Encoding().GetBytes("client");
-            Console.WriteLine("NET: ClientNonce: {0}", FormatHexString(nonce));
-            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, null, nonce, null);
+            Console.WriteLine("NET: CLIENT SECRET HMAC KEY {0}", FormatHexString(serverNonce));
+            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, serverNonce, null, null);
             Console.WriteLine("NET: ClientSecret: {0}", FormatHexString(clientSecret2));
 
             if (!AreEqual(clientSecret1, clientSecret2))
@@ -240,10 +239,8 @@ namespace EccTestClient
                 Console.WriteLine("CLIENT KEYS DO NOT MATCH!");
             }
 
-            nonce = new UTF8Encoding().GetBytes("server");
-            Console.WriteLine("NET: ServerNonce: {0}", FormatHexString(nonce));
-
-            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, null, nonce, null);
+            Console.WriteLine("NET: SERVER SECRET HMAC KEY {0}", FormatHexString(clientNonce));
+            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, clientNonce, null, null);
             Console.WriteLine("NET: ServerSecret: {0}", FormatHexString(serverSecret2));
 
             if (!AreEqual(serverSecret1, serverSecret2))
@@ -271,35 +268,38 @@ namespace EccTestClient
             //Console.WriteLine("NET: Secret: {0}", FormatHexString(secret));
             //Console.WriteLine("NET: Seed: {0}", FormatHexString(seed));
 
-            HMACSHA256 hmac = new HMACSHA256(secret);
-
-            byte[] keySeed = hmac.ComputeHash(seed);
-            //Console.WriteLine("NET: A(1): {0}", FormatHexString(keySeed));
-
-            byte[] prfSeed = new byte[hmac.HashSize/8 + seed.Length];
-            Buffer.BlockCopy(keySeed, 0, prfSeed, 0, keySeed.Length);
-            Buffer.BlockCopy(seed, 0, prfSeed, keySeed.Length, seed.Length);
-            //Console.WriteLine("NET: S(1): {0}", FormatHexString(prfSeed));
-
-            // create buffer with requested size.
             byte[] output = new byte[length];
 
-            int position = 0;
+            HMACSHA256 hmac = new HMACSHA256(secret);
 
-            do
+            byte counter = 1;
+
+            byte[] info = new byte[hmac.HashSize/8 + seed.Length + 1];
+            Buffer.BlockCopy(seed, 0, info, 0, seed.Length);
+            info[seed.Length] = counter++;
+
+            byte[] hash = hmac.ComputeHash(info, 0, seed.Length+1);
+
+            int pos = 0;
+
+            for (int ii = 0; ii < hash.Length && pos < length; ii++)
             {
-                byte[] hash = hmac.ComputeHash(prfSeed);
-                //Console.WriteLine("NET: R(1): {0}", FormatHexString(hash));
-
-                for (int ii = 0; position < length && ii < hash.Length; ii++)
-                {
-                    output[position++] = hash[ii];
-                }
-
-                keySeed = hmac.ComputeHash(keySeed);
-                Buffer.BlockCopy(keySeed, 0, prfSeed, 0, keySeed.Length);
+                output[pos++] = hash[ii];
             }
-            while (position < length);
+
+            while (pos < length)
+            {
+                Buffer.BlockCopy(hash, 0, info, 0, hash.Length);
+                Buffer.BlockCopy(seed, 0, info, hash.Length, seed.Length);
+                info[info.Length-1] = counter++;
+
+                hash = hmac.ComputeHash(info, 0, info.Length);
+
+                for (int ii = 0; ii < hash.Length && pos < length; ii++)
+                {
+                    output[pos++] = hash[ii];
+                }
+            }
 
             return output;
         }
@@ -322,7 +322,7 @@ namespace EccTestClient
             return true;
         }
 
-        static byte[] Encode(X509Certificate2 publicKey, ECDsaCng signingKey, ECDiffieHellmanCng ephemeralKey, byte[] senderNonce)
+        static byte[] Encode(X509Certificate2 publicKey, ECDsaCng signingKey, ECDiffieHellmanCng ephemeralKey, out byte[] senderNonce)
         {
             var data = ephemeralKey.Key.Export(CngKeyBlobFormat.EccPublicBlob);
             var signingCertificate = publicKey.RawData;
@@ -330,8 +330,10 @@ namespace EccTestClient
             var buffer = new byte[UInt16.MaxValue];
 
             int ephemeralKeySize = ephemeralKey.KeySize / 4;
+            senderNonce = new byte[ephemeralKeySize];
+            Buffer.BlockCopy(data, 8, senderNonce, 0, ephemeralKeySize);
 
-            int length = 16 + ephemeralKeySize + signingCertificate.Length + senderNonce.Length;
+            int length = 12 + ephemeralKeySize + signingCertificate.Length;
 
             int signatureLength = signingKey.KeySize / 4;
             length += signatureLength;
@@ -343,8 +345,6 @@ namespace EccTestClient
                 ostrm.Write(signingCertificate, 0, signingCertificate.Length);
                 ostrm.Write(BitConverter.GetBytes(ephemeralKeySize), 0, 4);
                 ostrm.Write(data, 8, ephemeralKeySize);
-                ostrm.Write(BitConverter.GetBytes(senderNonce.Length), 0, 4);
-                ostrm.Write(senderNonce, 0, senderNonce.Length);
 
                 SHA256Cng sha = new SHA256Cng();
                 var hash = sha.ComputeHash(buffer, 0, length - signatureLength);
@@ -400,9 +400,8 @@ namespace EccTestClient
             var keyLength = BitConverter.ToInt32(data, start);
             start += 4;
 
-            int nonceLength = BitConverter.ToInt32(data, start + keyLength);
-            senderNonce = new byte[nonceLength];
-            Array.Copy(data, start + keyLength + 4, senderNonce, 0, senderNonce.Length);
+            senderNonce = new byte[keyLength];
+            Buffer.BlockCopy(data, start, senderNonce, 0, keyLength);
 
             using (var ostrm = new System.IO.MemoryStream())
             {
@@ -461,11 +460,7 @@ namespace EccTestClient
             senderECDH.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hmac;
             senderECDH.HashAlgorithm = CngAlgorithm.Sha256;
             
-            senderNonce = new byte[senderECDH.KeySize / 8];
-            new RNGCryptoServiceProvider().GetBytes(senderNonce);
-            senderECDH.Seed = senderNonce;
-
-            var request = Encode(senderPublicKey, senderPrivateKey, senderECDH, senderNonce);
+            var request = Encode(senderPublicKey, senderPrivateKey, senderECDH, out senderNonce);
             System.IO.File.WriteAllBytes(requestFilePath, request);
             return request;
         }
@@ -485,13 +480,7 @@ namespace EccTestClient
             receiverECDH.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hmac;
             receiverECDH.HashAlgorithm = CngAlgorithm.Sha256;
 
-            receiverNonce = new byte[receiverECDH.KeySize / 2];
-            new RNGCryptoServiceProvider().GetBytes(receiverNonce);
-            receiverECDH.Seed = receiverNonce;
-
-            byte[] receiverSecret = receiverECDH.DeriveKeyFromHmac(senderKeyData.PublicKey, HashAlgorithmName.SHA256, receiverNonce);
-
-            var response = Encode(receiverPublicKey, receiverPrivateKey, receiverECDH, receiverNonce);
+            var response = Encode(receiverPublicKey, receiverPrivateKey, receiverECDH, out receiverNonce);
             System.IO.File.WriteAllBytes(responseFilePath, response);
             return response;
         }
