@@ -35,17 +35,6 @@ namespace EccTestClient
             }
 
             return BigInteger.Parse(text, System.Globalization.NumberStyles.HexNumber | System.Globalization.NumberStyles.AllowHexSpecifier);
-
-            /*
-            byte[] bytes = new byte[text.Length / 2];
-
-            for (int ii = text.Length - 2; ii >= 0; ii -= 2)
-            {
-                bytes[(text.Length - 1 - ii)/2] = Convert.ToByte(text.Substring(ii, 2), 16); 
-            }
-
-            return new BigInteger(bytes);
-            */
         }
 
         static BigInteger ToBigIntegerFromDecimal(string text)
@@ -153,47 +142,55 @@ namespace EccTestClient
             return ECDsa.Create(ecParameters);
         }
 
-        static void CalculateY_NistP256()
+        static byte[] CreateSalt(string label, byte[] serverNonce, byte[] clientNonce)
         {
-            try
+            int length = 0;
+            byte[] utf8Label = null;
+
+            if (label != null)
             {
-                var key = ECDiffieHellmanCng.Create(ECCurve.NamedCurves.nistP256);
-
-                BigInteger a = ToBigIntegerFromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC");
-                BigInteger m = ToBigIntegerFromHex("FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF");
-                BigInteger b = ToBigIntegerFromHex("5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B");
-
-                var xy = key.PublicKey.ToByteArray();
-                BigInteger x = ToBigIntegerFromNumber(xy, 8, 32);
-                BigInteger y1 = ToBigIntegerFromNumber(xy, 40, 32);
-
-                // y2 = (pow(x, 3, m) + a * x + b) % m
-                var r1 = BigInteger.ModPow(x, 3, m);
-                var r2 = BigInteger.Multiply(a, x);
-                var r3 = r1 + r2 + b;
-                var r4 = r3 % m;
-
-                // y = pow(y2, (m + 1) / 4, m)
-                var r5 = BigInteger.Divide(m + 1, 4);
-                var y2 = BigInteger.ModPow(r4, r5, m);
-
-                if (!AreEqual(y1.ToByteArray(), y2.ToByteArray()))
-                {
-                    Console.WriteLine("CalculateY Failed");
-                }
+                utf8Label = new UTF8Encoding().GetBytes(label);
+                length += utf8Label.Length;
             }
-            catch (Exception e)
+
+            if (clientNonce != null)
             {
-                Console.WriteLine("CalculateY Failed. " + e.Message);
+                length += clientNonce.Length;
             }
+
+            if (serverNonce != null)
+            {
+                length += serverNonce.Length;
+            }
+
+            int offset = 0;
+            byte[] salt = new byte[length];
+
+            if (utf8Label != null)
+            {
+                Buffer.BlockCopy(utf8Label, 0, salt, offset, utf8Label.Length);
+                offset += utf8Label.Length;
+            }
+
+            if (serverNonce != null)
+            {
+                Buffer.BlockCopy(serverNonce, 0, salt, offset, serverNonce.Length);
+                offset += serverNonce.Length;
+            }
+
+            if (clientNonce != null)
+            {
+                Buffer.BlockCopy(clientNonce, 0, salt, offset, clientNonce.Length);
+                offset += clientNonce.Length;
+            }
+
+            return salt;
         }
 
         static void Main(string[] args)
         {
             EccOpenSsl.EccTester tester = new EccOpenSsl.EccTester();
             tester.Initialize();
-
-            CalculateY_NistP256();
 
             // certs are generated with openssl and use the NIST p256 curve.
             string senderCertificateFilePath = Path.Combine("..\\..\\..\\..\\pki\\certs\\", ClientCertificate + ".der");
@@ -230,8 +227,13 @@ namespace EccTestClient
             clientEmpheralKey.SecretAppend = null;
             clientEmpheralKey.SecretPrepend = null;
 
-            Console.WriteLine("NET: CLIENT SECRET HMAC KEY {0}", FormatHexString(serverNonce));
-            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, serverNonce, null, null);
+            var clientSalt = CreateSalt("opcua-client", clientNonce, serverNonce);
+            Console.WriteLine("NET: ClientSalt: {0}", FormatHexString(clientSalt));
+
+            var serverSalt = CreateSalt("opcua-server", serverNonce, clientNonce);
+            Console.WriteLine("NET: ServerSalt: {0}", FormatHexString(serverSalt));
+
+            var clientSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, serverSalt, null, null);
             Console.WriteLine("NET: ClientSecret: {0}", FormatHexString(clientSecret2));
 
             if (!AreEqual(clientSecret1, clientSecret2))
@@ -239,8 +241,7 @@ namespace EccTestClient
                 Console.WriteLine("CLIENT KEYS DO NOT MATCH!");
             }
 
-            Console.WriteLine("NET: SERVER SECRET HMAC KEY {0}", FormatHexString(clientNonce));
-            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, clientNonce, null, null);
+            var serverSecret2 = clientEmpheralKey.DeriveKeyFromHmac(serverEmpheralKey.PublicKey, HashAlgorithmName.SHA256, clientSalt, null, null);
             Console.WriteLine("NET: ServerSecret: {0}", FormatHexString(serverSecret2));
 
             if (!AreEqual(serverSecret1, serverSecret2))
@@ -249,12 +250,13 @@ namespace EccTestClient
             }
 
             Console.WriteLine("==== NET Derived Keys ====");
-            var serverKeys = DeriveKeys(serverSecret2, clientSecret2, 80);
+
+            var serverKeys = DeriveKeys(serverSecret2, serverSalt, 80);
             Console.WriteLine("NET: ServerSigningKey: {0}", FormatHexString(serverKeys, 0, 32));
             Console.WriteLine("NET: ServerEncryptingKey: {0}", FormatHexString(serverKeys, 32, 32));
             Console.WriteLine("NET: ServerInitializationVector: {0}", FormatHexString(serverKeys, 64, 16));
 
-            var clientKeys = DeriveKeys(clientSecret2, serverSecret2, 80);
+            var clientKeys = DeriveKeys(clientSecret2, clientSalt, 80);
             Console.WriteLine("NET: ClientSigningKey: {0}", FormatHexString(clientKeys, 0, 32));
             Console.WriteLine("NET: ClientEncryptingKey: {0}", FormatHexString(clientKeys, 32, 32));
             Console.WriteLine("NET: ClientInitializationVector: {0}", FormatHexString(clientKeys, 64, 16));
@@ -263,7 +265,7 @@ namespace EccTestClient
             Console.ReadLine();
         }
 
-        static byte[] DeriveKeys(byte[] secret, byte[] seed, int length)
+        static byte[] DeriveKeys(byte[] secret, byte[] salt, int length)
         {
             //Console.WriteLine("NET: Secret: {0}", FormatHexString(secret));
             //Console.WriteLine("NET: Seed: {0}", FormatHexString(seed));
@@ -274,11 +276,11 @@ namespace EccTestClient
 
             byte counter = 1;
 
-            byte[] info = new byte[hmac.HashSize/8 + seed.Length + 1];
-            Buffer.BlockCopy(seed, 0, info, 0, seed.Length);
-            info[seed.Length] = counter++;
+            byte[] info = new byte[hmac.HashSize/8 + salt.Length + 1];
+            Buffer.BlockCopy(salt, 0, info, 0, salt.Length);
+            info[salt.Length] = counter++;
 
-            byte[] hash = hmac.ComputeHash(info, 0, seed.Length+1);
+            byte[] hash = hmac.ComputeHash(info, 0, salt.Length+1);
 
             int pos = 0;
 
@@ -290,7 +292,7 @@ namespace EccTestClient
             while (pos < length)
             {
                 Buffer.BlockCopy(hash, 0, info, 0, hash.Length);
-                Buffer.BlockCopy(seed, 0, info, hash.Length, seed.Length);
+                Buffer.BlockCopy(salt, 0, info, hash.Length, salt.Length);
                 info[info.Length-1] = counter++;
 
                 hash = hmac.ComputeHash(info, 0, info.Length);

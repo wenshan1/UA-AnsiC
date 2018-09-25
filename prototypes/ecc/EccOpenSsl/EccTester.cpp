@@ -587,18 +587,56 @@ bool GenerateKeys(
 	return true;
 }
 
-bool CreateNonce(unsigned int length, OpcUa_ByteString* pNonce)
+bool ComputeSalt(
+	const char* pLabel,
+	OpcUa_ByteString* pServerNonce,
+	OpcUa_ByteString* pClientNonce,
+	OpcUa_ByteString* pSalt)
 {
-	pNonce->Length = length;
-	pNonce->Data = new unsigned char[length];
+	int length = 0;
 
-	if (RAND_bytes(pNonce->Data, length) <= 0)
+	if (pLabel != nullptr)
 	{
-		delete[] pNonce->Data;
-		pNonce->Length = 0;
-		pNonce->Data = nullptr;
+		length += strlen(pLabel);
+	}
+
+	if (pServerNonce != nullptr)
+	{
+		length += pServerNonce->Length;
+	}
+
+	if (pClientNonce != nullptr)
+	{
+		length += pClientNonce->Length;
+	}
+
+	int offset = 0;
+	pSalt->Data = new unsigned char[length];
+
+	if (pSalt->Data == nullptr)
+	{
 		return false;
 	}
+
+	if (pLabel != nullptr)
+	{
+		memcpy(pSalt->Data, pLabel, strlen(pLabel));
+		offset += strlen(pLabel);
+	}
+
+	if (pServerNonce != nullptr)
+	{
+		memcpy(pSalt->Data + offset, pServerNonce->Data, pServerNonce->Length);
+		offset += pServerNonce->Length;
+	}
+
+	if (pClientNonce != nullptr)
+	{
+		memcpy(pSalt->Data + offset, pClientNonce->Data, pClientNonce->Length);
+		offset += pClientNonce->Length;
+	}
+
+	pSalt->Length = length;
 
 	return true;
 }
@@ -923,6 +961,10 @@ namespace EccOpenSsl {
 		OpcUa_ByteString localClientSecret = { 0, 0 };
 		OpcUa_ByteString localServerSecret = { 0, 0 };
 		OpcUa_ByteString derivedKeys = { 0, 0 };
+		OpcUa_ByteString serverSalt = { 0, 0 };
+		OpcUa_ByteString clientSalt = { 0, 0 };
+		OpcUa_ByteString serverNonce = { 0, 0 };
+		OpcUa_ByteString clientNonce = { 0, 0 };
 
 		try
 		{
@@ -937,38 +979,55 @@ namespace EccOpenSsl {
 			{
 				throw gcnew ArgumentException("generateKeys");
 			}
+			
+			serverNonce.Data = m_p->EphemeralPublicKey.Data;
+			serverNonce.Length = m_p->EphemeralPublicKey.Length;
 
-			PrintHexString("SSL: CLIENT SECRET HMAC KEY: ", m_p->EphemeralPublicKey);
+			clientNonce.Data = clientEphemeralPublicKey.Data;
+			clientNonce.Length = clientEphemeralPublicKey.Length;
 
-			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &m_p->EphemeralPublicKey, &localClientSecret))
+			if (!ComputeSalt("opcua-client", &clientNonce, &serverNonce, &clientSalt))
 			{
-				throw gcnew ArgumentException("computeSecret");
+				throw gcnew ArgumentException("computeSalt(clientSalt)");
+			}
+
+			PrintHexString("SSL: ClientSalt: ", clientSalt);
+
+			if (!ComputeSalt("opcua-server", &serverNonce, &clientNonce, &serverSalt))
+			{
+				throw gcnew ArgumentException("computeSalt(serverSalt)");
+			}
+
+			PrintHexString("SSL: ServerSalt: ", serverSalt);
+
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &serverSalt, &localClientSecret))
+			{
+				throw gcnew ArgumentException("computeSecret(clientSecret)");
 			}
 
 			PrintHexString("SSL: ClientSecret: ", localClientSecret);
 
-			PrintHexString("SSL: SERVER SECRET HMAC KEY: ", clientEphemeralPublicKey);
-
-			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &clientEphemeralPublicKey, &localServerSecret))
+			if (!ComputeSecret(&clientEphemeralPublicKey, &m_p->EphemeralPrivateKey, &clientSalt, &localServerSecret))
 			{
 				throw gcnew ArgumentException("computeSecret");
 			}
 
 			PrintHexString("SSL: ServerSecret: ", localServerSecret);
 
-			if (!DeriveKeys(&localServerSecret, &localClientSecret, 80, &derivedKeys))
+			Console::WriteLine("==== SSL Derived Keys ====");
+
+			if (!DeriveKeys(&localServerSecret, &serverSalt, 80, &derivedKeys))
 			{
 				throw gcnew ArgumentException("deriveKeys");
 			}
 
-			Console::WriteLine("==== SSL Derived Keys ====");
 			PrintHexString("SSL: ServerSigningKey: ", derivedKeys, 0, 32);
 			PrintHexString("SSL: ServerEncryptingKey: ", derivedKeys, 32, 32);
 			PrintHexString("SSL: ServerInitializationVector: ", derivedKeys, 64, 16);
 
 			delete [] derivedKeys.Data;
 
-			if (!DeriveKeys(&localClientSecret, &localServerSecret, 80, &derivedKeys))
+			if (!DeriveKeys(&localClientSecret, &clientSalt, 80, &derivedKeys))
 			{
 				throw gcnew ArgumentException("deriveKeys");
 			}
