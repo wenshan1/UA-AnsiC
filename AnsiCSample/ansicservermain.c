@@ -27,6 +27,14 @@
  * http://opcfoundation.org/License/MIT/1.00/
  * ======================================================================*/
 
+/* Copyright (c) 2018 Wind River Systems, Inc. */
+
+/*
+modification history
+--------------------
+27jul18,lan  port to vxWorks.
+*/
+ 
 /*********************************************************************************************/
 /*****************     A simple UA test server based on the Ansi C Stack     *****************/
 /*********************************************************************************************/
@@ -250,7 +258,7 @@ OpcUa_ServiceType*  UaTestServer_SupportedServices[] =
 /***********************               Internal Helpers               ************************/
 /*********************************************************************************************/
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__VXWORKS__)
 #include <sys/select.h>
 int _kbhit(void)
 {
@@ -1523,7 +1531,12 @@ OpcUa_StatusCode fill_server_variable(OpcUa_ApplicationDescription* p_Server)
 /*===========================================================================================*/
 /** @brief Main entry function.                                                              */
 /*===========================================================================================*/
+
+#ifdef _WRS_KERNEL
+int ansicserver_main(void)
+#else
 int main(void)
+#endif
   {
 	OpcUa_StatusCode    uStatus					= OpcUa_Good;
 
@@ -1538,8 +1551,11 @@ int main(void)
 	dummy_CreateSubscription.ResponseType       = &OpcUa_CreateSubscriptionResponse_EncodeableType;
 
     printf("Warning: The sample server is intended to show how to use the ANSI C stack and is has not gone through any sort of quality assurance process. Therefore, it cannot be used in any production system.\n");
+	
+#ifndef _WRS_KERNEL
     printf("Press enter to proceed or CTRL-C to exit now!\n");
     getchar();
+#endif
 	
 	
     /* Initialize Stack */
